@@ -1,0 +1,35 @@
+{
+    "name": "larasell-dev/admin",
+    "description": "Admin panel for Larasell",
+    "type": "library",
+    "license": "proprietary",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Nils Haberkamp",
+            "email": "nils@larasell.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "inertiajs/inertia-laravel": "^3.0",
+        "larasell-dev/larasell": "^1.18",
+        "laravel/framework": "^13.23"
+    },
+    "autoload": {
+        "psr-4": {
+            "Larasell\\Admin\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Larasell\\Admin\\AdminServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "sort-packages": true
+    }
+}
