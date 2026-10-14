@@ -2,7 +2,7 @@
 
 namespace Larasell\Admin\ValueObjects;
 
-use InvalidArgumentException;
+use Larasell\Admin\Exceptions\InvalidNavigationItem;
 
 class NavigationItem
 {
@@ -11,11 +11,11 @@ class NavigationItem
         public string $route,
     ) {
         if (trim($label) === '') {
-            throw new InvalidArgumentException('Navigation item label cannot be empty.');
+            throw InvalidNavigationItem::emptyLabel();
         }
 
         if (trim($route) === '') {
-            throw new InvalidArgumentException("Navigation item [{$label}] route cannot be empty.");
+            throw InvalidNavigationItem::emptyRoute($label);
         }
     }
 

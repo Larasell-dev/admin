@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Larasell\Admin\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\ValueObjects\NavigationItem;
 
 beforeEach(function () {
@@ -27,8 +28,8 @@ it('converts a navigation item to an array with the resolved url', function () {
 
 it('throws an exception when the label is empty', function () {
     new NavigationItem('  ', 'larasell.admin.home');
-})->throws(InvalidArgumentException::class, 'Navigation item label cannot be empty.');
+})->throws(InvalidNavigationItem::class, 'Navigation item label cannot be empty.');
 
 it('throws an exception when the route is empty', function () {
     new NavigationItem('Home', '');
-})->throws(InvalidArgumentException::class, 'Navigation item [Home] route cannot be empty.');
+})->throws(InvalidNavigationItem::class, 'Navigation item [Home] route cannot be empty.');
