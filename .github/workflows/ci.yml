@@ -6,6 +6,25 @@ on:
       - main
 
 jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: Run PHPStan
+        run: composer phpstan
+
   pint:
     runs-on: ubuntu-latest
     steps:
