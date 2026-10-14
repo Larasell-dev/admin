@@ -21,6 +21,11 @@
             "Larasell\\Admin\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Larasell\\Admin\\Tests\\": "tests"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -30,6 +35,9 @@
     },
     "minimum-stability": "stable",
     "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
         "sort-packages": true,
         "platform": {
             "php": "8.3"
@@ -38,11 +46,14 @@
     "require-dev": {
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.32",
-        "orchestra/testbench": "^11.0"
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^4.7",
+        "pestphp/pest-plugin-laravel": "^4.1"
     },
     "scripts": {
         "lint": "vendor/bin/pint",
         "lint:check": "vendor/bin/pint --test",
-        "phpstan": "phpstan analyse"
+        "phpstan": "phpstan analyse",
+        "test": "vendor/bin/pest"
     }
 }
