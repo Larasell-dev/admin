@@ -7,7 +7,7 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
-use Larasell\Admin\Navigation\NavigationItem;
+use Larasell\Admin\ValueObjects\NavigationItem;
 
 class AdminPanel
 {
