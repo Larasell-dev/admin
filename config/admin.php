@@ -6,6 +6,4 @@ return [
 
     'guard' => 'larasell-admin',
 
-    'home' => 'larasell.admin.home',
-
 ];

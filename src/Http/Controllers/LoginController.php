@@ -30,6 +30,6 @@ class LoginController
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route(config('larasell-admin.home')));
+        return redirect()->intended(route('larasell.admin.home'));
     }
 }

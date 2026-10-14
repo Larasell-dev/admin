@@ -12,7 +12,7 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::guard(config('larasell-admin.guard'))->check()) {
-            return redirect()->route(config('larasell-admin.home'));
+            return redirect()->route('larasell.admin.home');
         }
 
         return $next($request);
