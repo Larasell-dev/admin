@@ -20,9 +20,7 @@ class LoginController
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        $guard = config('larasell-admin.guard');
-
-        if (! Auth::guard($guard)->attempt($request->safe()->only(['email', 'password']))) {
+        if (! Auth::guard('larasell-admin')->attempt($request->safe()->only(['email', 'password']))) {
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);

@@ -63,15 +63,12 @@ class AdminServiceProvider extends ServiceProvider
 
     private function configureAuth(): void
     {
-        $guard = config('larasell-admin.guard');
-        $provider = $guard.'-users';
-
         config([
-            "auth.guards.{$guard}" => [
+            'auth.guards.larasell-admin' => [
                 'driver' => 'session',
-                'provider' => $provider,
+                'provider' => 'larasell-admin-users',
             ],
-            "auth.providers.{$provider}" => [
+            'auth.providers.larasell-admin-users' => [
                 'driver' => 'eloquent',
                 'model' => Admin::class,
             ],

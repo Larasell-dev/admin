@@ -10,7 +10,7 @@ class LogoutController
 {
     public function __invoke(Request $request): RedirectResponse
     {
-        Auth::guard(config('larasell-admin.guard'))->logout();
+        Auth::guard('larasell-admin')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

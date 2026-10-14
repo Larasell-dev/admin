@@ -10,7 +10,7 @@ class HomeController
 {
     public function __invoke(Request $request): Response
     {
-        $admin = $request->user(config('larasell-admin.guard'));
+        $admin = $request->user('larasell-admin');
 
         return Inertia::render('Home', [
             'admin' => [

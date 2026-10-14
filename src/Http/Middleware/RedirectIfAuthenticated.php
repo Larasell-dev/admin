@@ -11,7 +11,7 @@ class RedirectIfAuthenticated
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard(config('larasell-admin.guard'))->check()) {
+        if (Auth::guard('larasell-admin')->check()) {
             return redirect()->route('larasell.admin.home');
         }
 
