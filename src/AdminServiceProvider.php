@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
-use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
 
@@ -30,8 +29,6 @@ class AdminServiceProvider extends ServiceProvider
             ->prefix(config('larasell-admin.path'))
             ->name('larasell.admin.')
             ->group(__DIR__.'/../routes/web.php');
-
-        Navigation::add('Home', 'home');
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));
 
