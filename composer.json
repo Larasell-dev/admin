@@ -31,5 +31,12 @@
     "minimum-stability": "stable",
     "config": {
         "sort-packages": true
+    },
+    "require-dev": {
+        "laravel/pint": "^1.32"
+    },
+    "scripts": {
+        "lint": "vendor/bin/pint",
+        "lint:check": "vendor/bin/pint --test"
     }
 }
