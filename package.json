@@ -4,7 +4,8 @@
     "scripts": {
         "commitlint": "commitlint --from=HEAD~1 --to=HEAD",
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@inertiajs/react": "^3.0.0",
