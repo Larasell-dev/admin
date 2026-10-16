@@ -1,0 +1,70 @@
+name: release-please
+
+# Built admin assets are not committed to main. release-please tags the release
+# on main as admin-v<version>, which Composer ignores. The assets job then
+# builds the assets, commits them on top of that release commit, and tags it as
+# v<version>, so Composer installs a package that ships its JavaScript, CSS,
+# and fonts. release-please needs its own tag on main to find the last release.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  assets:
+    name: Tag release with built assets
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out release
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build admin assets
+        run: npm run build
+
+      - name: Commit assets and tag the Composer release
+        env:
+          TAG: v${{ needs.release-please.outputs.version }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --force public/vendor/larasell-admin
+          git commit --message "chore(release): $TAG"
+          git tag "$TAG"
+          git push origin "refs/tags/$TAG"
