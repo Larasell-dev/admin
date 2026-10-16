@@ -23,7 +23,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Larasell\\Admin\\Tests\\": "tests"
+            "Larasell\\Admin\\Tests\\": "tests",
+            "Workbench\\App\\": "workbench/app/"
         }
     },
     "extra": {

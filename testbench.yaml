@@ -1,0 +1,16 @@
+# Local playground for the admin panel: `vendor/bin/testbench serve`.
+providers:
+  - Workbench\App\Providers\WorkbenchServiceProvider
+  - Larasell\Admin\AdminServiceProvider
+  - Inertia\ServiceProvider
+
+env:
+  # Development-only key for the local Testbench app.
+  - APP_KEY=base64:mJ4Ue1jHG1x9tC0e3Dk0bS0xq5bS2kq8rXH3qXyq4yU=
+  - APP_DEBUG=true
+  - DB_CONNECTION=sqlite
+  - SESSION_DRIVER=file
+  - CACHE_STORE=file
+
+workbench:
+  install: false
