@@ -5,6 +5,7 @@ use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
+use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 
@@ -15,6 +16,8 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('logout', LogoutController::class)->name('logout');
 });
 
