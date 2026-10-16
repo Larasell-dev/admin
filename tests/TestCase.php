@@ -37,6 +37,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getEnvironmentSetUp($app)
     {
         config([
+            'cache.default' => 'array',
             'database.default' => 'testing',
             'database.connections.testing' => [
                 'driver' => 'sqlite',
