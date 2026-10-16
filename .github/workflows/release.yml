@@ -1,0 +1,63 @@
+name: Release
+
+# Built admin assets are not committed to main. A release builds them and
+# commits them on top of main in a commit that only the release tag points
+# to, so Composer installs a package that ships its JavaScript, CSS, and fonts.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Determine version
+        id: version
+        run: |
+          tag="v$(jq -r .version composer.json)"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+            echo "::error::Tag $tag already exists. Bump the version in composer.json first."
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build admin assets
+        run: npm run build
+
+      - name: Commit assets and tag the release
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --force public/vendor/larasell-admin
+          git commit --message "chore(release): $TAG"
+          git tag "$TAG"
+          git push origin "refs/tags/$TAG"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: gh release create "$TAG" --title "$TAG" --generate-notes --verify-tag
