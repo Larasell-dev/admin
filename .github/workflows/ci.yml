@@ -9,6 +9,31 @@ permissions:
   contents: read
 
 jobs:
+  no-built-assets:
+    name: No built assets
+    # Built assets are only committed by release-please in release pull requests.
+    if: ${{ !startsWith(github.head_ref, 'release-please--') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Fail if built assets changed
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          files=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- public/vendor/larasell-admin)
+
+          if [ -n "$files" ]; then
+            echo "::error::Built assets are committed by release pull requests only. Remove these files from this pull request:"
+            echo "$files"
+            exit 1
+          fi
+
   commitlint:
     name: Commitlint
     runs-on: ubuntu-latest
