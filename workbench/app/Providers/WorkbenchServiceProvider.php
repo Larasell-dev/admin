@@ -14,6 +14,10 @@ class WorkbenchServiceProvider extends ServiceProvider
         // makes generated asset URLs use https instead of being blocked as mixed content.
         TrustProxies::at('*');
 
+        // APP_URL is localhost, which a portal visitor's browser can't reach;
+        // a relative URL serves public uploads from whatever host the page uses.
+        config(['filesystems.disks.public.url' => '/storage']);
+
         // Portals open at the site root; send it to the panel.
         Route::redirect('/', '/'.config('larasell-admin.path'));
     }

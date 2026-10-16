@@ -9,3 +9,9 @@ export type SharedProps = {
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;
+
+export type ProfilePageProps = {
+    admin: { name: string; email: string; avatarUrl: string | null };
+    updateUrl: string;
+    avatarUploadUrl: string;
+};
