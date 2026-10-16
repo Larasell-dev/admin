@@ -27,7 +27,7 @@ export default function Login({ loginUrl }: { loginUrl: string }) {
                                         </Field>
                                     </Stack>
 
-                                    <Button type="submit" disabled={processing}>
+                                    <Button type="submit" loading={processing} DANGEROUS_className="w-full">
                                         Sign in
                                     </Button>
                                 </Stack>
