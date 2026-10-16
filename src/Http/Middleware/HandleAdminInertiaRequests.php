@@ -36,6 +36,7 @@ class HandleAdminInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'navigation' => fn (): array => $panel->navigationItems(),
+            'logoutUrl' => fn (): string => route('larasell.admin.logout'),
         ];
     }
 }

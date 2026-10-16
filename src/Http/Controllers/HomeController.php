@@ -17,7 +17,6 @@ class HomeController
                 'name' => $admin->name,
                 'email' => $admin->email,
             ],
-            'logoutUrl' => route('larasell.admin.logout'),
         ]);
     }
 }
