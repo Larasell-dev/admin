@@ -3,8 +3,8 @@
 namespace Larasell\Admin\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Larasell\Admin\Http\Controllers\AvatarController;
 use Illuminate\Validation\Rule;
+use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Models\Admin;
 
 class ProfileRequest extends FormRequest
