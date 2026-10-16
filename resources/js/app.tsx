@@ -53,6 +53,9 @@ window.LarasellAdmin = {
 
                 return loader();
             },
+            progress: {
+                color: 'var(--color-progress)',
+            },
             setup({ el, App, props }) {
                 createRoot(el).render(<App {...props} />);
             },
