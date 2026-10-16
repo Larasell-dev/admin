@@ -1,14 +1,16 @@
 import '../css/app.css';
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, type ResolvedComponent } from '@inertiajs/react';
 import * as Inertia from '@inertiajs/react';
 import * as React from 'react';
 import * as JsxDevRuntime from 'react/jsx-dev-runtime';
 import * as JsxRuntime from 'react/jsx-runtime';
 import { createRoot } from 'react-dom/client';
 
-const pages = import.meta.glob('./Pages/**/*.tsx');
+type PageModule = { default: ResolvedComponent };
 
-type RegisteredPage = { default: unknown } | (() => Promise<{ default: unknown }>);
+type RegisteredPage = PageModule | (() => Promise<PageModule>);
+
+const pages = import.meta.glob<PageModule>('./Pages/**/*.tsx');
 
 declare global {
     interface Window {
@@ -42,7 +44,9 @@ window.LarasellAdmin = {
                 const page = registered[name];
 
                 if (page) {
-                    return page;
+                    const module = typeof page === 'function' ? await page() : page;
+
+                    return module.default;
                 }
 
                 const loader = pages[`./Pages/${name}.tsx`];
@@ -51,7 +55,7 @@ window.LarasellAdmin = {
                     throw new Error(`Admin page [${name}] not found.`);
                 }
 
-                return loader();
+                return (await loader()).default;
             },
             progress: {
                 color: 'var(--color-progress)',
