@@ -4,28 +4,38 @@ namespace Larasell\Admin\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Inertia\Middleware;
 use Larasell\Admin\AdminPanel;
 use Symfony\Component\HttpFoundation\Response;
 
-class HandleAdminInertiaRequests
+class HandleAdminInertiaRequests extends Middleware
 {
+    protected $rootView = 'larasell-admin::app';
+
     public function handle(Request $request, Closure $next): Response
     {
-        $panel = app(AdminPanel::class);
-
         config([
             'inertia.ssr.enabled' => false,
             'inertia.pages.paths' => [
                 ...config('inertia.pages.paths', []),
                 realpath(__DIR__.'/../../../resources/js/Pages'),
-                ...$panel->pagePaths(),
+                ...app(AdminPanel::class)->pagePaths(),
             ],
         ]);
 
-        Inertia::share('navigation', fn (): array => $panel->navigationItems());
-        Inertia::setRootView('larasell-admin::app');
+        return parent::handle($request, $next);
+    }
 
-        return $next($request);
+    /**
+     * @return array<string, mixed>
+     */
+    public function share(Request $request): array
+    {
+        $panel = app(AdminPanel::class);
+
+        return [
+            ...parent::share($request),
+            'navigation' => fn (): array => $panel->navigationItems(),
+        ];
     }
 }

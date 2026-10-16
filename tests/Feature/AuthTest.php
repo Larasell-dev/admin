@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Inertia\Testing\AssertableInertia as Assert;
 use Larasell\Admin\Models\Admin;
 
 it('logs an admin in with valid credentials', function () {
@@ -35,6 +36,11 @@ it('fails to log an admin in with invalid credentials', function () {
         ->assertSessionHasErrors('email');
 
     expect(auth('larasell-admin')->check())->toBeFalse();
+
+    $this->get('/admin/login')->assertInertia(fn (Assert $page) => $page
+        ->component('Login')
+        ->where('errors.email', __('auth.failed'))
+    );
 });
 
 it('logs an admin out', function () {
