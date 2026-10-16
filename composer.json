@@ -3,7 +3,6 @@
     "description": "Admin panel for Larasell",
     "type": "library",
     "license": "proprietary",
-    "version": "1.0.0",
     "authors": [
         {
             "name": "Nils Haberkamp",
