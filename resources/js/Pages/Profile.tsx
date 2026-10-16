@@ -5,6 +5,7 @@ import { Button, Container, Error, Field, Input, Stack } from '@larasell-dev/ui'
 import { useRef, useState } from 'react';
 import { assertDefined } from 'ts-extras';
 import SidebarLayout from '../Layouts/SidebarLayout';
+import { initials } from '../utils/initials';
 import type { Page, ProfilePageProps } from '../types';
 
 export default function Profile({ admin, updateUrl }: ProfilePageProps) {
@@ -128,13 +129,4 @@ function AvatarInput({ error }: { error?: string }) {
             {avatarError && <Error match>{avatarError}</Error>}
         </BaseField.Root>
     );
-}
-
-function initials(name: string): string {
-    return name
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase())
-        .join('');
 }

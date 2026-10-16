@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Models\Admin;
 use Symfony\Component\HttpFoundation\Response;
 
 class HandleAdminInertiaRequests extends Middleware
@@ -36,6 +37,16 @@ class HandleAdminInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'navigation' => fn (): array => $panel->navigationItems(),
+            'admin' => function () use ($request): ?array {
+                $admin = $request->user('larasell-admin');
+
+                return $admin instanceof Admin ? [
+                    'name' => $admin->name,
+                    'email' => $admin->email,
+                    'avatarUrl' => $admin->avatarUrl(),
+                ] : null;
+            },
+            'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),
         ];
     }
