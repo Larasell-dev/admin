@@ -1,8 +1,8 @@
-import { Form, Link, usePage } from '@inertiajs/react';
-import { Button } from '@larasell-dev/ui';
+import { Link, usePage } from '@inertiajs/react';
 import { arrayFirst, assertDefined } from 'ts-extras';
 import type { Page } from '../types';
 import Logo from './Logo';
+import UserMenu from './UserMenu';
 
 export default function Sidebar() {
     const { props, url } = usePage<Page>();
@@ -39,15 +39,7 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            <div className="p-6">
-                <Form action={props.logoutUrl} method="post">
-                    {({ processing }) => (
-                        <Button type="submit" variant="tertiary" fullWidth loading={processing}>
-                            Log out
-                        </Button>
-                    )}
-                </Form>
-            </div>
+            <UserMenu />
         </aside>
     );
 }
