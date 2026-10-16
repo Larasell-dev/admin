@@ -1,3 +1,4 @@
+import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import * as Inertia from '@inertiajs/react';
 import * as React from 'react';
