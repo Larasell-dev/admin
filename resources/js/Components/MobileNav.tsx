@@ -36,9 +36,10 @@ export default function MobileNav() {
             <Drawer.Portal>
                 <Drawer.Backdrop className="fixed inset-0 z-40 bg-mauve-950/40 transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
                 <Drawer.Viewport className="fixed inset-0 z-50 pointer-events-none">
+                    {/* The sidebar extends a screen width to the left, so dragging the panel right keeps its background, border and highlight. */}
                     <Drawer.Popup
                         aria-label="Navigation"
-                        className="pointer-events-auto relative h-full w-fit before:absolute before:inset-y-0 before:right-full before:w-screen before:bg-white dark:before:bg-mauve-950 translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0"
+                        className="pointer-events-auto h-full w-fit translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0 [&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_nav_a]:pl-[calc(100vw+1.5rem)]"
                     >
                         <Sidebar />
                     </Drawer.Popup>
