@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         @php($panelVite = \Larasell\Admin\AdminPanel::resolve()->panelVite())
+        {{ $panelVite->fonts() }}
         {{ $panelVite->reactRefresh() }}
         {{ $panelVite('resources/js/app.tsx') }}
 
