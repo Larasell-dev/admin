@@ -1,33 +1,19 @@
-import { Form, Link, usePage } from '@inertiajs/react';
+import { Container, Stack } from '@larasell-dev/ui';
+import SidebarLayout from '../Layouts/SidebarLayout';
 
-export default function Home({
-    admin,
-    logoutUrl,
-}: {
-    admin: { name: string; email: string };
-    logoutUrl: string;
-}) {
-    const { navigation } = usePage<{
-        navigation: { label: string; url: string }[];
-    }>().props;
-
+export default function Home({ admin }: { admin: { name: string; email: string } }) {
     return (
-        <main>
-            <h1>Admin</h1>
-            <nav>
-                {navigation.map((item) => (
-                    <Link key={item.url} href={item.url}>
-                        {item.label}
-                    </Link>
-                ))}
-            </nav>
-            <p>
-                {admin.name} ({admin.email})
-            </p>
-
-            <Form action={logoutUrl} method="post">
-                <button type="submit">Log out</button>
-            </Form>
-        </main>
+        <Container>
+            <div className="py-10">
+                <Stack spacing={2}>
+                    <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">Dashboard</h1>
+                    <p className="type-body-md text-mauve-600 dark:text-mauve-400">
+                        {admin.name} ({admin.email})
+                    </p>
+                </Stack>
+            </div>
+        </Container>
     );
 }
+
+Home.layout = [SidebarLayout];
