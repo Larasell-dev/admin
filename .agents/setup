@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Amp orb setup: installs the PHP 8.3 toolchain and all project dependencies.
+# Safe to run repeatedly; a warm run skips package downloads and reinstalls.
+set -euo pipefail
+
+step() {
+    echo "==> [setup] $(date -u +%H:%M:%S) $*"
+}
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Root installs system packages; dependency managers must run as the "user"
+# account so vendor/, node_modules/ and their caches stay writable by Amp.
+if [ "$(id -u)" -eq 0 ]; then
+    run_user() {
+        sudo -u user -H bash -c "cd '$repo_root' && $*"
+    }
+else
+    run_user() {
+        "$@"
+    }
+fi
+
+# --- PHP 8.3 (Sury repository, Debian's default is 8.2) ---
+PHP_PACKAGES=(
+    php8.3-cli
+    php8.3-mbstring
+    php8.3-xml
+    php8.3-curl
+    php8.3-sqlite3
+    php8.3-zip
+    php8.3-intl
+    php8.3-bcmath
+)
+
+missing_php_packages=()
+for package in "${PHP_PACKAGES[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed'; then
+        missing_php_packages+=("$package")
+    fi
+done
+
+if [ "${#missing_php_packages[@]}" -gt 0 ]; then
+    step "Installing PHP 8.3 packages: ${missing_php_packages[*]}"
+    apt-get update -qq
+    apt-get install -y -qq ca-certificates curl gnupg2 >/dev/null
+    install -d /usr/share/keyrings
+    curl -fsSL https://packages.sury.org/php/apt.gpg -o /usr/share/keyrings/sury-php.gpg
+    echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php bookworm main" \
+        > /etc/apt/sources.list.d/sury-php.list
+    apt-get update -qq
+    apt-get install -y -qq "${missing_php_packages[@]}" >/dev/null
+else
+    step "PHP 8.3 packages already installed"
+fi
+
+# --- Composer ---
+if ! command -v composer >/dev/null 2>&1; then
+    step "Installing Composer"
+    curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o /usr/local/bin/composer
+    chmod +x /usr/local/bin/composer
+else
+    step "Composer already installed: $(composer --version 2>/dev/null | head -1)"
+fi
+
+# --- PHP dependencies ---
+step "Installing PHP dependencies"
+run_user composer install --no-interaction --no-progress
+
+# --- Node dependencies ---
+# npm ci is deterministic, keeps package-lock.json untouched (npm install
+# would rewrite it), and uses the npm cache on warm runs.
+step "Installing Node dependencies"
+run_user npm ci --no-audit --no-fund --loglevel=error
+
+step "Setup complete"
