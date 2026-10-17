@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.4](https://github.com/Larasell-dev/admin/compare/v0.1.3...v0.1.4) (2026-10-17)
+
+
+### Features
+
+* add positioning api to the navigation facade ([#33](https://github.com/Larasell-dev/admin/issues/33)) ([41b3d24](https://github.com/Larasell-dev/admin/commit/41b3d24c8adce458ae0adee8777ba5f9253275ba))
+
+
+### Bug Fixes
+
+* keep the mobile nav padding constant across breakpoints ([#31](https://github.com/Larasell-dev/admin/issues/31)) ([5065760](https://github.com/Larasell-dev/admin/commit/5065760d0284e3299efd9cce9b261361324d250c))
+
+
+### Miscellaneous Chores
+
+* update @larasell-dev/ui to 0.1.9 ([#34](https://github.com/Larasell-dev/admin/issues/34)) ([cdde471](https://github.com/Larasell-dev/admin/commit/cdde471bf29a91807830b35442c4aba8f0b11236))
+
 ## [0.1.3](https://github.com/Larasell-dev/admin/compare/v0.1.2...v0.1.3) (2026-10-17)
 
 
