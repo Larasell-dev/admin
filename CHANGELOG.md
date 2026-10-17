@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.2](https://github.com/Larasell-dev/admin/compare/v0.1.1...v0.1.2) (2026-10-17)
+
+
+### Features
+
+* expose @larasell-dev/ui for external admin pages ([#26](https://github.com/Larasell-dev/admin/issues/26)) ([61d537f](https://github.com/Larasell-dev/admin/commit/61d537fbcbf32e9fc53193be5f48b74eec882b70))
+
+
+### Bug Fixes
+
+* match the sidebar footer height to the table pagination ([#27](https://github.com/Larasell-dev/admin/issues/27)) ([58fb5f9](https://github.com/Larasell-dev/admin/commit/58fb5f935047860795421683136f47b931a15300))
+
 ## [0.1.1](https://github.com/Larasell-dev/admin/compare/v0.1.0...v0.1.1) (2026-10-17)
 
 
