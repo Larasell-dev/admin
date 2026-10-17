@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\ValueObjects;
 
+use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 
@@ -17,13 +18,15 @@ class NavigationItem
 
     public ?string $after = null;
 
+    public NavIcon $icon;
+
     /**
-     * @param  string  $icon  Remix icon name without the -line or -fill suffix, e.g. "home"; the sidebar renders its filled variant.
+     * @param  NavIcon|string  $icon  A NavIcon case or its Remix icon name, e.g. "home"; the sidebar renders it filled when active, line otherwise.
      */
     public function __construct(
         public string $label,
         public string $route,
-        public string $icon,
+        NavIcon|string $icon,
     ) {
         if (trim($label) === '') {
             throw InvalidNavigationItem::emptyLabel();
@@ -32,6 +35,8 @@ class NavigationItem
         if (trim($route) === '') {
             throw InvalidNavigationItem::emptyRoute($label);
         }
+
+        $this->icon = $icon instanceof NavIcon ? $icon : $this->resolveIcon($icon);
     }
 
     public function id(): string
@@ -80,6 +85,8 @@ class NavigationItem
     }
 
     /**
+     * The icon is sent as its case name, which @larasell-dev/ui/icons exports with a Fill or Line suffix.
+     *
      * @return array{id: string, label: string, url: string, icon: string}
      */
     public function toArray(): array
@@ -88,8 +95,22 @@ class NavigationItem
             'id' => $this->id(),
             'label' => $this->label,
             'url' => route($this->route),
-            'icon' => $this->icon,
+            'icon' => $this->icon->name,
         ];
+    }
+
+    protected function resolveIcon(string $icon): NavIcon
+    {
+        if (trim($icon) === '') {
+            throw InvalidNavigationItem::emptyIcon($this->id());
+        }
+
+        // Checked before the lookup: "home-line" is not a case either, but this error says how to fix it.
+        if (str_ends_with($icon, '-line') || str_ends_with($icon, '-fill')) {
+            throw InvalidNavigationItem::iconStyleVariant($this->id(), $icon);
+        }
+
+        return NavIcon::tryFrom($icon) ?? throw InvalidNavigationItem::unknownIcon($this->id(), $icon);
     }
 
     protected function resolveTarget(NavItem|string $target): string

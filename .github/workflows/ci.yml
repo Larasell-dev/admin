@@ -78,6 +78,11 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      - name: NavIcon matches the installed icon set
+        run: |
+          npm run generate:nav-icons
+          git diff --exit-code src/Enums/NavIcon.php
+
       - name: Build
         run: npm run build
 

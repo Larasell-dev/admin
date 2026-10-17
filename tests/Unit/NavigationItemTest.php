@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\ValueObjects\NavigationItem;
 
@@ -11,23 +12,46 @@ beforeEach(function () {
 });
 
 it('constructs a navigation item', function () {
-    $item = new NavigationItem('Home', 'larasell.admin.home', 'dashboard');
+    $item = new NavigationItem('Home', 'larasell.admin.home', NavIcon::Dashboard);
 
     expect($item->label)->toBe('Home')
         ->and($item->route)->toBe('larasell.admin.home')
-        ->and($item->icon)->toBe('dashboard');
+        ->and($item->icon)->toBe(NavIcon::Dashboard);
 });
 
+it('resolves an icon passed as its Remix name', function (string $name, string $case) {
+    $item = new NavigationItem('Home', 'larasell.admin.home', $name);
+
+    expect($item->icon)->toBe(constant(NavIcon::class.'::'.$case));
+})->with([
+    'single word' => ['dashboard', 'Dashboard'],
+    'with a number' => ['file-list-3', 'FileList3'],
+    'leading digit' => ['24-hours', 'TwentyFourHours'],
+    'one style only' => ['kanban-view', 'KanbanView'],
+]);
+
 it('converts a navigation item to an array with the resolved url and icon', function () {
-    $item = new NavigationItem('Home', 'larasell.admin.home', 'dashboard');
+    $item = new NavigationItem('Home', 'larasell.admin.home', '24-hours');
 
     expect($item->toArray())->toBe([
         'id' => 'larasell.admin.home',
         'label' => 'Home',
         'url' => route('larasell.admin.home'),
-        'icon' => 'dashboard',
+        'icon' => 'TwentyFourHours',
     ]);
 });
+
+it('throws when the icon is empty', function () {
+    new NavigationItem('Home', 'larasell.admin.home', ' ');
+})->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] icon cannot be empty.');
+
+it('throws when the icon names a style variant', function (string $icon) {
+    new NavigationItem('Home', 'larasell.admin.home', $icon);
+})->with(['home-line', 'home-fill'])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] icon must not end in -line or -fill.');
+
+it('throws when the icon is not a Remix icon', function (string $icon) {
+    new NavigationItem('Home', 'larasell.admin.home', $icon);
+})->with(['not-an-icon', 'Home', 'HomeFill'])->throws(InvalidNavigationItem::class, 'is not a Remix icon');
 
 it('throws an exception when the label is empty', function () {
     new NavigationItem('  ', 'larasell.admin.home', 'home');

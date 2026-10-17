@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Http\Controllers\HomeController;
@@ -23,4 +24,4 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('logout', LogoutController::class)->name('logout');
 });
 
-Navigation::add('Home', 'home', icon: 'home');
+Navigation::add('Home', 'home', icon: NavIcon::Home);

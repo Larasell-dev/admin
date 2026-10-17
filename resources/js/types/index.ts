@@ -2,7 +2,7 @@ export type NavigationItem = {
     id: string;
     label: string;
     url: string;
-    /** Remix icon name without the -line or -fill suffix, e.g. "home". */
+    /** NavIcon case name, e.g. "Home"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
     icon: string;
 };
 
