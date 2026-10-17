@@ -80,6 +80,6 @@ run_user npm run build --silent
 run_user touch vendor/orchestra/testbench-core/laravel/database/database.sqlite
 run_user vendor/bin/testbench migrate --force --no-interaction
 run_user vendor/bin/testbench larasell:link || true
-run_user vendor/bin/testbench larasell:create-admin --name=Admin --email=admin@example.com --password=password || true
+run_user vendor/bin/testbench larasell:create-admin --name=Admin --email=admin@example.com --password=Password-123! || true
 
 step "Setup complete"
