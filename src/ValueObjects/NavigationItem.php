@@ -2,10 +2,21 @@
 
 namespace Larasell\Admin\ValueObjects;
 
+use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 
 class NavigationItem
 {
+    public const POSITION_MIN = 0;
+
+    public const POSITION_MAX = 1_000_000;
+
+    public ?int $position = null;
+
+    public ?string $before = null;
+
+    public ?string $after = null;
+
     public function __construct(
         public string $label,
         public string $route,
@@ -19,14 +30,80 @@ class NavigationItem
         }
     }
 
+    public function id(): string
+    {
+        return $this->route;
+    }
+
+    public function position(int $position): static
+    {
+        $this->assertUnplaced();
+
+        if ($position < self::POSITION_MIN || $position > self::POSITION_MAX) {
+            throw InvalidNavigationItem::positionOutOfRange($this->id(), $position, self::POSITION_MIN, self::POSITION_MAX);
+        }
+
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function before(NavItem|string $target): static
+    {
+        $this->before = $this->resolveTarget($target);
+
+        return $this;
+    }
+
+    public function after(NavItem|string $target): static
+    {
+        $this->after = $this->resolveTarget($target);
+
+        return $this;
+    }
+
     /**
-     * @return array{label: string, url: string}
+     * The id this item is placed before or after, if it is placed relatively.
+     */
+    public function relativeTarget(): ?string
+    {
+        return $this->before ?? $this->after;
+    }
+
+    public function isPlaced(): bool
+    {
+        return $this->position !== null || $this->before !== null || $this->after !== null;
+    }
+
+    /**
+     * @return array{id: string, label: string, url: string}
      */
     public function toArray(): array
     {
         return [
+            'id' => $this->id(),
             'label' => $this->label,
             'url' => route($this->route),
         ];
+    }
+
+    protected function resolveTarget(NavItem|string $target): string
+    {
+        $this->assertUnplaced();
+
+        $id = $target instanceof NavItem ? $target->value : $target;
+
+        if ($id === $this->id()) {
+            throw InvalidNavigationItem::selfTarget($this->id());
+        }
+
+        return $id;
+    }
+
+    protected function assertUnplaced(): void
+    {
+        if ($this->isPlaced()) {
+            throw InvalidNavigationItem::alreadyPlaced($this->id());
+        }
     }
 }

@@ -1,4 +1,5 @@
 export type NavigationItem = {
+    id: string;
     label: string;
     url: string;
 };

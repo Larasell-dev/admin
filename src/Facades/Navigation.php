@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Larasell\Admin\AdminPanel;
 
 /**
- * @method static void add(string $label, string $route)
+ * @method static \Larasell\Admin\ValueObjects\NavigationItem add(string $label, string $route)
  */
 class Navigation extends Facade
 {
