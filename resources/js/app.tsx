@@ -1,6 +1,7 @@
 import '../css/app.css';
 import { createInertiaApp, type ResolvedComponent } from '@inertiajs/react';
 import * as Inertia from '@inertiajs/react';
+import * as UI from '@larasell-dev/ui';
 import * as React from 'react';
 import * as JsxDevRuntime from 'react/jsx-dev-runtime';
 import * as JsxRuntime from 'react/jsx-runtime';
@@ -20,6 +21,7 @@ declare global {
             JsxRuntime: typeof JsxRuntime;
             JsxDevRuntime: typeof JsxDevRuntime;
             Inertia: typeof Inertia;
+            UI: typeof UI;
             Layouts: {
                 SidebarLayout: typeof SidebarLayout;
             };
@@ -37,6 +39,7 @@ window.LarasellAdmin = {
     JsxRuntime,
     JsxDevRuntime,
     Inertia,
+    UI,
     Layouts: {
         SidebarLayout,
     },
