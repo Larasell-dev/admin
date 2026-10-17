@@ -17,9 +17,13 @@ class NavigationItem
 
     public ?string $after = null;
 
+    /**
+     * @param  string  $icon  Remix icon name without the -line or -fill suffix, e.g. "home"; the sidebar renders its filled variant.
+     */
     public function __construct(
         public string $label,
         public string $route,
+        public string $icon,
     ) {
         if (trim($label) === '') {
             throw InvalidNavigationItem::emptyLabel();
@@ -76,7 +80,7 @@ class NavigationItem
     }
 
     /**
-     * @return array{id: string, label: string, url: string}
+     * @return array{id: string, label: string, url: string, icon: string}
      */
     public function toArray(): array
     {
@@ -84,6 +88,7 @@ class NavigationItem
             'id' => $this->id(),
             'label' => $this->label,
             'url' => route($this->route),
+            'icon' => $this->icon,
         ];
     }
 

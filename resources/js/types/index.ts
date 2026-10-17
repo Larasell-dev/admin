@@ -2,6 +2,8 @@ export type NavigationItem = {
     id: string;
     label: string;
     url: string;
+    /** Remix icon name without the -line or -fill suffix, e.g. "home". */
+    icon: string;
 };
 
 export type AdminSummary = { name: string; email: string; avatarUrl: string | null };

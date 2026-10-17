@@ -23,4 +23,4 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('logout', LogoutController::class)->name('logout');
 });
 
-Navigation::add('Home', 'home');
+Navigation::add('Home', 'home', icon: 'home');
