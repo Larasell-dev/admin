@@ -5,6 +5,7 @@ namespace Larasell\Admin;
 use Closure;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Route;
+use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
@@ -38,7 +39,7 @@ class AdminPanel
         return app(self::class);
     }
 
-    public function add(string $label, string $route): NavigationItem
+    public function add(string $label, string $route, NavIcon|string $icon): NavigationItem
     {
         if (! str_contains($route, '.')) {
             $route = 'larasell.admin.'.$route;
@@ -52,11 +53,11 @@ class AdminPanel
 
         self::assert(count($this->navigation) < self::NAVIGATION_MAX, 'Too many navigation items.');
 
-        return $this->navigation[] = new NavigationItem($label, $route);
+        return $this->navigation[] = new NavigationItem($label, $route, $icon);
     }
 
     /**
-     * @return list<array{id: string, label: string, url: string}>
+     * @return list<array{id: string, label: string, url: string, icon: string}>
      */
     public function navigationItems(): array
     {

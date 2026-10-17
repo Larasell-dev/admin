@@ -2,6 +2,8 @@ export type NavigationItem = {
     id: string;
     label: string;
     url: string;
+    /** NavIcon case name, e.g. "Home"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
+    icon: string;
 };
 
 export type AdminSummary = { name: string; email: string; avatarUrl: string | null };

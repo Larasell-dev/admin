@@ -1,6 +1,8 @@
 import { Link, usePage } from '@inertiajs/react';
+import { Icon } from '@larasell-dev/ui';
 import { arrayFirst, assertDefined } from 'ts-extras';
 import type { Page } from '../types';
+import { navigationIcon } from '../utils/navigationIcon';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
 
@@ -27,12 +29,15 @@ export default function Sidebar() {
                             key={item.url}
                             href={item.url}
                             aria-current={active ? 'page' : undefined}
-                            className={`type-body-md px-6 py-2 outline-none focus-visible:focus-ring focus-visible:-outline-offset-2 ${
+                            className={`type-body-md flex items-center gap-3 px-6 py-2 outline-none focus-visible:focus-ring focus-visible:-outline-offset-2 ${
                                 active
                                     ? 'bg-mauve-100 text-mauve-950 dark:bg-mauve-900 dark:text-mauve-50'
                                     : 'text-mauve-600 hover:bg-mauve-50 hover:text-mauve-950 dark:text-mauve-400 dark:hover:bg-mauve-900 dark:hover:text-mauve-50'
                             }`}
                         >
+                            <span className="flex text-base">
+                                <Icon icon={navigationIcon(item.icon, active)} />
+                            </span>
                             {item.label}
                         </Link>
                     );

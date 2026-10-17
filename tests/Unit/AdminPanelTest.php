@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 
@@ -21,12 +22,12 @@ it('resolves the singleton instance from the container', function () {
 it('registers navigation items and prefixes short route names', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'home');
-    $panel->add('Settings', 'larasell.admin.settings');
+    $panel->add('Home', 'home', NavIcon::Home);
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3');
 
     expect($panel->navigationItems())->toBe([
-        ['id' => 'larasell.admin.home', 'label' => 'Home', 'url' => route('larasell.admin.home')],
-        ['id' => 'larasell.admin.settings', 'label' => 'Settings', 'url' => route('larasell.admin.settings')],
+        ['id' => 'larasell.admin.home', 'label' => 'Home', 'url' => route('larasell.admin.home'), 'icon' => 'Home'],
+        ['id' => 'larasell.admin.settings', 'label' => 'Settings', 'url' => route('larasell.admin.settings'), 'icon' => 'Settings3'],
     ]);
 });
 
@@ -43,8 +44,8 @@ it('registers scripts and page paths', function () {
 it('appends navigation items in registration order by default', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Settings', 'larasell.admin.settings');
-    $panel->add('Home', 'larasell.admin.home');
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3');
+    $panel->add('Home', 'larasell.admin.home', 'home');
 
     expect(labels($panel))->toBe(['Settings', 'Home']);
 });
@@ -52,9 +53,9 @@ it('appends navigation items in registration order by default', function () {
 it('sorts navigation items by position in ascending order', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'larasell.admin.home')->position(500);
-    $panel->add('Settings', 'larasell.admin.settings')->position(100);
-    $panel->add('Notes', 'larasell.admin.notes')->position(300);
+    $panel->add('Home', 'larasell.admin.home', 'home')->position(500);
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3')->position(100);
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note')->position(300);
 
     expect(labels($panel))->toBe(['Settings', 'Notes', 'Home']);
 });
@@ -62,9 +63,9 @@ it('sorts navigation items by position in ascending order', function () {
 it('puts unpositioned items below positioned ones', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Notes', 'larasell.admin.notes');
-    $panel->add('Home', 'larasell.admin.home')->position(900);
-    $panel->add('Settings', 'larasell.admin.settings');
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note');
+    $panel->add('Home', 'larasell.admin.home', 'home')->position(900);
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3');
 
     expect(labels($panel))->toBe(['Home', 'Notes', 'Settings']);
 });
@@ -72,9 +73,9 @@ it('puts unpositioned items below positioned ones', function () {
 it('sorts items with the same position alphabetically by label', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Settings', 'larasell.admin.settings')->position(100);
-    $panel->add('Notes', 'larasell.admin.notes')->position(100);
-    $panel->add('Home', 'larasell.admin.home')->position(100);
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3')->position(100);
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note')->position(100);
+    $panel->add('Home', 'larasell.admin.home', 'home')->position(100);
 
     expect(labels($panel))->toBe(['Home', 'Notes', 'Settings']);
 });
@@ -82,9 +83,9 @@ it('sorts items with the same position alphabetically by label', function () {
 it('places a navigation item before another item by id', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'larasell.admin.home');
-    $panel->add('Settings', 'larasell.admin.settings');
-    $panel->add('Notes', 'larasell.admin.notes')->before('larasell.admin.settings');
+    $panel->add('Home', 'larasell.admin.home', 'home');
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3');
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note')->before('larasell.admin.settings');
 
     expect(labels($panel))->toBe(['Home', 'Notes', 'Settings']);
 });
@@ -92,9 +93,9 @@ it('places a navigation item before another item by id', function () {
 it('places a navigation item after another item by enum case', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'larasell.admin.home');
-    $panel->add('Settings', 'larasell.admin.settings');
-    $panel->add('Notes', 'larasell.admin.notes')->after(NavItem::Home);
+    $panel->add('Home', 'larasell.admin.home', 'home');
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3');
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note')->after(NavItem::Home);
 
     expect(labels($panel))->toBe(['Home', 'Notes', 'Settings']);
 });
@@ -102,9 +103,9 @@ it('places a navigation item after another item by enum case', function () {
 it('resolves targets registered after the item that refers to them', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Notes', 'larasell.admin.notes')->after('larasell.admin.settings');
-    $panel->add('Settings', 'larasell.admin.settings')->after('larasell.admin.home');
-    $panel->add('Home', 'larasell.admin.home');
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note')->after('larasell.admin.settings');
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3')->after('larasell.admin.home');
+    $panel->add('Home', 'larasell.admin.home', 'home');
 
     expect(labels($panel))->toBe(['Home', 'Settings', 'Notes']);
 });
@@ -112,15 +113,15 @@ it('resolves targets registered after the item that refers to them', function ()
 it('throws when a navigation id is registered twice', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'larasell.admin.home');
-    $panel->add('Start', 'home');
+    $panel->add('Home', 'larasell.admin.home', 'home');
+    $panel->add('Start', 'home', 'home');
 })->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] is already registered.');
 
 it('throws when the relative target does not exist', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'larasell.admin.home');
-    $panel->add('Notes', 'larasell.admin.notes')->before('larasell.admin.missing');
+    $panel->add('Home', 'larasell.admin.home', 'home');
+    $panel->add('Notes', 'larasell.admin.notes', 'sticky-note')->before('larasell.admin.missing');
 
     $panel->navigationItems();
 })->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.notes] targets unknown item [larasell.admin.missing].');
@@ -128,8 +129,8 @@ it('throws when the relative target does not exist', function () {
 it('throws when relative placements form a cycle', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'larasell.admin.home')->before('larasell.admin.settings');
-    $panel->add('Settings', 'larasell.admin.settings')->before('larasell.admin.home');
+    $panel->add('Home', 'larasell.admin.home', 'home')->before('larasell.admin.settings');
+    $panel->add('Settings', 'larasell.admin.settings', 'settings-3')->before('larasell.admin.home');
 
     $panel->navigationItems();
 })->throws(InvalidNavigationItem::class, 'Navigation items [larasell.admin.home, larasell.admin.settings] form a placement cycle.');

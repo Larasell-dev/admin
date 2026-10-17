@@ -30,6 +30,36 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
         );
     }
 
+    public static function emptyIcon(string $id): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.empty-icon',
+            message: "Navigation item [{$id}] icon cannot be empty.",
+            why: "The navigation item [{$id}] was registered without an icon, but every navigation item needs one.",
+            fix: 'Pass a NavIcon case or a Remix icon name, e.g. NavIcon::Home or "home".',
+        );
+    }
+
+    public static function iconStyleVariant(string $id, string $icon): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.icon-style-variant',
+            message: "Navigation item [{$id}] icon must not end in -line or -fill.",
+            why: "The icon [{$icon}] names one style, but the sidebar picks the style itself: filled when the item is active, line otherwise.",
+            fix: 'Pass the icon name without its -line or -fill suffix, e.g. "home" instead of "home-line".',
+        );
+    }
+
+    public static function unknownIcon(string $id, string $icon): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.unknown-icon',
+            message: "Navigation item [{$id}] icon [{$icon}] is not a Remix icon.",
+            why: "No NavIcon case has the value [{$icon}], so the sidebar cannot render it.",
+            fix: 'Pass a NavIcon case, or a lowercase Remix icon name from https://remixicon.com such as "file-list-3".',
+        );
+    }
+
     public static function alreadyPlaced(string $id): static
     {
         return static::structured(
