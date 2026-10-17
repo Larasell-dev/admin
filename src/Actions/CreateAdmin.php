@@ -35,7 +35,6 @@ class CreateAdmin
             ->mixedCase()
             ->numbers()
             ->symbols()
-            // Checking against Have I Been Pwned sends a hash prefix to an external API, so only production does it.
             ->when(App::isProduction(), fn (Password $rule) => $rule->uncompromised());
     }
 }

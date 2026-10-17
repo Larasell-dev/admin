@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Larasell\Admin\Models\Admin;
 
-const STRONG_PASSWORD = 'Correct-Horse-7-Battery';
-
 /**
  * Fakes the Have I Been Pwned range API, reporting the given passwords as leaked.
  *
@@ -32,7 +30,7 @@ it('creates an admin', function () {
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
-        '--password' => STRONG_PASSWORD,
+        '--password' => 'Correct-Horse-7-Battery',
     ])
         ->expectsOutputToContain('Admin user [admin@example.com] created.')
         ->assertSuccessful();
@@ -41,7 +39,7 @@ it('creates an admin', function () {
 
     expect($admin->name)->toBe('New Admin')
         ->and($admin->email)->toBe('admin@example.com')
-        ->and(Hash::check(STRONG_PASSWORD, $admin->password))->toBeTrue();
+        ->and(Hash::check('Correct-Horse-7-Battery', $admin->password))->toBeTrue();
 });
 
 it('fails with a clear message when an admin with the email already exists', function () {
@@ -54,7 +52,7 @@ it('fails with a clear message when an admin with the email already exists', fun
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
-        '--password' => STRONG_PASSWORD,
+        '--password' => 'Correct-Horse-7-Battery',
     ])
         ->expectsOutputToContain('An admin with the email [admin@example.com] already exists.')
         ->assertFailed();
@@ -82,12 +80,12 @@ it('rejects weak passwords', function (string $password, string $error) {
 
 it('rejects compromised passwords in production', function () {
     $this->app->detectEnvironment(fn () => 'production');
-    fakePwnedPasswords([STRONG_PASSWORD]);
+    fakePwnedPasswords(['Correct-Horse-7-Battery']);
 
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
-        '--password' => STRONG_PASSWORD,
+        '--password' => 'Correct-Horse-7-Battery',
     ])
         ->expectsOutputToContain('The given password has appeared in a data leak.')
         ->assertFailed();
@@ -102,7 +100,7 @@ it('accepts uncompromised passwords in production', function () {
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
-        '--password' => STRONG_PASSWORD,
+        '--password' => 'Correct-Horse-7-Battery',
     ])->assertSuccessful();
 
     Http::assertSentCount(1);
@@ -110,12 +108,12 @@ it('accepts uncompromised passwords in production', function () {
 });
 
 it('does not check for compromised passwords outside production', function () {
-    fakePwnedPasswords([STRONG_PASSWORD]);
+    fakePwnedPasswords(['Correct-Horse-7-Battery']);
 
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
-        '--password' => STRONG_PASSWORD,
+        '--password' => 'Correct-Horse-7-Battery',
     ])->assertSuccessful();
 
     Http::assertNothingSent();
