@@ -1,17 +1,9 @@
 {
-  "_SidebarLayout-Cl9tA9Fl.js": {
-    "file": "assets/SidebarLayout-Cl9tA9Fl.js",
-    "name": "SidebarLayout",
-    "imports": [
-      "resources/js/app.tsx",
-      "_dist-BIJOgKGe.js"
-    ]
-  },
-  "_dist-BIJOgKGe.js": {
-    "file": "assets/dist-BIJOgKGe.js",
+  "_dist-B-TIS3y6.js": {
+    "file": "assets/dist-B-TIS3y6.js",
     "name": "dist",
     "imports": [
-      "resources/js/app.tsx"
+      "_rolldown-runtime-hePW80VL.js"
     ]
   },
   "_fonts-B0jRVrIJ.css": {
@@ -58,43 +50,51 @@
     "file": "assets/jetbrains-mono-400-normal-V6pRDFza.woff2",
     "src": "_jetbrains-mono-400-normal-V6pRDFza.woff2"
   },
+  "_rolldown-runtime-hePW80VL.js": {
+    "file": "assets/rolldown-runtime-hePW80VL.js",
+    "name": "rolldown-runtime"
+  },
   "resources/js/Pages/Home.tsx": {
-    "file": "assets/Home-BACQuqM_.js",
+    "file": "assets/Home-BPCT7tGW.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.tsx",
-      "_dist-BIJOgKGe.js",
-      "_SidebarLayout-Cl9tA9Fl.js"
+      "_rolldown-runtime-hePW80VL.js",
+      "_dist-B-TIS3y6.js",
+      "resources/js/app.tsx"
     ]
   },
   "resources/js/Pages/Login.tsx": {
-    "file": "assets/Login-dQeDcrbD.js",
+    "file": "assets/Login-Dq2NA7i6.js",
     "name": "Login",
     "src": "resources/js/Pages/Login.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.tsx",
-      "_dist-BIJOgKGe.js"
+      "_rolldown-runtime-hePW80VL.js",
+      "_dist-B-TIS3y6.js"
     ]
   },
   "resources/js/Pages/Profile.tsx": {
-    "file": "assets/Profile-CAa5yb77.js",
+    "file": "assets/Profile-2RQ_KhlI.js",
     "name": "Profile",
     "src": "resources/js/Pages/Profile.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.tsx",
-      "_dist-BIJOgKGe.js",
-      "_SidebarLayout-Cl9tA9Fl.js"
+      "_rolldown-runtime-hePW80VL.js",
+      "_dist-B-TIS3y6.js",
+      "resources/js/app.tsx"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-CR380QQn.js",
+    "file": "assets/app-B9uuhOUh.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
+    "imports": [
+      "_rolldown-runtime-hePW80VL.js",
+      "_dist-B-TIS3y6.js"
+    ],
     "dynamicImports": [
       "resources/js/Pages/Home.tsx",
       "resources/js/Pages/Login.tsx",
