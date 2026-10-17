@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/Larasell-dev/admin/compare/v0.1.0...v0.1.1) (2026-10-17)
+
+
+### Features
+
+* expose SidebarLayout for external admin pages ([#24](https://github.com/Larasell-dev/admin/issues/24)) ([007428e](https://github.com/Larasell-dev/admin/commit/007428e13a358d98f1d0fd5058517711a1b17511))
+
 ## 0.1.0 (2026-10-16)
 
 
