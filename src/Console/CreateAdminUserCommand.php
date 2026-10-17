@@ -23,6 +23,12 @@ class CreateAdminUserCommand extends Command
             return self::FAILURE;
         }
 
+        if (Admin::query()->where('email', $email)->exists()) {
+            $this->components->error("An admin with the email [{$email}] already exists.");
+
+            return self::FAILURE;
+        }
+
         Admin::query()->create([
             'name' => $name,
             'email' => $email,
