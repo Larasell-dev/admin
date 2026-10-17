@@ -5,6 +5,7 @@ import * as React from 'react';
 import * as JsxDevRuntime from 'react/jsx-dev-runtime';
 import * as JsxRuntime from 'react/jsx-runtime';
 import { createRoot } from 'react-dom/client';
+import SidebarLayout from './Layouts/SidebarLayout';
 
 type PageModule = { default: ResolvedComponent };
 
@@ -19,6 +20,9 @@ declare global {
             JsxRuntime: typeof JsxRuntime;
             JsxDevRuntime: typeof JsxDevRuntime;
             Inertia: typeof Inertia;
+            Layouts: {
+                SidebarLayout: typeof SidebarLayout;
+            };
             pages: Record<string, RegisteredPage>;
             registerPages: (pages: Record<string, RegisteredPage>) => void;
             boot: () => void;
@@ -33,6 +37,9 @@ window.LarasellAdmin = {
     JsxRuntime,
     JsxDevRuntime,
     Inertia,
+    Layouts: {
+        SidebarLayout,
+    },
     pages: registered,
     registerPages(next) {
         Object.assign(registered, next);
