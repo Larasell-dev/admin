@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/Larasell-dev/admin/compare/v0.1.2...v0.1.3) (2026-10-17)
+
+
+### Features
+
+* ship types for the admin page modules ([#29](https://github.com/Larasell-dev/admin/issues/29)) ([ae5a2dd](https://github.com/Larasell-dev/admin/commit/ae5a2ddf322719f8de2717f9e9aee860d9517093))
+
 ## [0.1.2](https://github.com/Larasell-dev/admin/compare/v0.1.1...v0.1.2) (2026-10-17)
 
 
