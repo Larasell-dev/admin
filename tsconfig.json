@@ -11,5 +11,5 @@
         "skipLibCheck": true,
         "types": ["vite/client"]
     },
-    "include": ["resources/js"]
+    "include": ["resources/js", "resources/vite/client.d.ts"]
 }
