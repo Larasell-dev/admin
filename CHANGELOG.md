@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.5](https://github.com/Larasell-dev/admin/compare/v0.1.4...v0.1.5) (2026-10-17)
+
+
+### Features
+
+* enforce strong passwords when creating an admin ([#37](https://github.com/Larasell-dev/admin/issues/37)) ([6d186dd](https://github.com/Larasell-dev/admin/commit/6d186ddfb1f3830119f50af461c8b06ec03d335f))
+* require a validated icon on every navigation item ([#38](https://github.com/Larasell-dev/admin/issues/38)) ([f3f58f6](https://github.com/Larasell-dev/admin/commit/f3f58f6059fe47830833238ea1ba5453590c8f99))
+
+
+### Bug Fixes
+
+* show clear error when creating an admin with an existing email ([#35](https://github.com/Larasell-dev/admin/issues/35)) ([cc19ccb](https://github.com/Larasell-dev/admin/commit/cc19ccb39903fba72f66e89400816b18b420a8ec))
+
 ## [0.1.4](https://github.com/Larasell-dev/admin/compare/v0.1.3...v0.1.4) (2026-10-17)
 
 
