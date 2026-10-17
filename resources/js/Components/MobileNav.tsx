@@ -1,6 +1,5 @@
 import { Drawer } from '@base-ui/react/drawer';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Container } from '@larasell-dev/ui';
 import { useEffect, useState } from 'react';
 import { arrayFirst, assertDefined } from 'ts-extras';
 import type { Page } from '../types';
@@ -18,7 +17,7 @@ export default function MobileNav() {
     return (
         <Drawer.Root open={open} onOpenChange={setOpen} swipeDirection="left">
             <header className="box-border h-14 border-b border-mauve-200 bg-white dark:border-mauve-800 dark:bg-mauve-950">
-                <Container DANGEROUS_className="flex h-full items-center justify-between">
+                <div className="flex h-full items-center justify-between px-4">
                     <Link href={home.url} aria-label="Home" className="inline-block outline-none focus-visible:focus-ring">
                         <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />
                     </Link>
@@ -30,7 +29,7 @@ export default function MobileNav() {
                             <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </Drawer.Trigger>
-                </Container>
+                </div>
             </header>
 
             <Drawer.Portal>
