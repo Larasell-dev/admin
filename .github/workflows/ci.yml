@@ -11,8 +11,9 @@ permissions:
 jobs:
   no-built-assets:
     name: No built assets
-    # Built assets are only committed by release-please in release pull requests.
-    if: ${{ !startsWith(github.head_ref, 'release-please--') }}
+    # Built assets are only committed by release-please in release pull requests. The branch name
+    # alone could be picked by anyone, so the pull request must also be opened by GitHub Actions.
+    if: ${{ !(startsWith(github.head_ref, 'release-please--') && github.event.pull_request.user.login == 'github-actions[bot]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -22,11 +23,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Deletions count too: removing committed assets would break installs just like changing them.
       - name: Fail if built assets changed
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          files=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- public/vendor/larasell-admin)
+          files=$(git diff --name-only "$BASE_SHA"...HEAD -- public/vendor/larasell-admin)
 
           if [ -n "$files" ]; then
             echo "::error::Built assets are committed by release pull requests only. Remove these files from this pull request:"
