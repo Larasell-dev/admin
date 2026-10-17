@@ -3,6 +3,7 @@ const ui = window.LarasellAdmin.UI;
 export const {
     Button,
     Container,
+    DataList,
     Error,
     Field,
     Icon,
