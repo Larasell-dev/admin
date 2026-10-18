@@ -11,6 +11,22 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    /**
+     * The environment the application boots in. Routes that only exist in some
+     * environments are registered during boot, so tests switch it with inEnvironment().
+     */
+    protected string $environment = 'testing';
+
+    protected function inEnvironment(string $environment): static
+    {
+        $this->environment = $environment;
+        $this->refreshApplication();
+        $this->withoutVite();
+        $this->artisan('migrate', ['--database' => 'testing', '--force' => true])->run();
+
+        return $this;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,6 +52,8 @@ abstract class TestCase extends OrchestraTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['env'] = $this->environment;
+
         config([
             'cache.default' => 'array',
             'database.default' => 'testing',

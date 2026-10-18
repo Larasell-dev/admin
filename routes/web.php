@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AvatarController;
+use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
+use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
@@ -23,5 +25,14 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('logout', LogoutController::class)->name('logout');
 });
+
+// Dev-only shortcuts. Never registered outside the local environment.
+if (app()->environment('local')) {
+    Route::prefix('__dev')->name('dev.')->group(function () {
+        Route::get('/', [DevRouteController::class, 'index'])->name('index');
+        Route::get('login', [DevSessionController::class, 'store'])->name('login');
+        Route::get('logout', [DevSessionController::class, 'destroy'])->name('logout');
+    });
+}
 
 Navigation::add('Home', 'home', icon: NavIcon::Home);
