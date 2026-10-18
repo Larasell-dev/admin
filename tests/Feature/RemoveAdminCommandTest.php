@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Exceptions\AdminRemovalFailed;
 use Larasell\Admin\Models\Admin;
 
 beforeEach(function () {
@@ -47,6 +49,42 @@ it('fails when no admin has the email', function () {
     $this->artisan('larasell:remove-admin', ['email' => 'nobody@example.com', '--force' => true])
         ->expectsOutputToContain('No admin with the email [nobody@example.com] exists.')
         ->assertFailed();
+
+    expect(Admin::query()->count())->toBe(2);
+});
+
+it('refuses to remove the last admin', function () {
+    Admin::query()->where('email', 'grace@example.com')->delete();
+
+    $this->artisan('larasell:remove-admin', ['email' => 'ada@example.com', '--force' => true])
+        ->expectsOutputToContain('Admin user [ada@example.com] is the last admin and cannot be removed.')
+        ->assertFailed();
+
+    expect(Admin::query()->pluck('email')->all())->toBe(['ada@example.com']);
+});
+
+it('deletes the avatar of the removed admin', function () {
+    $disk = Storage::fake(config('larasell-admin.disk'));
+    $disk->put('avatars/ada.png', 'ada');
+    $disk->put('avatars/grace.png', 'grace');
+    Admin::query()->where('email', 'ada@example.com')->update(['avatar_path' => 'avatars/ada.png']);
+    Admin::query()->where('email', 'grace@example.com')->update(['avatar_path' => 'avatars/grace.png']);
+
+    $this->artisan('larasell:remove-admin', ['email' => 'ada@example.com', '--force' => true])
+        ->assertSuccessful();
+
+    $disk->assertMissing('avatars/ada.png');
+    $disk->assertExists('avatars/grace.png');
+});
+
+it('throws a structured error when the admin is not deleted', function () {
+    Admin::deleting(fn () => false);
+
+    expect(fn () => $this->artisan('larasell:remove-admin', ['email' => 'ada@example.com', '--force' => true])->run())
+        ->toThrow(function (AdminRemovalFailed $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.admin.not-deleted')
+                ->and($exception->getMessage())->toBe('Admin user [ada@example.com] was not deleted.');
+        });
 
     expect(Admin::query()->count())->toBe(2);
 });
