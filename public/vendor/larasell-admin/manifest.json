@@ -55,7 +55,7 @@
     "name": "rolldown-runtime"
   },
   "resources/js/Pages/Home.tsx": {
-    "file": "assets/Home-D0vLQpk-.js",
+    "file": "assets/Home-Cdz16LSn.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.tsx",
     "isDynamicEntry": true,
@@ -76,7 +76,7 @@
     ]
   },
   "resources/js/Pages/Profile.tsx": {
-    "file": "assets/Profile-CN2Tr7t3.js",
+    "file": "assets/Profile-CeT1-Q33.js",
     "name": "Profile",
     "src": "resources/js/Pages/Profile.tsx",
     "isDynamicEntry": true,
@@ -87,7 +87,7 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-B4vuTzp3.js",
+    "file": "assets/app-08YVOfKt.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -101,7 +101,7 @@
       "resources/js/Pages/Profile.tsx"
     ],
     "css": [
-      "assets/app-X0rQji9h.css"
+      "assets/app-pTvukQca.css"
     ]
   }
 }

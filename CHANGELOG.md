@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.7](https://github.com/Larasell-dev/admin/compare/v0.1.6...v0.1.7) (2026-10-18)
+
+
+### Features
+
+* add a command to list admins ([#44](https://github.com/Larasell-dev/admin/issues/44)) ([c294e51](https://github.com/Larasell-dev/admin/commit/c294e5106c54ceb0153852a934883cfd3ae5d197))
+* add a command to remove admins ([#45](https://github.com/Larasell-dev/admin/issues/45)) ([127c474](https://github.com/Larasell-dev/admin/commit/127c474d9fadbf13ceec522482e46f4121d6b1a6))
+* add skip to main content link ([#47](https://github.com/Larasell-dev/admin/issues/47)) ([34a5e7d](https://github.com/Larasell-dev/admin/commit/34a5e7d20b55075bf007c9ab7d84a009b97f48e6))
+
 ## [0.1.6](https://github.com/Larasell-dev/admin/compare/v0.1.5...v0.1.6) (2026-10-18)
 
 
