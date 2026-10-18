@@ -14,7 +14,7 @@ export default function UserMenu() {
 
     return (
         <Menu.Root>
-            <Menu.Trigger className="flex w-full border-t border-border cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-50 dark:hover:bg-mauve-900 dark:data-popup-open:bg-mauve-900">
+            <Menu.Trigger className="flex w-full border-t border-border cursor-pointer [-webkit-tap-highlight-color:transparent] h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-50 dark:hover:bg-mauve-900 dark:data-popup-open:bg-mauve-900">
                 <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 text-sm text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
                     {admin.avatarUrl && <Avatar.Image src={admin.avatarUrl} alt="" className="size-full object-cover" />}
                     <Avatar.Fallback>{initials(admin.name)}</Avatar.Fallback>
