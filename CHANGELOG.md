@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.6](https://github.com/Larasell-dev/admin/compare/v0.1.5...v0.1.6) (2026-10-18)
+
+
+### Features
+
+* follow the system color scheme ([#42](https://github.com/Larasell-dev/admin/issues/42)) ([f13a65f](https://github.com/Larasell-dev/admin/commit/f13a65fced31a9113bd2612a338c1f71c4fd98d4))
+* use the ui border color token ([#40](https://github.com/Larasell-dev/admin/issues/40)) ([86be8de](https://github.com/Larasell-dev/admin/commit/86be8dec4c0fa8ae8bfff224e63eb69091e75f16))
+
 ## [0.1.5](https://github.com/Larasell-dev/admin/compare/v0.1.4...v0.1.5) (2026-10-17)
 
 
