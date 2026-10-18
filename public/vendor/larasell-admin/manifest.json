@@ -1,6 +1,6 @@
 {
-  "_dist-D2wtdId1.js": {
-    "file": "assets/dist-D2wtdId1.js",
+  "_dist-DghZj4tT.js": {
+    "file": "assets/dist-DghZj4tT.js",
     "name": "dist",
     "imports": [
       "_rolldown-runtime-hePW80VL.js"
@@ -54,54 +54,66 @@
     "file": "assets/rolldown-runtime-hePW80VL.js",
     "name": "rolldown-runtime"
   },
+  "resources/js/Pages/Customers.tsx": {
+    "file": "assets/Customers-BwaFauw-.js",
+    "name": "Customers",
+    "src": "resources/js/Pages/Customers.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rolldown-runtime-hePW80VL.js",
+      "_dist-DghZj4tT.js",
+      "resources/js/app.tsx"
+    ]
+  },
   "resources/js/Pages/Home.tsx": {
-    "file": "assets/Home-Cdz16LSn.js",
+    "file": "assets/Home-D5BcMfay.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-D2wtdId1.js",
+      "_dist-DghZj4tT.js",
       "resources/js/app.tsx"
     ]
   },
   "resources/js/Pages/Login.tsx": {
-    "file": "assets/Login-DbsiT4oR.js",
+    "file": "assets/Login-hSL-0rcC.js",
     "name": "Login",
     "src": "resources/js/Pages/Login.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-D2wtdId1.js"
+      "_dist-DghZj4tT.js"
     ]
   },
   "resources/js/Pages/Profile.tsx": {
-    "file": "assets/Profile-CeT1-Q33.js",
+    "file": "assets/Profile-CC5KuSNS.js",
     "name": "Profile",
     "src": "resources/js/Pages/Profile.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-D2wtdId1.js",
+      "_dist-DghZj4tT.js",
       "resources/js/app.tsx"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-08YVOfKt.js",
+    "file": "assets/app-BYp8wY2K.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-D2wtdId1.js"
+      "_dist-DghZj4tT.js"
     ],
     "dynamicImports": [
+      "resources/js/Pages/Customers.tsx",
       "resources/js/Pages/Home.tsx",
       "resources/js/Pages/Login.tsx",
       "resources/js/Pages/Profile.tsx"
     ],
     "css": [
-      "assets/app-pTvukQca.css"
+      "assets/app-DEJD2A1f.css"
     ]
   }
 }
