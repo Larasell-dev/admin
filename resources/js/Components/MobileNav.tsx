@@ -16,7 +16,7 @@ export default function MobileNav() {
 
     return (
         <Drawer.Root open={open} onOpenChange={setOpen} swipeDirection="left">
-            <header className="box-border h-14 border-b border-mauve-200 bg-white dark:border-mauve-800 dark:bg-mauve-950">
+            <header className="box-border h-14 border-b border-border bg-white dark:bg-mauve-950">
                 <div className="flex h-full items-center justify-between px-4">
                     <Link href={home.url} aria-label="Home" className="inline-block outline-none focus-visible:focus-ring">
                         <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />

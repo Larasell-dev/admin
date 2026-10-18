@@ -13,8 +13,8 @@ export default function Sidebar() {
     assertDefined(home, 'The admin panel needs at least one navigation item.');
 
     return (
-        <aside className="flex h-dvh w-64 shrink-0 flex-col border-r border-mauve-200 bg-white dark:border-mauve-800 dark:bg-mauve-950">
-            <div className="flex h-14 shrink-0 items-center border-b border-mauve-200 px-6 dark:border-mauve-800">
+        <aside className="flex h-dvh w-64 shrink-0 flex-col border-r border-border bg-white dark:bg-mauve-950">
+            <div className="flex h-14 shrink-0 items-center border-b border-border px-6">
                 <Link href={home.url} aria-label="Home" className="inline-block outline-none focus-visible:focus-ring">
                     <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />
                 </Link>

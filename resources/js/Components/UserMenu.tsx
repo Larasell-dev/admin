@@ -14,7 +14,7 @@ export default function UserMenu() {
 
     return (
         <Menu.Root>
-            <Menu.Trigger className="flex w-full border-t border-mauve-200 dark:border-mauve-800 cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-50 dark:hover:bg-mauve-900 dark:data-popup-open:bg-mauve-900">
+            <Menu.Trigger className="flex w-full border-t border-border cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-50 dark:hover:bg-mauve-900 dark:data-popup-open:bg-mauve-900">
                 <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 text-sm text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
                     {admin.avatarUrl && <Avatar.Image src={admin.avatarUrl} alt="" className="size-full object-cover" />}
                     <Avatar.Fallback>{initials(admin.name)}</Avatar.Fallback>
@@ -30,7 +30,7 @@ export default function UserMenu() {
 
             <Menu.Portal>
                 <Menu.Positioner side="top" align="end" sideOffset={6} alignOffset={12} className="z-50 w-58">
-                    <Menu.Popup className="origin-(--transform-origin) border border-mauve-200 bg-white shadow-lg outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0 dark:border-mauve-700 dark:bg-mauve-900">
+                    <Menu.Popup className="origin-(--transform-origin) border border-border bg-white bg-clip-padding shadow-lg outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0 dark:bg-mauve-900">
                         <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
                             Profile
                         </UserMenuItem>
