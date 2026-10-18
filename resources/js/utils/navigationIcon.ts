@@ -1,9 +1,9 @@
-import type { Icon } from '@larasell-dev/ui';
-import * as icons from '@larasell-dev/ui/icons';
-import type { ComponentProps } from 'react';
-import { assertDefined } from 'ts-extras';
+import type { Icon } from "@larasell-dev/ui";
+import * as icons from "@larasell-dev/ui/icons";
+import type { ComponentProps } from "react";
+import { assertDefined } from "ts-extras";
 
-type IconData = ComponentProps<typeof Icon>['icon'];
+type IconData = ComponentProps<typeof Icon>["icon"];
 
 /**
  * Resolves a NavIcon case name such as "FileList3" to its filled variant for the
@@ -14,9 +14,9 @@ type IconData = ComponentProps<typeof Icon>['icon'];
  * instead of letting the bundler keep only the icons it sees imported.
  */
 export function navigationIcon(name: string, active: boolean): IconData {
-    const set: Record<string, IconData | undefined> = icons;
-    const icon = set[`${name}${active ? 'Fill' : 'Line'}`] ?? set[name];
-    assertDefined(icon, `Navigation icon [${name}] is not exported by @larasell-dev/ui/icons.`);
+  const set: Record<string, IconData | undefined> = icons;
+  const icon = set[`${name}${active ? "Fill" : "Line"}`] ?? set[name];
+  assertDefined(icon, `Navigation icon [${name}] is not exported by @larasell-dev/ui/icons.`);
 
-    return icon;
+  return icon;
 }

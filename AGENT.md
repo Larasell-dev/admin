@@ -10,11 +10,11 @@ staging, testing, …) they are never registered and return 404. See
 
 The admin path prefix is configurable (`LARASELL_ADMIN_PATH`, default `admin`).
 
-| Route | What it does |
-| --- | --- |
-| `GET /admin/__dev` | JSON list of every `__dev` route (`name`, `methods`, `uri`). |
-| `GET /admin/__dev/login` | Logs in as the first admin, creating a `dev@example.com` admin if none exists. `?email=` picks a specific admin (404 if missing). Redirects to the admin home. |
-| `GET /admin/__dev/logout` | Logs out and redirects to the login page. |
+| Route                     | What it does                                                                                                                                                   |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /admin/__dev`        | JSON list of every `__dev` route (`name`, `methods`, `uri`).                                                                                                   |
+| `GET /admin/__dev/login`  | Logs in as the first admin, creating a `dev@example.com` admin if none exists. `?email=` picks a specific admin (404 if missing). Redirects to the admin home. |
+| `GET /admin/__dev/logout` | Logs out and redirects to the login page.                                                                                                                      |
 
 Both login and logout accept `?redirect=/some/path` to land somewhere else
 (same-site paths only).

@@ -4,17 +4,17 @@
  * application's tsconfig.json "include" (or "files").
  */
 
-declare module 'larasell-admin/register' {
-    import type { ComponentType } from 'react';
+declare module "larasell-admin/register" {
+  import type { ComponentType } from "react";
 
-    export const page: {
-        add(pages: Record<string, ComponentType<any>>): void;
-        add(name: string, component: ComponentType<any>): void;
-    };
+  export const page: {
+    add(pages: Record<string, ComponentType<any>>): void;
+    add(name: string, component: ComponentType<any>): void;
+  };
 }
 
-declare module 'larasell-admin/layouts' {
-    import type { ComponentType, ReactNode } from 'react';
+declare module "larasell-admin/layouts" {
+  import type { ComponentType, ReactNode } from "react";
 
-    export const SidebarLayout: ComponentType<{ children: ReactNode }>;
+  export const SidebarLayout: ComponentType<{ children: ReactNode }>;
 }
