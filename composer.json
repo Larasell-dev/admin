@@ -14,7 +14,8 @@
     "inertiajs/inertia-laravel": "^3.0",
     "larasell-dev/chronicle": "^0.2.7",
     "larasell-dev/larasell": "^1.18",
-    "laravel/framework": "^13.23"
+    "laravel/framework": "^13.23",
+    "spatie/laravel-data": "^4.23"
   },
   "autoload": {
     "psr-4": {
@@ -49,12 +50,17 @@
     "laravel/pint": "^1.32",
     "orchestra/testbench": "^11.0",
     "pestphp/pest": "^4.7",
-    "pestphp/pest-plugin-laravel": "^4.1"
+    "pestphp/pest-plugin-laravel": "^4.1",
+    "spatie/laravel-typescript-transformer": "^2.6"
   },
   "scripts": {
     "lint": "vendor/bin/pint",
     "lint:check": "vendor/bin/pint --test",
     "phpstan": "phpstan analyse",
-    "test": "vendor/bin/pest"
+    "test": "vendor/bin/pest",
+    "types": [
+      "testbench typescript:transform",
+      "npx oxfmt resources/js/types/generated.d.ts"
+    ]
   }
 }

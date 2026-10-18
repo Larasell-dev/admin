@@ -1,7 +1,7 @@
 import { Container, Stack } from "@larasell-dev/ui";
 import SidebarLayout from "../Layouts/SidebarLayout";
 
-export default function Home({ admin }: { admin: { name: string; email: string } }) {
+export default function Home({ admin }: Larasell.Admin.Data.View.HomePageData) {
   return (
     <Container>
       <div className="py-10">

@@ -1,7 +1,7 @@
 import { Form } from "@inertiajs/react";
 import { Button, Container, Field, Input, Stack } from "@larasell-dev/ui";
 
-export default function Login({ loginUrl }: { loginUrl: string }) {
+export default function Login({ loginUrl }: Larasell.Admin.Data.View.LoginPageData) {
   return (
     <main className="flex min-h-dvh items-center bg-white dark:bg-mauve-950">
       <Container>

@@ -7,6 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Data\View\ProfilePageData;
+use Larasell\Admin\Data\ViewModel\AdminData;
 use Larasell\Admin\Http\Requests\ProfileRequest;
 use Larasell\Admin\Models\Admin;
 
@@ -14,15 +16,11 @@ class ProfileController
 {
     public function edit(#[CurrentUser('larasell-admin')] Admin $admin): Response
     {
-        return Inertia::render('Profile', [
-            'admin' => [
-                'name' => $admin->name,
-                'email' => $admin->email,
-                'avatarUrl' => $admin->avatarUrl(),
-            ],
-            'updateUrl' => route('larasell.admin.profile.update'),
-            'avatarUploadUrl' => route('larasell.admin.profile.avatar.store'),
-        ]);
+        return Inertia::render('Profile', new ProfilePageData(
+            admin: AdminData::fromModel($admin),
+            updateUrl: route('larasell.admin.profile.update'),
+            avatarUploadUrl: route('larasell.admin.profile.avatar.store'),
+        ));
     }
 
     public function update(ProfileRequest $request, #[CurrentUser('larasell-admin')] Admin $admin): RedirectResponse
