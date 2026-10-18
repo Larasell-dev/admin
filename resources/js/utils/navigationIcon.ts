@@ -14,9 +14,9 @@ type IconData = ComponentProps<typeof Icon>['icon'];
  * instead of letting the bundler keep only the icons it sees imported.
  */
 export function navigationIcon(name: string, active: boolean): IconData {
-    const set: Record<string, IconData | undefined> = icons;
-    const icon = set[`${name}${active ? 'Fill' : 'Line'}`] ?? set[name];
-    assertDefined(icon, `Navigation icon [${name}] is not exported by @larasell-dev/ui/icons.`);
+  const set: Record<string, IconData | undefined> = icons;
+  const icon = set[`${name}${active ? 'Fill' : 'Line'}`] ?? set[name];
+  assertDefined(icon, `Navigation icon [${name}] is not exported by @larasell-dev/ui/icons.`);
 
-    return icon;
+  return icon;
 }

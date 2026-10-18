@@ -1,60 +1,60 @@
 {
-    "name": "larasell-dev/admin",
-    "description": "Admin panel for Larasell",
-    "type": "library",
-    "license": "proprietary",
-    "authors": [
-        {
-            "name": "Nils Haberkamp",
-            "email": "nils@larasell.dev"
-        }
-    ],
-    "require": {
-        "php": "^8.3",
-        "inertiajs/inertia-laravel": "^3.0",
-        "larasell-dev/chronicle": "^0.2.7",
-        "larasell-dev/larasell": "^1.18",
-        "laravel/framework": "^13.23"
-    },
-    "autoload": {
-        "psr-4": {
-            "Larasell\\Admin\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Larasell\\Admin\\Tests\\": "tests",
-            "Workbench\\App\\": "workbench/app/"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Larasell\\Admin\\AdminServiceProvider"
-            ]
-        }
-    },
-    "minimum-stability": "stable",
-    "config": {
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        },
-        "sort-packages": true,
-        "platform": {
-            "php": "8.3"
-        }
-    },
-    "require-dev": {
-        "larastan/larastan": "^3.0",
-        "laravel/pint": "^1.32",
-        "orchestra/testbench": "^11.0",
-        "pestphp/pest": "^4.7",
-        "pestphp/pest-plugin-laravel": "^4.1"
-    },
-    "scripts": {
-        "lint": "vendor/bin/pint",
-        "lint:check": "vendor/bin/pint --test",
-        "phpstan": "phpstan analyse",
-        "test": "vendor/bin/pest"
+  "name": "larasell-dev/admin",
+  "description": "Admin panel for Larasell",
+  "type": "library",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Nils Haberkamp",
+      "email": "nils@larasell.dev"
     }
+  ],
+  "require": {
+    "php": "^8.3",
+    "inertiajs/inertia-laravel": "^3.0",
+    "larasell-dev/chronicle": "^0.2.7",
+    "larasell-dev/larasell": "^1.18",
+    "laravel/framework": "^13.23"
+  },
+  "autoload": {
+    "psr-4": {
+      "Larasell\\Admin\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Larasell\\Admin\\Tests\\": "tests",
+      "Workbench\\App\\": "workbench/app/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Larasell\\Admin\\AdminServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable",
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    },
+    "sort-packages": true,
+    "platform": {
+      "php": "8.3"
+    }
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.0",
+    "laravel/pint": "^1.32",
+    "orchestra/testbench": "^11.0",
+    "pestphp/pest": "^4.7",
+    "pestphp/pest-plugin-laravel": "^4.1"
+  },
+  "scripts": {
+    "lint": "vendor/bin/pint",
+    "lint:check": "vendor/bin/pint --test",
+    "phpstan": "phpstan analyse",
+    "test": "vendor/bin/pest"
+  }
 }

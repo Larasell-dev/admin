@@ -2,13 +2,13 @@
 @import '@larasell-dev/ui/styles.css';
 
 @layer base {
-    :root {
-        color-scheme: light;
-        background-color: var(--color-white);
-    }
+  :root {
+    color-scheme: light;
+    background-color: var(--color-white);
+  }
 
-    :root.dark {
-        color-scheme: dark;
-        background-color: var(--color-mauve-950);
-    }
+  :root.dark {
+    color-scheme: dark;
+    background-color: var(--color-mauve-950);
+  }
 }

@@ -13,33 +13,51 @@ const chunk = readFileSync(path.join(dist, entry.match(/from "\.\/([^"]+)"/)[1])
 // variables under those aliases (`data$12 as e8`), and each data variable sits
 // in a region named after its Remix file (`.../ri/data/a/ab.js`).
 const remixNames = new Map(
-    [...chunk.matchAll(/\/\/#region node_modules\/@iconify-icons\/ri\/data\/[^/]+\/([^/]+)\.js\nconst ([\w$]+) =/g)].map(([, name, variable]) => [variable, name]),
+  [...chunk.matchAll(/\/\/#region node_modules\/@iconify-icons\/ri\/data\/[^/]+\/([^/]+)\.js\nconst ([\w$]+) =/g)].map(
+    ([, name, variable]) => [variable, name],
+  ),
 );
-const aliases = new Map([...chunk.match(/export \{([^}]+)\}/)[1].matchAll(/([\w$]+) as ([\w$]+)/g)].map(([, variable, alias]) => [alias, remixNames.get(variable)]));
-const exports = [...entry.match(/export \{([^}]+)\}/)[1].matchAll(/([\w$]+) as ([\w$]+)/g)].map(([, alias, name]) => [name, aliases.get(alias)]);
+const aliases = new Map(
+  [...chunk.match(/export \{([^}]+)\}/)[1].matchAll(/([\w$]+) as ([\w$]+)/g)].map(([, variable, alias]) => [
+    alias,
+    remixNames.get(variable),
+  ]),
+);
+const exports = [...entry.match(/export \{([^}]+)\}/)[1].matchAll(/([\w$]+) as ([\w$]+)/g)].map(([, alias, name]) => [
+  name,
+  aliases.get(alias),
+]);
 
 const cases = new Map();
 for (const [name, remixName] of exports) {
-    assert(remixName !== undefined, `No Remix name for export [${name}].`);
+  assert(remixName !== undefined, `No Remix name for export [${name}].`);
 
-    const style = name.match(/(Fill|Line)$/)?.[1];
-    const suffix = style && `-${style.toLowerCase()}`;
-    const [caseName, value] = suffix && remixName.endsWith(suffix) ? [name.slice(0, -style.length), remixName.slice(0, -suffix.length)] : [name, remixName];
+  const style = name.match(/(Fill|Line)$/)?.[1];
+  const suffix = style && `-${style.toLowerCase()}`;
+  const [caseName, value] =
+    suffix && remixName.endsWith(suffix)
+      ? [name.slice(0, -style.length), remixName.slice(0, -suffix.length)]
+      : [name, remixName];
 
-    assert(!/-(line|fill)$/.test(value), `Icon [${value}] would be rejected as a style variant.`);
-    assert((cases.get(caseName) ?? value) === value, `Case [${caseName}] maps to [${cases.get(caseName)}] and [${value}].`);
-    cases.set(caseName, value);
+  assert(!/-(line|fill)$/.test(value), `Icon [${value}] would be rejected as a style variant.`);
+  assert(
+    (cases.get(caseName) ?? value) === value,
+    `Case [${caseName}] maps to [${cases.get(caseName)}] and [${value}].`,
+  );
+  cases.set(caseName, value);
 }
 
 const values = new Set(cases.values());
 assert(values.size === cases.size, 'Two cases share a Remix name.');
 assert(cases.size > 1_000, `Only ${cases.size} icons found; the bundle format probably changed.`);
 
-const lines = [...cases].sort(([a], [b]) => (a < b ? -1 : 1)).map(([caseName, value]) => `    case ${caseName} = '${value}';`);
+const lines = [...cases]
+  .sort(([a], [b]) => (a < b ? -1 : 1))
+  .map(([caseName, value]) => `    case ${caseName} = '${value}';`);
 
 writeFileSync(
-    path.resolve(import.meta.dirname, '../src/Enums/NavIcon.php'),
-    `<?php
+  path.resolve(import.meta.dirname, '../src/Enums/NavIcon.php'),
+  `<?php
 
 namespace Larasell\\Admin\\Enums;
 
@@ -59,7 +77,7 @@ ${lines.join('\n')}
 console.log(`Wrote ${cases.size} icons to src/Enums/NavIcon.php.`);
 
 function assert(condition, message) {
-    if (!condition) {
-        throw new Error(message);
-    }
+  if (!condition) {
+    throw new Error(message);
+  }
 }
