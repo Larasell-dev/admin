@@ -1,6 +1,6 @@
 export default {
-  extends: ['@commitlint/config-conventional'],
+  extends: ["@commitlint/config-conventional"],
   rules: {
-    'scope-empty': [2, 'always'],
+    "scope-empty": [2, "always"],
   },
 };
