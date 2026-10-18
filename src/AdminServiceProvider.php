@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
+use Larasell\Admin\Console\ListAdminsCommand;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
 
@@ -36,6 +37,7 @@ class AdminServiceProvider extends ServiceProvider
             $this->commands([
                 CreateAdminUserCommand::class,
                 LinkAdminAssetsCommand::class,
+                ListAdminsCommand::class,
             ]);
         }
     }
