@@ -6,7 +6,9 @@ import { useRef, useState } from "react";
 import { assertDefined } from "ts-extras";
 import SidebarLayout from "../Layouts/SidebarLayout";
 import { initials } from "../utils/initials";
-import type { Page, ProfilePageProps } from "../types";
+import type { Page } from "../types";
+
+type ProfilePageProps = Larasell.Admin.Data.View.ProfilePageData;
 
 export default function Profile({ admin, updateUrl }: ProfilePageProps) {
   const [avatarKey, setAvatarKey] = useState(0);

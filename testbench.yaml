@@ -3,6 +3,7 @@ providers:
   - Workbench\App\Providers\WorkbenchServiceProvider
   - Larasell\Admin\AdminServiceProvider
   - Inertia\ServiceProvider
+  - Spatie\LaravelData\LaravelDataServiceProvider
 
 env:
   # Development-only key for the local Testbench app.

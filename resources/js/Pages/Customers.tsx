@@ -5,21 +5,7 @@ import { GroupLine } from "@larasell-dev/ui/icons";
 import { useState } from "react";
 import SidebarLayout from "../Layouts/SidebarLayout";
 
-type Customer = {
-  id: number;
-  name: string;
-  ordersCount: number;
-  createdAt: string | null;
-};
-
-type Props = {
-  customers: {
-    data: Customer[];
-    current_page: number;
-    per_page: number;
-    total: number;
-  };
-};
+type Props = Larasell.Admin.Data.View.CustomersPageData;
 
 export default function Customers({ customers }: Props) {
   const [isPaginating, setIsPaginating] = useState(false);
