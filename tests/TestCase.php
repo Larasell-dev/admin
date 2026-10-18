@@ -7,6 +7,7 @@ namespace Larasell\Admin\Tests;
 use Illuminate\Foundation\Application;
 use Inertia\ServiceProvider as InertiaServiceProvider;
 use Larasell\Admin\AdminServiceProvider;
+use Larasell\Larasell\LarasellServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
@@ -44,6 +45,7 @@ abstract class TestCase extends OrchestraTestCase
         return [
             AdminServiceProvider::class,
             InertiaServiceProvider::class,
+            LarasellServiceProvider::class,
         ];
     }
 

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AvatarController;
+use Larasell\Admin\Http\Controllers\CustomerController;
 use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
 use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
 use Larasell\Admin\Http\Controllers\HomeController;
@@ -20,6 +21,7 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
@@ -36,3 +38,4 @@ if (app()->environment('local')) {
 }
 
 Navigation::add('Home', 'home', icon: NavIcon::Home);
+Navigation::add('Customers', 'larasell.admin.customers.index', icon: NavIcon::Group);
