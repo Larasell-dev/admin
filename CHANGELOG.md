@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8](https://github.com/Larasell-dev/admin/compare/v0.1.7...v0.1.8) (2026-10-18)
+
+
+### Features
+
+* add customers index page ([#50](https://github.com/Larasell-dev/admin/issues/50)) ([1dbf7dd](https://github.com/Larasell-dev/admin/commit/1dbf7dd77cd8fd9ae4226c50bdf9efbcf5011e71))
+* add local-only __dev endpoints for login, logout and route listing ([#48](https://github.com/Larasell-dev/admin/issues/48)) ([fa08c17](https://github.com/Larasell-dev/admin/commit/fa08c172f1e4c1d2efaf660e43f4018049c85173))
+
 ## [0.1.7](https://github.com/Larasell-dev/admin/compare/v0.1.6...v0.1.7) (2026-10-18)
 
 
