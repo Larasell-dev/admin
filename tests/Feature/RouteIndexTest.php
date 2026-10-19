@@ -24,13 +24,13 @@ beforeEach(function () {
     Book::createTable();
 
     AdminPanel::resolve()->routes(function () {
-        Route::table('shop/library', LibraryTable::class);
+        Route::index('shop/library', LibraryTable::class);
     });
 
     Route::getRoutes()->refreshNameLookups();
 });
 
-it('renders the table page for a table route', function () {
+it('renders the table page for an index route', function () {
     $admin = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
     $book = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 

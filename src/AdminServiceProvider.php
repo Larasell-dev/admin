@@ -71,7 +71,7 @@ class AdminServiceProvider extends ServiceProvider
 
     private function registerRouteMacros(): void
     {
-        Route::macro('table', function (string $uri, string $table): RouteDefinition {
+        Route::macro('index', function (string $uri, string $table): RouteDefinition {
             return Route::get($uri, TableController::class)
                 ->defaults('table', $table)
                 ->name(str_replace('/', '.', trim($uri, '/')).'.index');
