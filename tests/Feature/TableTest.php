@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
+use Larasell\Admin\Tests\Fixtures\Book;
 
-class AdminsTable extends Table
+class BooksTable extends Table
 {
-    protected ?string $model = Admin::class;
+    protected ?string $model = Book::class;
 
     public function columns(): array
     {
         return [
-            TextColumn::make('name'),
-            TextColumn::make('email', 'Email address'),
+            TextColumn::make('title'),
+            TextColumn::make('author_name', 'Written by'),
         ];
     }
 }
 
-class AdminAvatarsTable extends Table
+class BookAuthorsTable extends Table
 {
-    protected ?string $model = Admin::class;
+    protected ?string $model = Book::class;
 
     public function columns(): array
     {
         return [
-            TextColumn::make('avatar_path'),
+            TextColumn::make('author_name'),
         ];
     }
 }
@@ -36,31 +36,35 @@ function tableResource(Table $table): array
     return json_decode(json_encode($table), true);
 }
 
+beforeEach(function () {
+    Book::createTable();
+});
+
 it('describes its columns with a label derived from the column name', function () {
-    expect(tableResource(AdminsTable::make())['columns'])->toBe([
-        ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
-        ['name' => 'email', 'label' => 'Email address', 'type' => 'text'],
+    expect(tableResource(BooksTable::make())['columns'])->toBe([
+        ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+        ['name' => 'author_name', 'label' => 'Written by', 'type' => 'text'],
     ]);
 });
 
 it('turns multi-word column names into a sentence case label', function () {
-    expect(tableResource(AdminAvatarsTable::make())['columns'][0]['label'])->toBe('Avatar path');
+    expect(tableResource(BookAuthorsTable::make())['columns'][0]['label'])->toBe('Author name');
 });
 
 it('returns a row per model with the value of each column', function () {
-    $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'secret-password']);
-    $grace = Admin::create(['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'secret-password']);
+    $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+    $emma = Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
 
-    expect(tableResource(AdminsTable::make())['rows'])->toBe([
-        ['id' => $ada->id, 'name' => 'Ada Lovelace', 'email' => 'ada@example.com'],
-        ['id' => $grace->id, 'name' => 'Grace Hopper', 'email' => 'grace@example.com'],
+    expect(tableResource(BooksTable::make())['rows'])->toBe([
+        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert'],
+        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen'],
     ]);
 });
 
 it('derives a sentence case title from the class name', function () {
-    expect(tableResource(AdminAvatarsTable::make())['title'])->toBe('Admin avatars table');
+    expect(tableResource(BookAuthorsTable::make())['title'])->toBe('Book authors table');
 });
 
 it('returns no rows when there are no models', function () {
-    expect(tableResource(AdminsTable::make())['rows'])->toBe([]);
+    expect(tableResource(BooksTable::make())['rows'])->toBe([]);
 });
