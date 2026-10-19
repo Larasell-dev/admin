@@ -22,9 +22,9 @@ it('scaffolds a table for the singular model', function () {
 });
 
 it('uses the given model', function () {
-    $this->artisan('make:larasell-table', ['name' => 'Admins', '--model' => 'Larasell\Admin\Models\Admin'])->assertSuccessful();
+    $this->artisan('make:larasell-table', ['name' => 'Books', '--model' => 'Larasell\Admin\Tests\Fixtures\Book'])->assertSuccessful();
 
-    expect(File::get(app_path('Tables/Admins.php')))
-        ->toContain('use Larasell\Admin\Models\Admin;')
-        ->toContain('protected ?string $model = Admin::class;');
+    expect(File::get(app_path('Tables/Books.php')))
+        ->toContain('use Larasell\Admin\Tests\Fixtures\Book;')
+        ->toContain('protected ?string $model = Book::class;');
 });
