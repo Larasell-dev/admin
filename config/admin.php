@@ -11,4 +11,13 @@ return [
      */
     'disk' => env('LARASELL_ADMIN_DISK', 'public'),
 
+    /*
+     * The namespace your table classes live in. Table actions are run through
+     * a URL that names the table by its path in this namespace, for example
+     * App\Tables\ProductReviews becomes "product-reviews".
+     */
+    'tables' => [
+        'namespace' => 'App\\Tables',
+    ],
+
 ];

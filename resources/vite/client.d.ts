@@ -24,7 +24,27 @@ declare module "larasell-admin/components" {
 
   export type TableColumn = { name: string; label: string; type: "text" };
 
-  export type TableRow = { id: string | number } & Record<string, string | number | null>;
+  export type TableActionConfirmation = {
+    title: string;
+    message: string;
+    confirmButton: string;
+    cancelButton: string;
+    /** Text the admin must type before the action runs. */
+    confirmationText: string | null;
+  };
+
+  export type TableAction = {
+    name: string;
+    label: string;
+    method: "get" | "post";
+    url: string;
+    confirm: TableActionConfirmation | null;
+  };
+
+  export type TableRow = { id: string | number; _actions: TableAction[] } & Record<
+    string,
+    string | number | null | TableAction[]
+  >;
 
   /** The JSON shape of a Larasell\Admin\Tables\Table. */
   export type TableResource = { title: string; columns: TableColumn[]; rows: TableRow[] };

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Columns\Column;
 use LogicException;
 
@@ -25,6 +26,75 @@ abstract class Table implements JsonSerializable
      * @return array<int, Column>
      */
     abstract public function columns(): array;
+
+    /**
+     * @return array<int, Action>
+     */
+    public function actions(): array
+    {
+        return [];
+    }
+
+    public function action(string $name): ?Action
+    {
+        foreach ($this->actions() as $action) {
+            if ($action->name() === $name) {
+                return $action;
+            }
+        }
+
+        return null;
+    }
+
+    public function findRecord(string $key): ?Model
+    {
+        return $this->query()->whereKey($key)->first();
+    }
+
+    /**
+     * The table's path in the tables namespace, e.g. "shop.product-reviews" for
+     * App\Tables\Shop\ProductReviews, or null when it lives outside that namespace.
+     */
+    public static function slug(): ?string
+    {
+        $namespace = trim((string) config('larasell-admin.tables.namespace'), '\\').'\\';
+
+        if (! str_starts_with(static::class, $namespace)) {
+            return null;
+        }
+
+        $segments = explode('\\', Str::after(static::class, $namespace));
+
+        return implode('.', array_map(fn (string $segment): string => Str::kebab($segment), $segments));
+    }
+
+    /**
+     * @return class-string<Table>|null
+     */
+    public static function fromSlug(string $slug): ?string
+    {
+        $namespace = trim((string) config('larasell-admin.tables.namespace'), '\\');
+        $class = $namespace.'\\'.implode('\\', array_map(fn (string $segment): string => Str::studly($segment), explode('.', $slug)));
+
+        if (! class_exists($class) || ! is_subclass_of($class, self::class) || $class::slug() !== $slug) {
+            return null;
+        }
+
+        return $class;
+    }
+
+    public function actionUrl(Action $action, Model $record): string
+    {
+        $slug = static::slug() ?? throw new LogicException(
+            static::class.' must live in the '.config('larasell-admin.tables.namespace').' namespace to run actions.',
+        );
+
+        return route('larasell.admin.tables.actions', [
+            'table' => $slug,
+            'record' => $record->getKey(),
+            'action' => $action->name(),
+        ]);
+    }
 
     public function title(): string
     {
@@ -49,13 +119,25 @@ abstract class Table implements JsonSerializable
     public function jsonSerialize(): array
     {
         $columns = $this->columns();
+        $actions = $this->actions();
 
-        $rows = $this->query()->get()->map(function (Model $record) use ($columns): array {
+        foreach ($actions as $action) {
+            $action->assertConfigured();
+        }
+
+        $names = array_map(fn (Action $action): string => $action->name(), $actions);
+        foreach (array_unique(array_diff_assoc($names, array_unique($names))) as $duplicate) {
+            throw new LogicException(static::class." defines more than one action named [{$duplicate}].");
+        }
+
+        $rows = $this->query()->get()->map(function (Model $record) use ($columns, $actions): array {
             $row = ['id' => $record->getKey()];
 
             foreach ($columns as $column) {
                 $row[$column->name()] = $column->value($record);
             }
+
+            $row['_actions'] = array_map(fn (Action $action): array => $action->toRow($this, $record), $actions);
 
             return $row;
         });

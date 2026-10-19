@@ -1,5 +1,7 @@
 import { DataList, Table } from "@larasell-dev/ui";
-import type { TableResource } from "../types";
+import type { TableResource, TableRow } from "../types";
+
+const cell = (row: TableRow, column: string) => row[column] as string | number | null;
 
 type Props = {
   resource: TableResource;
@@ -17,10 +19,10 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
         <DataList.Root aria-label={label}>
           {resource.rows.map((row) => (
             <DataList.Item key={row.id}>
-              {primary && <DataList.Title>{row[primary.name]}</DataList.Title>}
+              {primary && <DataList.Title>{cell(row, primary.name)}</DataList.Title>}
               {rest.map((column) => (
                 <DataList.Field key={column.name} label={column.label}>
-                  {row[column.name]}
+                  {cell(row, column.name)}
                 </DataList.Field>
               ))}
             </DataList.Item>
@@ -40,7 +42,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
               {resource.rows.map((row) => (
                 <Table.Row key={row.id}>
                   {resource.columns.map((column) => (
-                    <Table.Cell key={column.name}>{row[column.name]}</Table.Cell>
+                    <Table.Cell key={column.name}>{cell(row, column.name)}</Table.Cell>
                   ))}
                 </Table.Row>
               ))}

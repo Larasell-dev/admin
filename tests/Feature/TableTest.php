@@ -56,8 +56,8 @@ it('returns a row per model with the value of each column', function () {
     $emma = Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
 
     expect(tableResource(BooksTable::make())['rows'])->toBe([
-        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert'],
-        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen'],
+        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert', '_actions' => []],
+        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen', '_actions' => []],
     ]);
 });
 
