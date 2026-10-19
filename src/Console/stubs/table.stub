@@ -1,0 +1,18 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use Larasell\Admin\Tables\Table;
+
+class {{ class }} extends Table
+{
+    protected ?string $model = {{ model }}::class;
+
+    public function columns(): array
+    {
+        return [
+            //
+        ];
+    }
+}
