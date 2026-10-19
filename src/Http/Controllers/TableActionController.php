@@ -20,6 +20,7 @@ class TableActionController
 
         $model = $table->findRecord($record);
         abort_if($model === null, 404);
+        abort_if($action->isDisabledFor($model), 403);
 
         $expected = $action->confirmationTextFor($model);
 

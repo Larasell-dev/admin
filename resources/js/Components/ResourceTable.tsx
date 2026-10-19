@@ -65,6 +65,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
           <Table.ActionsItem
             key={action.name}
             variant={action.destructive ? "destructive" : "default"}
+            disabled={action.disabled}
             onClick={() => choose(action)}
           >
             {action.label}

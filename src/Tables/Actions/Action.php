@@ -16,6 +16,8 @@ class Action
 
     protected bool $destructive = false;
 
+    protected bool|Closure $disabled = false;
+
     /**
      * @var array{title: ?string, message: ?string, confirmButton: ?string, cancelButton: ?string, confirmationText: string|Closure|null}
      */
@@ -80,6 +82,21 @@ class Action
         return $this;
     }
 
+    /**
+     * Disable the action, for every row or for the rows where the closure returns true.
+     */
+    public function disabled(bool|Closure $condition = true): static
+    {
+        $this->disabled = $condition;
+
+        return $this;
+    }
+
+    public function isDisabledFor(Model $record): bool
+    {
+        return $this->disabled instanceof Closure ? (bool) ($this->disabled)($record) : $this->disabled;
+    }
+
     public function name(): string
     {
         return Str::slug($this->label);
@@ -122,7 +139,7 @@ class Action
     }
 
     /**
-     * @return array{name: string, label: string, method: string, url: string, confirm: array<string, string|null>|null, destructive: bool}
+     * @return array{name: string, label: string, method: string, url: string, confirm: array<string, string|null>|null, destructive: bool, disabled: bool}
      */
     public function toRow(Table $table, Model $record): array
     {
@@ -133,6 +150,7 @@ class Action
             'url' => $this->runs() ? $table->actionUrl($this, $record) : $this->urlFor($record),
             'confirm' => $this->confirms ? $this->confirmationFor($record) : null,
             'destructive' => $this->destructive,
+            'disabled' => $this->isDisabledFor($record),
         ];
     }
 

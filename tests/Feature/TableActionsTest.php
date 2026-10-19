@@ -85,7 +85,7 @@ describe('row actions', function () {
         withActions(fn () => [Action::make('View')->to('https://example.com/books')]);
 
         expect(rowActions())->toBe([
-            ['name' => 'view', 'label' => 'View', 'method' => 'get', 'url' => 'https://example.com/books', 'confirm' => null, 'destructive' => false],
+            ['name' => 'view', 'label' => 'View', 'method' => 'get', 'url' => 'https://example.com/books', 'confirm' => null, 'destructive' => false, 'disabled' => false],
         ]);
     });
 
@@ -109,7 +109,7 @@ describe('row actions', function () {
         withActions(fn () => [Action::make('Archive', handle: fn (Book $book) => null)]);
 
         expect(rowActions(1))->toBe([
-            ['name' => 'archive', 'label' => 'Archive', 'method' => 'post', 'url' => url(actionUrl($this->emma, 'archive')), 'confirm' => null, 'destructive' => false],
+            ['name' => 'archive', 'label' => 'Archive', 'method' => 'post', 'url' => url(actionUrl($this->emma, 'archive')), 'confirm' => null, 'destructive' => false, 'disabled' => false],
         ]);
     });
 
@@ -198,6 +198,25 @@ describe('row actions', function () {
 
         expect(rowActions()[0])->toMatchArray(['method' => 'get', 'destructive' => true])
             ->and(rowActions()[0]['confirm'])->not->toBeNull();
+    });
+
+    it('disables actions', function () {
+        withActions(fn () => [
+            Action::make('Archive', handle: fn (Book $book) => null)->disabled(),
+            Action::make('Publish', handle: fn (Book $book) => null)->disabled(false),
+            Action::make('View')->to('https://example.com')->disabled(true),
+        ]);
+
+        expect(array_column(rowActions(), 'disabled', 'name'))->toBe(['archive' => true, 'publish' => false, 'view' => true]);
+    });
+
+    it('disables actions per record', function () {
+        withActions(fn () => [
+            Action::make('Archive', handle: fn (Book $book) => null)->disabled(fn (Book $book) => $book->title === 'Emma'),
+        ]);
+
+        expect(rowActions(0)[0]['disabled'])->toBeFalse()
+            ->and(rowActions(1)[0]['disabled'])->toBeTrue();
     });
 
     it('rejects two actions with the same name', function () {
@@ -289,6 +308,19 @@ describe('running an action', function () {
         'class that is not a table' => '/admin/tables/book/1/actions/delete',
         'class name instead of slug' => '/admin/tables/Tables.BookActionsTable/1/actions/delete',
     ]);
+
+    it('refuses to run an action that is disabled for the record', function () {
+        withActions(fn () => [
+            Action::make('Delete', handle: fn (Book $book) => $book->delete())
+                ->disabled(fn (Book $book) => $book->title === 'Emma'),
+        ]);
+        signIn();
+
+        $this->post(actionUrl($this->emma, 'delete'))->assertForbidden();
+        $this->post(actionUrl($this->dune, 'delete'))->assertRedirect();
+
+        expect(Book::pluck('title')->all())->toBe(['Emma']);
+    });
 
     it('requires a signed-in admin', function () {
         withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);

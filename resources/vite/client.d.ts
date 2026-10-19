@@ -40,6 +40,7 @@ declare module "larasell-admin/components" {
     url: string;
     confirm: TableActionConfirmation | null;
     destructive: boolean;
+    disabled: boolean;
   };
 
   export type TableRow = { id: string | number; _actions: TableAction[] } & Record<
