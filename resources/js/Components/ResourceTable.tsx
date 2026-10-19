@@ -122,7 +122,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
       </div>
 
       <ConfirmActionDialog
-        confirmation={pending?.confirm ?? null}
+        action={pending}
         processing={processing}
         error={error}
         onConfirm={(typed) => pending && perform(pending, typed)}

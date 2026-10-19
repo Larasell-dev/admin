@@ -13,7 +13,7 @@
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@inertiajs/react": "^3.0.0",
-    "@larasell-dev/ui": "^0.1.11",
+    "@larasell-dev/ui": "^0.1.12",
     "@roving-focus/react": "^2.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
