@@ -9,13 +9,18 @@ use JsonSerializable;
 use Larasell\Admin\Enums\NavIcon;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
+use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\Column;
 use LogicException;
+use ReflectionClass;
 
 abstract class Table implements JsonSerializable
 {
     /** @var class-string<Model>|null */
     protected ?string $model = null;
+
+    /** @var array<class-string, class-string<Model>|false> */
+    protected static array $cachedModelAttributes = [];
 
     final public function __construct() {}
 
@@ -170,15 +175,35 @@ abstract class Table implements JsonSerializable
     }
 
     /**
+     * @return class-string<Model>
+     */
+    protected function model(): string
+    {
+        if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
+            $attribute = (new ReflectionClass(static::class))->getAttributes(UseModel::class);
+
+            static::$cachedModelAttributes[static::class] = $attribute !== []
+                ? $attribute[0]->newInstance()->class
+                : false;
+        }
+
+        if (static::$cachedModelAttributes[static::class]) {
+            return static::$cachedModelAttributes[static::class];
+        }
+
+        if ($this->model !== null) {
+            return $this->model;
+        }
+
+        throw new LogicException(static::class.' must define a model with the UseModel attribute, a $model property, or override query().');
+    }
+
+    /**
      * @return Builder<Model>
      */
     protected function query(): Builder
     {
-        if ($this->model === null) {
-            throw new LogicException(static::class.' must define a $model or override query().');
-        }
-
-        return $this->model::query();
+        return $this->model()::query();
     }
 
     /**
