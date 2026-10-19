@@ -62,7 +62,11 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
       />
       <Table.ActionsPopup>
         {row._actions.map((action) => (
-          <Table.ActionsItem key={action.name} onClick={() => choose(action)}>
+          <Table.ActionsItem
+            key={action.name}
+            variant={action.destructive ? "destructive" : "default"}
+            onClick={() => choose(action)}
+          >
             {action.label}
           </Table.ActionsItem>
         ))}

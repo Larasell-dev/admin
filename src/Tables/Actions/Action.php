@@ -14,6 +14,8 @@ class Action
 
     protected bool $confirms = false;
 
+    protected bool $destructive = false;
+
     /**
      * @var array{title: ?string, message: ?string, confirmButton: ?string, cancelButton: ?string, confirmationText: string|Closure|null}
      */
@@ -68,6 +70,16 @@ class Action
         return $this;
     }
 
+    /**
+     * Mark the action as one that destroys or irreversibly changes data, so it stands out.
+     */
+    public function destructive(bool $condition = true): static
+    {
+        $this->destructive = $condition;
+
+        return $this;
+    }
+
     public function name(): string
     {
         return Str::slug($this->label);
@@ -110,7 +122,7 @@ class Action
     }
 
     /**
-     * @return array{name: string, label: string, method: string, url: string, confirm: array<string, string|null>|null}
+     * @return array{name: string, label: string, method: string, url: string, confirm: array<string, string|null>|null, destructive: bool}
      */
     public function toRow(Table $table, Model $record): array
     {
@@ -120,6 +132,7 @@ class Action
             'method' => $this->runs() ? 'post' : 'get',
             'url' => $this->runs() ? $table->actionUrl($this, $record) : $this->urlFor($record),
             'confirm' => $this->confirms ? $this->confirmationFor($record) : null,
+            'destructive' => $this->destructive,
         ];
     }
 

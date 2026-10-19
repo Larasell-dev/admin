@@ -85,7 +85,7 @@ describe('row actions', function () {
         withActions(fn () => [Action::make('View')->to('https://example.com/books')]);
 
         expect(rowActions())->toBe([
-            ['name' => 'view', 'label' => 'View', 'method' => 'get', 'url' => 'https://example.com/books', 'confirm' => null],
+            ['name' => 'view', 'label' => 'View', 'method' => 'get', 'url' => 'https://example.com/books', 'confirm' => null, 'destructive' => false],
         ]);
     });
 
@@ -109,7 +109,7 @@ describe('row actions', function () {
         withActions(fn () => [Action::make('Archive', handle: fn (Book $book) => null)]);
 
         expect(rowActions(1))->toBe([
-            ['name' => 'archive', 'label' => 'Archive', 'method' => 'post', 'url' => url(actionUrl($this->emma, 'archive')), 'confirm' => null],
+            ['name' => 'archive', 'label' => 'Archive', 'method' => 'post', 'url' => url(actionUrl($this->emma, 'archive')), 'confirm' => null, 'destructive' => false],
         ]);
     });
 
@@ -173,6 +173,31 @@ describe('row actions', function () {
 
         expect(rowActions()[0])->toMatchArray(['method' => 'get', 'url' => 'https://example.com'])
             ->and(rowActions()[0]['confirm']['title'])->toBe('View book');
+    });
+
+    it('marks destructive actions', function () {
+        withActions(fn () => [
+            Action::make('Delete', handle: fn (Book $book) => null)->destructive(),
+            Action::make('Archive', handle: fn (Book $book) => null),
+        ]);
+
+        expect(array_column(rowActions(), 'destructive', 'name'))->toBe(['delete' => true, 'archive' => false]);
+    });
+
+    it('marks actions destructive only when the condition holds', function () {
+        withActions(fn () => [
+            Action::make('Delete', handle: fn (Book $book) => null)->destructive(false),
+            Action::make('Purge', handle: fn (Book $book) => null)->destructive(true),
+        ]);
+
+        expect(array_column(rowActions(), 'destructive', 'name'))->toBe(['delete' => false, 'purge' => true]);
+    });
+
+    it('can mark a confirmed link as destructive', function () {
+        withActions(fn () => [Action::make('Close account')->to('https://example.com/close')->confirm()->destructive()]);
+
+        expect(rowActions()[0])->toMatchArray(['method' => 'get', 'destructive' => true])
+            ->and(rowActions()[0]['confirm'])->not->toBeNull();
     });
 
     it('rejects two actions with the same name', function () {

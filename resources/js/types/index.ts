@@ -34,6 +34,7 @@ export type TableAction = {
   method: "get" | "post";
   url: string;
   confirm: TableActionConfirmation | null;
+  destructive: boolean;
 };
 
 export type TableRow = { id: string | number; _actions: TableAction[] } & Record<
