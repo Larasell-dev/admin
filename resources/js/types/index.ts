@@ -44,8 +44,17 @@ export type TableRow = { id: string | number; _actions: TableAction[] } & Record
 >;
 
 /** The JSON shape of a Larasell\Admin\Tables\Table. */
+export type TableEmptyState = {
+  title: string;
+  description: string | null;
+  /** NavIcon case name, e.g. "Book"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
+  icon: string | null;
+};
+
 export type TableResource = {
   title: string;
+  /** Shown when there are no rows; null for the default. */
+  emptyState: TableEmptyState | null;
   columns: TableColumn[];
   rows: TableRow[];
 };

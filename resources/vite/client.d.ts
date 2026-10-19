@@ -49,7 +49,19 @@ declare module "larasell-admin/components" {
   >;
 
   /** The JSON shape of a Larasell\Admin\Tables\Table. */
-  export type TableResource = { title: string; columns: TableColumn[]; rows: TableRow[] };
+  export type TableEmptyState = {
+    title: string;
+    description: string | null;
+    /** NavIcon case name, e.g. "Book"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
+    icon: string | null;
+  };
+
+  export type TableResource = {
+    title: string;
+    emptyState: TableEmptyState | null;
+    columns: TableColumn[];
+    rows: TableRow[];
+  };
 
   export const ResourceTable: ComponentType<{ resource: TableResource; "aria-label"?: string }>;
 }
