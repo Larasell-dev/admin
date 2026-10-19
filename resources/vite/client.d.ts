@@ -18,3 +18,16 @@ declare module "larasell-admin/layouts" {
 
   export const SidebarLayout: ComponentType<{ children: ReactNode }>;
 }
+
+declare module "larasell-admin/components" {
+  import type { ComponentType } from "react";
+
+  export type TableColumn = { name: string; label: string; type: "text" };
+
+  export type TableRow = { id: string | number } & Record<string, string | number | null>;
+
+  /** The JSON shape of a Larasell\Admin\Tables\Table. */
+  export type TableResource = { title: string; columns: TableColumn[]; rows: TableRow[] };
+
+  export const ResourceTable: ComponentType<{ resource: TableResource; "aria-label"?: string }>;
+}

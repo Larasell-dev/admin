@@ -6,6 +6,7 @@ import * as React from "react";
 import * as JsxDevRuntime from "react/jsx-dev-runtime";
 import * as JsxRuntime from "react/jsx-runtime";
 import { createRoot } from "react-dom/client";
+import ResourceTable from "./Components/ResourceTable";
 import SidebarLayout from "./Layouts/SidebarLayout";
 
 type PageModule = { default: ResolvedComponent };
@@ -25,6 +26,9 @@ declare global {
       Layouts: {
         SidebarLayout: typeof SidebarLayout;
       };
+      Components: {
+        ResourceTable: typeof ResourceTable;
+      };
       pages: Record<string, RegisteredPage>;
       registerPages: (pages: Record<string, RegisteredPage>) => void;
       boot: () => void;
@@ -42,6 +46,9 @@ window.LarasellAdmin = {
   UI,
   Layouts: {
     SidebarLayout,
+  },
+  Components: {
+    ResourceTable,
   },
   pages: registered,
   registerPages(next) {

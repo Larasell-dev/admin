@@ -11,6 +11,7 @@ export function admin(): Plugin {
     "react/jsx-dev-runtime": path.join(runtime, "jsx-dev-runtime.ts"),
     "@inertiajs/react": path.join(runtime, "inertia.ts"),
     "@larasell-dev/ui": path.join(runtime, "ui.ts"),
+    "larasell-admin/components": path.join(runtime, "components.ts"),
     "larasell-admin/layouts": path.join(runtime, "layouts.ts"),
     "larasell-admin/register": path.join(runtime, "register-pages.ts"),
   };

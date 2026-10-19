@@ -2,12 +2,14 @@
 
 namespace Larasell\Admin;
 
+use Illuminate\Routing\Route as RouteDefinition;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
+use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
 
@@ -31,6 +33,8 @@ class AdminServiceProvider extends ServiceProvider
             ->prefix(config('larasell-admin.path'))
             ->name('larasell.admin.')
             ->group(__DIR__.'/../routes/web.php');
+
+        $this->registerRouteMacros();
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));
 
@@ -63,6 +67,15 @@ class AdminServiceProvider extends ServiceProvider
                 require $routes;
             });
         }
+    }
+
+    private function registerRouteMacros(): void
+    {
+        Route::macro('index', function (string $uri, string $table): RouteDefinition {
+            return Route::get($uri, TableController::class)
+                ->defaults('table', $table)
+                ->name(str_replace('/', '.', trim($uri, '/')).'.index');
+        });
     }
 
     private function configureAuth(): void
