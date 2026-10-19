@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.9](https://github.com/Larasell-dev/admin/compare/v0.1.8...v0.1.9) (2026-10-19)
+
+
+### Features
+
+* add make:larasell-table command ([#58](https://github.com/Larasell-dev/admin/issues/58)) ([066fac0](https://github.com/Larasell-dev/admin/commit/066fac0d5f516ef408cf04a49b04ed344c81f5a1))
+* add PHP-defined admin tables with Route::index() ([#57](https://github.com/Larasell-dev/admin/issues/57)) ([c8b9fe7](https://github.com/Larasell-dev/admin/commit/c8b9fe7cf2475a88e4eefe5dc22454c91c7d7d06))
+* add roving focus to sidebar navigation ([#53](https://github.com/Larasell-dev/admin/issues/53)) ([68bb688](https://github.com/Larasell-dev/admin/commit/68bb688d4c2b23e59cfc9ef822e1974b939c2cbe))
+* add row actions to admin tables ([#60](https://github.com/Larasell-dev/admin/issues/60)) ([2741a6f](https://github.com/Larasell-dev/admin/commit/2741a6f8ff7aff174264bedd9ae3db226daa8741))
+* declare a table's model with the UseModel attribute ([#62](https://github.com/Larasell-dev/admin/issues/62)) ([039cbba](https://github.com/Larasell-dev/admin/commit/039cbba4b7251ee709181be8ab26c6597501a33b))
+* generate Inertia page prop types with laravel-data ([#56](https://github.com/Larasell-dev/admin/issues/56)) ([0fb5e78](https://github.com/Larasell-dev/admin/commit/0fb5e781364c4f386e854753b4c55a4e2891debd))
+* let tables define their empty state ([#61](https://github.com/Larasell-dev/admin/issues/61)) ([72fffda](https://github.com/Larasell-dev/admin/commit/72fffdab838f7a7009433753ae36f293b55f4db3))
+
+
+### Miscellaneous Chores
+
+* add oxfmt formatter and check formatting in CI ([#52](https://github.com/Larasell-dev/admin/issues/52)) ([0327723](https://github.com/Larasell-dev/admin/commit/0327723e03286dd3a8118ec1060dc687c30fd723))
+
 ## [0.1.8](https://github.com/Larasell-dev/admin/compare/v0.1.7...v0.1.8) (2026-10-18)
 
 
