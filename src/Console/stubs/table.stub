@@ -3,11 +3,12 @@
 namespace {{ namespace }};
 
 use {{ namespacedModel }};
+use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Table;
 
+#[UseModel({{ model }}::class)]
 class {{ class }} extends Table
 {
-    protected ?string $model = {{ model }}::class;
 
     public function columns(): array
     {

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
@@ -27,6 +28,17 @@ class BookAuthorsTable extends Table
     {
         return [
             TextColumn::make('author_name'),
+        ];
+    }
+}
+
+#[UseModel(Book::class)]
+class AttributedBooksTable extends Table
+{
+    public function columns(): array
+    {
+        return [
+            TextColumn::make('title'),
         ];
     }
 }
@@ -67,4 +79,12 @@ it('derives a sentence case title from the class name', function () {
 
 it('returns no rows when there are no models', function () {
     expect(tableResource(BooksTable::make())['rows'])->toBe([]);
+});
+
+it('lists the model declared with the UseModel attribute', function () {
+    $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+    expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
+        ['id' => $dune->id, 'title' => 'Dune', '_actions' => []],
+    ]);
 });

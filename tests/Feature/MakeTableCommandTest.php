@@ -17,7 +17,8 @@ it('scaffolds a table for the singular model', function () {
         ->toContain('namespace App\Tables;')
         ->toContain('use App\Models\ProductReview;')
         ->toContain('class ProductReviews extends Table')
-        ->toContain('protected ?string $model = ProductReview::class;')
+        ->toContain('use Larasell\Admin\Tables\Attributes\UseModel;')
+        ->toContain('#[UseModel(ProductReview::class)]')
         ->toContain('public function columns(): array');
 });
 
@@ -26,5 +27,5 @@ it('uses the given model', function () {
 
     expect(File::get(app_path('Tables/Books.php')))
         ->toContain('use Larasell\Admin\Tests\Fixtures\Book;')
-        ->toContain('protected ?string $model = Book::class;');
+        ->toContain('#[UseModel(Book::class)]');
 });
