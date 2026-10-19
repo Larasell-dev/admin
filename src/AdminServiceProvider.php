@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
+use Larasell\Admin\Console\MakeTableCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
@@ -43,6 +44,7 @@ class AdminServiceProvider extends ServiceProvider
                 CreateAdminUserCommand::class,
                 LinkAdminAssetsCommand::class,
                 ListAdminsCommand::class,
+                MakeTableCommand::class,
                 RemoveAdminCommand::class,
             ]);
         }
