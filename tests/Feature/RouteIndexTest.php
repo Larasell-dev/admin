@@ -43,7 +43,7 @@ it('renders the table page for an index route', function () {
             ->component('TablePage')
             ->where('table.title', 'Library table')
             ->where('table.columns', [['name' => 'title', 'label' => 'Title', 'type' => 'text']])
-            ->where('table.rows', [['id' => $book->id, 'title' => 'Dune']]));
+            ->where('table.rows', [['id' => $book->id, 'title' => 'Dune', '_actions' => []]]));
 });
 
 it('requires a signed-in admin', function () {

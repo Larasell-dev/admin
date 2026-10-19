@@ -11,6 +11,7 @@ use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
 use Larasell\Admin\Http\Controllers\ProfileController;
+use Larasell\Admin\Http\Controllers\TableActionController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 
@@ -25,6 +26,7 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
+    Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::post('logout', LogoutController::class)->name('logout');
 });
 

@@ -1,6 +1,7 @@
 const ui = window.LarasellAdmin.UI;
 
 export const {
+  AlertDialog,
   Button,
   Container,
   DataList,
