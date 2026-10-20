@@ -5,6 +5,8 @@ namespace Larasell\Admin\Tables\Actions;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Exceptions\InvalidTableAction;
 use Larasell\Admin\Tables\Table;
 use LogicException;
 
@@ -17,6 +19,8 @@ class Action
     protected bool $destructive = false;
 
     protected bool|Closure $disabled = false;
+
+    protected ?Icon $icon = null;
 
     /**
      * @var array{title: ?string, message: ?string, confirmButton: ?string, cancelButton: ?string, confirmationText: string|Closure|null}
@@ -92,6 +96,28 @@ class Action
         return $this;
     }
 
+    /**
+     * Show an icon before the label: an Icon case or its Remix icon name, e.g. "delete-bin".
+     */
+    public function icon(Icon|string $icon): static
+    {
+        $this->icon = is_string($icon) ? $this->resolveIcon($icon) : $icon;
+
+        return $this;
+    }
+
+    protected function resolveIcon(string $icon): Icon
+    {
+        $case = Icon::tryFrom($icon);
+
+        // Checked only after the lookup misses, so no Icon case can be rejected for its name.
+        if ($case === null && Str::endsWith($icon, ['-line', '-fill'])) {
+            throw InvalidTableAction::iconStyleVariant($this->name(), $icon);
+        }
+
+        return $case ?? throw InvalidTableAction::unknownIcon($this->name(), $icon);
+    }
+
     public function isDisabledFor(Model $record): bool
     {
         return $this->disabled instanceof Closure ? (bool) ($this->disabled)($record) : $this->disabled;
@@ -139,7 +165,9 @@ class Action
     }
 
     /**
-     * @return array{name: string, label: string, method: string, url: string, confirm: array<string, string|null>|null, destructive: bool, disabled: bool}
+     * The icon is sent as its case name, which @larasell-dev/ui/icons exports with a Fill or Line suffix.
+     *
+     * @return array{name: string, label: string, method: string, url: string, confirm: array<string, string|null>|null, destructive: bool, disabled: bool, icon: ?string}
      */
     public function toRow(Table $table, Model $record): array
     {
@@ -151,6 +179,7 @@ class Action
             'confirm' => $this->confirms ? $this->confirmationFor($record) : null,
             'destructive' => $this->destructive,
             'disabled' => $this->isDisabledFor($record),
+            'icon' => $this->icon?->name,
         ];
     }
 

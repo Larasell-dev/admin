@@ -14,6 +14,7 @@ const archive: TableAction = {
   confirm: null,
   destructive: false,
   disabled: false,
+  icon: null,
 };
 
 const row = (
@@ -139,6 +140,24 @@ describe.each([
     await expect.element(screen.getByRole("button", { name: "Actions for Dune" })).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await expect.element(page.getByRole("menuitem", { name: "Archive" })).toHaveFocus();
+  });
+
+  it("shows an action's icon before its label, hidden from assistive tech", async () => {
+    const remove = { ...archive, name: "delete", label: "Delete", icon: "DeleteBin" };
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", null, [remove, archive])])} />,
+    );
+
+    await screen.getByRole("button", { name: "Actions for Dune" }).click();
+    const withIcon = page.getByRole("menuitem", { name: "Delete" });
+    const withoutIcon = page.getByRole("menuitem", { name: "Archive" });
+
+    await expect.element(withIcon).toBeVisible();
+    const icon = withIcon.element().querySelector("svg");
+    expect(icon).not.toBeNull();
+    expect(icon?.getAttribute("aria-hidden")).toBe("true");
+    expect(withIcon.element().firstElementChild).toBe(icon);
+    expect(withoutIcon.element().querySelector("svg")).toBeNull();
   });
 
   it("runs a row action from its menu without following the row link", async () => {

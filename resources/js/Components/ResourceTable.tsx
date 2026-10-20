@@ -3,6 +3,7 @@ import { DataList, Table } from "@larasell-dev/ui";
 import { type ReactNode, useState } from "react";
 import type { TableAction, TableResource, TableRow } from "../types";
 import { isSameSite } from "../utils/isSameSite";
+import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 
 type Props = {
@@ -77,6 +78,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
             key={action.name}
             variant={action.destructive ? "destructive" : "default"}
             disabled={action.disabled}
+            icon={action.icon ? navigationIcon(action.icon, false) : undefined}
             onClick={() => choose(action)}
           >
             {action.label}
