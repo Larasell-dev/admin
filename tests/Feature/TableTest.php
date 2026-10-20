@@ -154,6 +154,52 @@ it('lists the model declared with the UseModel attribute', function () {
 });
 
 describe('mapped columns', function () {
+    it('rejects a callback that changes the record', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        try {
+            tableResource(new class extends Table
+            {
+                protected ?string $model = Book::class;
+
+                public function columns(): array
+                {
+                    return [TextColumn::make('title')->map(function ($value, Book $book): string {
+                        $book->author_name = 'Someone else';
+
+                        return $value;
+                    })];
+                }
+            });
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.record-modified')
+                ->and($exception->getMessage())->toContain('[title]')
+                ->and($exception->getMessage())->toContain('author_name');
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
+    });
+
+    it('allows a callback that sets an attribute back to its original value', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(new class extends Table
+        {
+            protected ?string $model = Book::class;
+
+            public function columns(): array
+            {
+                return [TextColumn::make('title')->map(function ($value, Book $book): string {
+                    $book->title = $value;
+
+                    return $value;
+                })];
+            }
+        })['rows'][0]['title'])->toBe('Dune');
+    });
+
     it('computes a column that is not an attribute from the record', function () {
         Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 

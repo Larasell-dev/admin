@@ -69,7 +69,14 @@ abstract class Column implements JsonSerializable
             $value = null;
         }
 
-        return ($this->map)($value, $record);
+        $mapped = ($this->map)($value, $record);
+
+        // Actions and rowLink() get the same record, so a change here would leak into them.
+        if ($record->isDirty()) {
+            throw InvalidTableColumn::recordModified($this->name, array_keys($record->getDirty()));
+        }
+
+        return $mapped;
     }
 
     /**
