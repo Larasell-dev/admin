@@ -21,6 +21,78 @@
 * stop tables from overriding query() ([#71](https://github.com/Larasell-dev/admin/issues/71)) ([d1dff3e](https://github.com/Larasell-dev/admin/commit/d1dff3e8bb5903dce9e25f8f7c24ddbbd027dce9))
 * validate icons the same way everywhere ([#70](https://github.com/Larasell-dev/admin/issues/70)) ([f26235e](https://github.com/Larasell-dev/admin/commit/f26235eca0da0c353a9ea1767857f09eda622ad3))
 
+### Upgrade guide
+
+#### An empty empty-state icon now throws `empty-icon`
+
+A table whose `emptyState()` returns an empty or whitespace-only `'icon'` now
+fails with the error code `larasell-admin.table.empty-state.empty-icon` instead
+of `larasell-admin.table.empty-state.unknown-icon`. A blank icon is a different
+mistake than a misspelled one, so it now gets its own error and fix, the same
+way navigation items and table actions already report it.
+
+##### Who is affected
+
+Apps that catch `Larasell\Admin\Exceptions\InvalidTableEmptyState` and compare
+its `errorCode()` to `larasell-admin.table.empty-state.unknown-icon` for blank
+icons. The exception class is unchanged, and so is the error for icon names
+that are not empty. Apps that don't inspect error codes are not affected.
+
+##### How to upgrade
+
+Check for the new code where you handle blank icons:
+
+```php
+use Larasell\Admin\Exceptions\InvalidTableEmptyState;
+
+// Before
+if ($exception->errorCode() === 'larasell-admin.table.empty-state.unknown-icon') {
+    // ...
+}
+
+// After
+if (in_array($exception->errorCode(), [
+    'larasell-admin.table.empty-state.empty-icon',
+    'larasell-admin.table.empty-state.unknown-icon',
+], true)) {
+    // ...
+}
+```
+
+To avoid the error, leave `'icon'` out of `emptyState()` for the default icon
+instead of returning `''`.
+
+#### The `NavIcon` enum is now `Icon`
+
+`Larasell\Admin\Enums\NavIcon` is renamed to `Larasell\Admin\Enums\Icon`. The
+enum is no longer only for navigation items: tables use it for their empty
+state too, so the old name was misleading. Its cases and values are unchanged.
+
+##### Who is affected
+
+Apps that import `Larasell\Admin\Enums\NavIcon`, for example to register
+navigation items or to set a table's empty state icon. Apps that pass icons as
+strings such as `'home'` are not affected.
+
+##### How to upgrade
+
+Replace every `NavIcon` import and reference with `Icon`:
+
+```php
+// Before
+use Larasell\Admin\Enums\NavIcon;
+
+Navigation::add('Orders', 'orders.index', NavIcon::ShoppingBag);
+
+// After
+use Larasell\Admin\Enums\Icon;
+
+Navigation::add('Orders', 'orders.index', Icon::ShoppingBag);
+```
+
+Cases and their string values stay the same, so a find-and-replace of
+`Enums\NavIcon` and `NavIcon::` is enough.
+
 ## [0.1.9](https://github.com/Larasell-dev/admin/compare/v0.1.8...v0.1.9) (2026-10-19)
 
 
