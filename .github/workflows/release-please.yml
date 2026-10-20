@@ -5,8 +5,12 @@ name: release-please
 # and commits them to that pull request's branch, so the release commit and its
 # tag ship the JavaScript, CSS, and fonts that Composer installs.
 #
+# The same job moves the upgrade notes from breaking-changes/ into an "Upgrade
+# guide" section of the new version in CHANGELOG.md and deletes the files.
+#
 # release-please only rewrites its branch when the release notes change unless
-# "always-update" is set, which keeps the built assets in sync with main.
+# "always-update" is set, which keeps the built assets and the upgrade guide in
+# sync with main.
 
 on:
   push:
@@ -36,7 +40,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   assets:
-    name: Build assets for the release pull request
+    name: Prepare the release pull request
     needs: release-please
     if: needs.release-please.outputs.prs_created == 'true'
     runs-on: ubuntu-latest
@@ -56,13 +60,29 @@ jobs:
           node-version: "22"
           cache: npm
 
+      - name: Configure Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      # Runs again on every rewrite of the release branch; once the notes are moved there is
+      # nothing left to bundle until the next release.
+      - name: Bundle breaking changes into the changelog
+        run: |
+          node scripts/breaking-changes.mjs bundle
+          git add --all CHANGELOG.md breaking-changes
+
+          if ! git diff --cached --quiet; then
+            git commit --message 'docs: bundle breaking changes into the changelog'
+          fi
+
       - name: Install dependencies
         run: npm ci
 
       - name: Build admin assets
         run: npm run build
 
-      - name: Commit assets to the release branch
+      - name: Commit assets and push the release branch
         env:
           BRANCH: ${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
         run: |
@@ -70,10 +90,8 @@ jobs:
 
           if git diff --cached --quiet; then
             echo 'Built assets are already up to date.'
-            exit 0
+          else
+            git commit --message 'build: bundle admin assets for release'
           fi
 
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit --message 'build: bundle admin assets for release'
           git push origin "HEAD:refs/heads/$BRANCH"
