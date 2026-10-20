@@ -3,6 +3,8 @@
 //   node scripts/breaking-changes.mjs check   Pull request check. Needs PR_TITLE and BASE_SHA.
 //   node scripts/breaking-changes.mjs bundle  Release step. Moves the notes into the newest
 //                                             CHANGELOG.md version and deletes the files.
+//   node scripts/breaking-changes.mjs notes <version>
+//                                             Prints that version's CHANGELOG.md section.
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -92,7 +94,22 @@ function bundle() {
   console.log(`Bundled ${files.length} breaking change(s) into CHANGELOG.md: ${files.join(", ")}`);
 }
 
-const commands = { check, bundle };
+// Prints one version's CHANGELOG.md section, upgrade guide included, for its GitHub release.
+// release-please writes release notes from commits, so they lack the guide bundled above.
+function notes() {
+  const version = process.argv[3];
+  if (!version) fail("Usage: node scripts/breaking-changes.mjs notes <version>");
+
+  const changelog = readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
+  const sections = changelog.split(/^(?=## )/m);
+  const heading = new RegExp(`^## \\[?${version.replaceAll(".", "\\.")}[\\] ]`);
+  const section = sections.find((part) => heading.test(part));
+  if (!section) fail(`CHANGELOG.md has no section for version ${version}.`);
+
+  process.stdout.write(`${section.trim()}\n`);
+}
+
+const commands = { check, bundle, notes };
 const command = commands[process.argv[2]];
 if (!command) fail(`Usage: node scripts/breaking-changes.mjs <${Object.keys(commands).join("|")}>`);
 command();

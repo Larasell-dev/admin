@@ -6,7 +6,8 @@ or changed defaults. Every breaking change gets its own Markdown file in this
 directory, written for the developers who have to upgrade their app. When a
 release is cut, the release workflow moves all files here into an **Upgrade
 guide** section of that version in [`CHANGELOG.md`](../CHANGELOG.md) and
-deletes them.
+deletes them. Once the release is published, the workflow copies that version's
+changelog section, upgrade guide included, into the GitHub release.
 
 ## Adding one
 
