@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   test: {
-    include: ["resources/js/**/*.test.tsx"],
+    include: ["resources/js/**/*.test.{ts,tsx}"],
     browser: {
       enabled: true,
       provider: playwright(),
