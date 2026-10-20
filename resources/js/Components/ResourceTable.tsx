@@ -1,5 +1,6 @@
 import { Link, router } from "@inertiajs/react";
-import { DataList, Table } from "@larasell-dev/ui";
+import type { PaginationChange } from "@larasell-dev/ui";
+import { DataList, Pagination, Table } from "@larasell-dev/ui";
 import { type ReactNode, useState } from "react";
 import type { TableAction, TableResource, TableRow } from "../types";
 import { isSameSite } from "../utils/isSameSite";
@@ -30,6 +31,23 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
   const [pending, setPending] = useState<TableAction | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string>();
+  const [isPaginating, setIsPaginating] = useState(false);
+
+  const pagination = {
+    ...resource.pagination,
+    pageSizeOptions: [25, 50, 100],
+    disabled: isPaginating,
+    onPaginationChange: ({ page, pageSize }: PaginationChange) =>
+      router.get(
+        window.location.pathname,
+        { page, per_page: pageSize },
+        {
+          preserveScroll: true,
+          onStart: () => setIsPaginating(true),
+          onFinish: () => setIsPaginating(false),
+        },
+      ),
+  };
 
   const perform = (action: TableAction, confirmation?: string) => {
     if (action.method === "get") {
@@ -90,26 +108,31 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
 
   return (
     <>
-      <div className="min-h-0 flex-1 overflow-y-auto lg:hidden">
-        <DataList.Root aria-label={label}>
-          {resource.rows.map((row) => (
-            <DataList.Item key={row.id}>
-              <div className="flex items-start justify-between gap-2">
-                {primary && (
-                  <DataList.Title>
-                    {linked(row, DataList.Link, cell(row, primary.name))}
-                  </DataList.Title>
-                )}
-                {hasActions && actionsMenu(row)}
-              </div>
-              {rest.map((column) => (
-                <DataList.Field key={column.name} label={column.label}>
-                  {cell(row, column.name)}
-                </DataList.Field>
-              ))}
-            </DataList.Item>
-          ))}
-        </DataList.Root>
+      <div className="flex min-h-0 flex-1 flex-col lg:hidden">
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <DataList.Root aria-label={label}>
+            {resource.rows.map((row) => (
+              <DataList.Item key={row.id}>
+                <div className="flex items-start justify-between gap-2">
+                  {primary && (
+                    <DataList.Title>
+                      {linked(row, DataList.Link, cell(row, primary.name))}
+                    </DataList.Title>
+                  )}
+                  {hasActions && actionsMenu(row)}
+                </div>
+                {rest.map((column) => (
+                  <DataList.Field key={column.name} label={column.label}>
+                    {cell(row, column.name)}
+                  </DataList.Field>
+                ))}
+              </DataList.Item>
+            ))}
+          </DataList.Root>
+        </div>
+        <div className="border-border shrink-0 border-t px-4 py-3">
+          <Pagination {...pagination} />
+        </div>
       </div>
 
       <div className="hidden min-h-0 flex-1 lg:block">
@@ -140,6 +163,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
               ))}
             </Table.Body>
           </Table.Content>
+          <Table.Pagination {...pagination} />
         </Table.Root>
       </div>
 

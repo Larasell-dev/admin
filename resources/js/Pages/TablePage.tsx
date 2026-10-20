@@ -19,7 +19,7 @@ export default function TablePage({ table }: Props) {
         <h1 className="type-body-md text-mauve-950 dark:text-mauve-50">{table.title}</h1>
       </header>
 
-      {table.rows.length === 0 ? (
+      {table.pagination.total === 0 ? (
         <div className="flex flex-1 items-center justify-center px-6 py-12">
           <EmptyState
             icon={table.emptyState?.icon ? emptyStateIcon(table.emptyState.icon) : InboxLine}

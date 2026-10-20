@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Request;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
@@ -64,9 +65,21 @@ class LinkedBooksTable extends Table
     }
 }
 
-function tableResource(Table $table): array
+/**
+ * @param  array<string, mixed>  $query  The request's query string, e.g. ['page' => 2].
+ */
+function tableResource(Table $table, array $query = []): array
 {
+    app()->instance('request', Request::create('/admin/tables/books', 'GET', $query));
+
     return json_decode(json_encode($table), true);
+}
+
+function createBooks(int $count): void
+{
+    foreach (range(1, $count) as $number) {
+        Book::create(['title' => "Book {$number}", 'author_name' => "Author {$number}"]);
+    }
 }
 
 beforeEach(function () {
@@ -120,4 +133,51 @@ it('lists the model declared with the UseModel attribute', function () {
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
         ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
     ]);
+});
+
+describe('pagination', function () {
+    it('shows the first 25 rows and the total across all pages', function () {
+        createBooks(30);
+
+        $resource = tableResource(BooksTable::make());
+
+        expect(array_column($resource['rows'], 'title'))->toBe(array_map(fn (int $n): string => "Book {$n}", range(1, 25)))
+            ->and($resource['pagination'])->toBe(['page' => 1, 'pageSize' => 25, 'total' => 30]);
+    });
+
+    it('shows the requested page', function () {
+        createBooks(30);
+
+        $resource = tableResource(BooksTable::make(), ['page' => 2]);
+
+        expect(array_column($resource['rows'], 'title'))->toBe(['Book 26', 'Book 27', 'Book 28', 'Book 29', 'Book 30'])
+            ->and($resource['pagination'])->toBe(['page' => 2, 'pageSize' => 25, 'total' => 30]);
+    });
+
+    it('shows as many rows per page as requested', function (int $pageSize) {
+        createBooks(101);
+
+        $resource = tableResource(BooksTable::make(), ['per_page' => $pageSize]);
+
+        expect($resource['rows'])->toHaveCount($pageSize)
+            ->and($resource['pagination'])->toBe(['page' => 1, 'pageSize' => $pageSize, 'total' => 101]);
+    })->with([50, 100]);
+
+    it('falls back to 25 rows per page for a page size it does not offer', function (mixed $pageSize) {
+        createBooks(30);
+
+        $resource = tableResource(BooksTable::make(), ['per_page' => $pageSize]);
+
+        expect($resource['rows'])->toHaveCount(25)
+            ->and($resource['pagination']['pageSize'])->toBe(25);
+    })->with([10, 1000, 0, -50, 'all']);
+
+    it('shows the last page when the requested page is past it', function () {
+        createBooks(30);
+
+        $resource = tableResource(BooksTable::make(), ['page' => 9]);
+
+        expect(array_column($resource['rows'], 'title'))->toBe(['Book 26', 'Book 27', 'Book 28', 'Book 29', 'Book 30'])
+            ->and($resource['pagination'])->toBe(['page' => 2, 'pageSize' => 25, 'total' => 30]);
+    });
 });

@@ -3,7 +3,7 @@ import { router } from "@inertiajs/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import type { TableAction, TableResource, TableRow } from "../types";
+import type { TableAction, TablePagination, TableResource, TableRow } from "../types";
 import ResourceTable from "./ResourceTable";
 
 const archive: TableAction = {
@@ -30,7 +30,10 @@ const row = (
   _link: link,
 });
 
-const resource = (rows: TableRow[]): TableResource => ({
+const resource = (
+  rows: TableRow[],
+  pagination: TablePagination = { page: 1, pageSize: 25, total: rows.length },
+): TableResource => ({
   title: "Books",
   emptyState: null,
   columns: [
@@ -38,11 +41,13 @@ const resource = (rows: TableRow[]): TableResource => ({
     { name: "author", label: "Author", type: "text" },
   ],
   rows,
+  pagination,
 });
 
 beforeEach(() => {
   vi.spyOn(router, "visit").mockImplementation(() => {});
   vi.spyOn(router, "post").mockImplementation(() => {});
+  vi.spyOn(router, "get").mockImplementation(() => {});
 });
 
 afterEach(() => {
@@ -170,5 +175,31 @@ describe.each([
 
     expect(router.post).toHaveBeenCalledWith(archive.url, {}, expect.anything());
     expect(router.visit).not.toHaveBeenCalled();
+  });
+
+  it("shows which page of how many is on screen", async () => {
+    const screen = await render(
+      <ResourceTable
+        resource={resource([row(26, "Dune", null)], { page: 2, pageSize: 25, total: 60 })}
+      />,
+    );
+
+    const pagination = screen.getByRole("navigation", { name: "Pagination" });
+    await expect.element(pagination.getByText("Page 2 of 3")).toBeVisible();
+  });
+
+  it("requests the next page, keeping the page size and scroll position", async () => {
+    const screen = await render(
+      <ResourceTable
+        resource={resource([row(51, "Dune", null)], { page: 2, pageSize: 50, total: 120 })}
+      />,
+    );
+
+    await screen.getByRole("button", { name: "Next page" }).click();
+
+    expect(router.get).toHaveBeenCalledOnce();
+    expect(vi.mocked(router.get).mock.calls[0][0]).toBe(window.location.pathname);
+    expect(vi.mocked(router.get).mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
+    expect(vi.mocked(router.get).mock.calls[0][2]).toMatchObject({ preserveScroll: true });
   });
 });
