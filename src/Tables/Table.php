@@ -14,6 +14,13 @@ use Larasell\Admin\Tables\Columns\Column;
 use LogicException;
 use ReflectionClass;
 
+/**
+ * To link each row somewhere, define a public rowLink() method that takes a
+ * record of the table's model and returns its URL, or null to leave that row
+ * unlinked. It is not declared here so it can type its parameter as the model:
+ *
+ *     public function rowLink(ProductReview $productReview): ?string
+ */
 abstract class Table implements JsonSerializable
 {
     /** @var class-string<Model>|null */
@@ -231,6 +238,7 @@ abstract class Table implements JsonSerializable
             }
 
             $row['_actions'] = array_map(fn (Action $action): array => $action->toRow($this, $record), $actions);
+            $row['_link'] = method_exists($this, 'rowLink') ? $this->rowLink($record) : null;
 
             return $row;
         });
