@@ -38,10 +38,12 @@ export type TableAction = {
   disabled: boolean;
 };
 
-export type TableRow = { id: string | number; _actions: TableAction[] } & Record<
-  string,
-  string | number | null | TableAction[]
->;
+export type TableRow = {
+  id: string | number;
+  _actions: TableAction[];
+  /** Where the row links to; null when it links nowhere. */
+  _link: string | null;
+} & Record<string, string | number | null | TableAction[]>;
 
 /** The JSON shape of a Larasell\Admin\Tables\Table. */
 export type TableEmptyState = {

@@ -16,11 +16,17 @@ const archive: TableAction = {
   disabled: false,
 };
 
-const row = (id: number, title: string, actions: TableAction[] = []): TableRow => ({
+const row = (
+  id: number,
+  title: string,
+  link: string | null,
+  actions: TableAction[] = [],
+): TableRow => ({
   id,
   title,
   author: `Author ${id}`,
   _actions: actions,
+  _link: link,
 });
 
 const resource = (rows: TableRow[]): TableResource => ({
@@ -34,6 +40,7 @@ const resource = (rows: TableRow[]): TableResource => ({
 });
 
 beforeEach(() => {
+  vi.spyOn(router, "visit").mockImplementation(() => {});
   vi.spyOn(router, "post").mockImplementation(() => {});
 });
 
@@ -43,28 +50,106 @@ afterEach(() => {
 
 // The data list shows below `lg`, the table from `lg` up; the other one is hidden.
 describe.each([
-  { layout: "data list", width: 400 },
-  { layout: "table", width: 1280 },
-])("in the $layout", ({ width }) => {
+  { layout: "data list", role: "list", width: 400 },
+  { layout: "table", role: "table", width: 1280 },
+] as const)("in the $layout", ({ role, width }) => {
   beforeEach(async () => {
     await page.viewport(width, 800);
   });
 
-  it("runs a row action from its menu", async () => {
-    const screen = await render(<ResourceTable resource={resource([row(1, "Dune", [archive])])} />);
+  it("links a row through its primary value, named after it", async () => {
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1")])} />,
+    );
 
-    await screen.getByRole("button", { name: "Actions for Dune" }).click();
-    await page.getByRole("menuitem", { name: "Archive" }).click();
+    const link = screen.getByRole("link", { name: "Dune" });
+    await expect.element(link).toHaveAttribute("href", "/admin/books/1");
+    expect(screen.getByRole("link").elements()).toHaveLength(1);
+  });
 
-    expect(router.post).toHaveBeenCalledWith(archive.url, {}, expect.anything());
+  it("renders no link for rows whose link is null", async () => {
+    const screen = await render(
+      <ResourceTable
+        resource={resource([row(1, "Dune", "/admin/books/1"), row(2, "Beowulf", null)])}
+      />,
+    );
+
+    await expect.element(screen.getByRole(role).getByText("Beowulf")).toBeVisible();
+    expect(
+      screen
+        .getByRole("link")
+        .elements()
+        .map((link) => link.textContent),
+    ).toEqual(["Dune"]);
+  });
+
+  it("visits same-site links with Inertia when clicking anywhere in the row", async () => {
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1")])} />,
+    );
+
+    // The link stretches over the row, so it receives the click on another field.
+    await screen.getByRole(role).getByText("Author 1").click({ force: true });
+
+    expect(router.visit).toHaveBeenCalledOnce();
+    expect(String(vi.mocked(router.visit).mock.calls[0][0])).toContain("/admin/books/1");
+  });
+
+  it("follows links to other sites as plain anchors", async () => {
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", "https://books.test/1")])} />,
+    );
+    // Runs after React's handlers, so Inertia would already have intercepted the click.
+    const stayOnPage = (event: Event) => event.preventDefault();
+    window.addEventListener("click", stayOnPage);
+
+    try {
+      await screen.getByRole("link", { name: "Dune" }).click();
+    } finally {
+      window.removeEventListener("click", stayOnPage);
+    }
+
+    await expect
+      .element(screen.getByRole("link", { name: "Dune" }))
+      .toHaveAttribute("href", "https://books.test/1");
+    expect(router.visit).not.toHaveBeenCalled();
+  });
+
+  it("keeps the row's actions outside the link, after it in the tab order", async () => {
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1", [archive])])} />,
+    );
+    const link = screen.getByRole("link", { name: "Dune" });
+    const trigger = screen.getByRole("button", { name: "Actions for Dune" });
+
+    expect(trigger.element().closest("a")).toBeNull();
+
+    await userEvent.tab();
+    await expect.element(link).toHaveFocus();
+    await userEvent.tab();
+    await expect.element(trigger).toHaveFocus();
   });
 
   it("opens a row's actions from the keyboard", async () => {
-    const screen = await render(<ResourceTable resource={resource([row(1, "Dune", [archive])])} />);
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", null, [archive])])} />,
+    );
 
     await userEvent.tab();
     await expect.element(screen.getByRole("button", { name: "Actions for Dune" })).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await expect.element(page.getByRole("menuitem", { name: "Archive" })).toHaveFocus();
+  });
+
+  it("runs a row action from its menu without following the row link", async () => {
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1", [archive])])} />,
+    );
+
+    await screen.getByRole("button", { name: "Actions for Dune" }).click();
+    await page.getByRole("menuitem", { name: "Archive" }).click();
+
+    expect(router.post).toHaveBeenCalledWith(archive.url, {}, expect.anything());
+    expect(router.visit).not.toHaveBeenCalled();
   });
 });

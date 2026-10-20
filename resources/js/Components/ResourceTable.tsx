@@ -1,7 +1,8 @@
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { DataList, Table } from "@larasell-dev/ui";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import type { TableAction, TableResource, TableRow } from "../types";
+import { isSameSite } from "../utils/isSameSite";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
 const cell = (row: TableRow, column: string) => row[column] as string | number | null;
 
 function visit(url: string) {
-  if (new URL(url, window.location.href).origin === window.location.origin) {
+  if (isSameSite(url)) {
     router.visit(url);
   } else {
     window.location.assign(url);
@@ -55,6 +56,16 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
     }
   };
 
+  /** Links the row through its primary cell's value; the link stretches over the whole row. */
+  const linked = (row: TableRow, RowLink: typeof Table.Link, value: ReactNode) =>
+    row._link ? (
+      <RowLink render={isSameSite(row._link) ? <Link href={row._link} /> : <a href={row._link} />}>
+        {value}
+      </RowLink>
+    ) : (
+      value
+    );
+
   const actionsMenu = (row: TableRow) => (
     <Table.Actions>
       <Table.ActionsTrigger
@@ -82,7 +93,11 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
           {resource.rows.map((row) => (
             <DataList.Item key={row.id}>
               <div className="flex items-start justify-between gap-2">
-                {primary && <DataList.Title>{cell(row, primary.name)}</DataList.Title>}
+                {primary && (
+                  <DataList.Title>
+                    {linked(row, DataList.Link, cell(row, primary.name))}
+                  </DataList.Title>
+                )}
                 {hasActions && actionsMenu(row)}
               </div>
               {rest.map((column) => (
@@ -112,7 +127,11 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
               {resource.rows.map((row) => (
                 <Table.Row key={row.id}>
                   {resource.columns.map((column) => (
-                    <Table.Cell key={column.name}>{cell(row, column.name)}</Table.Cell>
+                    <Table.Cell key={column.name}>
+                      {column === primary
+                        ? linked(row, Table.Link, cell(row, column.name))
+                        : cell(row, column.name)}
+                    </Table.Cell>
                   ))}
                   {hasActions && <Table.Cell>{actionsMenu(row)}</Table.Cell>}
                 </Table.Row>
