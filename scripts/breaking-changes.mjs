@@ -1,4 +1,4 @@
-// Manages the per-change upgrade notes in breaking-changes/. See breaking-changes/README.md.
+// Manages the per-change upgrade notes in breaking-changes/. See breaking-changes/AGENT.md.
 //
 //   node scripts/breaking-changes.mjs check   Pull request check. Needs PR_TITLE and BASE_SHA.
 //   node scripts/breaking-changes.mjs bundle  Release step. Moves the notes into the newest
@@ -10,7 +10,7 @@ import path from "node:path";
 const root = path.resolve(import.meta.dirname, "..");
 const dir = "breaking-changes";
 
-const isNote = (name) => name.endsWith(".md") && !name.startsWith("_") && name !== "README.md";
+const isNote = (name) => name.endsWith(".md") && !name.startsWith("_") && name !== "AGENT.md";
 
 function fail(message) {
   console.error(`::error::${message}`);

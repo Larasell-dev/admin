@@ -1,9 +1,12 @@
 # Breaking changes
 
-Every breaking change gets its own Markdown file in this directory, written for
-the developers who have to upgrade their app. When a release is cut, the
-release workflow moves all files here into an **Upgrade guide** section of that
-version in [`CHANGELOG.md`](../CHANGELOG.md) and deletes them.
+Follow these rules whenever a change breaks the public API or behavior that
+apps rely on: renamed or removed classes, methods, enums, config keys, routes,
+or changed defaults. Every breaking change gets its own Markdown file in this
+directory, written for the developers who have to upgrade their app. When a
+release is cut, the release workflow moves all files here into an **Upgrade
+guide** section of that version in [`CHANGELOG.md`](../CHANGELOG.md) and
+deletes them.
 
 ## Adding one
 
@@ -40,4 +43,4 @@ title without adding a file here.
 
 Start the file with a single `#` title and use `##` for sections. Headings are
 nested under the version when they are bundled into the changelog. Files whose
-name starts with `_`, and this README, are never bundled.
+name starts with `_`, and this `AGENT.md`, are never bundled.

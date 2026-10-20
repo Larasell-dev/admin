@@ -36,3 +36,8 @@ In `agent-browser`, open `/admin/__dev/login?redirect=/admin/profile` to land on
 a page as a signed-in admin. Hit `/admin/__dev` to discover any newly added
 shortcuts. When adding a new dev shortcut, put it in the `__dev` group in
 `routes/web.php` so it is listed automatically and inherits the local-only guard.
+
+## Breaking changes
+
+Every breaking change needs an upgrade note in `breaking-changes/` and a `!` in
+the pull request title. Follow `breaking-changes/AGENT.md` when writing one.
