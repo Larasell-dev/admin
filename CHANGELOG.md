@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Larasell-dev/admin/compare/v0.3.0...v0.3.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* let map() callbacks type the record as the table's model ([#83](https://github.com/Larasell-dev/admin/issues/83)) ([5af24e9](https://github.com/Larasell-dev/admin/commit/5af24e90fc96d7137ff4e0d82e57698118d5f2c2))
+
 ## [0.3.0](https://github.com/Larasell-dev/admin/compare/v0.2.0...v0.3.0) (2026-10-20)
 
 
