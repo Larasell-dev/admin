@@ -11,7 +11,9 @@ use Larasell\Admin\Exceptions\InvalidTableColumn;
 
 abstract class Column implements JsonSerializable
 {
-    /** @var (Closure(mixed, Model): mixed)|null */
+    /**
+     * Takes the value and a record of the table's model, which map() lets callers type as that model.
+     */
     protected ?Closure $map = null;
 
     final public function __construct(
@@ -43,7 +45,12 @@ abstract class Column implements JsonSerializable
      *
      *     TextColumn::make('name')->map(fn ($value, Contact $contact) => "{$contact->first_name} {$contact->last_name}")
      *
-     * @param  Closure(mixed, Model): mixed  $callback
+     * The record is always an instance of the table's model, so the callback
+     * may type it as that model.
+     *
+     * @template TModel of Model
+     *
+     * @param  Closure(mixed, TModel): mixed  $callback
      */
     public function map(Closure $callback): static
     {
