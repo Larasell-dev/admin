@@ -142,11 +142,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
               {resource.columns.map((column) => (
                 <Table.Column key={column.name}>{column.label}</Table.Column>
               ))}
-              {hasActions && (
-                <Table.Column>
-                  <span className="sr-only">Actions</span>
-                </Table.Column>
-              )}
+              {hasActions && <Table.Column type="action">Actions</Table.Column>}
             </Table.Header>
             <Table.Body>
               {resource.rows.map((row) => (
