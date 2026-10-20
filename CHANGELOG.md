@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/Larasell-dev/admin/compare/v0.2.0...v0.3.0) (2026-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* reject configuring a table column or action twice ([#77](https://github.com/Larasell-dev/admin/issues/77))
+
+### Features
+
+* compute table column values with map() ([#75](https://github.com/Larasell-dev/admin/issues/75)) ([036c505](https://github.com/Larasell-dev/admin/commit/036c5058d12bc3a68772479f2bdc1cffd2530cb3))
+* let a table list the records of a query or relationship ([#82](https://github.com/Larasell-dev/admin/issues/82)) ([90b33f9](https://github.com/Larasell-dev/admin/commit/90b33f902742c0fc4be94a1d6f5172436bb4caf3))
+* reject a mapped text column value that is not text ([#78](https://github.com/Larasell-dev/admin/issues/78)) ([05010ef](https://github.com/Larasell-dev/admin/commit/05010ef59d795b53c5376ca738367c8d418aab00))
+* reject configuring a table column or action twice ([#77](https://github.com/Larasell-dev/admin/issues/77)) ([b2775de](https://github.com/Larasell-dev/admin/commit/b2775de89297ad9b57fcc06369a2c0c56bb790ba))
+
 ## [0.2.0](https://github.com/Larasell-dev/admin/compare/v0.1.9...v0.2.0) (2026-10-20)
 
 
