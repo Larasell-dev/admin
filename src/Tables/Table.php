@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use JsonSerializable;
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Attributes\UseModel;
@@ -105,7 +105,7 @@ abstract class Table implements JsonSerializable
 
     /**
      * What to show when the table has no rows: a 'title', and optionally a
-     * 'description' and an 'icon' (a NavIcon case or its Remix icon name).
+     * 'description' and an 'icon' (an Icon case or its Remix icon name).
      * Return null for the default empty state.
      *
      * @return array<string, mixed>|null
@@ -154,19 +154,19 @@ abstract class Table implements JsonSerializable
 
     protected function resolveEmptyStateIcon(mixed $icon): ?string
     {
-        if ($icon === null || $icon instanceof NavIcon) {
+        if ($icon === null || $icon instanceof Icon) {
             return $icon?->name;
         }
 
         if (! is_string($icon)) {
-            throw InvalidTableEmptyState::invalidValue(static::class, 'icon', 'a NavIcon case or a Remix icon name');
+            throw InvalidTableEmptyState::invalidValue(static::class, 'icon', 'an Icon case or a Remix icon name');
         }
 
         if (str_ends_with($icon, '-line') || str_ends_with($icon, '-fill')) {
             throw InvalidTableEmptyState::iconStyleVariant(static::class, $icon);
         }
 
-        return (NavIcon::tryFrom($icon) ?? throw InvalidTableEmptyState::unknownIcon(static::class, $icon))->name;
+        return (Icon::tryFrom($icon) ?? throw InvalidTableEmptyState::unknownIcon(static::class, $icon))->name;
     }
 
     public function title(): string

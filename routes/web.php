@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Http\Controllers\CustomerController;
@@ -39,5 +39,5 @@ if (app()->environment('local')) {
     });
 }
 
-Navigation::add('Home', 'home', icon: NavIcon::Home);
-Navigation::add('Customers', 'larasell.admin.customers.index', icon: NavIcon::Group);
+Navigation::add('Home', 'home', icon: Icon::Home);
+Navigation::add('Customers', 'larasell.admin.customers.index', icon: Icon::Group);

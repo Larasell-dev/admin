@@ -6,7 +6,7 @@ import { assertDefined } from "ts-extras";
 type IconData = ComponentProps<typeof Icon>["icon"];
 
 /**
- * Resolves a NavIcon case name such as "FileList3" to its filled variant for the
+ * Resolves an Icon case name such as "FileList3" to its filled variant for the
  * active item and its line variant otherwise. Icons that come in one style only,
  * such as "KanbanView", resolve to that style.
  *

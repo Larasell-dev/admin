@@ -55,8 +55,8 @@ class InvalidTableEmptyState extends InvalidArgumentException implements Structu
         return static::structured(
             code: 'larasell-admin.table.empty-state.unknown-icon',
             message: "Table [{$table}] empty state icon [{$icon}] is not a Remix icon.",
-            why: "No NavIcon case has the value [{$icon}], so the empty state cannot render it.",
-            fix: 'Pass a NavIcon case, or a lowercase Remix icon name from https://remixicon.com such as "file-list-3".',
+            why: "No Icon case has the value [{$icon}], so the empty state cannot render it.",
+            fix: 'Pass an Icon case, or a lowercase Remix icon name from https://remixicon.com such as "file-list-3".',
         );
     }
 }

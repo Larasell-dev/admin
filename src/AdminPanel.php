@@ -5,7 +5,7 @@ namespace Larasell\Admin;
 use Closure;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
@@ -39,7 +39,7 @@ class AdminPanel
         return app(self::class);
     }
 
-    public function add(string $label, string $route, NavIcon|string $icon): NavigationItem
+    public function add(string $label, string $route, Icon|string $icon): NavigationItem
     {
         if (! str_contains($route, '.')) {
             $route = 'larasell.admin.'.$route;

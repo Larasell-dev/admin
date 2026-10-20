@@ -52,7 +52,7 @@ declare module "larasell-admin/components" {
   export type TableEmptyState = {
     title: string;
     description: string | null;
-    /** NavIcon case name, e.g. "Book"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
+    /** Icon case name, e.g. "Book"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
     icon: string | null;
   };
 

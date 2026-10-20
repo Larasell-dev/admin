@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\AdminPanel;
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Tables\Columns\TextColumn;
@@ -57,11 +57,11 @@ it('has no empty state unless the table defines one', function () {
     expect(emptyStateOf(PlainShelfTable::make()))->toBeNull();
 });
 
-it('describes the empty state with a NavIcon case', function () {
+it('describes the empty state with an Icon case', function () {
     ShelfTable::$emptyState = [
         'title' => 'No books yet',
         'description' => 'Books appear here once you add them.',
-        'icon' => NavIcon::Book,
+        'icon' => Icon::Book,
     ];
 
     expect(emptyStateOf(ShelfTable::make()))->toBe([
@@ -112,7 +112,7 @@ it('rejects an invalid empty state', function (array $emptyState, string $code) 
 ]);
 
 it('sends the empty state to the table page', function () {
-    ShelfTable::$emptyState = ['title' => 'No books yet', 'icon' => NavIcon::Book];
+    ShelfTable::$emptyState = ['title' => 'No books yet', 'icon' => Icon::Book];
     AdminPanel::resolve()->routes(function () {
         Route::index('shelf', ShelfTable::class);
     });

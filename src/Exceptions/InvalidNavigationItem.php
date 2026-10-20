@@ -36,7 +36,7 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
             code: 'larasell-admin.navigation.empty-icon',
             message: "Navigation item [{$id}] icon cannot be empty.",
             why: "The navigation item [{$id}] was registered without an icon, but every navigation item needs one.",
-            fix: 'Pass a NavIcon case or a Remix icon name, e.g. NavIcon::Home or "home".',
+            fix: 'Pass an Icon case or a Remix icon name, e.g. Icon::Home or "home".',
         );
     }
 
@@ -55,8 +55,8 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
         return static::structured(
             code: 'larasell-admin.navigation.unknown-icon',
             message: "Navigation item [{$id}] icon [{$icon}] is not a Remix icon.",
-            why: "No NavIcon case has the value [{$icon}], so the sidebar cannot render it.",
-            fix: 'Pass a NavIcon case, or a lowercase Remix icon name from https://remixicon.com such as "file-list-3".',
+            why: "No Icon case has the value [{$icon}], so the sidebar cannot render it.",
+            fix: 'Pass an Icon case, or a lowercase Remix icon name from https://remixicon.com such as "file-list-3".',
         );
     }
 
