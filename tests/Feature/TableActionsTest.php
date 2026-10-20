@@ -252,7 +252,8 @@ describe('row actions', function () {
         test()->fail('Expected an InvalidTableAction exception.');
     })->with([
         'unknown icon' => ['not-an-icon', 'larasell-admin.table.action.unknown-icon'],
-        'empty icon' => ['', 'larasell-admin.table.action.unknown-icon'],
+        'empty icon' => ['', 'larasell-admin.table.action.empty-icon'],
+        'whitespace icon' => ['   ', 'larasell-admin.table.action.empty-icon'],
         'line style' => ['delete-bin-line', 'larasell-admin.table.action.icon-style-variant'],
         'fill style' => ['delete-bin-fill', 'larasell-admin.table.action.icon-style-variant'],
         'case name instead of Remix name' => ['DeleteBin', 'larasell-admin.table.action.unknown-icon'],

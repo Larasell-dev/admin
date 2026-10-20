@@ -108,14 +108,16 @@ class Action
 
     protected function resolveIcon(string $icon): Icon
     {
-        $case = Icon::tryFrom($icon);
+        if (Str::trim($icon) === '') {
+            throw InvalidTableAction::emptyIcon($this->name());
+        }
 
-        // Checked only after the lookup misses, so no Icon case can be rejected for its name.
-        if ($case === null && Str::endsWith($icon, ['-line', '-fill'])) {
+        // Checked before the lookup: "home-line" is not a case either, but this error says how to fix it.
+        if (Str::endsWith($icon, ['-line', '-fill'])) {
             throw InvalidTableAction::iconStyleVariant($this->name(), $icon);
         }
 
-        return $case ?? throw InvalidTableAction::unknownIcon($this->name(), $icon);
+        return Icon::tryFrom($icon) ?? throw InvalidTableAction::unknownIcon($this->name(), $icon);
     }
 
     public function isDisabledFor(Model $record): bool

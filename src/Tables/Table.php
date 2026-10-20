@@ -169,7 +169,12 @@ abstract class Table implements JsonSerializable
             throw InvalidTableEmptyState::invalidValue(static::class, 'icon', 'an Icon case or a Remix icon name');
         }
 
-        if (str_ends_with($icon, '-line') || str_ends_with($icon, '-fill')) {
+        if (Str::trim($icon) === '') {
+            throw InvalidTableEmptyState::emptyIcon(static::class);
+        }
+
+        // Checked before the lookup: "home-line" is not a case either, but this error says how to fix it.
+        if (Str::endsWith($icon, ['-line', '-fill'])) {
             throw InvalidTableEmptyState::iconStyleVariant(static::class, $icon);
         }
 
