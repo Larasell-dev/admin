@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\ValueObjects\NavigationItem;
 
@@ -12,17 +12,17 @@ beforeEach(function () {
 });
 
 it('constructs a navigation item', function () {
-    $item = new NavigationItem('Home', 'larasell.admin.home', NavIcon::Dashboard);
+    $item = new NavigationItem('Home', 'larasell.admin.home', Icon::Dashboard);
 
     expect($item->label)->toBe('Home')
         ->and($item->route)->toBe('larasell.admin.home')
-        ->and($item->icon)->toBe(NavIcon::Dashboard);
+        ->and($item->icon)->toBe(Icon::Dashboard);
 });
 
 it('resolves an icon passed as its Remix name', function (string $name, string $case) {
     $item = new NavigationItem('Home', 'larasell.admin.home', $name);
 
-    expect($item->icon)->toBe(constant(NavIcon::class.'::'.$case));
+    expect($item->icon)->toBe(constant(Icon::class.'::'.$case));
 })->with([
     'single word' => ['dashboard', 'Dashboard'],
     'with a number' => ['file-list-3', 'FileList3'],

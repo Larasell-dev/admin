@@ -2,7 +2,7 @@
 
 namespace Larasell\Admin\ValueObjects;
 
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 
@@ -18,15 +18,15 @@ class NavigationItem
 
     public ?string $after = null;
 
-    public NavIcon $icon;
+    public Icon $icon;
 
     /**
-     * @param  NavIcon|string  $icon  A NavIcon case or its Remix icon name, e.g. "home"; the sidebar renders it filled when active, line otherwise.
+     * @param  Icon|string  $icon  A Icon case or its Remix icon name, e.g. "home"; the sidebar renders it filled when active, line otherwise.
      */
     public function __construct(
         public string $label,
         public string $route,
-        NavIcon|string $icon,
+        Icon|string $icon,
     ) {
         if (trim($label) === '') {
             throw InvalidNavigationItem::emptyLabel();
@@ -36,7 +36,7 @@ class NavigationItem
             throw InvalidNavigationItem::emptyRoute($label);
         }
 
-        $this->icon = $icon instanceof NavIcon ? $icon : $this->resolveIcon($icon);
+        $this->icon = $icon instanceof Icon ? $icon : $this->resolveIcon($icon);
     }
 
     public function id(): string
@@ -99,7 +99,7 @@ class NavigationItem
         ];
     }
 
-    protected function resolveIcon(string $icon): NavIcon
+    protected function resolveIcon(string $icon): Icon
     {
         if (trim($icon) === '') {
             throw InvalidNavigationItem::emptyIcon($this->id());
@@ -110,7 +110,7 @@ class NavigationItem
             throw InvalidNavigationItem::iconStyleVariant($this->id(), $icon);
         }
 
-        return NavIcon::tryFrom($icon) ?? throw InvalidNavigationItem::unknownIcon($this->id(), $icon);
+        return Icon::tryFrom($icon) ?? throw InvalidNavigationItem::unknownIcon($this->id(), $icon);
     }
 
     protected function resolveTarget(NavItem|string $target): string

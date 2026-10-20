@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\AdminPanel;
-use Larasell\Admin\Enums\NavIcon;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
 
@@ -22,7 +22,7 @@ it('resolves the singleton instance from the container', function () {
 it('registers navigation items and prefixes short route names', function () {
     $panel = new AdminPanel;
 
-    $panel->add('Home', 'home', NavIcon::Home);
+    $panel->add('Home', 'home', Icon::Home);
     $panel->add('Settings', 'larasell.admin.settings', 'settings-3');
 
     expect($panel->navigationItems())->toBe([

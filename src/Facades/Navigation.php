@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Larasell\Admin\AdminPanel;
 
 /**
- * @method static \Larasell\Admin\ValueObjects\NavigationItem add(string $label, string $route, \Larasell\Admin\Enums\NavIcon|string $icon)
+ * @method static \Larasell\Admin\ValueObjects\NavigationItem add(string $label, string $route, \Larasell\Admin\Enums\Icon|string $icon)
  */
 class Navigation extends Facade
 {

@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "generate:nav-icons": "node scripts/generate-nav-icons.mjs"
+    "generate:icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
