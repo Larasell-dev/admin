@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\MissingAttributeException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
@@ -62,6 +64,21 @@ class LinkedBooksTable extends Table
         }
 
         return "https://books.test/{$book->id}";
+    }
+}
+
+class MappedBooksTable extends Table
+{
+    protected ?string $model = Book::class;
+
+    public function columns(): array
+    {
+        return [
+            TextColumn::make('summary')
+                ->map(fn ($value, Book $book): string => "{$book->title} by {$book->author_name}"),
+            TextColumn::make('created_at', 'Added')
+                ->map(fn ($value) => $value?->diffForHumans()),
+        ];
     }
 }
 
@@ -133,6 +150,59 @@ it('lists the model declared with the UseModel attribute', function () {
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
         ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
     ]);
+});
+
+describe('mapped columns', function () {
+    it('computes a column that is not an attribute from the record', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(MappedBooksTable::make())['rows'][0]['summary'])->toBe('Dune by Frank Herbert');
+    });
+
+    it('maps the cast value of an attribute', function () {
+        $this->travelTo('2026-10-20 12:00:00');
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+        $this->travelTo('2026-10-20 14:00:00');
+
+        expect(tableResource(MappedBooksTable::make())['rows'][0]['created_at'])->toBe('2 hours ago');
+    });
+
+    it('computes a column even when models forbid accessing missing attributes', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            expect(tableResource(MappedBooksTable::make())['rows'][0]['summary'])->toBe('Dune by Frank Herbert');
+        } finally {
+            Model::preventAccessingMissingAttributes(false);
+        }
+    });
+
+    it('still rejects a missing attribute on an unmapped column when models forbid it', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            expect(fn () => tableResource(new class extends Table
+            {
+                protected ?string $model = Book::class;
+
+                public function columns(): array
+                {
+                    return [TextColumn::make('summary')];
+                }
+            }))->toThrow(MissingAttributeException::class);
+        } finally {
+            Model::preventAccessingMissingAttributes(false);
+        }
+    });
+
+    it('does not expose the mapping in the column description', function () {
+        expect(tableResource(MappedBooksTable::make())['columns'])->toBe([
+            ['name' => 'summary', 'label' => 'Summary', 'type' => 'text'],
+            ['name' => 'created_at', 'label' => 'Added', 'type' => 'text'],
+        ]);
+    });
 });
 
 describe('pagination', function () {
