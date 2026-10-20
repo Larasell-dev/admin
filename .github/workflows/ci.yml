@@ -83,6 +83,12 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests
+        run: npm test
+
       - name: Icon matches the installed icon set
         run: |
           npm run generate:icons
