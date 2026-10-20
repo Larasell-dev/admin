@@ -84,6 +84,28 @@ class MappedBooksTable extends Table
 }
 
 /**
+ * A table whose only column maps the title with the given callback.
+ */
+function mappedTitleTable(Closure $map): Table
+{
+    MappedTitleTable::$map = $map;
+
+    return MappedTitleTable::make();
+}
+
+class MappedTitleTable extends Table
+{
+    public static Closure $map;
+
+    protected ?string $model = Book::class;
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title')->map(static::$map)];
+    }
+}
+
+/**
  * @param  array<string, mixed>  $query  The request's query string, e.g. ['page' => 2].
  */
 function tableResource(Table $table, array $query = []): array
@@ -331,6 +353,39 @@ describe('mapped columns', function () {
 
         test()->fail('Expected an InvalidTableColumn exception.');
     });
+});
+
+describe('mapped text columns', function () {
+    it('shows a number or a Stringable the callback returns as text', function (mixed $result, string $text) {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(mappedTitleTable(fn () => $result))['rows'][0]['title'])->toBe($text);
+    })->with([
+        'int' => [42, '42'],
+        'float' => [4.5, '4.5'],
+        'Stringable' => [str('Dune')->upper(), 'DUNE'],
+    ]);
+
+    it('rejects a callback result that is not text', function (mixed $result, string $type) {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        try {
+            tableResource(mappedTitleTable(fn () => $result));
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.invalid-mapped-value')
+                ->and($exception->getMessage())->toContain('title')
+                ->and($exception->getMessage())->toContain($type);
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
+    })->with([
+        'true' => [true, 'bool'],
+        'false' => [false, 'bool'],
+        'array' => [['Dune'], 'array'],
+        'object without __toString' => [new stdClass, 'stdClass'],
+    ]);
 });
 
 describe('pagination', function () {

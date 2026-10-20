@@ -54,4 +54,14 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
             fix: 'Only read from the record in map() and return the value to show, without assigning attributes.',
         );
     }
+
+    public static function invalidMappedValue(string $column, string $type): static
+    {
+        return static::structured(
+            code: 'larasell-admin.table.column.invalid-mapped-value',
+            message: "Text column [{$column}] map() returned {$type}, not text.",
+            why: "A text column shows its value as text, but the map() callback of [{$column}] returned {$type}, which has no clear text form.",
+            fix: 'Return a string, a number, a Stringable or null from map(), e.g. $value ? \'Yes\' : \'No\' for a bool.',
+        );
+    }
 }
