@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Attributes\UseModel;
@@ -231,6 +232,14 @@ abstract class Table implements JsonSerializable
 
         foreach ($actions as $action) {
             $action->assertConfigured();
+        }
+
+        $columnNames = array_map(fn (Column $column): string => $column->name(), $columns);
+        foreach (array_unique(array_diff_assoc($columnNames, array_unique($columnNames))) as $duplicate) {
+            throw InvalidTableColumn::duplicateName(static::class, $duplicate);
+        }
+        foreach (array_intersect($columnNames, ['_actions', '_link']) as $reserved) {
+            throw InvalidTableColumn::reservedName(static::class, $reserved);
         }
 
         $names = array_map(fn (Action $action): string => $action->name(), $actions);
