@@ -1,5 +1,82 @@
 # Changelog
 
+## [0.3.0](https://github.com/Larasell-dev/admin/compare/v0.2.0...v0.3.0) (2026-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* reject configuring a table column or action twice ([#77](https://github.com/Larasell-dev/admin/issues/77))
+
+### Features
+
+* compute table column values with map() ([#75](https://github.com/Larasell-dev/admin/issues/75)) ([036c505](https://github.com/Larasell-dev/admin/commit/036c5058d12bc3a68772479f2bdc1cffd2530cb3))
+* let a table list the records of a query or relationship ([#82](https://github.com/Larasell-dev/admin/issues/82)) ([90b33f9](https://github.com/Larasell-dev/admin/commit/90b33f902742c0fc4be94a1d6f5172436bb4caf3))
+* reject a mapped text column value that is not text ([#78](https://github.com/Larasell-dev/admin/issues/78)) ([05010ef](https://github.com/Larasell-dev/admin/commit/05010ef59d795b53c5376ca738367c8d418aab00))
+* reject configuring a table column or action twice ([#77](https://github.com/Larasell-dev/admin/issues/77)) ([b2775de](https://github.com/Larasell-dev/admin/commit/b2775de89297ad9b57fcc06369a2c0c56bb790ba))
+
+### Upgrade guide
+
+#### Action configuration methods can only be called once
+
+Calling `to()`, `route()`, `confirm()`, `destructive()`, `disabled()` or
+`icon()` a second time on the same action used to silently replace the first
+call. It now throws an `InvalidTableAction` exception with the code
+`larasell-admin.table.action.configured-twice`, so a call that has no effect
+can't hide in a table definition.
+
+##### Who is affected
+
+Tables that call one of these methods more than once on the same
+`Larasell\Admin\Tables\Actions\Action`, including `to()` followed by `route()`,
+since both set the link. If every method is called at most once per action,
+you can skip this entry.
+
+##### How to upgrade
+
+Keep only the call you want to take effect, usually the last one:
+
+```php
+use Larasell\Admin\Tables\Actions\Action;
+
+// Before
+Action::make('Delete', handle: fn (Book $book) => $book->delete())
+    ->disabled()
+    ->disabled(fn (Book $book) => $book->is_locked);
+
+// After
+Action::make('Delete', handle: fn (Book $book) => $book->delete())
+    ->disabled(fn (Book $book) => $book->is_locked);
+```
+
+#### Table column names must be unique and not reserved
+
+A table whose columns share a name, or that has a column named `_actions` or
+`_link`, now throws an `InvalidTableColumn` exception when it renders. Each row
+stores a column's value under its name, so such a column silently overwrote
+another column's value or the row's actions or link.
+
+##### Who is affected
+
+Tables whose `columns()` return two columns with the same name, or a column
+named `_actions` or `_link`. Tables with unique column names that don't start
+with an underscore are not affected. An `id` column is still allowed.
+
+##### How to upgrade
+
+Give the second column its own name and read the attribute in `map()`:
+
+```php
+use Larasell\Admin\Tables\Columns\TextColumn;
+
+// Before
+TextColumn::make('created_at', 'Received')->map(fn ($value) => $value?->diffForHumans()),
+TextColumn::make('created_at', 'Date'),
+
+// After
+TextColumn::make('received')->map(fn ($value, ContactRequest $request) => $request->created_at?->diffForHumans()),
+TextColumn::make('created_at', 'Date'),
+```
+
 ## [0.2.0](https://github.com/Larasell-dev/admin/compare/v0.1.9...v0.2.0) (2026-10-20)
 
 
