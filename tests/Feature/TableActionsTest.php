@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Exceptions\InvalidTableAction;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Columns\TextColumn;
@@ -85,7 +87,7 @@ describe('row actions', function () {
         withActions(fn () => [Action::make('View')->to('https://example.com/books')]);
 
         expect(rowActions())->toBe([
-            ['name' => 'view', 'label' => 'View', 'method' => 'get', 'url' => 'https://example.com/books', 'confirm' => null, 'destructive' => false, 'disabled' => false],
+            ['name' => 'view', 'label' => 'View', 'method' => 'get', 'url' => 'https://example.com/books', 'confirm' => null, 'destructive' => false, 'disabled' => false, 'icon' => null],
         ]);
     });
 
@@ -109,7 +111,7 @@ describe('row actions', function () {
         withActions(fn () => [Action::make('Archive', handle: fn (Book $book) => null)]);
 
         expect(rowActions(1))->toBe([
-            ['name' => 'archive', 'label' => 'Archive', 'method' => 'post', 'url' => url(actionUrl($this->emma, 'archive')), 'confirm' => null, 'destructive' => false, 'disabled' => false],
+            ['name' => 'archive', 'label' => 'Archive', 'method' => 'post', 'url' => url(actionUrl($this->emma, 'archive')), 'confirm' => null, 'destructive' => false, 'disabled' => false, 'icon' => null],
         ]);
     });
 
@@ -218,6 +220,43 @@ describe('row actions', function () {
         expect(rowActions(0)[0]['disabled'])->toBeFalse()
             ->and(rowActions(1)[0]['disabled'])->toBeTrue();
     });
+
+    it('shows an icon given as an Icon case', function () {
+        withActions(fn () => [
+            Action::make('Delete', handle: fn (Book $book) => null)->icon(Icon::DeleteBin),
+            Action::make('Archive', handle: fn (Book $book) => null),
+        ]);
+
+        expect(array_column(rowActions(), 'icon', 'name'))->toBe(['delete' => 'DeleteBin', 'archive' => null]);
+    });
+
+    it('shows an icon given as its Remix icon name', function (string $icon, string $case) {
+        withActions(fn () => [Action::make('View')->to('https://example.com')->icon($icon)]);
+
+        expect(rowActions()[0]['icon'])->toBe($case);
+    })->with([
+        'multi-word name' => ['file-list-3', 'FileList3'],
+        'name whose case is spelled differently' => ['24-hours', 'TwentyFourHours'],
+    ]);
+
+    it('rejects an icon that is not a Remix icon name', function (string $icon, string $code) {
+        try {
+            Action::make('Send Reminder', handle: fn (Book $book) => null)->icon($icon);
+        } catch (InvalidTableAction $exception) {
+            expect($exception->errorCode())->toBe($code)
+                ->and($exception->getMessage())->toContain('send-reminder');
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableAction exception.');
+    })->with([
+        'unknown icon' => ['not-an-icon', 'larasell-admin.table.action.unknown-icon'],
+        'empty icon' => ['', 'larasell-admin.table.action.unknown-icon'],
+        'line style' => ['delete-bin-line', 'larasell-admin.table.action.icon-style-variant'],
+        'fill style' => ['delete-bin-fill', 'larasell-admin.table.action.icon-style-variant'],
+        'case name instead of Remix name' => ['DeleteBin', 'larasell-admin.table.action.unknown-icon'],
+    ]);
 
     it('rejects two actions with the same name', function () {
         withActions(fn () => [

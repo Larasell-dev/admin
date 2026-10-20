@@ -36,6 +36,8 @@ export type TableAction = {
   confirm: TableActionConfirmation | null;
   destructive: boolean;
   disabled: boolean;
+  /** Icon case name, e.g. "DeleteBin"; shown in its line style before the label. */
+  icon: string | null;
 };
 
 export type TableRow = {
