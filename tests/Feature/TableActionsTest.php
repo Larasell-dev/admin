@@ -397,6 +397,18 @@ describe('running an action', function () {
         expect(Book::pluck('title')->all())->toBe(['Emma']);
     });
 
+    it('only runs on records matched by the query returned from model()', function () {
+        withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
+        signIn();
+
+        $url = fn (Book $book): string => "/admin/tables/tables.frank-herbert-book-actions-table/{$book->id}/actions/delete";
+
+        $this->post($url($this->emma))->assertNotFound();
+        $this->post($url($this->dune))->assertRedirect();
+
+        expect(Book::pluck('title')->all())->toBe(['Emma']);
+    });
+
     it('requires a signed-in admin', function () {
         withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
 
