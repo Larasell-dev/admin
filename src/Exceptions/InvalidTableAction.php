@@ -10,6 +10,16 @@ class InvalidTableAction extends InvalidArgumentException implements StructuredE
 {
     use HasStructuredError;
 
+    public static function emptyIcon(string $action): static
+    {
+        return static::structured(
+            code: 'larasell-admin.table.action.empty-icon',
+            message: "Action [{$action}] icon cannot be empty.",
+            why: "The action [{$action}] was given an empty icon name, so there is no icon to show.",
+            fix: 'Pass an Icon case or a Remix icon name, e.g. Icon::DeleteBin or "delete-bin", or do not call icon().',
+        );
+    }
+
     public static function iconStyleVariant(string $action, string $icon): static
     {
         return static::structured(

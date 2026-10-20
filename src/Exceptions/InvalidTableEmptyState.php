@@ -40,6 +40,16 @@ class InvalidTableEmptyState extends InvalidArgumentException implements Structu
         );
     }
 
+    public static function emptyIcon(string $table): static
+    {
+        return static::structured(
+            code: 'larasell-admin.table.empty-state.empty-icon',
+            message: "Table [{$table}] empty state icon cannot be empty.",
+            why: "The empty state of [{$table}] has an empty icon name, so there is no icon to show.",
+            fix: "Return an Icon case or a Remix icon name for 'icon', e.g. Icon::Book or \"book\", or leave 'icon' out for the default.",
+        );
+    }
+
     public static function iconStyleVariant(string $table, string $icon): static
     {
         return static::structured(

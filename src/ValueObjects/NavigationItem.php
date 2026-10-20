@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\ValueObjects;
 
+use Illuminate\Support\Str;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
@@ -101,12 +102,12 @@ class NavigationItem
 
     protected function resolveIcon(string $icon): Icon
     {
-        if (trim($icon) === '') {
+        if (Str::trim($icon) === '') {
             throw InvalidNavigationItem::emptyIcon($this->id());
         }
 
         // Checked before the lookup: "home-line" is not a case either, but this error says how to fix it.
-        if (str_ends_with($icon, '-line') || str_ends_with($icon, '-fill')) {
+        if (Str::endsWith($icon, ['-line', '-fill'])) {
             throw InvalidNavigationItem::iconStyleVariant($this->id(), $icon);
         }
 

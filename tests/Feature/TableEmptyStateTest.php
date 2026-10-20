@@ -106,6 +106,8 @@ it('rejects an invalid empty state', function (array $emptyState, string $code) 
     'title that is not a string' => [['title' => 42], 'larasell-admin.table.empty-state.invalid-value'],
     'description that is not a string' => [['title' => 'No books yet', 'description' => ['a']], 'larasell-admin.table.empty-state.invalid-value'],
     'unknown icon' => [['title' => 'No books yet', 'icon' => 'not-an-icon'], 'larasell-admin.table.empty-state.unknown-icon'],
+    'empty icon' => [['title' => 'No books yet', 'icon' => ''], 'larasell-admin.table.empty-state.empty-icon'],
+    'whitespace icon' => [['title' => 'No books yet', 'icon' => '   '], 'larasell-admin.table.empty-state.empty-icon'],
     'icon with a style suffix' => [['title' => 'No books yet', 'icon' => 'book-line'], 'larasell-admin.table.empty-state.icon-style-variant'],
     'icon of the wrong type' => [['title' => 'No books yet', 'icon' => 12], 'larasell-admin.table.empty-state.invalid-value'],
     'unknown key' => [['title' => 'No books yet', 'subtitle' => 'Oops'], 'larasell-admin.table.empty-state.unknown-key'],

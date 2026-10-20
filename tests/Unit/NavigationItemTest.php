@@ -41,9 +41,9 @@ it('converts a navigation item to an array with the resolved url and icon', func
     ]);
 });
 
-it('throws when the icon is empty', function () {
-    new NavigationItem('Home', 'larasell.admin.home', ' ');
-})->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] icon cannot be empty.');
+it('throws when the icon is empty', function (string $icon) {
+    new NavigationItem('Home', 'larasell.admin.home', $icon);
+})->with(['', ' '])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] icon cannot be empty.');
 
 it('throws when the icon names a style variant', function (string $icon) {
     new NavigationItem('Home', 'larasell.admin.home', $icon);
