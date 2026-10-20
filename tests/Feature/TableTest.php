@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
@@ -173,6 +175,83 @@ it('lists the model declared with the UseModel attribute', function () {
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
         ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
     ]);
+});
+
+class FrankHerbertBooksTable extends Table
+{
+    /**
+     * @return Builder<Book>
+     */
+    protected function model(): Builder
+    {
+        return Book::where('author_name', 'Frank Herbert');
+    }
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title')];
+    }
+}
+
+class BooksByTitleTable extends Table
+{
+    /**
+     * @return Builder<Book>
+     */
+    protected function model(): Builder
+    {
+        return Book::orderBy('title');
+    }
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title')];
+    }
+}
+
+class BooksLikeDuneTable extends Table
+{
+    /**
+     * @return HasMany<Book, Book>
+     */
+    protected function model(): HasMany
+    {
+        return Book::where('title', 'Dune')->firstOrFail()->booksBySameAuthor();
+    }
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title')];
+    }
+}
+
+it('lists only the records matched by the query returned from model()', function () {
+    Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+    Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
+    Book::create(['title' => 'Dune Messiah', 'author_name' => 'Frank Herbert']);
+
+    $table = tableResource(FrankHerbertBooksTable::make());
+
+    expect(array_column($table['rows'], 'title'))->toBe(['Dune', 'Dune Messiah'])
+        ->and($table['pagination']['total'])->toBe(2);
+});
+
+it('keeps the order of the query returned from model()', function () {
+    Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
+    Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+    expect(array_column(tableResource(BooksByTitleTable::make())['rows'], 'title'))->toBe(['Dune', 'Emma']);
+});
+
+it('lists the records of a relationship returned from model()', function () {
+    Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+    Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
+    Book::create(['title' => 'Dune Messiah', 'author_name' => 'Frank Herbert']);
+
+    $table = tableResource(BooksLikeDuneTable::make());
+
+    expect(array_column($table['rows'], 'title'))->toBe(['Dune', 'Dune Messiah'])
+        ->and($table['pagination']['total'])->toBe(2);
 });
 
 class ColumnsTable extends Table

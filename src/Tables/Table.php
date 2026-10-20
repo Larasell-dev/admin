@@ -4,6 +4,7 @@ namespace Larasell\Admin\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Larasell\Admin\Enums\Icon;
@@ -191,9 +192,14 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return class-string<Model>
+     * The records the table lists: a model class, or a query or relationship
+     * to list only some records, e.g. Book::where('published', true). Row
+     * actions only run on records this returns. Defaults to the UseModel
+     * attribute or the $model property.
+     *
+     * @return class-string<Model>|Builder<covariant Model>|Relation<covariant Model, covariant Model, mixed>
      */
-    protected function model(): string
+    protected function model(): Builder|Relation|string
     {
         if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
             $attribute = (new ReflectionClass(static::class))->getAttributes(UseModel::class);
@@ -215,11 +221,13 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return Builder<Model>
+     * @return Builder<covariant Model>|Relation<covariant Model, covariant Model, mixed>
      */
-    private function query(): Builder
+    private function query(): Builder|Relation
     {
-        return $this->model()::query();
+        $model = $this->model();
+
+        return is_string($model) ? $model::query() : $model;
     }
 
     /**
@@ -253,7 +261,8 @@ abstract class Table implements JsonSerializable
         }
 
         // Ordered by key so that every row shows up on exactly one page.
-        $query = $this->query()->orderBy($this->model()::make()->getQualifiedKeyName());
+        $query = $this->query();
+        $query->orderBy($query->getModel()->getQualifiedKeyName());
         $paginator = $query->paginate($pageSize);
 
         // Past the last page, e.g. after deleting its only row, show the last page instead.

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Larasell\Admin\Tests\Fixtures;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -14,6 +15,14 @@ use Illuminate\Support\Facades\Schema;
 class Book extends Model
 {
     protected $guarded = [];
+
+    /**
+     * @return HasMany<Book, $this>
+     */
+    public function booksBySameAuthor(): HasMany
+    {
+        return $this->hasMany(Book::class, 'author_name', 'author_name');
+    }
 
     public static function createTable(): void
     {
