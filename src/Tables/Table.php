@@ -26,6 +26,9 @@ abstract class Table implements JsonSerializable
     /** @var class-string<Model>|null */
     protected ?string $model = null;
 
+    /** The page sizes a visitor can choose from; the first one is the default. */
+    private const array PAGE_SIZES = [25, 50, 100];
+
     /** @var array<class-string, class-string<Model>|false> */
     protected static array $cachedModelAttributes = [];
 
@@ -219,7 +222,7 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string}|null, columns: array<int, Column>, rows: array<int, array<string, mixed>>}
+     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string}|null, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
      */
     public function jsonSerialize(): array
     {
@@ -235,7 +238,21 @@ abstract class Table implements JsonSerializable
             throw new LogicException(static::class." defines more than one action named [{$duplicate}].");
         }
 
-        $rows = $this->query()->get()->map(function (Model $record) use ($columns, $actions): array {
+        $pageSize = request()->integer('per_page');
+        if (! in_array($pageSize, self::PAGE_SIZES, true)) {
+            $pageSize = self::PAGE_SIZES[0];
+        }
+
+        // Ordered by key so that every row shows up on exactly one page.
+        $query = $this->query()->orderBy($this->model()::make()->getQualifiedKeyName());
+        $paginator = $query->paginate($pageSize);
+
+        // Past the last page, e.g. after deleting its only row, show the last page instead.
+        if ($paginator->isEmpty() && $paginator->currentPage() > $paginator->lastPage()) {
+            $paginator = $query->paginate($pageSize, page: $paginator->lastPage());
+        }
+
+        $rows = $paginator->getCollection()->map(function (Model $record) use ($columns, $actions): array {
             $row = ['id' => $record->getKey()];
 
             foreach ($columns as $column) {
@@ -253,6 +270,11 @@ abstract class Table implements JsonSerializable
             'emptyState' => $this->resolveEmptyState(),
             'columns' => $columns,
             'rows' => $rows->all(),
+            'pagination' => [
+                'page' => $paginator->currentPage(),
+                'pageSize' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
         ];
     }
 }

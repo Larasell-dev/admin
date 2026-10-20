@@ -60,5 +60,15 @@ export type TableResource = {
   /** Shown when there are no rows; null for the default. */
   emptyState: TableEmptyState | null;
   columns: TableColumn[];
+  /** The rows on the current page. */
   rows: TableRow[];
+  pagination: TablePagination;
+};
+
+export type TablePagination = {
+  /** 1-based page number. */
+  page: number;
+  pageSize: number;
+  /** Total number of rows across all pages. */
+  total: number;
 };
