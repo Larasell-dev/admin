@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
@@ -152,7 +153,120 @@ it('lists the model declared with the UseModel attribute', function () {
     ]);
 });
 
+class ColumnsTable extends Table
+{
+    /** @var array<int, TextColumn> */
+    public static array $definedColumns = [];
+
+    protected ?string $model = Book::class;
+
+    public function columns(): array
+    {
+        return static::$definedColumns;
+    }
+}
+
+/**
+ * @param  array<int, TextColumn>  $columns
+ */
+function tableWithColumns(array $columns): Table
+{
+    ColumnsTable::$definedColumns = $columns;
+
+    return ColumnsTable::make();
+}
+
+describe('column names', function () {
+    it('rejects two columns with the same name', function () {
+        try {
+            tableResource(tableWithColumns([
+                TextColumn::make('title'),
+                TextColumn::make('author_name'),
+                TextColumn::make('title', 'Headline')->map(fn ($value) => strtoupper($value)),
+            ]));
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.duplicate-name')
+                ->and($exception->getMessage())->toContain('[title]')
+                ->and($exception->getMessage())->not->toContain('author_name');
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
+    });
+
+    it('rejects a column named like a key the table adds to every row', function (string $name) {
+        try {
+            tableResource(tableWithColumns([TextColumn::make('title'), TextColumn::make($name)]));
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.reserved-name')
+                ->and($exception->getMessage())->toContain("[{$name}]");
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
+    })->with(['_actions', '_link']);
+
+    it('rejects column names before there are any rows', function () {
+        tableResource(tableWithColumns([TextColumn::make('title'), TextColumn::make('title')]));
+    })->throws(InvalidTableColumn::class);
+
+    it('allows an id column', function () {
+        $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(tableWithColumns([TextColumn::make('id', 'ID'), TextColumn::make('title')]))['rows'][0])
+            ->toMatchArray(['id' => (string) $dune->id, 'title' => 'Dune']);
+    });
+});
+
 describe('mapped columns', function () {
+    it('rejects a callback that changes the record', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        try {
+            tableResource(new class extends Table
+            {
+                protected ?string $model = Book::class;
+
+                public function columns(): array
+                {
+                    return [TextColumn::make('title')->map(function ($value, Book $book): string {
+                        $book->author_name = 'Someone else';
+
+                        return $value;
+                    })];
+                }
+            });
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.record-modified')
+                ->and($exception->getMessage())->toContain('[title]')
+                ->and($exception->getMessage())->toContain('author_name');
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
+    });
+
+    it('allows a callback that sets an attribute back to its original value', function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(new class extends Table
+        {
+            protected ?string $model = Book::class;
+
+            public function columns(): array
+            {
+                return [TextColumn::make('title')->map(function ($value, Book $book): string {
+                    $book->title = $value;
+
+                    return $value;
+                })];
+            }
+        })['rows'][0]['title'])->toBe('Dune');
+    });
+
     it('computes a column that is not an attribute from the record', function () {
         Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
@@ -202,6 +316,20 @@ describe('mapped columns', function () {
             ['name' => 'summary', 'label' => 'Summary', 'type' => 'text'],
             ['name' => 'created_at', 'label' => 'Added', 'type' => 'text'],
         ]);
+    });
+
+    it('rejects mapping a column twice', function () {
+        try {
+            TextColumn::make('summary')->map(fn () => 'first')->map(fn () => 'second');
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.configured-twice')
+                ->and($exception->getMessage())->toContain('summary')
+                ->and($exception->getMessage())->toContain('map()');
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
     });
 });
 

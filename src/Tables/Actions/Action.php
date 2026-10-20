@@ -22,6 +22,9 @@ class Action
 
     protected ?Icon $icon = null;
 
+    /** @var array<int, string> The configuration methods called so far, which may each be called only once. */
+    private array $configured = [];
+
     /**
      * @var array{title: ?string, message: ?string, confirmButton: ?string, cancelButton: ?string, confirmationText: string|Closure|null}
      */
@@ -48,6 +51,7 @@ class Action
      */
     public function to(string|Closure $url): static
     {
+        $this->configureOnce('to() or route()');
         $this->url = $url;
 
         return $this;
@@ -70,6 +74,7 @@ class Action
         ?string $cancelButton = null,
         string|Closure|null $confirmationText = null,
     ): static {
+        $this->configureOnce('confirm()');
         $this->confirms = true;
         $this->confirmation = compact('title', 'message', 'confirmButton', 'cancelButton', 'confirmationText');
 
@@ -81,6 +86,7 @@ class Action
      */
     public function destructive(bool $condition = true): static
     {
+        $this->configureOnce('destructive()');
         $this->destructive = $condition;
 
         return $this;
@@ -91,6 +97,7 @@ class Action
      */
     public function disabled(bool|Closure $condition = true): static
     {
+        $this->configureOnce('disabled()');
         $this->disabled = $condition;
 
         return $this;
@@ -101,9 +108,19 @@ class Action
      */
     public function icon(Icon|string $icon): static
     {
+        $this->configureOnce('icon()');
         $this->icon = is_string($icon) ? $this->resolveIcon($icon) : $icon;
 
         return $this;
+    }
+
+    private function configureOnce(string $method): void
+    {
+        if (in_array($method, $this->configured, true)) {
+            throw InvalidTableAction::configuredTwice($this->name(), $method);
+        }
+
+        $this->configured[] = $method;
     }
 
     protected function resolveIcon(string $icon): Icon
