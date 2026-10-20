@@ -277,6 +277,41 @@ describe('row actions', function () {
 
         rowActions();
     })->throws(LogicException::class, 'delete');
+
+    it('rejects configuring the same thing twice', function (Closure $configureTwice, string $method) {
+        try {
+            $configureTwice(Action::make('Send Reminder'));
+        } catch (InvalidTableAction $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.action.configured-twice')
+                ->and($exception->getMessage())->toContain('send-reminder')
+                ->and($exception->getMessage())->toContain($method);
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableAction exception.');
+    })->with([
+        'to' => [fn (Action $action) => $action->to('/a')->to('/b'), 'to() or route()'],
+        'route' => [fn (Action $action) => $action->route('a')->route('b'), 'to() or route()'],
+        'to, then route' => [fn (Action $action) => $action->to('/a')->route('b'), 'to() or route()'],
+        'confirm' => [fn (Action $action) => $action->confirm()->confirm(title: 'Sure?'), 'confirm()'],
+        'destructive' => [fn (Action $action) => $action->destructive()->destructive(false), 'destructive()'],
+        'disabled' => [fn (Action $action) => $action->disabled()->disabled(false), 'disabled()'],
+        'icon' => [fn (Action $action) => $action->icon(Icon::DeleteBin)->icon('delete-bin'), 'icon()'],
+    ]);
+
+    it('lets each configuration method be called once on the same action', function () {
+        withActions(fn () => [
+            Action::make('Delete')
+                ->to('https://example.com')
+                ->confirm()
+                ->destructive()
+                ->disabled(false)
+                ->icon(Icon::DeleteBin),
+        ]);
+
+        expect(rowActions()[0])->toMatchArray(['destructive' => true, 'disabled' => false, 'icon' => 'DeleteBin']);
+    });
 });
 
 describe('running an action', function () {

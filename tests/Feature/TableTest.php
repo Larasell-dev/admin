@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
@@ -202,6 +203,20 @@ describe('mapped columns', function () {
             ['name' => 'summary', 'label' => 'Summary', 'type' => 'text'],
             ['name' => 'created_at', 'label' => 'Added', 'type' => 'text'],
         ]);
+    });
+
+    it('rejects mapping a column twice', function () {
+        try {
+            TextColumn::make('summary')->map(fn () => 'first')->map(fn () => 'second');
+        } catch (InvalidTableColumn $exception) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.column.configured-twice')
+                ->and($exception->getMessage())->toContain('summary')
+                ->and($exception->getMessage())->toContain('map()');
+
+            return;
+        }
+
+        test()->fail('Expected an InvalidTableColumn exception.');
     });
 });
 

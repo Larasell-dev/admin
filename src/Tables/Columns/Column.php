@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use Larasell\Admin\Exceptions\InvalidTableColumn;
 
 abstract class Column implements JsonSerializable
 {
@@ -46,6 +47,10 @@ abstract class Column implements JsonSerializable
      */
     public function map(Closure $callback): static
     {
+        if ($this->map !== null) {
+            throw InvalidTableColumn::configuredTwice($this->name, 'map()');
+        }
+
         $this->map = $callback;
 
         return $this;
