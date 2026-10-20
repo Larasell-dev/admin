@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.0](https://github.com/Larasell-dev/admin/compare/v0.1.9...v0.2.0) (2026-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* validate icons the same way everywhere ([#70](https://github.com/Larasell-dev/admin/issues/70))
+* Larasell\Admin\Enums\NavIcon is now Larasell\Admin\Enums\Icon. Cases and values are unchanged; replace NavIcon imports and references with Icon.
+
+### Features
+
+* link table rows with rowLink() ([#67](https://github.com/Larasell-dev/admin/issues/67)) ([148d467](https://github.com/Larasell-dev/admin/commit/148d46754bf4d0a4869c463f71885b9d8db1ae11))
+* paginate tables ([#72](https://github.com/Larasell-dev/admin/issues/72)) ([15520d9](https://github.com/Larasell-dev/admin/commit/15520d9b0edd224e640f775c4bda343a433a1e6c))
+* show icons on table actions with icon() ([#69](https://github.com/Larasell-dev/admin/issues/69)) ([373fdf6](https://github.com/Larasell-dev/admin/commit/373fdf688176c8158c1e04174527570de6079597))
+
+
+### Bug Fixes
+
+* rename NavIcon enum to Icon ([#63](https://github.com/Larasell-dev/admin/issues/63)) ([9f4c87a](https://github.com/Larasell-dev/admin/commit/9f4c87a1fbefebefb90b863af55b4efbb26e0bd9))
+* stop tables from overriding query() ([#71](https://github.com/Larasell-dev/admin/issues/71)) ([d1dff3e](https://github.com/Larasell-dev/admin/commit/d1dff3e8bb5903dce9e25f8f7c24ddbbd027dce9))
+* validate icons the same way everywhere ([#70](https://github.com/Larasell-dev/admin/issues/70)) ([f26235e](https://github.com/Larasell-dev/admin/commit/f26235eca0da0c353a9ea1767857f09eda622ad3))
+
 ## [0.1.9](https://github.com/Larasell-dev/admin/compare/v0.1.8...v0.1.9) (2026-10-19)
 
 
