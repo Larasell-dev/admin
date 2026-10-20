@@ -11,6 +11,7 @@ use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\AudioBook;
 use Larasell\Admin\Tests\Fixtures\Book;
+use Larasell\Admin\Tests\Fixtures\Tables\AudioBookActionsTable;
 use Larasell\Admin\Tests\Fixtures\Tables\BookActionsTable;
 
 class BooksWithoutActionsTable extends Table
@@ -47,11 +48,12 @@ function withActions(Closure $actions): void
 }
 
 /**
+ * @param  class-string<BookActionsTable>  $table
  * @return array<int, array<string, mixed>>
  */
-function rowActions(int $row = 0): array
+function rowActions(int $row = 0, string $table = BookActionsTable::class): array
 {
-    return json_decode(json_encode(BookActionsTable::make()), true)['rows'][$row]['_actions'];
+    return json_decode(json_encode($table::make()), true)['rows'][$row]['_actions'];
 }
 
 function signIn(): void
@@ -69,7 +71,6 @@ function actionUrl(Book $book, string $action): string
 
 beforeEach(function () {
     config(['larasell-admin.tables.namespace' => 'Larasell\\Admin\\Tests\\Fixtures']);
-    BookActionsTable::$bookModel = Book::class;
     Book::createTable();
 
     $this->dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
@@ -134,10 +135,9 @@ describe('row actions', function () {
     });
 
     it('names multi-word models in plain words in the default confirmation', function () {
-        BookActionsTable::$bookModel = AudioBook::class;
         withActions(fn () => [Action::make('Send Reminder', handle: fn (AudioBook $book) => null)->confirm()]);
 
-        expect(rowActions()[0]['confirm'])->toMatchArray([
+        expect(rowActions(table: AudioBookActionsTable::class)[0]['confirm'])->toMatchArray([
             'title' => 'Send reminder audio book',
             'message' => 'Are you sure you want to send reminder this audio book?',
             'confirmButton' => 'Send Reminder',
