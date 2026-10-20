@@ -207,13 +207,13 @@ abstract class Table implements JsonSerializable
             return $this->model;
         }
 
-        throw new LogicException(static::class.' must define a model with the UseModel attribute, a $model property, or override query().');
+        throw new LogicException(static::class.' must define a model with the UseModel attribute or a $model property.');
     }
 
     /**
      * @return Builder<Model>
      */
-    protected function query(): Builder
+    private function query(): Builder
     {
         return $this->model()::query();
     }
