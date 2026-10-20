@@ -46,7 +46,9 @@ function check() {
     }
   }
 
-  console.log(breaking ? `Breaking change documented in ${added.join(", ")}.` : "Not a breaking change.");
+  console.log(
+    breaking ? `Breaking change documented in ${added.join(", ")}.` : "Not a breaking change.",
+  );
 }
 
 // Nests a note under "### Upgrade guide": strips guidance comments and turns "#" into "####".
@@ -74,7 +76,8 @@ function bundle() {
   const changelogPath = path.join(root, "CHANGELOG.md");
   const changelog = readFileSync(changelogPath, "utf8");
   const versions = [...changelog.matchAll(/^## /gm)].map((match) => match.index);
-  if (versions.length === 0) fail("CHANGELOG.md has no version heading to add the upgrade guide to.");
+  if (versions.length === 0)
+    fail("CHANGELOG.md has no version heading to add the upgrade guide to.");
 
   // The guide goes at the end of the newest version, after release-please's own sections.
   const end = versions[1] ?? changelog.length;

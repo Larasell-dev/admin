@@ -12,7 +12,7 @@ version in [`CHANGELOG.md`](../CHANGELOG.md) and deletes them.
 2. Fill it in and delete the guidance comments you no longer need. Comments are
    stripped from the changelog anyway.
 3. Mark the pull request title as breaking with `!`, e.g.
-   `refactor!: rename NavIcon enum to Icon`. While the version is below 1.0,
+   `fix!: rename NavIcon enum to Icon`. While the version is below 1.0,
    this makes release-please bump the minor version instead of the patch
    version.
 
