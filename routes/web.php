@@ -4,14 +4,17 @@ use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AvatarController;
+use Larasell\Admin\Http\Controllers\CategoryController;
 use Larasell\Admin\Http\Controllers\CustomerController;
 use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
 use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
+use Larasell\Admin\Http\Controllers\HideCategoryController;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
 use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Controllers\TableActionController;
+use Larasell\Admin\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 
@@ -22,6 +25,10 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+    Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
+    Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -40,4 +47,5 @@ if (app()->environment('local')) {
 }
 
 Navigation::add('Home', 'home', icon: Icon::Home);
+Navigation::add('Categories', 'larasell.admin.categories.index', icon: Icon::Folders);
 Navigation::add('Customers', 'larasell.admin.customers.index', icon: Icon::Group);

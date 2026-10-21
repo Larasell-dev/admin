@@ -3,13 +3,14 @@ import { Icon } from "@larasell-dev/ui";
 import { RovingFocusGroup, RovingFocusItem } from "@roving-focus/react";
 import { arrayFirst, assertDefined } from "ts-extras";
 import type { Page } from "../types";
+import { activeNavigationItem } from "../utils/activeNavigationItem";
 import { navigationIcon } from "../utils/navigationIcon";
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
 
 export default function Sidebar() {
   const { props, url } = usePage<Page>();
-  const currentPath = url.split("?")[0];
+  const activeItem = activeNavigationItem(props.navigation, url.split("?")[0]);
   const home = arrayFirst(props.navigation);
   assertDefined(home, "The admin panel needs at least one navigation item.");
 
@@ -31,7 +32,7 @@ export default function Sidebar() {
         className="flex flex-1 flex-col overflow-y-auto pb-3"
       >
         {props.navigation.map((item) => {
-          const active = new URL(item.url, window.location.origin).pathname === currentPath;
+          const active = item === activeItem;
 
           return (
             <RovingFocusItem key={item.url} asChild active={active}>
