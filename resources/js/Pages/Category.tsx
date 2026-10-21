@@ -14,7 +14,6 @@ export default function Category({ category }: Props) {
       <header className="flex h-14 shrink-0 items-center border-b border-border px-6">
         <h2 className="type-body-md text-mauve-950 dark:text-mauve-50">{category.name}</h2>
       </header>
-      {/* The category's content scrolls here, below its fixed header. */}
       <div
         ref={contentScroll}
         className="scroll-mask-y-from-95% min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-6 type-body-md text-mauve-600 dark:text-mauve-400"

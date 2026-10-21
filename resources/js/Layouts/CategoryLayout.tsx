@@ -4,9 +4,6 @@ import { type ReactNode, useRef } from "react";
 import CategoryTree from "../Components/CategoryTree";
 import type { Page } from "../types";
 
-/**
- * The category tree on the left, capped at a fixed width; the page content takes the rest.
- */
 export default function CategoryLayout({ children }: { children: ReactNode }) {
   // Category pages also pass the category they show; the index page doesn't.
   const { categories, category } =

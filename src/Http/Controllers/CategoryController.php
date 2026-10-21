@@ -18,7 +18,6 @@ class CategoryController
      */
     public function index(): Response|RedirectResponse
     {
-        // Not Category::root(): that skips hidden categories, which the tree shows.
         $first = Category::query()->whereNull('parent_id')->orderBy('id')->first();
 
         if ($first !== null) {
