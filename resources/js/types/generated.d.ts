@@ -20,6 +20,15 @@ declare namespace Larasell.Admin.Data.ViewModel {
     email: string;
     avatarUrl: string | null;
   };
+  export type CategoryData = {
+    id: number;
+    name: string;
+    visible: boolean;
+    url: string;
+    hideUrl: string;
+    unhideUrl: string;
+    children: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+  };
   export type CustomerData = {
     id: number;
     name: string;
