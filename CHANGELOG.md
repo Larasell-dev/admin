@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.2](https://github.com/Larasell-dev/admin/compare/v0.3.1...v0.3.2) (2026-10-20)
+
+
+### Bug Fixes
+
+* keep the table's action column at the right edge ([#85](https://github.com/Larasell-dev/admin/issues/85)) ([96da6fe](https://github.com/Larasell-dev/admin/commit/96da6fe6412aee1223bea0ce961cd0b6e9b23e48))
+
+
+### Miscellaneous Chores
+
+* update @larasell-dev/ui to 0.1.14 ([#87](https://github.com/Larasell-dev/admin/issues/87)) ([4640b64](https://github.com/Larasell-dev/admin/commit/4640b6414a739f8bacec0645bb4212ee75ce1ac0))
+
 ## [0.3.1](https://github.com/Larasell-dev/admin/compare/v0.3.0...v0.3.1) (2026-10-20)
 
 

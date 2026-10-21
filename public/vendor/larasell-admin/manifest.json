@@ -1,14 +1,14 @@
 {
-  "_SidebarLayout-D_7aoYGQ.js": {
-    "file": "assets/SidebarLayout-D_7aoYGQ.js",
+  "_SidebarLayout-BaZZG8-L.js": {
+    "file": "assets/SidebarLayout-BaZZG8-L.js",
     "name": "SidebarLayout",
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js"
+      "_dist-Bqq46v5S.js"
     ]
   },
-  "_dist-Ns75tW8k.js": {
-    "file": "assets/dist-Ns75tW8k.js",
+  "_dist-Bqq46v5S.js": {
+    "file": "assets/dist-Bqq46v5S.js",
     "name": "dist",
     "imports": [
       "_rolldown-runtime-hePW80VL.js"
@@ -63,69 +63,69 @@
     "name": "rolldown-runtime"
   },
   "resources/js/Pages/Customers.tsx": {
-    "file": "assets/Customers-CGbaVnUq.js",
+    "file": "assets/Customers-CyuWSbm-.js",
     "name": "Customers",
     "src": "resources/js/Pages/Customers.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js",
-      "_SidebarLayout-D_7aoYGQ.js"
+      "_dist-Bqq46v5S.js",
+      "_SidebarLayout-BaZZG8-L.js"
     ]
   },
   "resources/js/Pages/Home.tsx": {
-    "file": "assets/Home-yEsiSlSv.js",
+    "file": "assets/Home-Ce3Wj-6j.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js",
-      "_SidebarLayout-D_7aoYGQ.js"
+      "_dist-Bqq46v5S.js",
+      "_SidebarLayout-BaZZG8-L.js"
     ]
   },
   "resources/js/Pages/Login.tsx": {
-    "file": "assets/Login-BpMNRAVq.js",
+    "file": "assets/Login-f2y7Yl1k.js",
     "name": "Login",
     "src": "resources/js/Pages/Login.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js"
+      "_dist-Bqq46v5S.js"
     ]
   },
   "resources/js/Pages/Profile.tsx": {
-    "file": "assets/Profile-CDQmZDX9.js",
+    "file": "assets/Profile-DGNUcuim.js",
     "name": "Profile",
     "src": "resources/js/Pages/Profile.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js",
-      "_SidebarLayout-D_7aoYGQ.js"
+      "_dist-Bqq46v5S.js",
+      "_SidebarLayout-BaZZG8-L.js"
     ]
   },
   "resources/js/Pages/TablePage.tsx": {
-    "file": "assets/TablePage-CDW_-dWu.js",
+    "file": "assets/TablePage-DJ1BDt2y.js",
     "name": "TablePage",
     "src": "resources/js/Pages/TablePage.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js",
-      "_SidebarLayout-D_7aoYGQ.js",
+      "_dist-Bqq46v5S.js",
+      "_SidebarLayout-BaZZG8-L.js",
       "resources/js/app.tsx"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-BddTbmE_.js",
+    "file": "assets/app-DL63yWvV.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
     "imports": [
       "_rolldown-runtime-hePW80VL.js",
-      "_dist-Ns75tW8k.js",
-      "_SidebarLayout-D_7aoYGQ.js"
+      "_dist-Bqq46v5S.js",
+      "_SidebarLayout-BaZZG8-L.js"
     ],
     "dynamicImports": [
       "resources/js/Pages/Customers.tsx",
@@ -135,7 +135,7 @@
       "resources/js/Pages/TablePage.tsx"
     ],
     "css": [
-      "assets/app-BukDk8Kv.css"
+      "assets/app-CogJRbhM.css"
     ]
   }
 }
