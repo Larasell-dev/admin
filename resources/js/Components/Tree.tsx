@@ -2,12 +2,12 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import {
   createContext,
-  type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
   type Ref,
   useContext,
   useId,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -24,21 +24,29 @@ export type TreeItemState = {
 
 type Label = { "aria-label": string } | { "aria-labelledby": string };
 
-export type TreeProps<T, TId extends string | number> = Label & {
-  items: readonly T[];
-  getId: (item: T) => TId;
-  getChildren: (item: T) => readonly T[];
-  /** Plain-text name of a node, used for type-ahead. */
-  getLabel: (item: T) => string;
-  /** Renders a node's row: return a `<TreeItem>`, whose content becomes the node's accessible name. */
-  renderItem: (item: T, state: TreeItemState) => ReactNode;
-  defaultExpandedIds?: Iterable<TId>;
-  selectedId?: TId | null;
-  /** Makes nodes selectable: Enter, Space and click select the node. */
-  onSelectedIdChange?: (id: TId) => void;
-  className?: string;
-  groupClassName?: string;
-};
+/** `getId` and `getChildren` default to a node's `id` and `children`, so they're only required without them. */
+type Accessors<T, TId> = (T extends { id: TId }
+  ? { getId?: (item: T) => TId }
+  : { getId: (item: T) => TId }) &
+  (T extends { children: readonly T[] }
+    ? { getChildren?: (item: T) => readonly T[] }
+    : { getChildren: (item: T) => readonly T[] });
+
+export type TreeProps<T, TId extends string | number> = Label &
+  Accessors<T, TId> & {
+    items: readonly T[];
+    /** Plain-text name of a node, used for type-ahead. */
+    getLabel: (item: T) => string;
+    /** Renders a node's row: return a `<TreeItem>`, whose content becomes the node's accessible name. */
+    renderItem: (item: T, state: TreeItemState) => ReactNode;
+    // NoInfer: TId comes from getId, or from the nodes' `id` when getId is left out.
+    defaultExpandedIds?: Iterable<NoInfer<TId>>;
+    selectedId?: NoInfer<TId> | null;
+    /** Makes nodes selectable: Enter, Space and click select the node. */
+    onSelectedIdChange?: (id: NoInfer<TId>) => void;
+    className?: string;
+    groupClassName?: string;
+  };
 
 type Entry<T, TId> = {
   item: T;
@@ -59,10 +67,19 @@ type Entry<T, TId> = {
  * `renderItem`) and, when open, its child group, which the row owns through `aria-owns`.
  * The APG navigation tree view uses this structure so a row can be a link.
  */
-export default function Tree<T, TId extends string | number>({
+// Module-level, so the defaults keep their identity across renders.
+const getOwnId = (item: unknown) => (item as { id: string | number }).id;
+const getOwnChildren = (item: unknown) => (item as { children: readonly unknown[] }).children;
+
+export default function Tree<
+  T,
+  TId extends string | number = T extends { id: infer Id extends string | number }
+    ? Id
+    : string | number,
+>({
   items,
-  getId,
-  getChildren,
+  getId = getOwnId as (item: T) => TId,
+  getChildren = getOwnChildren as (item: T) => readonly T[],
   getLabel,
   renderItem,
   defaultExpandedIds = [],
@@ -79,25 +96,29 @@ export default function Tree<T, TId extends string | number>({
   const selectable = onSelectedIdChange !== undefined;
 
   // Visible nodes in display order: what Up, Down, Home, End and type-ahead move through.
-  const visible: Entry<T, TId>[] = [];
-  const collect = (nodes: readonly T[], parentId: TId | null) => {
-    for (const item of nodes) {
-      const id = getId(item);
-      const children = getChildren(item);
-      visible.push({ item, id, parentId, hasChildren: children.length > 0 });
-      if (children.length > 0 && expanded.has(id)) {
-        collect(children, id);
+  const visible = useMemo(() => {
+    const entries: Entry<T, TId>[] = [];
+    const collect = (nodes: readonly T[], parentId: TId | null) => {
+      for (const item of nodes) {
+        const id = getId(item);
+        const children = getChildren(item);
+        entries.push({ item, id, parentId, hasChildren: children.length > 0 });
+        if (children.length > 0 && expanded.has(id)) {
+          collect(children, id);
+        }
       }
-    }
-  };
-  collect(items, null);
+    };
+    collect(items, null);
+    return entries;
+  }, [items, expanded, getId, getChildren]);
 
-  const isVisible = (id: TId | null) => id !== null && visible.some((entry) => entry.id === id);
-  const tabStopId = isVisible(focusedId)
-    ? focusedId
-    : isVisible(selectedId)
-      ? selectedId
-      : (visible[0]?.id ?? null);
+  // The single tab stop: the focused node, else the selected one, else the first.
+  const tabStopId = useMemo(() => {
+    const isVisible = (id: TId | null) => id !== null && visible.some((entry) => entry.id === id);
+    if (isVisible(focusedId)) return focusedId;
+    if (isVisible(selectedId)) return selectedId;
+    return visible[0]?.id ?? null;
+  }, [visible, focusedId, selectedId]);
 
   const focus = (id: TId) => {
     setFocusedId(id);
@@ -107,10 +128,8 @@ export default function Tree<T, TId extends string | number>({
   const setOpen = (ids: TId[], open: boolean) =>
     setExpanded((current) => {
       const next = new Set(current);
-      for (const id of ids) {
-        if (open) next.add(id);
-        else next.delete(id);
-      }
+      if (open) ids.forEach((id) => next.add(id));
+      else ids.forEach((id) => next.delete(id));
       return next;
     });
 
@@ -215,7 +234,7 @@ export default function Tree<T, TId extends string | number>({
           "aria-selected": selectable ? state.selected : undefined,
           "aria-owns": isExpanded ? groupId : undefined,
           tabIndex: id === tabStopId ? 0 : -1,
-          style: { "--tree-level": level } as CSSProperties,
+          style: { "--tree-level": level },
           onFocus: () => setFocusedId(id),
           onClick: () => onItemClick(entry),
         },

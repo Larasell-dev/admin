@@ -27,8 +27,6 @@ function renderTree(props: { selectedId?: string | null; onSelect?: (id: string)
     <Tree
       aria-label="Food"
       items={items}
-      getId={(item) => item.id}
-      getChildren={(item) => item.children}
       getLabel={(item) => item.name}
       defaultExpandedIds={["fruits"]}
       selectedId={selectedId}
@@ -39,10 +37,6 @@ function renderTree(props: { selectedId?: string | null; onSelect?: (id: string)
 }
 
 const item = (name: string) => page.getByRole("treeitem", { name, exact: true });
-
-async function focusTree() {
-  await userEvent.tab();
-}
 
 describe("roles, states and properties", () => {
   it("labels the tree and nests child nodes in groups", async () => {
@@ -98,21 +92,21 @@ describe("focus", () => {
     await expect.element(item("Apple")).toHaveAttribute("tabindex", "-1");
     await expect.element(item("Grains")).toHaveAttribute("tabindex", "-1");
 
-    await focusTree();
+    await userEvent.tab();
     await expect.element(item("Fruits")).toHaveFocus();
   });
 
   it("starts on the selected node when one is selected", async () => {
     await renderTree({ selectedId: "grains", onSelect: () => {} });
 
-    await focusTree();
+    await userEvent.tab();
     await expect.element(item("Grains")).toHaveFocus();
   });
 
   it("returns to the last focused node when tabbing back in", async () => {
     await renderTree();
 
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}");
     await userEvent.tab();
     await userEvent.tab({ shift: true });
@@ -124,7 +118,7 @@ describe("focus", () => {
 describe("keyboard", () => {
   it("moves down and up through visible nodes, skipping closed ones", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
     await expect.element(item("Vegetables")).toHaveFocus();
@@ -138,7 +132,7 @@ describe("keyboard", () => {
 
   it("does not move past the first or last node", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("{ArrowUp}");
     await expect.element(item("Fruits")).toHaveFocus();
@@ -149,7 +143,7 @@ describe("keyboard", () => {
 
   it("opens a closed node with Right Arrow without moving focus, then moves to its first child", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
 
     await userEvent.keyboard("{ArrowRight}");
@@ -162,7 +156,7 @@ describe("keyboard", () => {
 
   it("does nothing on Right Arrow at an end node", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}");
 
     await userEvent.keyboard("{ArrowRight}");
@@ -171,7 +165,7 @@ describe("keyboard", () => {
 
   it("closes an open node with Left Arrow without moving focus", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("{ArrowLeft}");
     await expect.element(item("Fruits")).toHaveAttribute("aria-expanded", "false");
@@ -181,7 +175,7 @@ describe("keyboard", () => {
 
   it("moves from a child node to its parent with Left Arrow", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}");
 
     await userEvent.keyboard("{ArrowLeft}");
@@ -191,7 +185,7 @@ describe("keyboard", () => {
 
   it("does nothing on Left Arrow at a root end node", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{End}");
 
     await userEvent.keyboard("{ArrowLeft}");
@@ -200,7 +194,7 @@ describe("keyboard", () => {
 
   it("moves to the first node with Home and the last visible node with End", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{ArrowRight}");
 
     // Vegetables is open now, but its children sit above the last node.
@@ -213,7 +207,7 @@ describe("keyboard", () => {
 
   it("opens every sibling of the focused node with *", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("*");
     await expect.element(item("Vegetables")).toHaveAttribute("aria-expanded", "true");
@@ -225,7 +219,7 @@ describe("keyboard", () => {
 
   it("moves to the next visible node starting with a typed character, wrapping around", async () => {
     await renderTree();
-    await focusTree();
+    await userEvent.tab();
 
     // Carrot and Celery start with "c" but are hidden inside the closed Vegetables.
     await userEvent.keyboard("c");
@@ -254,7 +248,7 @@ describe("controls inside a row", () => {
     await expect.element(item("Fruits")).toHaveAttribute("data-tabbable", "true");
     await expect.element(item("Grains")).toHaveAttribute("data-tabbable", "false");
 
-    await focusTree();
+    await userEvent.tab();
     await userEvent.keyboard("{End}");
     await expect.element(item("Cherries")).toHaveAttribute("data-tabbable", "true");
     await expect.element(item("Fruits")).toHaveAttribute("data-tabbable", "false");
@@ -289,7 +283,7 @@ describe("selection", () => {
   it("selects the focused node with Enter and Space", async () => {
     const onSelect = vi.fn();
     await renderTree({ onSelect });
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("{ArrowDown}{Enter}");
     expect(onSelect).toHaveBeenLastCalledWith("apple");
@@ -301,7 +295,7 @@ describe("selection", () => {
   it("does not select when moving focus", async () => {
     const onSelect = vi.fn();
     await renderTree({ onSelect });
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{End}{Home}");
     expect(onSelect).not.toHaveBeenCalled();
@@ -378,7 +372,7 @@ describe("render prop", () => {
   it("activates the focused item with Enter, running the tree's and the consumer's click handlers", async () => {
     const onLinkClick = vi.fn();
     await renderLinkTree(onLinkClick);
-    await focusTree();
+    await userEvent.tab();
 
     await userEvent.keyboard("{End}{Enter}");
     expect(onLinkClick).toHaveBeenCalledExactlyOnceWith("#cherries");
