@@ -42,8 +42,6 @@ export default function CategoryTree({
     <Tree
       aria-labelledby={labelledBy}
       items={categories}
-      getId={(category) => category.id}
-      getChildren={(category) => category.children}
       getLabel={(category) => category.name}
       defaultExpandedIds={currentId === null ? [] : ancestorIds(categories, currentId)}
       // Not selectable: this only makes the current category the tree's tab stop.
