@@ -4,6 +4,7 @@ import {
   DeleteBinLine,
   EyeLine,
   EyeOffLine,
+  FolderAddLine,
   FolderLine,
   FolderOpenLine,
   More2Fill,
@@ -144,6 +145,12 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
           <Icon icon={More2Fill} />
         </Menu.Trigger>
         <Menu.Popup>
+          <Menu.Item
+            icon={FolderAddLine}
+            render={<Link href={category.createChildUrl} prefetch="hover" />}
+          >
+            Add subcategory
+          </Menu.Item>
           {category.visible ? (
             <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
               Hide

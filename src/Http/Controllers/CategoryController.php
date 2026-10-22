@@ -53,21 +53,30 @@ class CategoryController
         ));
     }
 
-    public function create(): Response
+    /**
+     * Creates a root category, or one inside the category given as ?parent=.
+     */
+    public function create(Request $request): Response
     {
+        $parent = $request->filled('parent')
+            ? Category::query()->findOrFail($request->integer('parent'))
+            : null;
+
         return Inertia::render('Category/Create', new CreateCategoryPageData(
             categories: $this->tree(),
             createUrl: route('larasell.admin.categories.create'),
             storeUrl: route('larasell.admin.categories.store'),
+            parent: $parent ? CategoryDetailData::fromModel($parent) : null,
         ));
     }
 
     /**
-     * Creates a root category with the name and slug in the current locale.
+     * Creates a category, inside its parent when given, with the name and slug in the current locale.
      */
     public function store(CategoryRequest $request): RedirectResponse
     {
         $category = Category::create([
+            'parent_id' => $request->validated('parent_id'),
             'name' => Translatable::fromString($request->validated('name')),
             'slug' => Translatable::fromString($request->validated('slug')),
             'status' => $this->visibility($request),
