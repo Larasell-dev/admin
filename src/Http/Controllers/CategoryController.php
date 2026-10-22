@@ -12,6 +12,7 @@ use Larasell\Admin\Data\View\CreateCategoryPageData;
 use Larasell\Admin\Data\ViewModel\CategoryData;
 use Larasell\Admin\Data\ViewModel\CategoryDetailData;
 use Larasell\Admin\Http\Requests\CategoryRequest;
+use Larasell\Admin\Tables\Panel\CategoryProducts;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Translatable;
@@ -42,6 +43,9 @@ class CategoryController
             createUrl: route('larasell.admin.categories.create'),
             category: CategoryDetailData::fromModel($category),
             updateUrl: route('larasell.admin.categories.update', $category),
+            products: CategoryProducts::make($category),
+            availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
+            addProductUrl: route('larasell.admin.categories.products.store', $category),
         ));
     }
 

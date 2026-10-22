@@ -8,6 +8,9 @@ declare namespace Larasell.Admin.Data.View {
     createUrl: string;
     category: Larasell.Admin.Data.ViewModel.CategoryDetailData;
     updateUrl: string;
+    products: import("./index").TableResource;
+    availableProductsUrl: string;
+    addProductUrl: string;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;

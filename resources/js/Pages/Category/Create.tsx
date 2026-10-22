@@ -3,6 +3,7 @@ import { useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { useRef } from "react";
 
 import CategoryForm from "../../Components/CategoryForm";
+import ProductsTable from "../../Components/ProductsTable";
 import { Section, SectionStack } from "../../Components/Section";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout from "../../Layouts/CategoryLayout";
@@ -35,6 +36,7 @@ export default function Create({ storeUrl }: Props) {
               </Section.Root>
               <UnsavedChangesToast container={contentScroll} />
             </Form>
+            <ProductsTable table={null} />
           </SectionStack>
         </div>
       </div>
