@@ -56,7 +56,6 @@ window.LarasellAdmin = {
   },
   boot() {
     void createInertiaApp({
-      // Laravel Head sets the page titles on the server (see routes/web.php).
       serverHead: true,
       resolve: async (name) => {
         const page = registered[name];
