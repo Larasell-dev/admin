@@ -566,3 +566,86 @@ it('does not let guests delete a category', function () {
 
     expect(Category::query()->count())->toBe(1);
 });
+
+it('gives every category in the tree a url to create a category inside it', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$clothing->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('categories.0.createChildUrl', url("/admin/categories/create?parent={$clothing->id}"))
+            ->where('categories.0.children.0.createChildUrl', url("/admin/categories/create?parent={$men->id}")));
+});
+
+it('shows the create page for a category inside another one', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/create?parent={$clothing->id}")
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Category/Create', shouldExist: false)
+            ->where('parent.id', $clothing->id)
+            ->where('parent.name', 'Clothing'));
+});
+
+it('shows the create page without a parent for a root category', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/categories/create')
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('parent', null));
+});
+
+it('returns 404 for the create page inside a category that does not exist', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/categories/create?parent=999')
+        ->assertNotFound();
+});
+
+it('creates a category inside another one and opens it', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+
+    $response = $this->actingAs($admin, 'larasell-admin')
+        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'visible' => '1', 'parent_id' => $men->id]);
+
+    $jackets = Category::query()->where('slug->en', 'jackets')->sole();
+
+    $response->assertSessionHasNoErrors()
+        ->assertRedirect("/admin/categories/{$jackets->id}");
+
+    expect($jackets->parent_id)->toBe($men->id);
+});
+
+it('rejects a parent that does not exist', function (mixed $parentId) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'visible' => '1', 'parent_id' => $parentId])
+        ->assertSessionHasErrors('parent_id');
+
+    expect(Category::query()->count())->toBe(0);
+})->with([
+    'unknown' => [999],
+    'not a number' => ['clothing'],
+]);
+
+it('does not move a category to another parent when it is updated', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $shoes = category('Shoes');
+    $men = category('Men', $clothing);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->put("/admin/categories/{$men->id}", ['name' => 'Men', 'slug' => 'men', 'visible' => '1', 'parent_id' => $shoes->id])
+        ->assertSessionHasNoErrors();
+
+    expect($men->fresh()->parent_id)->toBe($clothing->id);
+});

@@ -11,14 +11,16 @@ import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CreateCategoryPageData;
 
-export default function Create({ storeUrl }: Props) {
+export default function Create({ storeUrl, parent }: Props) {
   const contentScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(contentScroll);
 
   return (
     <>
       <header className="flex h-14 shrink-0 items-center border-b border-border px-6">
-        <h2 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">New category</h2>
+        <h2 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">
+          {parent ? `New category in ${parent.name}` : "New category"}
+        </h2>
       </header>
       <div
         ref={contentScroll}
@@ -26,7 +28,13 @@ export default function Create({ storeUrl }: Props) {
       >
         <div className="max-w-2xl">
           <SectionStack>
-            <Form action={storeUrl} method="post">
+            <Form
+              // Inertia keeps this page mounted when only the parent changes; remounting empties the fields.
+              key={parent?.id ?? "root"}
+              action={storeUrl}
+              method="post"
+            >
+              {parent && <input type="hidden" name="parent_id" value={parent.id} />}
               <Section.Root>
                 <Section.Header
                   title="General"

@@ -28,6 +28,8 @@ class CategoryRequest extends FormRequest
                     ->ignore($category instanceof Category ? $category->id : null),
             ],
             'visible' => ['boolean'],
+            // Only creating reads it; a category keeps its place in the tree when it's updated.
+            'parent_id' => ['nullable', 'integer', Rule::exists(Category::class, 'id')],
         ];
     }
 

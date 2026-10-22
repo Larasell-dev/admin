@@ -15,6 +15,7 @@ const category = (id: number, name: string, visible = true, children: Category[]
   hideUrl: `/admin/categories/${id}/hide`,
   unhideUrl: `/admin/categories/${id}/unhide`,
   deleteUrl: `/admin/categories/${id}`,
+  createChildUrl: `/admin/categories/create?parent=${id}`,
   children,
 });
 
@@ -221,7 +222,7 @@ describe("keyboard navigation with menus", () => {
     await userEvent.keyboard("{ArrowDown}");
 
     await expect.element(page.getByRole("menu")).toBeVisible();
-    await expect.element(page.getByRole("menuitem", { name: "Hide" })).toHaveFocus();
+    await expect.element(page.getByRole("menuitem", { name: "Add subcategory" })).toHaveFocus();
     await expect.element(item("Sale")).not.toHaveFocus();
     // The menu takes focus either way, so also check the tree did not move its tab stop to Sale.
     await expect.element(item("Clothing")).toHaveAttribute("tabindex", "0");
