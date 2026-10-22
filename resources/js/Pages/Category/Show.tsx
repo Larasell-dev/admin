@@ -51,6 +51,7 @@ export default function Show({
               <UnsavedChangesToast container={contentScroll} />
             </Form>
             <ProductsTable
+              mode="edit"
               table={products}
               availableProductsUrl={availableProductsUrl}
               addProductUrl={addProductUrl}

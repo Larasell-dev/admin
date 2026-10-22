@@ -44,7 +44,7 @@ export default function Create({ storeUrl, parent }: Props) {
               </Section.Root>
               <UnsavedChangesToast container={contentScroll} />
             </Form>
-            <ProductsTable table={null} />
+            <ProductsTable mode="create" />
           </SectionStack>
         </div>
       </div>

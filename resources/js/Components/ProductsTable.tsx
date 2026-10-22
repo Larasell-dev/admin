@@ -1,28 +1,33 @@
 import { Combobox } from "@base-ui/react/combobox";
-import { router, useHttp } from "@inertiajs/react";
-import { Button, EmptyState, Icon, Input, Menu, Pagination } from "@larasell-dev/ui";
+import { Field } from "@base-ui/react/field";
+import { router } from "@inertiajs/react";
+import { Button, EmptyState, Error, Icon, Input, Menu, Pagination } from "@larasell-dev/ui";
 import { AddLine, More2Fill } from "@larasell-dev/ui/icons";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TableAction, TableResource } from "../types";
+import { abortPrevious } from "../utils/abortPrevious";
+import { debounce } from "../utils/debounce";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import { Section } from "./Section";
 
+type Props =
+  /** The category doesn't exist yet, so it can't list or take products. */
+  | { mode: "create" }
+  | {
+      mode: "edit";
+      table: TableResource;
+      availableProductsUrl: string;
+      addProductUrl: string;
+    };
+
 /**
  * The products section of a category: its header and a Section.Card with the products and a
- * menu of row actions. With the urls to find and add products, the empty state, or the header
- * once there are products, offers to add one, which shows a row to pick products until cancelled. Without a table, e.g. while the
- * category is being created, it only explains that none are listed yet.
+ * menu of row actions. When editing, the empty state, or the header once there are products,
+ * offers to add one, which shows a bar to pick products until closed. When creating, it only
+ * explains that products show up once the category exists.
  */
-export default function ProductsTable({
-  table,
-  availableProductsUrl,
-  addProductUrl,
-}: {
-  table: TableResource | null;
-  availableProductsUrl?: string;
-  addProductUrl?: string;
-}) {
+export default function ProductsTable(props: Props) {
   const [adding, setAdding] = useState(false);
   const [pending, setPending] = useState<TableAction | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -54,18 +59,19 @@ export default function ProductsTable({
     }
   };
 
+  const table = props.mode === "edit" ? props.table : null;
   const rows = table?.rows ?? [];
-  const canAdd =
-    table !== null && availableProductsUrl !== undefined && addProductUrl !== undefined;
-  const showsAddRow = canAdd && adding;
+  const canAdd = props.mode === "edit";
+  const showsAddRow = props.mode === "edit" && adding;
   const hasActions = rows.some((row) => row._actions.length > 0);
   const startAdding = () => setAdding(true);
-  const empty = table
-    ? (table.emptyState ?? { title: "No products yet", description: null })
-    : {
-        title: "No products yet",
-        description: "Products show up here once the category is created.",
-      };
+  const empty =
+    props.mode === "edit"
+      ? (props.table.emptyState ?? { title: "No products yet", description: null })
+      : {
+          title: "No products yet",
+          description: "Products show up here once the category is created.",
+        };
 
   return (
     <Section.Root>
@@ -105,8 +111,8 @@ export default function ProductsTable({
         <Section.Card>
           {showsAddRow && (
             <AddProductBar
-              availableProductsUrl={availableProductsUrl!}
-              addProductUrl={addProductUrl!}
+              availableProductsUrl={props.availableProductsUrl}
+              addProductUrl={props.addProductUrl}
               onCancel={() => setAdding(false)}
             />
           )}
@@ -212,26 +218,39 @@ function AddProductBar({
   addProductUrl: string;
   onCancel: () => void;
 }) {
-  const search = useHttp<{ search: string }, { products: AvailableProduct[] }>({ search: "" });
   const [products, setProducts] = useState<AvailableProduct[]>([]);
+  const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState<AvailableProduct | null>(null);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string>();
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Debounced, and a newer search cancels the one still running.
-  function find(query: string) {
-    clearTimeout(timer.current);
-    timer.current = setTimeout(async () => {
-      search.cancel();
-      search.transform(() => ({ search: query }));
+  // Debounced, and a newer search aborts the one still running.
+  const find = useMemo(() => {
+    const search = abortPrevious(async (signal, query: string) => {
+      const url = new URL(availableProductsUrl, window.location.origin);
+      url.searchParams.set("search", query);
+      setSearching(true);
       try {
-        setProducts((await search.get(availableProductsUrl)).products);
-      } catch {
-        // A cancelled search is replaced by the newer one.
+        const response = await fetch(url, { signal, headers: { Accept: "application/json" } });
+        setProducts(((await response.json()) as { products: AvailableProduct[] }).products);
+        setSearching(false);
+      } catch (error) {
+        // An aborted search was replaced by a newer one, which is still searching.
+        if (signal.aborted) return;
+        setSearching(false);
+        throw error;
       }
-    }, 200);
-  }
+    });
+    const debounced = debounce((query: string) => void search(query), 200);
+
+    return Object.assign(debounced, {
+      stop: () => {
+        debounced.cancel();
+        search.abort();
+      },
+    });
+  }, [availableProductsUrl]);
+  useEffect(() => find.stop, [find]);
 
   function add() {
     if (!selected) return;
@@ -256,7 +275,8 @@ function AddProductBar({
 
   return (
     <div className="flex items-start gap-1.5 border-b border-border p-3 last:border-b-0">
-      <div className="min-w-0 flex-1">
+      {/* Without a name: the field only shows the error, it submits nothing. */}
+      <Field.Root invalid={error !== undefined} className="min-w-0 flex-1">
         <Combobox.Root
           items={products}
           // The server filters by the search, so every result it returns is shown.
@@ -280,7 +300,7 @@ function AddProductBar({
             <Combobox.Positioner sideOffset={4} align="start" className="z-50 w-(--anchor-width)">
               <Combobox.Popup className="max-h-72 overflow-y-auto border border-border bg-white py-1 shadow-lg dark:bg-mauve-900">
                 <Combobox.Empty className="px-3.5 py-2 type-body-md text-mauve-600 empty:hidden dark:text-mauve-400">
-                  {search.processing ? "Searching…" : "No products found."}
+                  {searching ? "Searching…" : "No products found."}
                 </Combobox.Empty>
                 <Combobox.List>
                   {(product: AvailableProduct) => (
@@ -298,11 +318,11 @@ function AddProductBar({
           </Combobox.Portal>
         </Combobox.Root>
         {error && (
-          <p role="alert" className="mt-1.5 type-body-sm text-red-600 dark:text-red-400">
+          <Error match DANGEROUS_className="mt-1.5">
             {error}
-          </p>
+          </Error>
         )}
-      </div>
+      </Field.Root>
       <div className="flex shrink-0 gap-1">
         <Button type="button" variant="tertiary" disabled={posting} onClick={onCancel}>
           Close
