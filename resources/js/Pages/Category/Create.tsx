@@ -5,7 +5,7 @@ import { useRef } from "react";
 import CategoryForm from "../../Components/CategoryForm";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
-import CategoryLayout, { CategoryTreeDialog } from "../../Layouts/CategoryLayout";
+import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CreateCategoryPageData;
@@ -20,7 +20,7 @@ export default function Create({ storeUrl, parent }: Props) {
         <h2 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">
           {parent ? `New category in ${parent.name}` : "New category"}
         </h2>
-        <CategoryTreeDialog />
+        <CategoryTreeTrigger />
       </header>
       <div
         ref={contentScroll}

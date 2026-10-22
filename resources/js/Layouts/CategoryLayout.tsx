@@ -30,14 +30,17 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
     // Below lg the 3.5rem mobile nav sits above the layout, so it takes the rest of the viewport.
     <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh">
       {/* Without categories there is no tree to show; the page offers to add the first one.
-          Below lg the tree moves into CategoryTreeDialog, opened from the page header. */}
+          Below lg the tree moves into a dialog, opened by CategoryTreeTrigger in the page header. */}
       {categories.length > 0 && (
-        <TreePanel
-          categories={categories}
-          createUrl={createUrl}
-          currentId={category?.id}
-          className="hidden border-r border-border lg:flex"
-        />
+        <>
+          <TreePanel
+            categories={categories}
+            createUrl={createUrl}
+            currentId={category?.id}
+            className="hidden border-r border-border lg:flex"
+          />
+          <TreeDialog categories={categories} createUrl={createUrl} currentId={category?.id} />
+        </>
       )}
 
       {/* Pages scroll their own content area so their header stays put, like the tree's. */}
@@ -46,21 +49,35 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
   );
 }
 
+// Links the trigger in the page header to the dialog here: Inertia remounts the page on every
+// visit, so a dialog inside the page would vanish mid-navigation instead of animating out.
+const treeDialog = Dialog.createHandle();
+
 /** Opens the category tree below lg, where the layout hides it. Belongs in the page header. */
-export function CategoryTreeDialog() {
-  const { props, url } = usePage<Props>();
+export function CategoryTreeTrigger() {
+  return (
+    <Dialog.Trigger
+      handle={treeDialog}
+      aria-label="Open categories"
+      className="-mr-1.5 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring lg:hidden dark:text-mauve-100 dark:hover:bg-mauve-800 [&_svg]:size-5"
+    >
+      <Icon icon={NodeTree} />
+    </Dialog.Trigger>
+  );
+}
+
+function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number }) {
+  const { url } = usePage();
   // Remembers the page it was opened on, so it closes once a link in the tree leads elsewhere
   // but stays open while hiding, moving or adding products keeps the admin on the same page.
   const [openOn, setOpenOn] = useState<string | null>(null);
 
   return (
-    <Dialog.Root open={openOn === url} onOpenChange={(open) => setOpenOn(open ? url : null)}>
-      <Dialog.Trigger
-        aria-label="Open categories"
-        className="-mr-1.5 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring lg:hidden dark:text-mauve-100 dark:hover:bg-mauve-800 [&_svg]:size-5"
-      >
-        <Icon icon={NodeTree} />
-      </Dialog.Trigger>
+    <Dialog.Root
+      handle={treeDialog}
+      open={openOn === url}
+      onOpenChange={(open) => setOpenOn(open ? url : null)}
+    >
       <Dialog.Portal>
         {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
         <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
@@ -68,12 +85,7 @@ export function CategoryTreeDialog() {
           aria-label="Categories"
           className="fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full lg:hidden dark:bg-mauve-950"
         >
-          <TreePanel
-            categories={props.categories}
-            createUrl={props.createUrl}
-            currentId={props.category?.id}
-            className="flex flex-1"
-          />
+          <TreePanel {...props} className="flex flex-1" />
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
