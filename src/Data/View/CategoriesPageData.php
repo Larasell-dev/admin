@@ -12,5 +12,6 @@ class CategoriesPageData extends Data
     public function __construct(
         /** @var array<int, CategoryData> */
         public array $categories,
+        public string $createUrl,
     ) {}
 }

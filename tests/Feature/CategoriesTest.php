@@ -39,7 +39,7 @@ it('shows the index when the store has no categories', function () {
         ->get('/admin/categories')
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Categories', shouldExist: false)
+            ->component('Category/Index', shouldExist: false)
             ->where('categories', []));
 });
 
@@ -56,7 +56,7 @@ it('shows every category of the store as a tree', function () {
         ->get("/admin/categories/{$shoes->id}")
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category', shouldExist: false)
+            ->component('Category/Show', shouldExist: false)
             ->has('categories', 2)
             ->where('categories.0.name', 'Clothing')
             ->where('categories.0.children.0.name', 'Shirts')
@@ -92,7 +92,7 @@ it('shows a category, including a hidden one, next to the tree', function () {
         ->get("/admin/categories/{$linen->id}")
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category', shouldExist: false)
+            ->component('Category/Show', shouldExist: false)
             ->where('category.id', $linen->id)
             ->where('category.name', 'Linen')
             ->where('categories.0.children.0.name', 'Linen'));
@@ -151,3 +151,166 @@ it('does not let guests change a category\'s visibility', function (string $acti
 
     expect($clothing->fresh()->status)->toBe(Visibility::Visible);
 })->with(['hide', 'unhide']);
+
+it('links the category layout to the create page', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$clothing->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('createUrl', url('/admin/categories/create')));
+});
+
+it('shows the create page next to the tree', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    category('Clothing');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/categories/create')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Category/Create', shouldExist: false)
+            ->where('categories.0.name', 'Clothing')
+            ->where('createUrl', url('/admin/categories/create'))
+            ->where('storeUrl', url('/admin/categories')));
+});
+
+it('creates a root category and opens it', function (bool $visible, Visibility $status) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $response = $this->actingAs($admin, 'larasell-admin')
+        ->post('/admin/categories', ['name' => 'Summer Sale', 'slug' => 'summer-sale', 'visible' => $visible ? '1' : '0']);
+
+    $category = Category::query()->sole();
+
+    $response->assertSessionHasNoErrors()
+        ->assertRedirect("/admin/categories/{$category->id}");
+
+    expect($category->name->all())->toBe(['en' => 'Summer Sale'])
+        ->and($category->slug->all())->toBe(['en' => 'summer-sale'])
+        ->and($category->status)->toBe($status)
+        ->and($category->parent_id)->toBeNull();
+})->with([
+    'visible' => [true, Visibility::Visible],
+    'hidden' => [false, Visibility::Hidden],
+]);
+
+it('creates a hidden category when the visibility checkbox is left out', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post('/admin/categories', ['name' => 'Sale', 'slug' => 'sale'])
+        ->assertSessionHasNoErrors();
+
+    expect(Category::query()->sole()->status)->toBe(Visibility::Hidden);
+});
+
+it('shows the category\'s values to edit on its page', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $linen = category('Linen', $clothing, Visibility::Hidden);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$linen->id}")
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Category/Show', shouldExist: false)
+            ->where('categories.0.children.0.name', 'Linen')
+            ->where('category.id', $linen->id)
+            ->where('category.name', 'Linen')
+            ->where('category.slug', 'linen')
+            ->where('category.visible', false)
+            ->where('createUrl', url('/admin/categories/create'))
+            ->where('updateUrl', url("/admin/categories/{$linen->id}")));
+});
+
+it('updates a category and stays on its page', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $shirts = category('Shirts', $clothing);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->put("/admin/categories/{$shirts->id}", ['name' => 'Tops', 'slug' => 'tops', 'visible' => '0'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect("/admin/categories/{$shirts->id}");
+
+    $shirts->refresh();
+
+    expect($shirts->name->get())->toBe('Tops')
+        ->and($shirts->slug->get())->toBe('tops')
+        ->and($shirts->status)->toBe(Visibility::Hidden)
+        ->and($shirts->parent_id)->toBe($clothing->id);
+});
+
+it('only changes the current locale\'s name and slug', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = Category::create([
+        'name' => ['en' => 'Shoes', 'de' => 'Schuhe'],
+        'slug' => ['en' => 'shoes', 'de' => 'schuhe'],
+        'status' => Visibility::Visible,
+    ]);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->put("/admin/categories/{$shoes->id}", ['name' => 'Footwear', 'slug' => 'footwear', 'visible' => '1'])
+        ->assertSessionHasNoErrors();
+
+    $shoes->refresh();
+
+    expect($shoes->name->all())->toBe(['en' => 'Footwear', 'de' => 'Schuhe'])
+        ->and($shoes->slug->all())->toBe(['en' => 'footwear', 'de' => 'schuhe']);
+});
+
+it('rejects an invalid category', function (array $input, string $error) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    category('Shoes');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post('/admin/categories', [...['name' => 'Sale', 'slug' => 'sale', 'visible' => '1'], ...$input])
+        ->assertSessionHasErrors($error);
+
+    expect(Category::query()->count())->toBe(1);
+})->with([
+    'missing name' => [['name' => ''], 'name'],
+    'too long name' => [['name' => str_repeat('a', 256)], 'name'],
+    'missing slug' => [['slug' => ''], 'slug'],
+    'slug with spaces' => [['slug' => 'summer sale'], 'slug'],
+    'slug with capitals' => [['slug' => 'Sale'], 'slug'],
+    'slug with a trailing dash' => [['slug' => 'sale-'], 'slug'],
+    'slug of another category' => [['slug' => 'shoes'], 'slug'],
+    'non-boolean visibility' => [['visible' => 'yes'], 'visible'],
+]);
+
+it('lets a category keep its own slug', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->put("/admin/categories/{$shoes->id}", ['name' => 'All Shoes', 'slug' => 'shoes', 'visible' => '1'])
+        ->assertSessionHasNoErrors();
+
+    expect($shoes->fresh()->name->get())->toBe('All Shoes');
+});
+
+it('does not let a category take the slug of another one', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    category('Shoes');
+    $boots = category('Boots');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->put("/admin/categories/{$boots->id}", ['name' => 'Boots', 'slug' => 'shoes', 'visible' => '1'])
+        ->assertSessionHasErrors('slug');
+
+    expect($boots->fresh()->slug->get())->toBe('boots');
+});
+
+it('does not let guests create or edit categories', function () {
+    $shoes = category('Shoes');
+
+    $this->get('/admin/categories/create')->assertRedirect('/admin/login');
+    $this->post('/admin/categories', ['name' => 'Sale', 'slug' => 'sale', 'visible' => '1'])->assertRedirect('/admin/login');
+    $this->put("/admin/categories/{$shoes->id}", ['name' => 'Boots', 'slug' => 'boots', 'visible' => '0'])->assertRedirect('/admin/login');
+
+    expect(Category::query()->count())->toBe(1)
+        ->and($shoes->fresh()->name->get())->toBe('Shoes');
+});

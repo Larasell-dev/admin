@@ -1,16 +1,17 @@
-import { usePage } from "@inertiajs/react";
-import { useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Link, usePage } from "@inertiajs/react";
+import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { AddLine } from "@larasell-dev/ui/icons";
 import { type ReactNode, useRef } from "react";
 import CategoryTree from "../Components/CategoryTree";
 import type { Page } from "../types";
 
 export default function CategoryLayout({ children }: { children: ReactNode }) {
-  // Category pages also pass the category they show; the index page doesn't.
-  const { categories, category } =
+  // Pages of a single category also pass that category; the index and create pages don't.
+  const { categories, createUrl, category } =
     usePage<
       Page<
         Larasell.Admin.Data.View.CategoriesPageData &
-          Partial<Larasell.Admin.Data.View.CategoryPageData>
+          Partial<Pick<Larasell.Admin.Data.View.CategoryPageData, "category">>
       >
     >().props;
 
@@ -24,10 +25,20 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
         aria-labelledby="category-tree-heading"
         className="flex min-h-0 w-full max-w-80 shrink-0 flex-col border-r border-border"
       >
-        <header className="flex h-14 shrink-0 items-center border-b border-border px-6">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
           <h1 id="category-tree-heading" className="type-body-md text-mauve-950 dark:text-mauve-50">
             Categories
           </h1>
+          <Button
+            variant="tertiary"
+            nativeButton={false}
+            // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
+            role="link"
+            render={<Link href={createUrl} prefetch="hover" />}
+          >
+            <Icon icon={AddLine} />
+            Add
+          </Button>
         </header>
         <div
           ref={treeScroll}
