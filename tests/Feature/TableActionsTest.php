@@ -12,6 +12,7 @@ use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\AudioBook;
 use Larasell\Admin\Tests\Fixtures\Book;
 use Larasell\Admin\Tests\Fixtures\Tables\AudioBookActionsTable;
+use Larasell\Admin\Tests\Fixtures\Tables\AuthorBookActionsTable;
 use Larasell\Admin\Tests\Fixtures\Tables\BookActionsTable;
 
 class BooksWithoutActionsTable extends Table
@@ -40,6 +41,14 @@ class OutsideNamespaceTable extends Table
     {
         return [Action::make('Delete', handle: fn (Book $book) => $book->delete())];
     }
+}
+
+/**
+ * Takes an author like AuthorBookActionsTable, but doesn't remember it for its actions.
+ */
+class ForgetfulAuthorBookActionsTable extends BookActionsTable
+{
+    public function __construct(public string $author) {}
 }
 
 function withActions(Closure $actions): void
@@ -415,5 +424,48 @@ describe('running an action', function () {
         $this->post(actionUrl($this->emma, 'delete'))->assertRedirect('/admin/login');
 
         expect(Book::count())->toBe(2);
+    });
+});
+
+describe('stateful tables', function () {
+    it('runs actions on the table made with the same arguments', function () {
+        withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
+        signIn();
+        $janeAusten = json_decode(json_encode(AuthorBookActionsTable::make('Jane Austen')), true);
+
+        expect($janeAusten['rows'])->toHaveCount(1);
+
+        $this->post($janeAusten['rows'][0]['_actions'][0]['url'])->assertRedirect();
+
+        expect(Book::pluck('title')->all())->toBe(['Dune']);
+    });
+
+    it('keeps the arguments in the action url encrypted', function () {
+        withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
+        signIn();
+        $url = json_decode(json_encode(AuthorBookActionsTable::make('Frank Herbert')), true)['rows'][0]['_actions'][0]['url'];
+        $emma = str_replace("/{$this->dune->id}/", "/{$this->emma->id}/", $url);
+
+        expect(urldecode($url))->not->toContain('Frank Herbert');
+
+        // Jane Austen's book isn't in the Frank Herbert table, and the url's state can't be altered or left out.
+        $this->post($emma)->assertNotFound();
+        $this->post(preg_replace('/state=[^&]+/', 'state=tampered', $url))->assertNotFound();
+        $this->post(preg_replace('/\\?state=[^&]+/', '', $url))->assertNotFound();
+
+        expect(Book::count())->toBe(2);
+    });
+
+    it('rejects actions on a table whose arguments it does not remember', function () {
+        withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
+
+        json_encode(ForgetfulAuthorBookActionsTable::make('Jane Austen'));
+    })->throws(LogicException::class, 'Remember');
+
+    it('still lets a stateful table link without remembering its arguments', function () {
+        withActions(fn () => [Action::make('View')->to('https://example.com')]);
+
+        expect(json_decode(json_encode(ForgetfulAuthorBookActionsTable::make('Jane Austen')), true)['rows'][0]['_actions'][0]['url'])
+            ->toBe('https://example.com');
     });
 });
