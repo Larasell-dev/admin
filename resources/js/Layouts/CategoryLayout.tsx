@@ -1,7 +1,7 @@
-import { Link, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine } from "@larasell-dev/ui/icons";
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import CategoryTree from "../Components/CategoryTree";
 import type { Page } from "../types";
 
@@ -14,6 +14,17 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
           Partial<Pick<Larasell.Admin.Data.View.CategoryPageData, "category">>
       >
     >().props;
+
+  // Every category page shares the tree, so a change can leave any prefetched category page
+  // stale, not just the one the request returns (the only one Inertia flushes). Flushing once
+  // the request finishes also drops prefetches still in flight, which may predate the change.
+  useEffect(
+    () =>
+      router.on("finish", (event) => {
+        if (event.detail.visit.method !== "get") router.flushAll();
+      }),
+    [],
+  );
 
   const treeScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(treeScroll);

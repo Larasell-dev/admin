@@ -1,5 +1,5 @@
 import "../css/app.css";
-import { createInertiaApp, type ResolvedComponent, router } from "@inertiajs/react";
+import { createInertiaApp, type ResolvedComponent } from "@inertiajs/react";
 import * as Inertia from "@inertiajs/react";
 import * as UI from "@larasell-dev/ui";
 import * as React from "react";
@@ -55,14 +55,6 @@ window.LarasellAdmin = {
     Object.assign(registered, next);
   },
   boot() {
-    // Every page shares data, such as the category tree, so any change can leave any
-    // prefetched page stale, not just the one the request returns (the only one Inertia
-    // flushes). Flushing once the request finishes also drops prefetches still in flight,
-    // which may have been answered before the change was saved.
-    router.on("finish", (event) => {
-      if (event.detail.visit.method !== "get") router.flushAll();
-    });
-
     void createInertiaApp({
       title: (title) => (title ? `${title} - Admin` : "Admin"),
       resolve: async (name) => {
