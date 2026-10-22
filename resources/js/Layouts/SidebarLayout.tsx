@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import MobileNav from "../Components/MobileNav";
 import Sidebar from "../Components/Sidebar";
 import { SkipLink } from "../Components/SkipLink";
+import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
   return (
@@ -16,6 +17,8 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
         {children}
       </main>
+      {/* Outside the page, so a toast can animate out after its page is gone. */}
+      <UnsavedChangesToastHost />
     </div>
   );
 }
