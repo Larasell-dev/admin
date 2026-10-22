@@ -238,3 +238,56 @@ describe("keyboard navigation with menus", () => {
     await expect.element(item("Sale")).toHaveFocus();
   });
 });
+
+describe("path to the current category", () => {
+  // Built anew for every render, like the props of each page load.
+  const nested = () => [
+    category(1, "Clothing", true, [category(2, "Men", true, [category(5, "Shirts")])]),
+    category(3, "Sale", false, [category(6, "Clearance")]),
+  ];
+  const tree = (currentId: number) => (
+    <>
+      <h2 id="heading">Categories</h2>
+      <CategoryTree categories={nested()} labelledBy="heading" currentId={currentId} />
+    </>
+  );
+
+  it("opens every category above the current one, which can still be closed", async () => {
+    await render(tree(5));
+
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Men")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Shirts")).toHaveAttribute("aria-current", "page");
+    await expect.element(item("Sale")).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}{ArrowLeft}{ArrowLeft}");
+
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
+    await expect.element(item("Shirts")).not.toBeInTheDocument();
+  });
+
+  it("opens the path again when the page loads again after it was closed", async () => {
+    const screen = await render(tree(5));
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}{ArrowLeft}{ArrowLeft}");
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
+
+    // The layout stays mounted across Inertia visits, such as after saving the category.
+    await screen.rerender(tree(5));
+
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Men")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Shirts")).toBeVisible();
+  });
+
+  it("opens the path to a category that becomes current and keeps other open categories open", async () => {
+    const screen = await render(tree(5));
+
+    await screen.rerender(tree(6));
+
+    await expect.element(item("Sale")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Clearance")).toHaveAttribute("aria-current", "page");
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+  });
+});
