@@ -38,16 +38,16 @@ function renderPage() {
 const toast = () => page.getByRole("region", { name: "Unsaved changes" });
 const visible = () => page.getByRole("checkbox", { name: "Visible in the store" });
 const submitted = () =>
-  new FormData(page.getByTestId("form").element() as HTMLFormElement).get("visible");
+  new FormData(page.getByTestId("form").element() as HTMLFormElement).get("status");
 
 it("counts toggling the visibility as an unsaved change", async () => {
   await renderPage();
   await expect.element(visible()).toBeChecked();
-  expect(submitted()).toBe("1");
+  expect(submitted()).toBe("visible");
 
   await page.getByText("Visible in the store").click();
   await expect.element(visible()).not.toBeChecked();
-  expect(submitted()).toBeNull();
+  expect(submitted()).toBe("hidden");
   await expect.element(toast()).toBeVisible();
 
   await page.getByText("Visible in the store").click();
@@ -62,6 +62,6 @@ it("shows the visibility it was reset to on cancel", async () => {
   await toast().getByRole("button", { name: "Cancel" }).click();
 
   await expect.element(visible()).toBeChecked();
-  expect(submitted()).toBe("1");
+  expect(submitted()).toBe("visible");
   await expect.element(toast()).not.toBeInTheDocument();
 });

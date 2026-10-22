@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Facades\Navigation;
-use Larasell\Admin\Http\Controllers\AvailableProductController;
 use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Http\Controllers\CategoryController;
 use Larasell\Admin\Http\Controllers\CategoryProductController;
@@ -16,6 +15,7 @@ use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
 use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
+use Larasell\Admin\Http\Controllers\SearchProductsNotInCategoryController;
 use Larasell\Admin\Http\Controllers\TableActionController;
 use Larasell\Admin\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Http\Middleware\Authenticate;
@@ -34,7 +34,7 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-    Route::get('categories/{category}/available-products', [AvailableProductController::class, 'index'])->name('categories.available-products.index');
+    Route::get('categories/{category}/available-products', SearchProductsNotInCategoryController::class)->name('categories.available-products.index');
     Route::post('categories/{category}/products', [CategoryProductController::class, 'store'])->name('categories.products.store');
     Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
     Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
