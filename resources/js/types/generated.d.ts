@@ -48,6 +48,7 @@ declare namespace Larasell.Admin.Data.ViewModel {
     unhideUrl: string;
     deleteUrl: string;
     createChildUrl: string;
+    moveUrl: string;
     children: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
   };
   export type CategoryDetailData = {

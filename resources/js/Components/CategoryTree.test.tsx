@@ -16,6 +16,7 @@ const category = (id: number, name: string, visible = true, children: Category[]
   unhideUrl: `/admin/categories/${id}/unhide`,
   deleteUrl: `/admin/categories/${id}`,
   createChildUrl: `/admin/categories/create?parent=${id}`,
+  moveUrl: `/admin/categories/${id}/move`,
   children,
 });
 

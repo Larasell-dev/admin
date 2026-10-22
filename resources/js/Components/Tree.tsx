@@ -41,6 +41,9 @@ export type TreeProps<T, TId extends string | number> = Label &
     renderItem: (item: T, state: TreeItemState) => ReactNode;
     // NoInfer: TId comes from getId, or from the nodes' `id` when getId is left out.
     defaultExpandedIds?: Iterable<NoInfer<TId>>;
+    /** Controls which nodes are open; pair it with `onExpandedIdsChange`. */
+    expandedIds?: ReadonlySet<NoInfer<TId>>;
+    onExpandedIdsChange?: (ids: Set<NoInfer<TId>>) => void;
     selectedId?: NoInfer<TId> | null;
     /** Makes nodes selectable: Enter, Space and click select the node. */
     onSelectedIdChange?: (id: NoInfer<TId>) => void;
@@ -83,6 +86,8 @@ export default function Tree<
   getLabel,
   renderItem,
   defaultExpandedIds = [],
+  expandedIds,
+  onExpandedIdsChange,
   selectedId = null,
   onSelectedIdChange,
   className,
@@ -90,7 +95,8 @@ export default function Tree<
   ...label
 }: TreeProps<T, TId>) {
   const baseId = useId();
-  const [expanded, setExpanded] = useState(() => new Set(defaultExpandedIds));
+  const [ownExpanded, setOwnExpanded] = useState(() => new Set(defaultExpandedIds));
+  const expanded = expandedIds ?? ownExpanded;
   const [focusedId, setFocusedId] = useState<TId | null>(null);
   const elements = useRef(new Map<TId, HTMLElement>());
   const selectable = onSelectedIdChange !== undefined;
@@ -125,13 +131,13 @@ export default function Tree<
     elements.current.get(id)?.focus();
   };
 
-  const setOpen = (ids: TId[], open: boolean) =>
-    setExpanded((current) => {
-      const next = new Set(current);
-      if (open) ids.forEach((id) => next.add(id));
-      else ids.forEach((id) => next.delete(id));
-      return next;
-    });
+  const setOpen = (ids: TId[], open: boolean) => {
+    const next = new Set(expanded);
+    if (open) ids.forEach((id) => next.add(id));
+    else ids.forEach((id) => next.delete(id));
+    setOwnExpanded(next);
+    onExpandedIdsChange?.(next);
+  };
 
   const onKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;

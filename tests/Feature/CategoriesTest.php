@@ -649,3 +649,75 @@ it('does not move a category to another parent when it is updated', function () 
 
     expect($men->fresh()->parent_id)->toBe($clothing->id);
 });
+
+it('gives every category in the tree its move url', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$clothing->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('categories.0.moveUrl', url("/admin/categories/{$clothing->id}/move")));
+});
+
+it('moves a category with its children into another category', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+    $shirts = category('Shirts', $men);
+    $sale = category('Sale');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->from("/admin/categories/{$clothing->id}")
+        ->post("/admin/categories/{$men->id}/move", ['parent_id' => $sale->id])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect("/admin/categories/{$clothing->id}");
+
+    expect($men->fresh()->parent_id)->toBe($sale->id)
+        ->and($shirts->fresh()->parent_id)->toBe($men->id);
+});
+
+it('moves a category to the root', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $men = category('Men', category('Clothing'));
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post("/admin/categories/{$men->id}/move", ['parent_id' => null])
+        ->assertSessionHasNoErrors();
+
+    expect($men->fresh()->parent_id)->toBeNull();
+});
+
+it('does not move a category into itself or a category below it', function (string $into) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+    $jackets = category('Jackets', $men);
+    $rain = category('Rain jackets', $jackets);
+    $target = ['itself' => $men, 'its child' => $jackets, 'its grandchild' => $rain][$into];
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post("/admin/categories/{$men->id}/move", ['parent_id' => $target->id])
+        ->assertSessionHasErrors('parent_id');
+
+    expect($men->fresh()->parent_id)->toBe($clothing->id);
+})->with(['itself', 'its child', 'its grandchild']);
+
+it('does not move a category into one that does not exist', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $men = category('Men', category('Clothing'));
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post("/admin/categories/{$men->id}/move", ['parent_id' => 999])
+        ->assertSessionHasErrors('parent_id');
+});
+
+it('does not let guests move a category', function () {
+    $clothing = category('Clothing');
+    $sale = category('Sale');
+
+    $this->post("/admin/categories/{$clothing->id}/move", ['parent_id' => $sale->id])
+        ->assertRedirect('/admin/login');
+
+    expect($clothing->fresh()->parent_id)->toBeNull();
+});

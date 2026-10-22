@@ -14,6 +14,7 @@ use Larasell\Admin\Http\Controllers\HideCategoryController;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
+use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Controllers\TableActionController;
 use Larasell\Admin\Http\Controllers\UnhideCategoryController;
@@ -37,6 +38,7 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('categories/{category}/products', [CategoryProductController::class, 'store'])->name('categories.products.store');
     Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
     Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
+    Route::post('categories/{category}/move', MoveCategoryController::class)->name('categories.move');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
