@@ -42,6 +42,9 @@ abstract class Table implements JsonSerializable
     /** @var array<class-string, class-string<Model>|false> */
     protected static array $cachedModelAttributes = [];
 
+    /** The namespace of the panel's own tables, whose slugs start with "larasell:". */
+    private const string PANEL_NAMESPACE = 'Larasell\\Admin\\Tables\\Panel\\';
+
     public static function make(mixed ...$arguments): static
     {
         // @phpstan-ignore new.static (subclasses define their own constructor arguments)
@@ -124,15 +127,23 @@ abstract class Table implements JsonSerializable
      */
     public static function slug(): ?string
     {
+        // Can't clash with an app table, since a kebab-cased class name never contains a colon.
+        if (str_starts_with(static::class, self::PANEL_NAMESPACE)) {
+            return 'larasell:'.self::path(Str::after(static::class, self::PANEL_NAMESPACE));
+        }
+
         $namespace = trim((string) config('larasell-admin.tables.namespace'), '\\').'\\';
 
         if (! str_starts_with(static::class, $namespace)) {
             return null;
         }
 
-        $segments = explode('\\', Str::after(static::class, $namespace));
+        return self::path(Str::after(static::class, $namespace));
+    }
 
-        return implode('.', array_map(fn (string $segment): string => Str::kebab($segment), $segments));
+    private static function path(string $class): string
+    {
+        return implode('.', array_map(fn (string $segment): string => Str::kebab($segment), explode('\\', $class)));
     }
 
     /**
@@ -140,8 +151,10 @@ abstract class Table implements JsonSerializable
      */
     public static function fromSlug(string $slug): ?string
     {
-        $namespace = trim((string) config('larasell-admin.tables.namespace'), '\\');
-        $class = $namespace.'\\'.implode('\\', array_map(fn (string $segment): string => Str::studly($segment), explode('.', $slug)));
+        $namespace = str_starts_with($slug, 'larasell:')
+            ? rtrim(self::PANEL_NAMESPACE, '\\')
+            : trim((string) config('larasell-admin.tables.namespace'), '\\');
+        $class = $namespace.'\\'.implode('\\', array_map(fn (string $segment): string => Str::studly($segment), explode('.', Str::after($slug, 'larasell:'))));
 
         if (! class_exists($class) || ! is_subclass_of($class, self::class) || $class::slug() !== $slug) {
             return null;
