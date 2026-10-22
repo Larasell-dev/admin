@@ -26,6 +26,7 @@ declare namespace Larasell.Admin.Data.View {
   };
   export type LoginPageData = {
     loginUrl: string;
+    devLoginUrl: string | null;
   };
   export type ProfilePageData = {
     admin: Larasell.Admin.Data.ViewModel.AdminData;
