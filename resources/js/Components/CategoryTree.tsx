@@ -101,9 +101,18 @@ export default function CategoryTree({
   labelledBy: string;
   currentId?: number | null;
 }) {
-  const [expandedIds, setExpandedIds] = useState(
-    () => new Set(currentId === null ? [] : ancestorIds(categories, currentId)),
-  );
+  const pathIds = (ids: Iterable<number>) =>
+    new Set([...ids, ...(currentId === null ? [] : ancestorIds(categories, currentId))]);
+  const [expandedIds, setExpandedIds] = useState(() => pathIds([]));
+
+  // The layout stays mounted across visits, so every page load, a new current category
+  // or fresh props for this one, opens the path to the current category again. Closing it
+  // in between still works, as that changes neither.
+  const [loaded, setLoaded] = useState({ categories, currentId });
+  if (loaded.categories !== categories || loaded.currentId !== currentId) {
+    setLoaded({ categories, currentId });
+    setExpandedIds(pathIds(expandedIds));
+  }
   const parents = useMemo(() => parentIds(categories), [categories]);
   const expandTimer = useRef<number>(undefined);
 
