@@ -12,6 +12,10 @@ use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
+use Larasell\Admin\Tests\Fixtures\Models;
+use Larasell\Admin\Tests\Fixtures\Tables\Books;
+use Larasell\Admin\Tests\Fixtures\Tables\Library\AudioBooksTable;
+use Larasell\Admin\Tests\Fixtures\Tables\Magazines;
 
 class BooksTable extends Table
 {
@@ -175,6 +179,27 @@ it('lists the model declared with the UseModel attribute', function () {
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
         ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
     ]);
+});
+
+describe('inferred model', function () {
+    it('lists the singular model named like the table in the Models namespace', function () {
+        $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(Books::make())['rows'])->toBe([
+            ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
+        ])->and(Books::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Book::class);
+    });
+
+    it('keeps the sub-namespace and ignores a Table suffix', function () {
+        $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(AudioBooksTable::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Library\AudioBook::class);
+    });
+
+    it('names the model it looked for when there is none', function () {
+        expect(fn () => tableResource(Magazines::make()))
+            ->toThrow(LogicException::class, 'Larasell\Admin\Tests\Fixtures\Models\Magazine');
+    });
 });
 
 class FrankHerbertBooksTable extends Table

@@ -285,7 +285,7 @@ abstract class Table implements JsonSerializable
      * The records the table lists: a model class, or a query or relationship
      * to list only some records, e.g. Book::where('published', true). Row
      * actions only run on records this returns. Defaults to the UseModel
-     * attribute or the $model property.
+     * attribute, the $model property, or the model guessModelName() names.
      *
      * @return class-string<Model>|Builder<covariant Model>|Relation<covariant Model, covariant Model, mixed>
      */
@@ -307,7 +307,31 @@ abstract class Table implements JsonSerializable
             return $this->model;
         }
 
-        throw new LogicException(static::class.' must define a model with the UseModel attribute or a $model property.');
+        $guess = self::guessModelName(static::class);
+
+        if ($guess !== null && is_subclass_of($guess, Model::class)) {
+            return $guess;
+        }
+
+        throw new LogicException(static::class.' must define a model with the UseModel attribute or a $model property'.($guess !== null ? ", or there must be a [{$guess}] model." : '.'));
+    }
+
+    /**
+     * The model the given table class lists by convention, like Laravel guesses a model's resource:
+     * App\Tables\Shop\ProductReviews (or ProductReviewsTable) lists App\Models\Shop\ProductReview.
+     * The class it names may not exist.
+     */
+    public static function guessModelName(string $table): ?string
+    {
+        if (! Str::contains($table, '\\Tables\\')) {
+            return null;
+        }
+
+        $relativeClass = Str::after($table, '\\Tables\\');
+        $basename = Str::singular(Str::replaceEnd('Table', '', class_basename($table)));
+        $relativeNamespace = Str::contains($relativeClass, '\\') ? Str::beforeLast($relativeClass, '\\').'\\' : '';
+
+        return Str::before($table, '\\Tables\\').'\\Models\\'.$relativeNamespace.$basename;
     }
 
     /**

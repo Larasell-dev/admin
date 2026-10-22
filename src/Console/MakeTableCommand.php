@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Str;
+use Larasell\Admin\Tables\Table;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -16,9 +16,12 @@ class MakeTableCommand extends GeneratorCommand
 
     protected $type = 'Table';
 
+    /** Whether the table names its model, because it differs from the one the table would infer. */
+    private bool $namesModel = false;
+
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/table.stub';
+        return __DIR__.($this->namesModel ? '/stubs/table.model.stub' : '/stubs/table.stub');
     }
 
     protected function getDefaultNamespace($rootNamespace): string
@@ -28,8 +31,14 @@ class MakeTableCommand extends GeneratorCommand
 
     protected function buildClass($name): string
     {
-        $model = $this->option('model') ?: Str::singular(class_basename($name));
+        $model = $this->option('model');
+
+        if (! is_string($model) || $model === '') {
+            return parent::buildClass($name);
+        }
+
         $model = class_exists($model) ? ltrim($model, '\\') : $this->qualifyModel($model);
+        $this->namesModel = $model !== Table::guessModelName($name);
 
         return str_replace(
             ['{{ namespacedModel }}', '{{ model }}'],
@@ -41,7 +50,7 @@ class MakeTableCommand extends GeneratorCommand
     protected function getOptions(): array
     {
         return [
-            ['model', 'm', InputOption::VALUE_REQUIRED, 'The model the table lists (defaults to the singular table name)'],
+            ['model', 'm', InputOption::VALUE_REQUIRED, 'The model the table lists (defaults to the one the table infers from its name)'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the table already exists'],
         ];
     }
