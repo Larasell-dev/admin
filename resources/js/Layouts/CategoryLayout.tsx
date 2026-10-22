@@ -26,47 +26,57 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
     [],
   );
 
-  const treeScroll = useRef<HTMLDivElement>(null);
-  useScrollMaskScrollbar(treeScroll);
-
   return (
     // Below lg the 3.5rem mobile nav sits above the layout, so it takes the rest of the viewport.
     <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh">
-      <section
-        aria-labelledby="category-tree-heading"
-        className="flex min-h-0 w-full max-w-80 shrink-0 flex-col border-r border-border"
-      >
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
-          <h1 id="category-tree-heading" className="type-body-md text-mauve-950 dark:text-mauve-50">
-            Categories
-          </h1>
-          <Button
-            variant="tertiary"
-            nativeButton={false}
-            // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-            role="link"
-            render={<Link href={createUrl} prefetch="hover" />}
-          >
-            <Icon icon={AddLine} />
-            Add
-          </Button>
-        </header>
-        <div
-          ref={treeScroll}
-          className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto pb-3"
-        >
-          {categories.length > 0 && (
-            <CategoryTree
-              categories={categories}
-              labelledBy="category-tree-heading"
-              currentId={category?.id}
-            />
-          )}
-        </div>
-      </section>
+      {/* Without categories there is no tree to show; the page offers to add the first one. */}
+      {categories.length > 0 && (
+        <TreePanel categories={categories} createUrl={createUrl} currentId={category?.id} />
+      )}
 
       {/* Pages scroll their own content area so their header stays put, like the tree's. */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
     </div>
+  );
+}
+
+// Its own component so the scroll mask is measured whenever the panel mounts, such as after
+// the first category is created while the layout stays mounted.
+function TreePanel({
+  categories,
+  createUrl,
+  currentId,
+}: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number }) {
+  const treeScroll = useRef<HTMLDivElement>(null);
+  useScrollMaskScrollbar(treeScroll);
+
+  return (
+    <section
+      aria-labelledby="category-tree-heading"
+      className="flex min-h-0 w-full max-w-80 shrink-0 flex-col border-r border-border"
+    >
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
+        <h1 id="category-tree-heading" className="type-body-md text-mauve-950 dark:text-mauve-50">
+          Categories
+        </h1>
+        <Button
+          variant="tertiary"
+          nativeButton={false}
+          // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
+          role="link"
+          render={<Link href={createUrl} prefetch="hover" />}
+        >
+          <Icon icon={AddLine} />
+          Add
+        </Button>
+      </header>
+      <div ref={treeScroll} className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto pb-3">
+        <CategoryTree
+          categories={categories}
+          labelledBy="category-tree-heading"
+          currentId={currentId}
+        />
+      </div>
+    </section>
   );
 }
