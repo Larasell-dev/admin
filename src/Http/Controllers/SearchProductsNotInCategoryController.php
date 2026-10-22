@@ -8,12 +8,9 @@ use Illuminate\Support\Facades\App;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 
-class AvailableProductController
+class SearchProductsNotInCategoryController
 {
-    /**
-     * The products that can still be added to the category, matching the search by name.
-     */
-    public function index(Request $request, Category $category): JsonResponse
+    public function __invoke(Request $request, Category $category): JsonResponse
     {
         $search = $request->string('search')->trim()->value();
 

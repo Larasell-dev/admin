@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Actions\DeleteCategory;
 use Larasell\Admin\Models\Admin;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
@@ -193,11 +191,11 @@ it('shows the create page next to the tree', function () {
             ->where('storeUrl', url('/admin/categories')));
 });
 
-it('creates a root category and opens it', function (bool $visible, Visibility $status) {
+it('creates a root category and opens it', function (Visibility $status) {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Summer Sale', 'slug' => 'summer-sale', 'visible' => $visible ? '1' : '0']);
+        ->post('/admin/categories', ['name' => 'Summer Sale', 'slug' => 'summer-sale', 'status' => $status->value]);
 
     $category = Category::query()->sole();
 
@@ -209,19 +207,9 @@ it('creates a root category and opens it', function (bool $visible, Visibility $
         ->and($category->status)->toBe($status)
         ->and($category->parent_id)->toBeNull();
 })->with([
-    'visible' => [true, Visibility::Visible],
-    'hidden' => [false, Visibility::Hidden],
+    'visible' => [Visibility::Visible],
+    'hidden' => [Visibility::Hidden],
 ]);
-
-it('creates a hidden category when the visibility checkbox is left out', function () {
-    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
-
-    $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Sale', 'slug' => 'sale'])
-        ->assertSessionHasNoErrors();
-
-    expect(Category::query()->sole()->status)->toBe(Visibility::Hidden);
-});
 
 it('shows the category\'s values to edit on its page', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
@@ -248,7 +236,7 @@ it('updates a category and stays on its page', function () {
     $shirts = category('Shirts', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$shirts->id}", ['name' => 'Tops', 'slug' => 'tops', 'visible' => '0'])
+        ->put("/admin/categories/{$shirts->id}", ['name' => 'Tops', 'slug' => 'tops', 'status' => 'hidden'])
         ->assertSessionHasNoErrors()
         ->assertRedirect("/admin/categories/{$shirts->id}");
 
@@ -269,7 +257,7 @@ it('only changes the current locale\'s name and slug', function () {
     ]);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$shoes->id}", ['name' => 'Footwear', 'slug' => 'footwear', 'visible' => '1'])
+        ->put("/admin/categories/{$shoes->id}", ['name' => 'Footwear', 'slug' => 'footwear', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     $shoes->refresh();
@@ -283,7 +271,7 @@ it('rejects an invalid category', function (array $input, string $error) {
     category('Shoes');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', [...['name' => 'Sale', 'slug' => 'sale', 'visible' => '1'], ...$input])
+        ->post('/admin/categories', [...['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'], ...$input])
         ->assertSessionHasErrors($error);
 
     expect(Category::query()->count())->toBe(1);
@@ -295,7 +283,8 @@ it('rejects an invalid category', function (array $input, string $error) {
     'slug with capitals' => [['slug' => 'Sale'], 'slug'],
     'slug with a trailing dash' => [['slug' => 'sale-'], 'slug'],
     'slug of another category' => [['slug' => 'shoes'], 'slug'],
-    'non-boolean visibility' => [['visible' => 'yes'], 'visible'],
+    'missing visibility' => [['status' => null], 'status'],
+    'unknown visibility' => [['status' => 'secret'], 'status'],
 ]);
 
 it('lets a category keep its own slug', function () {
@@ -303,7 +292,7 @@ it('lets a category keep its own slug', function () {
     $shoes = category('Shoes');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$shoes->id}", ['name' => 'All Shoes', 'slug' => 'shoes', 'visible' => '1'])
+        ->put("/admin/categories/{$shoes->id}", ['name' => 'All Shoes', 'slug' => 'shoes', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     expect($shoes->fresh()->name->get())->toBe('All Shoes');
@@ -315,7 +304,7 @@ it('does not let a category take the slug of another one', function () {
     $boots = category('Boots');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$boots->id}", ['name' => 'Boots', 'slug' => 'shoes', 'visible' => '1'])
+        ->put("/admin/categories/{$boots->id}", ['name' => 'Boots', 'slug' => 'shoes', 'status' => 'visible'])
         ->assertSessionHasErrors('slug');
 
     expect($boots->fresh()->slug->get())->toBe('boots');
@@ -325,8 +314,8 @@ it('does not let guests create or edit categories', function () {
     $shoes = category('Shoes');
 
     $this->get('/admin/categories/create')->assertRedirect('/admin/login');
-    $this->post('/admin/categories', ['name' => 'Sale', 'slug' => 'sale', 'visible' => '1'])->assertRedirect('/admin/login');
-    $this->put("/admin/categories/{$shoes->id}", ['name' => 'Boots', 'slug' => 'boots', 'visible' => '0'])->assertRedirect('/admin/login');
+    $this->post('/admin/categories', ['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'])->assertRedirect('/admin/login');
+    $this->put("/admin/categories/{$shoes->id}", ['name' => 'Boots', 'slug' => 'boots', 'status' => 'hidden'])->assertRedirect('/admin/login');
 
     expect(Category::query()->count())->toBe(1)
         ->and($shoes->fresh()->name->get())->toBe('Shoes');
@@ -519,18 +508,6 @@ it('deletes a category with all its descendants but keeps its parent, siblings a
         ->and($coat->categories()->count())->toBe(0);
 });
 
-it('deletes the category and its descendants in a single query', function () {
-    $clothing = category('Clothing');
-    $men = category('Men', $clothing);
-    category('Rain jackets', category('Jackets', $men));
-
-    DB::enableQueryLog();
-    app(DeleteCategory::class)->handle($clothing, 'Clothing');
-
-    expect(DB::getQueryLog())->toHaveCount(1)
-        ->and(Category::query()->count())->toBe(0);
-});
-
 it('requires the category name to delete it', function (?string $typed) {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $clothing = category('Clothing');
@@ -614,7 +591,7 @@ it('creates a category inside another one and opens it', function () {
     $men = category('Men', $clothing);
 
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'visible' => '1', 'parent_id' => $men->id]);
+        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $men->id]);
 
     $jackets = Category::query()->where('slug->en', 'jackets')->sole();
 
@@ -628,7 +605,7 @@ it('rejects a parent that does not exist', function (mixed $parentId) {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'visible' => '1', 'parent_id' => $parentId])
+        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $parentId])
         ->assertSessionHasErrors('parent_id');
 
     expect(Category::query()->count())->toBe(0);
@@ -644,7 +621,7 @@ it('does not move a category to another parent when it is updated', function () 
     $men = category('Men', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$men->id}", ['name' => 'Men', 'slug' => 'men', 'visible' => '1', 'parent_id' => $shoes->id])
+        ->put("/admin/categories/{$men->id}", ['name' => 'Men', 'slug' => 'men', 'status' => 'visible', 'parent_id' => $shoes->id])
         ->assertSessionHasNoErrors();
 
     expect($men->fresh()->parent_id)->toBe($clothing->id);

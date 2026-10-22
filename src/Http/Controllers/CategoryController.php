@@ -16,7 +16,6 @@ use Larasell\Admin\Data\ViewModel\CategoryData;
 use Larasell\Admin\Data\ViewModel\CategoryDetailData;
 use Larasell\Admin\Http\Requests\CategoryRequest;
 use Larasell\Admin\Tables\Panel\CategoryProducts;
-use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Translatable;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -79,7 +78,7 @@ class CategoryController
             'parent_id' => $request->validated('parent_id'),
             'name' => Translatable::fromString($request->validated('name')),
             'slug' => Translatable::fromString($request->validated('slug')),
-            'status' => $this->visibility($request),
+            'status' => $request->validated('status'),
         ]);
 
         return redirect()->route('larasell.admin.categories.show', $category);
@@ -95,7 +94,7 @@ class CategoryController
         $category->update([
             'name' => $category->name->with($locale, $request->validated('name')),
             'slug' => $category->slug->with($locale, $request->validated('slug')),
-            'status' => $this->visibility($request),
+            'status' => $request->validated('status'),
         ]);
 
         return redirect()->route('larasell.admin.categories.show', $category);
@@ -122,14 +121,6 @@ class CategoryController
         }
 
         return back();
-    }
-
-    /**
-     * An unchecked visibility checkbox isn't submitted, so a missing value hides the category.
-     */
-    protected function visibility(CategoryRequest $request): Visibility
-    {
-        return $request->boolean('visible') ? Visibility::Visible : Visibility::Hidden;
     }
 
     /**

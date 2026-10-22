@@ -28,20 +28,20 @@ export default function CategoryForm({ category }: { category?: Category }) {
         </div>
       </div>
 
-      <BaseField.Root name="visible" invalid={!!errors.visible} className="flex flex-col gap-1.5">
+      <BaseField.Root name="status" invalid={!!errors.status} className="flex flex-col gap-1.5">
         <Checkbox.Label>
           <VisibleCheckbox defaultChecked={category?.visible ?? true} />
           Visible in the store
         </Checkbox.Label>
-        {errors.visible && <Error match>{errors.visible}</Error>}
+        {errors.status && <Error match>{errors.status}</Error>}
       </BaseField.Root>
     </Stack>
   );
 }
 
 /**
- * Unticked it isn't submitted, which hides the category. The form resets its hidden input
- * directly, which the checkbox doesn't notice, so on reset it reads the input back.
+ * Submits the category's status either way. The form resets its hidden input directly,
+ * which the checkbox doesn't notice, so on reset it reads the input back.
  */
 function VisibleCheckbox({ defaultChecked }: { defaultChecked: boolean }) {
   const [checked, setChecked] = useState(defaultChecked);
@@ -59,8 +59,9 @@ function VisibleCheckbox({ defaultChecked }: { defaultChecked: boolean }) {
 
   return (
     <Checkbox.Indicator
-      name="visible"
-      value="1"
+      name="status"
+      value="visible"
+      uncheckedValue="hidden"
       checked={checked}
       onCheckedChange={setChecked}
       inputRef={input}
