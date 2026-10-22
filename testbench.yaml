@@ -1,6 +1,7 @@
 # Local playground for the admin panel: `vendor/bin/testbench serve`.
 providers:
   - Workbench\App\Providers\WorkbenchServiceProvider
+  - Laravel\Head\HeadServiceProvider
   - Larasell\Admin\AdminServiceProvider
   - Inertia\ServiceProvider
   - Spatie\LaravelData\LaravelDataServiceProvider

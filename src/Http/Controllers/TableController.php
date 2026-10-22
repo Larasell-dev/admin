@@ -5,6 +5,7 @@ namespace Larasell\Admin\Http\Controllers;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Tables\Table;
+use Laravel\Head\Facades\Head;
 
 class TableController
 {
@@ -13,8 +14,12 @@ class TableController
      */
     public function __invoke(string $table): Response
     {
+        $resource = $table::make();
+
+        Head::title($resource->title());
+
         return Inertia::render('TablePage', [
-            'table' => $table::make(),
+            'table' => $resource,
         ]);
     }
 }

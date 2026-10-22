@@ -33,6 +33,7 @@ class AdminServiceProvider extends ServiceProvider
         Route::middleware(['web', HandleAdminInertiaRequests::class])
             ->prefix(config('larasell-admin.path'))
             ->name('larasell.admin.')
+            ->withHead(title: AdminPanel::TITLE)
             ->group(__DIR__.'/../routes/web.php');
 
         $this->registerRouteMacros();

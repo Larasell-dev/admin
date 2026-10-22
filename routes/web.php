@@ -22,15 +22,15 @@ use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
-    Route::get('login', [LoginController::class, 'create'])->name('login');
+    Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');
     Route::post('login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
 });
 
 Route::middleware(Authenticate::class)->group(function () {
-    Route::get('/', HomeController::class)->name('home');
-    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/', HomeController::class)->name('home')->withHead(title: 'Dashboard');
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index')->withHead(title: 'Categories');
     Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create')->withHead(title: 'New category');
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
@@ -39,8 +39,8 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
     Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
     Route::post('categories/{category}/move', MoveCategoryController::class)->name('categories.move');
-    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
-    Route::get('profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->withHead(title: 'Customers');
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
