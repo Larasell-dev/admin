@@ -1,10 +1,18 @@
 declare namespace Larasell.Admin.Data.View {
   export type CategoriesPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    createUrl: string;
   };
   export type CategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    createUrl: string;
     category: Larasell.Admin.Data.ViewModel.CategoryDetailData;
+    updateUrl: string;
+  };
+  export type CreateCategoryPageData = {
+    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    createUrl: string;
+    storeUrl: string;
   };
   export type CustomersPageData = {
     customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
@@ -39,6 +47,8 @@ declare namespace Larasell.Admin.Data.ViewModel {
   export type CategoryDetailData = {
     id: number;
     name: string;
+    slug: string;
+    visible: boolean;
   };
   export type CustomerData = {
     id: number;

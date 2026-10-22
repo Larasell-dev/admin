@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Data\ViewModel;
 
+use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -12,6 +13,8 @@ class CategoryDetailData extends Data
     public function __construct(
         public int $id,
         public string $name,
+        public string $slug,
+        public bool $visible,
     ) {}
 
     public static function fromModel(Category $category): self
@@ -19,6 +22,8 @@ class CategoryDetailData extends Data
         return new self(
             id: $category->id,
             name: $category->name->get(),
+            slug: $category->slug->get(),
+            visible: $category->status === Visibility::Visible,
         );
     }
 }

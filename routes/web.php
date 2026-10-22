@@ -26,7 +26,10 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
     Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+    Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
     Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
