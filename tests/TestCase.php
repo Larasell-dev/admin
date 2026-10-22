@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Inertia\ServiceProvider as InertiaServiceProvider;
 use Larasell\Admin\AdminServiceProvider;
 use Larasell\Larasell\LarasellServiceProvider;
+use Laravel\Head\HeadServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 
@@ -44,6 +45,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
+            HeadServiceProvider::class,
             AdminServiceProvider::class,
             InertiaServiceProvider::class,
             LarasellServiceProvider::class,

@@ -25,9 +25,8 @@
             @vite(\Larasell\Admin\AdminPanel::resolve()->scripts())
         @endif
 
-        <x-inertia::head>
-            <title>Admin</title>
-        </x-inertia::head>
+        @head
+        <x-inertia::head />
     </head>
     <body>
         <x-inertia::app />
