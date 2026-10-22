@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 type Side = "top" | "right" | "bottom" | "left";
 
-// Whole class names, so Tailwind finds them.
 const padding: Record<Side, string> = {
   top: "pt-(--inset)",
   right: "pr-(--inset)",
@@ -23,12 +22,11 @@ export default function Inset({
   side?: Side | Side[] | "x" | "y";
   children: ReactNode;
 }) {
-  const sides =
-    side === undefined
-      ? (Object.keys(padding) as Side[])
-      : side === "x" || side === "y"
-        ? axes[side]
-        : [side].flat();
+  const sides = (() => {
+    if (side === undefined) return Object.keys(padding) as Side[];
+    if (side === "x" || side === "y") return axes[side];
+    return [side].flat();
+  })();
 
   return <div className={sides.map((name) => padding[name]).join(" ")}>{children}</div>;
 }
