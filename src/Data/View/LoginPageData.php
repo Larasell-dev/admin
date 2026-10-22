@@ -10,5 +10,7 @@ class LoginPageData extends Data
 {
     public function __construct(
         public string $loginUrl,
+        /** Only set in the local environment, where the dev login shortcut exists. */
+        public ?string $devLoginUrl,
     ) {}
 }

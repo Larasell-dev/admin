@@ -1,7 +1,7 @@
 import { Form } from "@inertiajs/react";
 import { Button, Container, Field, Input, Stack } from "@larasell-dev/ui";
 
-export default function Login({ loginUrl }: Larasell.Admin.Data.View.LoginPageData) {
+export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.View.LoginPageData) {
   return (
     <main className="flex min-h-dvh items-center bg-white dark:bg-mauve-950">
       <Container>
@@ -30,6 +30,17 @@ export default function Login({ loginUrl }: Larasell.Admin.Data.View.LoginPageDa
                   <Button type="submit" fullWidth loading={processing}>
                     Sign in
                   </Button>
+
+                  {devLoginUrl && (
+                    <Button
+                      variant="secondary"
+                      fullWidth
+                      nativeButton={false}
+                      render={<a href={devLoginUrl} />}
+                    >
+                      Log in as admin
+                    </Button>
+                  )}
                 </Stack>
               )}
             </Form>

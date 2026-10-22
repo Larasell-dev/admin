@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Inertia\Testing\AssertableInertia as Assert;
 use Larasell\Admin\Models\Admin;
 
 dataset('non-local environments', ['production', 'staging', 'testing']);
@@ -22,6 +23,24 @@ it('does not expose dev routes outside the local environment', function (string 
 
     expect(auth('larasell-admin')->check())->toBeFalse();
 })->with('non-local environments');
+
+it('does not offer the dev login button outside the local environment', function (string $environment) {
+    $this->inEnvironment($environment);
+
+    $this->get('/admin/login')->assertInertia(fn (Assert $page) => $page
+        ->component('Login')
+        ->where('devLoginUrl', null)
+    );
+})->with('non-local environments');
+
+it('offers the dev login button in the local environment', function () {
+    $this->inEnvironment('local');
+
+    $this->get('/admin/login')->assertInertia(fn (Assert $page) => $page
+        ->component('Login')
+        ->where('devLoginUrl', route('larasell.admin.dev.login'))
+    );
+});
 
 it('lists the dev routes', function () {
     $this->inEnvironment('local');
