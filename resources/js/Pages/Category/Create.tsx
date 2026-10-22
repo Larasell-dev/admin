@@ -1,10 +1,9 @@
 import { Form } from "@inertiajs/react";
-import { useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { useRef } from "react";
 
 import CategoryForm from "../../Components/CategoryForm";
 import ProductsTable from "../../Components/ProductsTable";
-import { Section, SectionStack } from "../../Components/Section";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout from "../../Layouts/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";

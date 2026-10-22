@@ -1,7 +1,16 @@
 import { Combobox } from "@base-ui/react/combobox";
 import { Field } from "@base-ui/react/field";
 import { router } from "@inertiajs/react";
-import { Button, EmptyState, Error, Icon, Input, Menu, Pagination } from "@larasell-dev/ui";
+import {
+  Button,
+  EmptyState,
+  Error,
+  Icon,
+  Input,
+  Menu,
+  Pagination,
+  Section,
+} from "@larasell-dev/ui";
 import { AddLine, More2Fill } from "@larasell-dev/ui/icons";
 import { useEffect, useMemo, useState } from "react";
 import type { TableAction, TableResource } from "../types";
@@ -9,7 +18,6 @@ import { abortPrevious } from "../utils/abortPrevious";
 import { debounce } from "../utils/debounce";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
-import { Section } from "./Section";
 
 type Props =
   /** The category doesn't exist yet, so it can't list or take products. */
