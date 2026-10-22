@@ -1,14 +1,6 @@
 import { Link, router } from "@inertiajs/react";
 import { Icon, Menu } from "@larasell-dev/ui";
-import {
-  ArrowDownSLine,
-  ArrowRightSLine,
-  EyeLine,
-  EyeOffLine,
-  FolderLine,
-  FolderOpenLine,
-  More2Fill,
-} from "@larasell-dev/ui/icons";
+import { EyeLine, EyeOffLine, FolderLine, FolderOpenLine, More2Fill } from "@larasell-dev/ui/icons";
 import Tree, { TreeItem } from "./Tree";
 
 type Category = Larasell.Admin.Data.ViewModel.CategoryData;
@@ -52,13 +44,8 @@ export default function CategoryTree({
           <TreeItem
             render={<Link href={category.url} prefetch="hover" />}
             aria-current={category.id === currentId ? "page" : undefined}
-            className="type-body-md flex cursor-pointer items-center gap-1.5 py-2 pr-10 pl-[calc(1rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none group-hover/row:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 aria-[current=page]:bg-mauve-100 dark:text-mauve-50 dark:group-hover/row:bg-mauve-900 dark:aria-[current=page]:bg-mauve-900"
+            className="type-body-md flex cursor-pointer items-center gap-1.5 py-2 pr-10 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none group-hover/row:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 aria-[current=page]:bg-mauve-100 dark:text-mauve-50 dark:group-hover/row:bg-mauve-900 dark:aria-[current=page]:bg-mauve-900"
           >
-            <span className="flex size-4 shrink-0 text-mauve-500 dark:text-mauve-400">
-              {expanded !== undefined && (
-                <Icon icon={expanded ? ArrowDownSLine : ArrowRightSLine} />
-              )}
-            </span>
             <span className="flex shrink-0 text-base text-mauve-500 dark:text-mauve-400">
               <Icon icon={expanded ? FolderOpenLine : FolderLine} />
             </span>
