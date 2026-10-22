@@ -14,7 +14,10 @@ class TableActionController
         $class = Table::fromSlug($table);
         abort_if($class === null, 404);
 
-        $table = $class::make();
+        $state = $request->query('state');
+        $table = $class::fromState(is_string($state) ? $state : null);
+        abort_if($table === null, 404);
+
         $action = $table->action($action);
         abort_if($action === null || ! $action->runs(), 404);
 

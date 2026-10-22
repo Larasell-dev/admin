@@ -2,15 +2,19 @@
 
 namespace Larasell\Admin\Tables;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
+use JsonException;
 use JsonSerializable;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
+use Larasell\Admin\Tables\Attributes\Remember;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\Column;
 use LogicException;
@@ -22,6 +26,10 @@ use ReflectionClass;
  * unlinked. It is not declared here so it can type its parameter as the model:
  *
  *     public function rowLink(ProductReview $productReview): ?string
+ *
+ * A table may take arguments in its constructor, e.g. the record whose related
+ * records it lists. Mark each with #[Remember] when the table has actions that
+ * run a handler, so those can make the same table again.
  */
 abstract class Table implements JsonSerializable
 {
@@ -34,11 +42,51 @@ abstract class Table implements JsonSerializable
     /** @var array<class-string, class-string<Model>|false> */
     protected static array $cachedModelAttributes = [];
 
-    final public function __construct() {}
-
-    public static function make(): static
+    public static function make(mixed ...$arguments): static
     {
-        return new static;
+        // @phpstan-ignore new.static (subclasses define their own constructor arguments)
+        return new static(...$arguments);
+    }
+
+    /**
+     * Makes the table again from the state its action urls carry, or returns null when
+     * the state is missing, altered, or names a record that no longer exists.
+     */
+    public static function fromState(?string $state): ?static
+    {
+        $parameters = (new ReflectionClass(static::class))->getConstructor()?->getParameters() ?? [];
+
+        if ($parameters === []) {
+            return static::make();
+        }
+
+        try {
+            $values = json_decode(Crypt::decryptString((string) $state), true, flags: JSON_THROW_ON_ERROR);
+        } catch (DecryptException|JsonException) {
+            return null;
+        }
+
+        $arguments = [];
+
+        foreach ($parameters as $parameter) {
+            if (! is_array($values) || ! is_array($value = $values[$parameter->getName()] ?? null)) {
+                return null;
+            }
+
+            if (isset($value['model'])) {
+                $value = $value['model']::query()->find($value['key']);
+
+                if ($value === null) {
+                    return null;
+                }
+            } else {
+                $value = $value['value'];
+            }
+
+            $arguments[$parameter->getName()] = $value;
+        }
+
+        return static::make(...$arguments);
     }
 
     /**
@@ -104,6 +152,8 @@ abstract class Table implements JsonSerializable
 
     public function actionUrl(Action $action, Model $record): string
     {
+        $state = $this->state();
+
         $slug = static::slug() ?? throw new LogicException(
             static::class.' must live in the '.config('larasell-admin.tables.namespace').' namespace to run actions.',
         );
@@ -112,7 +162,34 @@ abstract class Table implements JsonSerializable
             'table' => $slug,
             'record' => $record->getKey(),
             'action' => $action->name(),
+            // Encrypted, so the arguments stay hidden and can't be changed.
+            ...$state === [] ? [] : ['state' => Crypt::encryptString(json_encode($state, JSON_THROW_ON_ERROR))],
         ]);
+    }
+
+    /**
+     * The constructor arguments, read from the properties they promote, by parameter name.
+     *
+     * @return array<string, array{model: class-string<Model>, key: mixed}|array{value: mixed}>
+     */
+    private function state(): array
+    {
+        $parameters = (new ReflectionClass(static::class))->getConstructor()?->getParameters() ?? [];
+        $state = [];
+
+        foreach ($parameters as $parameter) {
+            if ($parameter->getAttributes(Remember::class) === [] || ! $parameter->isPromoted()) {
+                throw new LogicException(static::class." must mark its constructor argument [\${$parameter->getName()}] as a promoted property with #[Remember] to run actions.");
+            }
+
+            $value = $this->{$parameter->getName()};
+
+            $state[$parameter->getName()] = $value instanceof Model
+                ? ['model' => $value::class, 'key' => $value->getKey()]
+                : ['value' => $value];
+        }
+
+        return $state;
     }
 
     /**
