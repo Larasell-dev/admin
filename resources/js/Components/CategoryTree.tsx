@@ -10,11 +10,19 @@ import {
   More2Fill,
 } from "@larasell-dev/ui/icons";
 import { defaultPreset, Feedback, PointerActivationConstraints } from "@dnd-kit/dom";
-import { DragDropProvider, PointerSensor, useDraggable, useDroppable } from "@dnd-kit/react";
+import {
+  type DragEndEvent,
+  DragDropProvider,
+  type DragOverEvent,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/react";
 import { type ReactNode, useMemo, useRef, useState } from "react";
 import type { TableAction } from "../types";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
+import { cn } from "cn";
 
 type Category = Larasell.Admin.Data.ViewModel.CategoryData;
 
@@ -143,31 +151,31 @@ export default function CategoryTree({
     );
   };
 
+  // Opens a closed category with children once it has been dragged over for a moment.
+  const openAfterHovering = (event: DragOverEvent) => {
+    window.clearTimeout(expandTimer.current);
+    const id = event.operation.target?.id;
+    if (typeof id !== "number" || expandedIds.has(id)) return;
+    if (!find(categories, id)?.children.length) return;
+    expandTimer.current = window.setTimeout(
+      () => setExpandedIds((current) => new Set(current).add(id)),
+      200,
+    );
+  };
+
+  const drop = (event: DragEndEvent) => {
+    window.clearTimeout(expandTimer.current);
+    const { source, target } = event.operation;
+    if (event.canceled || source === null || target === null) return;
+    move(source.id as number, target.id === ROOT ? null : (target.id as number));
+  };
+
   return (
     <DragDropProvider
       sensors={sensors}
       plugins={plugins}
-      onDragOver={(event) => {
-        window.clearTimeout(expandTimer.current);
-        const id = event.operation.target?.id;
-        if (
-          typeof id !== "number" ||
-          expandedIds.has(id) ||
-          !find(categories, id)?.children.length
-        ) {
-          return;
-        }
-        expandTimer.current = window.setTimeout(
-          () => setExpandedIds((current) => new Set(current).add(id)),
-          200,
-        );
-      }}
-      onDragEnd={(event) => {
-        window.clearTimeout(expandTimer.current);
-        const { source, target } = event.operation;
-        if (event.canceled || source === null || target === null) return;
-        move(source.id as number, target.id === ROOT ? null : (target.id as number));
-      }}
+      onDragOver={openAfterHovering}
+      onDragEnd={drop}
     >
       <RootDropZone accepts={(id) => canMove(id, null)}>
         <Tree
@@ -193,13 +201,15 @@ export default function CategoryTree({
   );
 }
 
+/** The category `id` anywhere in the tree, searching it level by level. */
 function find(categories: Category[], id: number): Category | undefined {
-  for (const category of categories) {
-    if (category.id === id) return category;
-    const below = find(category.children, id);
-    if (below) return below;
-  }
-  return undefined;
+  const match = categories.find((category) => category.id === id);
+  if (match) return match;
+  if (categories.length === 0) return undefined;
+  return find(
+    categories.flatMap((category) => category.children),
+    id,
+  );
 }
 
 /** Fills the rest of the sidebar, so there is room below the tree to drop a category at the root. */
@@ -264,7 +274,22 @@ function CategoryRow({
         render={<Link ref={draggable.ref} href={category.url} prefetch="hover" draggable={false} />}
         aria-current={current ? "page" : undefined}
         data-dragging={draggable.isDragging || undefined}
-        className="type-body-md flex cursor-pointer items-center gap-1.5 py-2 pr-10 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none group-hover/row:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 aria-[current=page]:bg-mauve-100 dark:text-mauve-50 data-dragging:bg-white dark:data-dragging:bg-mauve-950 group-data-drop-target/row:bg-primary-50! dark:group-data-drop-target/row:bg-primary-950/40! data-dnd-placeholder:visible! data-dragging:opacity-60 data-dnd-placeholder:opacity-100! data-dnd-placeholder:bg-mauve-50! data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,color-mix(in_oklab,var(--color-mauve-200)_60%,transparent)_0_1px,transparent_1px_6px)] data-dnd-placeholder:outline-1 data-dnd-placeholder:-outline-offset-1 data-dnd-placeholder:outline-mauve-300 data-dnd-placeholder:outline-dashed data-dnd-placeholder:*:invisible dark:data-dnd-placeholder:bg-mauve-900! dark:data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,var(--color-mauve-800)_0_1px,transparent_1px_6px)] dark:data-dnd-placeholder:outline-mauve-600 dark:group-hover/row:bg-mauve-900 dark:aria-[current=page]:bg-mauve-900"
+        className={cn(
+          // Row
+          "type-body-md flex cursor-pointer items-center gap-1.5 py-2 pr-10 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none dark:text-mauve-50",
+          "group-hover/row:bg-mauve-50 dark:group-hover/row:bg-mauve-900",
+          "focus-visible:focus-ring focus-visible:-outline-offset-2",
+          "aria-[current=page]:bg-mauve-100 dark:aria-[current=page]:bg-mauve-900",
+          // The row being dragged
+          "data-dragging:bg-white data-dragging:opacity-60 dark:data-dragging:bg-mauve-950",
+          // The row dropped onto
+          "group-data-drop-target/row:bg-primary-50! dark:group-data-drop-target/row:bg-primary-950/40!",
+          // The striped placeholder in the dragged row's old place
+          "data-dnd-placeholder:visible! data-dnd-placeholder:opacity-100! data-dnd-placeholder:*:invisible",
+          "data-dnd-placeholder:outline-1 data-dnd-placeholder:-outline-offset-1 data-dnd-placeholder:outline-dashed data-dnd-placeholder:outline-mauve-300 dark:data-dnd-placeholder:outline-mauve-600",
+          "data-dnd-placeholder:bg-mauve-50! data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,color-mix(in_oklab,var(--color-mauve-200)_60%,transparent)_0_1px,transparent_1px_6px)]",
+          "dark:data-dnd-placeholder:bg-mauve-900! dark:data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,var(--color-mauve-800)_0_1px,transparent_1px_6px)]",
+        )}
       >
         <span className="flex shrink-0 text-base text-mauve-500 dark:text-mauve-400">
           <Icon icon={expanded ? FolderOpenLine : FolderLine} />
