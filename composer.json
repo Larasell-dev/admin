@@ -15,6 +15,7 @@
     "larasell-dev/chronicle": "^0.2.7",
     "larasell-dev/larasell": "^1.18",
     "laravel/framework": "^13.23",
+    "laravel/head": "^0.2",
     "spatie/laravel-data": "^4.23"
   },
   "autoload": {
@@ -25,7 +26,8 @@
   "autoload-dev": {
     "psr-4": {
       "Larasell\\Admin\\Tests\\": "tests",
-      "Workbench\\App\\": "workbench/app/"
+      "Workbench\\App\\": "workbench/app/",
+      "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
     }
   },
   "extra": {

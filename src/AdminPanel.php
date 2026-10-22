@@ -25,6 +25,12 @@ class AdminPanel
     public const NAVIGATION_MAX = 1_000;
 
     /**
+     * Base page title of every admin route. Pages that set their own title
+     * read "Categories - Admin"; pages without one read "Admin".
+     */
+    public const TITLE = ['value' => 'Admin', 'suffix' => ' - Admin', 'exact' => true];
+
+    /**
      * @var list<string>
      */
     protected array $scripts = [];
@@ -158,6 +164,7 @@ class AdminPanel
         Route::middleware(['web', HandleAdminInertiaRequests::class, Authenticate::class])
             ->prefix(config('larasell-admin.path'))
             ->name('larasell.admin.')
+            ->withHead(title: self::TITLE)
             ->group($routes);
     }
 

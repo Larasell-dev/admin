@@ -56,7 +56,7 @@ window.LarasellAdmin = {
   },
   boot() {
     void createInertiaApp({
-      title: (title) => (title ? `${title} - Admin` : "Admin"),
+      serverHead: true,
       resolve: async (name) => {
         const page = registered[name];
 

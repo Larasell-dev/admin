@@ -18,6 +18,7 @@ use Larasell\Admin\Http\Requests\CategoryRequest;
 use Larasell\Admin\Tables\Panel\CategoryProducts;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Translatable;
+use Laravel\Head\Facades\Head;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CategoryController
@@ -41,6 +42,8 @@ class CategoryController
 
     public function show(Category $category): Response
     {
+        Head::title($category->name->get());
+
         return Inertia::render('Category/Show', new CategoryPageData(
             categories: $this->tree(),
             createUrl: route('larasell.admin.categories.create'),
@@ -60,6 +63,10 @@ class CategoryController
         $parent = $request->filled('parent')
             ? Category::query()->findOrFail($request->integer('parent'))
             : null;
+
+        if ($parent !== null) {
+            Head::title("New category in {$parent->name->get()}");
+        }
 
         return Inertia::render('Category/Create', new CreateCategoryPageData(
             categories: $this->tree(),

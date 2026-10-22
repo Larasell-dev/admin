@@ -1,19 +1,19 @@
+import { Dialog } from "@base-ui/react/dialog";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
-import { AddLine } from "@larasell-dev/ui/icons";
-import { type ReactNode, useEffect, useRef } from "react";
+import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import CategoryTree from "../Components/CategoryTree";
 import type { Page } from "../types";
 
+// Pages of a single category also pass that category; the index and create pages don't.
+type Props = Page<
+  Larasell.Admin.Data.View.CategoriesPageData &
+    Partial<Pick<Larasell.Admin.Data.View.CategoryPageData, "category">>
+>;
+
 export default function CategoryLayout({ children }: { children: ReactNode }) {
-  // Pages of a single category also pass that category; the index and create pages don't.
-  const { categories, createUrl, category } =
-    usePage<
-      Page<
-        Larasell.Admin.Data.View.CategoriesPageData &
-          Partial<Pick<Larasell.Admin.Data.View.CategoryPageData, "category">>
-      >
-    >().props;
+  const { categories, createUrl, category } = usePage<Props>().props;
 
   // Every category page shares the tree, so a change can leave any prefetched category page
   // stale, not just the one the request returns (the only one Inertia flushes). Flushing once
@@ -29,14 +29,66 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
   return (
     // Below lg the 3.5rem mobile nav sits above the layout, so it takes the rest of the viewport.
     <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh">
-      {/* Without categories there is no tree to show; the page offers to add the first one. */}
+      {/* Without categories there is no tree to show; the page offers to add the first one.
+          Below lg the tree moves into a dialog, opened by CategoryTreeTrigger in the page header. */}
       {categories.length > 0 && (
-        <TreePanel categories={categories} createUrl={createUrl} currentId={category?.id} />
+        <>
+          <TreePanel
+            categories={categories}
+            createUrl={createUrl}
+            currentId={category?.id}
+            className="hidden border-r border-border lg:flex"
+          />
+          <TreeDialog categories={categories} createUrl={createUrl} currentId={category?.id} />
+        </>
       )}
 
       {/* Pages scroll their own content area so their header stays put, like the tree's. */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
     </div>
+  );
+}
+
+// Links the trigger in the page header to the dialog here: Inertia remounts the page on every
+// visit, so a dialog inside the page would vanish mid-navigation instead of animating out.
+const treeDialog = Dialog.createHandle();
+
+/** Opens the category tree below lg, where the layout hides it. Belongs in the page header. */
+export function CategoryTreeTrigger() {
+  return (
+    <Dialog.Trigger
+      handle={treeDialog}
+      aria-label="Open categories"
+      className="-mr-1.5 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring lg:hidden dark:text-mauve-100 dark:hover:bg-mauve-800 [&_svg]:size-5"
+    >
+      <Icon icon={NodeTree} />
+    </Dialog.Trigger>
+  );
+}
+
+function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number }) {
+  const { url } = usePage();
+  // Remembers the page it was opened on, so it closes once a link in the tree leads elsewhere
+  // but stays open while hiding, moving or adding products keeps the admin on the same page.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+
+  return (
+    <Dialog.Root
+      handle={treeDialog}
+      open={openOn === url}
+      onOpenChange={(open) => setOpenOn(open ? url : null)}
+    >
+      <Dialog.Portal>
+        {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
+        <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
+        <Dialog.Popup
+          aria-label="Categories"
+          className="fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full lg:hidden dark:bg-mauve-950"
+        >
+          <TreePanel {...props} className="flex flex-1" />
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
@@ -46,17 +98,20 @@ function TreePanel({
   categories,
   createUrl,
   currentId,
-}: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number }) {
+  className,
+}: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number; className: string }) {
   const treeScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(treeScroll);
+  // The dialog renders a second panel, so each needs its own heading id.
+  const headingId = useId();
 
   return (
     <section
-      aria-labelledby="category-tree-heading"
-      className="flex min-h-0 w-full max-w-80 shrink-0 flex-col border-r border-border"
+      aria-labelledby={headingId}
+      className={`min-h-0 w-full max-w-80 shrink-0 flex-col ${className}`}
     >
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
-        <h1 id="category-tree-heading" className="type-body-md text-mauve-950 dark:text-mauve-50">
+        <h1 id={headingId} className="type-body-md text-mauve-950 dark:text-mauve-50">
           Categories
         </h1>
         <Button
@@ -71,11 +126,7 @@ function TreePanel({
         </Button>
       </header>
       <div ref={treeScroll} className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto pb-3">
-        <CategoryTree
-          categories={categories}
-          labelledBy="category-tree-heading"
-          currentId={currentId}
-        />
+        <CategoryTree categories={categories} labelledBy={headingId} currentId={currentId} />
       </div>
     </section>
   );
