@@ -8,7 +8,7 @@ use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 
 /**
- * Lists Models\Book without naming it.
+ * Names no model, and a plural name doesn't infer Models\Book.
  */
 class Books extends Table
 {

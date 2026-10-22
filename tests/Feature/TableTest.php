@@ -13,9 +13,8 @@ use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 use Larasell\Admin\Tests\Fixtures\Models;
-use Larasell\Admin\Tests\Fixtures\Tables\Books;
-use Larasell\Admin\Tests\Fixtures\Tables\Library\AudioBooksTable;
-use Larasell\Admin\Tests\Fixtures\Tables\Magazines;
+use Larasell\Admin\Tests\Fixtures\Tables;
+use Larasell\Admin\Tests\Fixtures\Tables\Library\AudioBookTable;
 
 class BooksTable extends Table
 {
@@ -182,23 +181,23 @@ it('lists the model declared with the UseModel attribute', function () {
 });
 
 describe('inferred model', function () {
-    it('lists the singular model named like the table in the Models namespace', function () {
+    it('lists the model named like the table in the Models namespace', function () {
         $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
-        expect(tableResource(Books::make())['rows'])->toBe([
+        expect(tableResource(Tables\Book::make())['rows'])->toBe([
             ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
-        ])->and(Books::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Book::class);
+        ])->and(Tables\Book::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Book::class);
     });
 
     it('keeps the sub-namespace and ignores a Table suffix', function () {
         $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
-        expect(AudioBooksTable::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Library\AudioBook::class);
+        expect(AudioBookTable::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Library\AudioBook::class);
     });
 
-    it('names the model it looked for when there is none', function () {
-        expect(fn () => tableResource(Magazines::make()))
-            ->toThrow(LogicException::class, 'Larasell\Admin\Tests\Fixtures\Models\Magazine');
+    it('does not infer the singular model from a plural name, and names the model it looked for', function () {
+        expect(fn () => tableResource(Tables\Books::make()))
+            ->toThrow(LogicException::class, '[Larasell\Admin\Tests\Fixtures\Models\Books]');
     });
 });
 

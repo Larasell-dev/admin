@@ -8,18 +8,28 @@ afterEach(function () {
     File::deleteDirectory(app_path('Tables'));
 });
 
-it('scaffolds a table that infers its model', function () {
+it('scaffolds a table that names the singular model of a plural table name', function () {
     $this->artisan('make:larasell-table', ['name' => 'ProductReviews'])->assertSuccessful();
 
     $contents = File::get(app_path('Tables/ProductReviews.php'));
 
     expect($contents)
         ->toContain('namespace App\Tables;')
+        ->toContain('use App\Models\ProductReview;')
         ->toContain('class ProductReviews extends Table')
-        ->toContain('public function columns(): array')
+        ->toContain('use Larasell\Admin\Tables\Attributes\UseModel;')
+        ->toContain('#[UseModel(ProductReview::class)]')
+        ->toContain('public function columns(): array');
+});
+
+it('scaffolds a table that infers its model when named after it', function (string $name) {
+    $this->artisan('make:larasell-table', ['name' => $name])->assertSuccessful();
+
+    expect(File::get(app_path("Tables/{$name}.php")))
+        ->toContain("class {$name} extends Table")
         ->not->toContain('UseModel')
         ->not->toContain('use App\Models');
-});
+})->with(['ProductReview', 'ProductReviewTable']);
 
 it('uses the given model', function () {
     $this->artisan('make:larasell-table', ['name' => 'Books', '--model' => 'Larasell\Admin\Tests\Fixtures\Book'])->assertSuccessful();
@@ -31,9 +41,9 @@ it('uses the given model', function () {
 });
 
 it('leaves out a given model the table would infer anyway', function () {
-    $this->artisan('make:larasell-table', ['name' => 'Shop/ProductReviews', '--model' => 'Shop/ProductReview'])->assertSuccessful();
+    $this->artisan('make:larasell-table', ['name' => 'Shop/ProductReview', '--model' => 'Shop/ProductReview'])->assertSuccessful();
 
-    expect(File::get(app_path('Tables/Shop/ProductReviews.php')))
+    expect(File::get(app_path('Tables/Shop/ProductReview.php')))
         ->toContain('namespace App\Tables\Shop;')
         ->not->toContain('UseModel');
 });

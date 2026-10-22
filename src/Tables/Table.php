@@ -318,7 +318,7 @@ abstract class Table implements JsonSerializable
 
     /**
      * The model the given table class lists by convention, like Laravel guesses a model's resource:
-     * App\Tables\Shop\ProductReviews (or ProductReviewsTable) lists App\Models\Shop\ProductReview.
+     * App\Tables\Shop\ProductReview (or ProductReviewTable) lists App\Models\Shop\ProductReview.
      * The class it names may not exist.
      */
     public static function guessModelName(string $table): ?string
@@ -328,7 +328,7 @@ abstract class Table implements JsonSerializable
         }
 
         $relativeClass = Str::after($table, '\\Tables\\');
-        $basename = Str::singular(Str::replaceEnd('Table', '', class_basename($table)));
+        $basename = Str::replaceEnd('Table', '', class_basename($table));
         $relativeNamespace = Str::contains($relativeClass, '\\') ? Str::beforeLast($relativeClass, '\\').'\\' : '';
 
         return Str::before($table, '\\Tables\\').'\\Models\\'.$relativeNamespace.$basename;
