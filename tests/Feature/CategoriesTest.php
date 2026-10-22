@@ -6,6 +6,8 @@ use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 
 function category(string $name, ?Category $parent = null, Visibility $status = Visibility::Visible): Category
@@ -16,6 +18,19 @@ function category(string $name, ?Category $parent = null, Visibility $status = V
         'name' => Translatable::fromString($name),
         'status' => $status,
     ]);
+}
+
+function product(string $name, Category $category, Visibility $status = Visibility::Visible): Product
+{
+    $product = Product::create([
+        'slug' => str($name)->slug()->value(),
+        'name' => $name,
+        'price' => Price::of(1000),
+        'status' => $status,
+    ]);
+    $product->categories()->attach($category);
+
+    return $product;
 }
 
 it('redirects the index to the top-most root category', function () {
@@ -313,4 +328,157 @@ it('does not let guests create or edit categories', function () {
 
     expect(Category::query()->count())->toBe(1)
         ->and($shoes->fresh()->name->get())->toBe('Shoes');
+});
+
+it('lists the products of the category on its page', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $boots = product('Boots', $shoes);
+    $sandals = product('Sandals', $shoes, Visibility::Hidden);
+    product('Scarf', category('Accessories'));
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$shoes->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('products.title', 'Products')
+            ->where('products.columns', [
+                ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
+                ['name' => 'status', 'label' => 'Visibility', 'type' => 'text'],
+            ])
+            ->has('products.rows', 2)
+            ->where('products.rows.0.id', $boots->id)
+            ->where('products.rows.0.name', 'Boots')
+            ->where('products.rows.0.status', 'Visible')
+            ->where('products.rows.1.id', $sandals->id)
+            ->where('products.rows.1.name', 'Sandals')
+            ->where('products.rows.1.status', 'Hidden')
+            ->where('products.rows.0._actions.0.label', 'Remove')
+            ->where('products.rows.0._actions.0.method', 'post')
+            ->where('products.rows.0._actions.0.destructive', true)
+            ->where('products.rows.0._actions.0.icon', 'FolderReduce'));
+});
+
+it('does not list products on the create page', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/categories/create')
+        ->assertInertia(fn (AssertableInertia $page) => $page->missing('products'));
+});
+
+it('removes a product from the category but keeps it in the store and its other categories', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $sale = category('Sale');
+    $boots = product('Boots', $shoes);
+    $boots->categories()->attach($sale);
+    product('Sandals', $shoes);
+
+    $url = $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$shoes->id}")
+        ->viewData('page')['props']['products']['rows'][0]['_actions'][0]['url'];
+
+    $this->from("/admin/categories/{$shoes->id}")
+        ->post($url)
+        ->assertRedirect("/admin/categories/{$shoes->id}");
+
+    expect($shoes->products()->pluck('name')->map->get()->all())->toBe(['Sandals'])
+        ->and($sale->products()->pluck('larasell_products.id')->all())->toBe([$boots->id])
+        ->and(Product::query()->count())->toBe(2);
+});
+
+it('only removes products that are in the category', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $boots = product('Boots', $shoes);
+    $scarf = product('Scarf', category('Accessories'));
+
+    $url = $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$shoes->id}")
+        ->viewData('page')['props']['products']['rows'][0]['_actions'][0]['url'];
+
+    $this->post(str_replace("/{$boots->id}/", "/{$scarf->id}/", $url))->assertNotFound();
+
+    expect($scarf->categories()->count())->toBe(1);
+});
+
+it('gives the category page the urls to find and add products', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$shoes->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('availableProductsUrl', url("/admin/categories/{$shoes->id}/available-products"))
+            ->where('addProductUrl', url("/admin/categories/{$shoes->id}/products")));
+});
+
+it('finds the products by name that are not in the category yet', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $accessories = category('Accessories');
+    product('Leather boots', $shoes);
+    $rainBoots = product('Rain boots', $accessories);
+    $hiddenBoots = product('Hidden boots', $accessories, Visibility::Hidden);
+    product('Scarf', $accessories);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->getJson("/admin/categories/{$shoes->id}/available-products?search=BOOTS")
+        ->assertOk()
+        ->assertExactJson(['products' => [
+            ['id' => $rainBoots->id, 'name' => 'Rain boots'],
+            ['id' => $hiddenBoots->id, 'name' => 'Hidden boots'],
+        ]]);
+});
+
+it('suggests products without a search', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $scarf = product('Scarf', category('Accessories'));
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->getJson("/admin/categories/{$shoes->id}/available-products")
+        ->assertExactJson(['products' => [['id' => $scarf->id, 'name' => 'Scarf']]]);
+});
+
+it('adds a product to the category and goes back', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $sale = category('Sale');
+    $boots = product('Boots', $sale);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->from("/admin/categories/{$shoes->id}")
+        ->post("/admin/categories/{$shoes->id}/products", ['product_id' => $boots->id])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect("/admin/categories/{$shoes->id}");
+
+    expect($shoes->products()->pluck('larasell_products.id')->all())->toBe([$boots->id])
+        ->and($sale->products()->pluck('larasell_products.id')->all())->toBe([$boots->id]);
+});
+
+it('rejects adding a product that is missing or already in the category', function (Closure $productId) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $boots = product('Boots', $shoes);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post("/admin/categories/{$shoes->id}/products", ['product_id' => $productId($boots)])
+        ->assertSessionHasErrors('product_id');
+
+    expect($shoes->products()->count())->toBe(1);
+})->with([
+    'none' => [fn (Product $boots) => null],
+    'unknown' => [fn (Product $boots) => 999],
+    'already in the category' => [fn (Product $boots) => $boots->id],
+]);
+
+it('does not let guests find or add products', function () {
+    $shoes = category('Shoes');
+    $boots = product('Boots', category('Sale'));
+
+    $this->get("/admin/categories/{$shoes->id}/available-products")->assertRedirect('/admin/login');
+    $this->post("/admin/categories/{$shoes->id}/products", ['product_id' => $boots->id])->assertRedirect('/admin/login');
+
+    expect($shoes->products()->count())->toBe(0);
 });
