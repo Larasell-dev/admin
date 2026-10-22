@@ -18,6 +18,7 @@ class CategoryData extends Data
         public string $url,
         public string $hideUrl,
         public string $unhideUrl,
+        public string $deleteUrl,
         /** @var array<int, CategoryData> */
         public array $children,
     ) {}
@@ -48,6 +49,7 @@ class CategoryData extends Data
                 url: route('larasell.admin.categories.show', $category),
                 hideUrl: route('larasell.admin.categories.hide', $category),
                 unhideUrl: route('larasell.admin.categories.unhide', $category),
+                deleteUrl: route('larasell.admin.categories.destroy', $category),
                 children: self::branch($byParent, $category->id),
             ))
             ->values()
