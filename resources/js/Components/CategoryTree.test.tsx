@@ -14,6 +14,7 @@ const category = (id: number, name: string, visible = true, children: Category[]
   url: `/admin/categories/${id}`,
   hideUrl: `/admin/categories/${id}/hide`,
   unhideUrl: `/admin/categories/${id}/unhide`,
+  deleteUrl: `/admin/categories/${id}`,
   children,
 });
 

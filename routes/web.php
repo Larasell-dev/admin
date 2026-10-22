@@ -32,6 +32,7 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::get('categories/{category}/available-products', [AvailableProductController::class, 'index'])->name('categories.available-products.index');
     Route::post('categories/{category}/products', [CategoryProductController::class, 'store'])->name('categories.products.store');
     Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');

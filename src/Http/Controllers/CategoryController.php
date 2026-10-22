@@ -3,9 +3,12 @@
 namespace Larasell\Admin\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Actions\DeleteCategory;
 use Larasell\Admin\Data\View\CategoriesPageData;
 use Larasell\Admin\Data\View\CategoryPageData;
 use Larasell\Admin\Data\View\CreateCategoryPageData;
@@ -16,6 +19,7 @@ use Larasell\Admin\Tables\Panel\CategoryProducts;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Translatable;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CategoryController
 {
@@ -86,6 +90,29 @@ class CategoryController
         ]);
 
         return redirect()->route('larasell.admin.categories.show', $category);
+    }
+
+    /**
+     * Deletes the category with all categories below it. Goes back, unless the previous page
+     * was one of the deleted categories.
+     */
+    public function destroy(Request $request, Category $category, DeleteCategory $delete): RedirectResponse
+    {
+        $delete->handle($category, $request->string('confirmation')->value() ?: null);
+
+        try {
+            $previous = Route::getRoutes()->match(Request::create(url()->previous()));
+        } catch (HttpException) {
+            return back();
+        }
+
+        $shown = $previous->getName() === 'larasell.admin.categories.show' ? $previous->parameter('category') : null;
+
+        if ($shown !== null && Category::query()->whereKey($shown)->doesntExist()) {
+            return redirect()->route('larasell.admin.categories.index');
+        }
+
+        return back();
     }
 
     /**

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
+use Larasell\Admin\Actions\DeleteCategory;
 use Larasell\Admin\Models\Admin;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
@@ -481,4 +483,86 @@ it('does not let guests find or add products', function () {
     $this->post("/admin/categories/{$shoes->id}/products", ['product_id' => $boots->id])->assertRedirect('/admin/login');
 
     expect($shoes->products()->count())->toBe(0);
+});
+
+it('gives every category in the tree its delete url', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$clothing->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('categories.0.deleteUrl', url("/admin/categories/{$clothing->id}")));
+});
+
+it('deletes a category with all its descendants but keeps its parent, siblings and products', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+    $jackets = category('Jackets', $men);
+    category('Rain jackets', $jackets);
+    category('Shirts', $men);
+    category('Women', $clothing);
+    category('Shoes');
+    $coat = product('Coat', $jackets);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->from("/admin/categories/{$clothing->id}")
+        ->delete("/admin/categories/{$men->id}", ['confirmation' => 'Men'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect("/admin/categories/{$clothing->id}");
+
+    expect(Category::query()->orderBy('id')->pluck('id')->all())
+        ->toBe(Category::query()->whereIn('slug->en', ['clothing', 'women', 'shoes'])->orderBy('id')->pluck('id')->all())
+        ->and(Category::query()->count())->toBe(3)
+        ->and($coat->fresh())->not->toBeNull()
+        ->and($coat->categories()->count())->toBe(0);
+});
+
+it('deletes the category and its descendants in a single query', function () {
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+    category('Rain jackets', category('Jackets', $men));
+
+    DB::enableQueryLog();
+    app(DeleteCategory::class)->handle($clothing, 'Clothing');
+
+    expect(DB::getQueryLog())->toHaveCount(1)
+        ->and(Category::query()->count())->toBe(0);
+});
+
+it('requires the category name to delete it', function (?string $typed) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    category('Men', $clothing);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->delete("/admin/categories/{$clothing->id}", array_filter(['confirmation' => $typed]))
+        ->assertSessionHasErrors('confirmation');
+
+    expect(Category::query()->count())->toBe(2);
+})->with([
+    'missing' => [null],
+    'wrong' => ['Men'],
+    'wrong case' => ['clothing'],
+]);
+
+it('goes to the categories index after deleting the category that was open', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->from("/admin/categories/{$men->id}")
+        ->delete("/admin/categories/{$clothing->id}", ['confirmation' => 'Clothing'])
+        ->assertRedirect('/admin/categories');
+});
+
+it('does not let guests delete a category', function () {
+    $clothing = category('Clothing');
+
+    $this->delete("/admin/categories/{$clothing->id}", ['confirmation' => 'Clothing'])
+        ->assertRedirect('/admin/login');
+
+    expect(Category::query()->count())->toBe(1);
 });

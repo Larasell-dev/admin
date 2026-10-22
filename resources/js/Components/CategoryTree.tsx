@@ -1,6 +1,16 @@
 import { Link, router } from "@inertiajs/react";
 import { Icon, Menu } from "@larasell-dev/ui";
-import { EyeLine, EyeOffLine, FolderLine, FolderOpenLine, More2Fill } from "@larasell-dev/ui/icons";
+import {
+  DeleteBinLine,
+  EyeLine,
+  EyeOffLine,
+  FolderLine,
+  FolderOpenLine,
+  More2Fill,
+} from "@larasell-dev/ui/icons";
+import { useState } from "react";
+import type { TableAction } from "../types";
+import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
 
 type Category = Larasell.Admin.Data.ViewModel.CategoryData;
@@ -91,26 +101,77 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
       },
     );
 
+  const [deleting, setDeleting] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string>();
+
+  // The admin types the name to confirm; the server checks it again.
+  const deletion: TableAction = {
+    name: "delete",
+    label: "Delete",
+    method: "post",
+    url: category.deleteUrl,
+    confirm: {
+      title: "Delete category",
+      message: `This also deletes all categories inside "${category.name}". Their products stay in the store.`,
+      confirmButton: "Delete",
+      cancelButton: "Cancel",
+      confirmationText: category.name,
+    },
+    destructive: true,
+    disabled: false,
+    icon: null,
+  };
+
+  const destroy = (confirmation: string) =>
+    router.delete(category.deleteUrl, {
+      data: { confirmation },
+      preserveScroll: true,
+      onStart: () => setProcessing(true),
+      onFinish: () => setProcessing(false),
+      onSuccess: () => setDeleting(false),
+      onError: (errors) => setError(errors.confirmation),
+    });
+
   return (
-    <Menu.Root>
-      <Menu.Trigger
-        aria-label={`Actions for ${category.name}`}
-        tabIndex={tabbable ? 0 : -1}
-        className="absolute top-0 right-0 inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 opacity-0 select-none group-has-[:focus-visible]/row:opacity-100 group-hover/row:opacity-100 hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 data-popup-open:opacity-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800"
-      >
-        <Icon icon={More2Fill} />
-      </Menu.Trigger>
-      <Menu.Popup>
-        {category.visible ? (
-          <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
-            Hide
+    <>
+      <Menu.Root>
+        <Menu.Trigger
+          aria-label={`Actions for ${category.name}`}
+          tabIndex={tabbable ? 0 : -1}
+          className="absolute top-0 right-0 inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 opacity-0 select-none group-has-[:focus-visible]/row:opacity-100 group-hover/row:opacity-100 hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 data-popup-open:opacity-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800"
+        >
+          <Icon icon={More2Fill} />
+        </Menu.Trigger>
+        <Menu.Popup>
+          {category.visible ? (
+            <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
+              Hide
+            </Menu.Item>
+          ) : (
+            <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
+              Make visible
+            </Menu.Item>
+          )}
+          <Menu.Item
+            variant="destructive"
+            icon={DeleteBinLine}
+            onClick={() => {
+              setError(undefined);
+              setDeleting(true);
+            }}
+          >
+            Delete
           </Menu.Item>
-        ) : (
-          <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
-            Make visible
-          </Menu.Item>
-        )}
-      </Menu.Popup>
-    </Menu.Root>
+        </Menu.Popup>
+      </Menu.Root>
+      <ConfirmActionDialog
+        action={deleting ? deletion : null}
+        processing={processing}
+        error={error}
+        onConfirm={destroy}
+        onCancel={() => setDeleting(false)}
+      />
+    </>
   );
 }
