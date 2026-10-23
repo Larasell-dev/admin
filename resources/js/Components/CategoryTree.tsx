@@ -21,7 +21,15 @@ import {
   useDroppable,
 } from "@dnd-kit/react";
 import { MotionConfig, motion } from "motion/react";
-import { type ReactNode, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { TableAction } from "../types";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
@@ -395,22 +403,65 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
       },
     );
 
-  const [deleting, setDeleting] = useState(false);
+  const askToDelete = useContext(DeleteContext);
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger
+        aria-label={`Actions for ${category.name}`}
+        tabIndex={tabbable ? 0 : -1}
+        render={<RowButton />}
+      >
+        <Icon icon={More2Fill} />
+      </Menu.Trigger>
+      <Menu.Popup>
+        <Menu.Item
+          icon={FolderAddLine}
+          render={<Link href={category.createChildUrl} prefetch="hover" />}
+        >
+          Add subcategory
+        </Menu.Item>
+        {category.visible ? (
+          <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
+            Hide
+          </Menu.Item>
+        ) : (
+          <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
+            Make visible
+          </Menu.Item>
+        )}
+        <Menu.Item variant="destructive" icon={DeleteBinLine} onClick={() => askToDelete(category)}>
+          Delete
+        </Menu.Item>
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+const DeleteContext = createContext<(category: Category) => void>(() => {});
+
+/**
+ * Lets the category trees inside it delete a category after the admin confirms it. The
+ * confirmation lives here rather than in the deleted row, so it can still animate out once the
+ * row, or every tree when it was the last category, is gone.
+ */
+export function CategoryDeletion({ children }: { children: ReactNode }) {
+  const [deleting, setDeleting] = useState<Category | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string>();
 
   // The admin types the name to confirm; the server checks it again.
-  const deletion: TableAction = {
+  const deletion: TableAction | null = deleting && {
     name: "delete",
     label: "Delete",
     method: "post",
-    url: category.deleteUrl,
+    url: deleting.deleteUrl,
     confirm: {
       title: "Delete category",
-      message: `This also deletes all categories inside "${category.name}". Their products stay in the store.`,
+      message: `This also deletes all categories inside "${deleting.name}". Their products stay in the store.`,
       confirmButton: "Delete",
       cancelButton: "Cancel",
-      confirmationText: category.name,
+      confirmationText: deleting.name,
     },
     destructive: true,
     disabled: false,
@@ -418,60 +469,30 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
   };
 
   const destroy = (confirmation: string) =>
-    router.delete(category.deleteUrl, {
+    router.delete(deleting!.deleteUrl, {
       data: { confirmation },
       preserveScroll: true,
       onStart: () => setProcessing(true),
       onFinish: () => setProcessing(false),
-      onSuccess: () => setDeleting(false),
+      onSuccess: () => setDeleting(null),
       onError: (errors) => setError(errors.confirmation),
     });
 
+  const askToDelete = useCallback((category: Category) => {
+    setError(undefined);
+    setDeleting(category);
+  }, []);
+
   return (
-    <>
-      <Menu.Root>
-        <Menu.Trigger
-          aria-label={`Actions for ${category.name}`}
-          tabIndex={tabbable ? 0 : -1}
-          render={<RowButton />}
-        >
-          <Icon icon={More2Fill} />
-        </Menu.Trigger>
-        <Menu.Popup>
-          <Menu.Item
-            icon={FolderAddLine}
-            render={<Link href={category.createChildUrl} prefetch="hover" />}
-          >
-            Add subcategory
-          </Menu.Item>
-          {category.visible ? (
-            <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
-              Hide
-            </Menu.Item>
-          ) : (
-            <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
-              Make visible
-            </Menu.Item>
-          )}
-          <Menu.Item
-            variant="destructive"
-            icon={DeleteBinLine}
-            onClick={() => {
-              setError(undefined);
-              setDeleting(true);
-            }}
-          >
-            Delete
-          </Menu.Item>
-        </Menu.Popup>
-      </Menu.Root>
+    <DeleteContext value={askToDelete}>
+      {children}
       <ConfirmActionDialog
-        action={deleting ? deletion : null}
+        action={deletion}
         processing={processing}
         error={error}
         onConfirm={destroy}
-        onCancel={() => setDeleting(false)}
+        onCancel={() => setDeleting(null)}
       />
-    </>
+    </DeleteContext>
   );
 }

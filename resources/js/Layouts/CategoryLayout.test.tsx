@@ -1,6 +1,6 @@
 import "../../css/app.css";
-import { App } from "@inertiajs/react";
-import { afterEach, beforeEach, expect, it } from "vitest";
+import { App, router } from "@inertiajs/react";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import CategoryLayout, { CategoryTreeTrigger } from "./CategoryLayout";
@@ -61,7 +61,10 @@ function renderIndex() {
 
 // Below lg the tree lives in a dialog.
 beforeEach(() => page.viewport(390, 800));
-afterEach(() => page.viewport(1280, 720));
+afterEach(() => {
+  vi.restoreAllMocks();
+  return page.viewport(1280, 720);
+});
 
 it("keeps the mobile tree's open categories when the dialog closes and opens again", async () => {
   await renderIndex();
@@ -125,4 +128,27 @@ it("puts the delete dialog above the category dialog it was opened from", async 
   await expect
     .poll(() => isClickable(confirm.getByRole("button", { name: "Cancel" }).element()))
     .toBe(true);
+});
+
+it("lets the delete dialog animate out after deleting the last category", async () => {
+  await page.viewport(1280, 720);
+  // Stands in for the server: the deletion leaves no categories, then reports success.
+  vi.spyOn(router, "delete").mockImplementation((_url, options) =>
+    router.replaceProp("categories", [], { onSuccess: () => options?.onSuccess?.({} as never) }),
+  );
+  await renderIndex();
+  const tree = page.getByRole("region", { name: "Categories" });
+
+  await tree.getByRole("button", { name: "Actions for Toys" }).click();
+  await page.getByRole("menuitem", { name: "Delete" }).click();
+  const confirm = page.getByRole("alertdialog", { name: "Delete category" });
+  await confirm.getByRole("textbox").fill("Toys");
+  const dialog = confirm.element();
+  await confirm.getByRole("button", { name: "Delete" }).click();
+
+  await expect.poll(() => tree.query()).toBeNull();
+  // Still the same dialog, closing, rather than removed along with the tree.
+  expect(dialog.isConnected).toBe(true);
+  expect(dialog).toHaveAttribute("data-ending-style");
+  await expect.poll(() => dialog.isConnected).toBe(false);
 });
