@@ -282,8 +282,6 @@ function AddProductBar({
   }
 
   return (
-    // Search and buttons side by side when the bar is wide enough, the buttons below otherwise.
-    // It queries the bar's own width, since the sidebars decide how much of the viewport it gets.
     <div className="@container border-b border-border p-3 last:border-b-0">
       <div className="flex flex-col gap-1.5 @md:flex-row @md:items-start">
         {/* Without a name: the field only shows the error, it submits nothing. */}
