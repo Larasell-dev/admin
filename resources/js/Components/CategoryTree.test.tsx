@@ -48,7 +48,7 @@ async function renderTree() {
 
 const item = (name: string) => page.getByRole("treeitem", { name, exact: true });
 const trigger = (name: string) => page.getByRole("button", { name: `Actions for ${name}` });
-// Hidden menu buttons are transparent, which toBeVisible() does not treat as hidden.
+// toBeVisible() ignores opacity, so check that the menu buttons are not transparent.
 const shown = (name: string) =>
   expect.poll(() => getComputedStyle(trigger(name).element()).opacity);
 
@@ -65,30 +65,13 @@ describe("category menu", () => {
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("only shows the menu button while its item is hovered or focused", async () => {
+  it("shows every menu button without hover or focus", async () => {
     await renderTree();
     // The pointer stays where the previous test left it, possibly over a row.
     await page.getByRole("heading", { name: "Categories" }).hover();
 
-    await shown("Clothing").toBe("0");
-
-    await item("Sale").hover();
-    await shown("Sale").toBe("1");
-    await shown("Clothing").toBe("0");
-
-    await userEvent.tab();
-    await expect.element(item("Clothing")).toHaveFocus();
     await shown("Clothing").toBe("1");
-  });
-
-  it("does not show the menu button for an item focused by a click", async () => {
-    await renderTree();
-
-    await item("Sale").click();
-    await expect.element(item("Sale")).toHaveFocus();
-    await page.getByRole("heading", { name: "Categories" }).hover();
-
-    await shown("Sale").toBe("0");
+    await shown("Sale").toBe("1");
   });
 
   it("puts only the focused item's menu button in the tab order", async () => {
@@ -123,17 +106,6 @@ describe("category menu", () => {
     await expect.element(trigger("Clothing")).toHaveFocus();
   });
 
-  it("stays visible while open", async () => {
-    await renderTree();
-
-    await item("Clothing").hover();
-    await trigger("Clothing").click();
-    // The open menu covers the page, so move the pointer off the row with force.
-    await page.getByRole("heading", { name: "Categories" }).hover({ force: true });
-
-    await shown("Clothing").toBe("1");
-  });
-
   it("hides a visible category", async () => {
     await renderTree();
 
@@ -165,6 +137,56 @@ describe("category menu", () => {
       {},
       expect.objectContaining({ preserveScroll: true }),
     );
+  });
+});
+
+describe("opening categories", () => {
+  const chevron = (name: string) => page.getByRole("button", { name: `Open ${name}`, exact: true });
+
+  it("opens and closes a category with its chevron, without following its link", async () => {
+    await renderTree();
+
+    await chevron("Clothing").click();
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Shirts")).toBeVisible();
+
+    await page.getByRole("button", { name: "Close Clothing", exact: true }).click();
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
+    await expect.element(item("Shirts")).not.toBeInTheDocument();
+    expect(router.visit).not.toHaveBeenCalled();
+  });
+
+  it("shows the number of direct children next to the chevron, and neither without children", async () => {
+    render(
+      <>
+        <h2 id="heading">Categories</h2>
+        <CategoryTree
+          labelledBy="heading"
+          categories={[
+            category(1, "Clothing", true, [
+              category(2, "Shirts", true, [category(3, "Polos"), category(4, "Tees")]),
+              category(5, "Pants"),
+            ]),
+            category(6, "Toys"),
+          ]}
+        />
+      </>,
+    );
+
+    // Clothing has four categories below it, but only two directly.
+    await expect.element(page.getByText("(2)", { exact: true })).toBeVisible();
+    await expect.element(chevron("Clothing")).toBeVisible();
+    await expect.element(chevron("Toys")).not.toBeInTheDocument();
+    await expect.element(page.getByText("(0)", { exact: true })).not.toBeInTheDocument();
+  });
+
+  it("only follows the link when its row is clicked, without opening it", async () => {
+    await renderTree();
+
+    await item("Clothing").click();
+
+    expect(router.visit).toHaveBeenCalledWith("/admin/categories/1", expect.anything());
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
   });
 });
 
@@ -265,6 +287,16 @@ describe("path to the current category", () => {
 
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
     await expect.element(item("Shirts")).not.toBeInTheDocument();
+  });
+
+  it("opens the current category when it has children, also when the page loads again", async () => {
+    const screen = await render(tree(1));
+
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Men")).toHaveAttribute("aria-expanded", "false");
+
+    await screen.rerender(tree(1));
+    await expect.element(item("Men")).toBeVisible();
   });
 
   it("opens the path again when the page loads again after it was closed", async () => {

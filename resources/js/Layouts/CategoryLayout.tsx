@@ -4,6 +4,7 @@ import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import CategoryTree from "../Components/CategoryTree";
+import Freeze from "../Components/Freeze";
 import type { Page } from "../types";
 
 // Pages of a single category also pass that category; the index and create pages don't.
@@ -71,21 +72,28 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
   // Remembers the page it was opened on, so it closes once a link in the tree leads elsewhere
   // but stays open while hiding, moving or adding products keeps the admin on the same page.
   const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === url;
 
   return (
     <Dialog.Root
       handle={treeDialog}
-      open={openOn === url}
+      open={open}
       onOpenChange={(open) => setOpenOn(open ? url : null)}
     >
-      <Dialog.Portal>
+      {/* Kept mounted, so the tree remembers its open categories between openings,
+          like the panel beside the page does across visits. */}
+      <Dialog.Portal keepMounted>
         {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
         <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
         <Dialog.Popup
           aria-label="Categories"
           className="fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full lg:hidden dark:bg-mauve-950"
         >
-          <TreePanel {...props} className="flex flex-1" />
+          {/* Following a link closes the dialog in the same render that makes another category
+              current, which would open it while the panel slides out. */}
+          <Freeze frozen={!open}>
+            <TreePanel {...props} className="flex flex-1" />
+          </Freeze>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
