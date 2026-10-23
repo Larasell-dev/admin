@@ -34,6 +34,23 @@ jobs:
             exit 1
           fi
 
+  best-before:
+    name: Best before
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fail on expired BEST-BEFORE markers
+        run: npm run best-before
+
   commitlint:
     name: Commitlint
     runs-on: ubuntu-latest

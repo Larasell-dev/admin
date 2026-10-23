@@ -9,6 +9,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "generate:icons": "node scripts/generate-icons.mjs",
+    "best-before": "node scripts/best-before.mjs",
     "test": "vitest run"
   },
   "dependencies": {
