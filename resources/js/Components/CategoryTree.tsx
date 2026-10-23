@@ -1,3 +1,4 @@
+import { Button } from "@base-ui/react/button";
 import { Link, router } from "@inertiajs/react";
 import { Icon, Menu } from "@larasell-dev/ui";
 import {
@@ -20,7 +21,7 @@ import {
   useDroppable,
 } from "@dnd-kit/react";
 import { MotionConfig, motion } from "motion/react";
-import { type ComponentProps, type ReactNode, useMemo, useRef, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 import type { TableAction } from "../types";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
@@ -346,10 +347,12 @@ function CategoryRow({
 }
 
 /** A square icon button at the end of a category's row. */
-function RowButton({ className, ...props }: ComponentProps<"button">) {
+function RowButton({
+  className,
+  ...props
+}: Omit<Button.Props, "className"> & { className?: string }) {
   return (
-    <button
-      type="button"
+    <Button
       className={cn(
         "pointer-events-auto inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800",
         className,
