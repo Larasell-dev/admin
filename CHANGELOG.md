@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/Larasell-dev/admin/compare/v0.4.0...v0.4.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* boot Laravel Head before the admin routes use withHead() ([#114](https://github.com/Larasell-dev/admin/issues/114)) ([f7be632](https://github.com/Larasell-dev/admin/commit/f7be632a7e734340909a41236a3c3031bb0069be))
+
 ## [0.4.0](https://github.com/Larasell-dev/admin/compare/v0.3.2...v0.4.0) (2026-10-23)
 
 
