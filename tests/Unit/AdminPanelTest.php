@@ -145,6 +145,30 @@ it('has a registered navigation item for every NavItem case', function () {
     expect(array_column(AdminPanel::resolve()->navigationItems(), 'id'))->toContain(...$ids);
 });
 
+it('positions NavItem cases in steps of 1000 in declaration order', function () {
+    expect(array_map(fn (NavItem $case): int => $case->position(), NavItem::cases()))
+        ->toBe([1000, 2000, 3000]);
+});
+
+it('lists NavItem labels keyed by route', function () {
+    expect(NavItem::all())->toBe([
+        'larasell.admin.home' => 'Home',
+        'larasell.admin.categories.index' => 'Categories',
+        'larasell.admin.customers.index' => 'Customers',
+    ]);
+});
+
+it('places built-in navigation items at their NavItem position', function () {
+    AdminPanel::resolve()->add('Notes', 'larasell.admin.notes', 'sticky-note')->position(1500);
+
+    expect(array_column(AdminPanel::resolve()->navigationItems(), 'id'))->toBe([
+        'larasell.admin.home',
+        'larasell.admin.notes',
+        'larasell.admin.categories.index',
+        'larasell.admin.customers.index',
+    ]);
+});
+
 function labels(AdminPanel $panel): array
 {
     return array_column($panel->navigationItems(), 'label');

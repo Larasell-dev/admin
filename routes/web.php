@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Http\Controllers\CategoryController;
@@ -56,6 +57,6 @@ if (app()->environment('local')) {
     });
 }
 
-Navigation::add('Home', 'home', icon: Icon::Home);
-Navigation::add('Categories', 'larasell.admin.categories.index', icon: Icon::Folders);
-Navigation::add('Customers', 'larasell.admin.customers.index', icon: Icon::Group);
+Navigation::add(NavItem::Home->label(), NavItem::Home->value, icon: Icon::Home)->position(NavItem::Home->position());
+Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
+Navigation::add(NavItem::Customers->label(), NavItem::Customers->value, icon: Icon::Group)->position(NavItem::Customers->position());
