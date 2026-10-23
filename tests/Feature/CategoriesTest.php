@@ -113,12 +113,18 @@ it('shows a category, including a hidden one, next to the tree', function () {
             ->where('categories.0.children.0.name', 'Linen'));
 });
 
-it('returns 404 for a category that does not exist', function () {
+it('shows the tree without a category, with a 404, for a category that does not exist', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
         ->get('/admin/categories/999')
-        ->assertNotFound();
+        ->assertNotFound()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Category/Show', shouldExist: false)
+            ->where('category', null)
+            ->missing('updateUrl')
+            ->where('categories.0.name', 'Clothing'));
 });
 
 it('hides a category and goes back to the previous page', function () {

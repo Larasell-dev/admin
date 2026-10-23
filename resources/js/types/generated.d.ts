@@ -28,6 +28,11 @@ declare namespace Larasell.Admin.Data.View {
     loginUrl: string;
     devLoginUrl: string | null;
   };
+  export type MissingCategoryPageData = {
+    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    createUrl: string;
+    category: null;
+  };
   export type ProfilePageData = {
     admin: Larasell.Admin.Data.ViewModel.AdminData;
     updateUrl: string;
