@@ -282,66 +282,68 @@ function AddProductBar({
   }
 
   return (
-    <div className="flex items-start gap-1.5 border-b border-border p-3 last:border-b-0">
-      {/* Without a name: the field only shows the error, it submits nothing. */}
-      <Field.Root invalid={error !== undefined} className="min-w-0 flex-1">
-        <Combobox.Root
-          items={products}
-          // The server filters by the search, so every result it returns is shown.
-          filter={null}
-          value={selected}
-          onValueChange={(product) => {
-            setSelected(product);
-            setError(undefined);
-          }}
-          itemToStringLabel={(product: AvailableProduct) => product.name}
-          isItemEqualToValue={(a: AvailableProduct, b: AvailableProduct) => a.id === b.id}
-          onInputValueChange={(query) => find(query)}
-          onOpenChange={(open) => open && products.length === 0 && find("")}
-        >
-          <Combobox.Input
-            aria-label="Product to add"
-            placeholder="Search products"
-            render={<Input />}
-          />
-          <Combobox.Portal>
-            <Combobox.Positioner sideOffset={4} align="start" className="z-50 w-(--anchor-width)">
-              <Combobox.Popup className="max-h-72 overflow-y-auto border border-border bg-white py-1 shadow-lg dark:bg-mauve-900">
-                <Combobox.Empty className="px-3.5 py-2 type-body-md text-mauve-600 empty:hidden dark:text-mauve-400">
-                  {searching ? "Searching…" : "No products found."}
-                </Combobox.Empty>
-                <Combobox.List>
-                  {(product: AvailableProduct) => (
-                    <Combobox.Item
-                      key={product.id}
-                      value={product}
-                      className="cursor-pointer px-3.5 py-2 type-body-md text-mauve-950 outline-none select-none data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:data-highlighted:bg-mauve-800"
-                    >
-                      {product.name}
-                    </Combobox.Item>
-                  )}
-                </Combobox.List>
-              </Combobox.Popup>
-            </Combobox.Positioner>
-          </Combobox.Portal>
-        </Combobox.Root>
-        {error && (
-          <Error match DANGEROUS_className="mt-1.5">
-            {error}
-          </Error>
-        )}
-      </Field.Root>
-      <div className="flex shrink-0 gap-1">
-        <Button type="button" variant="tertiary" disabled={posting} onClick={onCancel}>
-          Close
-        </Button>
-        <Button
-          type="button"
-          {...(posting ? { loading: true } : { disabled: !selected })}
-          onClick={add}
-        >
-          Add product
-        </Button>
+    <div className="@container border-b border-border p-3 last:border-b-0">
+      <div className="flex flex-col gap-1.5 @md:flex-row @md:items-start">
+        {/* Without a name: the field only shows the error, it submits nothing. */}
+        <Field.Root invalid={error !== undefined} className="min-w-0 flex-1">
+          <Combobox.Root
+            items={products}
+            // The server filters by the search, so every result it returns is shown.
+            filter={null}
+            value={selected}
+            onValueChange={(product) => {
+              setSelected(product);
+              setError(undefined);
+            }}
+            itemToStringLabel={(product: AvailableProduct) => product.name}
+            isItemEqualToValue={(a: AvailableProduct, b: AvailableProduct) => a.id === b.id}
+            onInputValueChange={(query) => find(query)}
+            onOpenChange={(open) => open && products.length === 0 && find("")}
+          >
+            <Combobox.Input
+              aria-label="Product to add"
+              placeholder="Search products"
+              render={<Input />}
+            />
+            <Combobox.Portal>
+              <Combobox.Positioner sideOffset={4} align="start" className="z-50 w-(--anchor-width)">
+                <Combobox.Popup className="max-h-72 overflow-y-auto border border-border bg-white py-1 shadow-lg dark:bg-mauve-900">
+                  <Combobox.Empty className="px-3.5 py-2 type-body-md text-mauve-600 empty:hidden dark:text-mauve-400">
+                    {searching ? "Searching…" : "No products found."}
+                  </Combobox.Empty>
+                  <Combobox.List>
+                    {(product: AvailableProduct) => (
+                      <Combobox.Item
+                        key={product.id}
+                        value={product}
+                        className="cursor-pointer px-3.5 py-2 type-body-md text-mauve-950 outline-none select-none data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:data-highlighted:bg-mauve-800"
+                      >
+                        {product.name}
+                      </Combobox.Item>
+                    )}
+                  </Combobox.List>
+                </Combobox.Popup>
+              </Combobox.Positioner>
+            </Combobox.Portal>
+          </Combobox.Root>
+          {error && (
+            <Error match DANGEROUS_className="mt-1.5">
+              {error}
+            </Error>
+          )}
+        </Field.Root>
+        <div className="flex shrink-0 justify-end gap-1">
+          <Button type="button" variant="tertiary" disabled={posting} onClick={onCancel}>
+            Close
+          </Button>
+          <Button
+            type="button"
+            {...(posting ? { loading: true } : { disabled: !selected })}
+            onClick={add}
+          >
+            Add product
+          </Button>
+        </div>
       </div>
     </div>
   );
