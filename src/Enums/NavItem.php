@@ -2,11 +2,24 @@
 
 namespace Larasell\Admin\Enums;
 
+use Larasell\Admin\Enums\Concerns\HasLabel;
+
 enum NavItem: string
 {
+    use HasLabel;
+
     case Home = 'larasell.admin.home';
     case Categories = 'larasell.admin.categories.index';
     case Customers = 'larasell.admin.customers.index';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Home => 'Home',
+            self::Categories => 'Categories',
+            self::Customers => 'Customers',
+        };
+    }
 
     /**
      * Built-in items sit 1000 apart, so a custom item can take any position between two of them.

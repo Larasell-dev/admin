@@ -150,6 +150,14 @@ it('positions NavItem cases in steps of 1000 in declaration order', function () 
         ->toBe([1000, 2000, 3000]);
 });
 
+it('lists NavItem labels keyed by route', function () {
+    expect(NavItem::all())->toBe([
+        'larasell.admin.home' => 'Home',
+        'larasell.admin.categories.index' => 'Categories',
+        'larasell.admin.customers.index' => 'Customers',
+    ]);
+});
+
 it('places built-in navigation items at their NavItem position', function () {
     AdminPanel::resolve()->add('Notes', 'larasell.admin.notes', 'sticky-note')->position(1500);
 
