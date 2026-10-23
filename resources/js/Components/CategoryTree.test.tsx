@@ -179,6 +179,15 @@ describe("opening categories", () => {
     await expect.element(chevron("Toys")).not.toBeInTheDocument();
     await expect.element(page.getByText("(0)", { exact: true })).not.toBeInTheDocument();
   });
+
+  it("only follows the link when its row is clicked, without opening it", async () => {
+    await renderTree();
+
+    await item("Clothing").click();
+
+    expect(router.visit).toHaveBeenCalledWith("/admin/categories/1", expect.anything());
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
+  });
 });
 
 describe("keyboard navigation with menus", () => {
@@ -278,6 +287,16 @@ describe("path to the current category", () => {
 
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
     await expect.element(item("Shirts")).not.toBeInTheDocument();
+  });
+
+  it("opens the current category when it has children, also when the page loads again", async () => {
+    const screen = await render(tree(1));
+
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Men")).toHaveAttribute("aria-expanded", "false");
+
+    await screen.rerender(tree(1));
+    await expect.element(item("Men")).toBeVisible();
   });
 
   it("opens the path again when the page loads again after it was closed", async () => {
