@@ -12,6 +12,9 @@ use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
+use Larasell\Admin\Tests\Fixtures\Models;
+use Larasell\Admin\Tests\Fixtures\Tables;
+use Larasell\Admin\Tests\Fixtures\Tables\Library\AudioBookTable;
 
 class BooksTable extends Table
 {
@@ -161,8 +164,9 @@ it('links each row to the url returned by rowLink, or not at all when it returns
     ]);
 });
 
-it('derives a sentence case title from the class name', function () {
-    expect(tableResource(BookAuthorsTable::make())['title'])->toBe('Book authors table');
+it('derives a sentence case title from the class name without its Table suffix', function () {
+    expect(tableResource(BookAuthorsTable::make())['title'])->toBe('Book authors')
+        ->and(Tables\Books::make()->title())->toBe('Books');
 });
 
 it('returns no rows when there are no models', function () {
@@ -175,6 +179,27 @@ it('lists the model declared with the UseModel attribute', function () {
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
         ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
     ]);
+});
+
+describe('inferred model', function () {
+    it('lists the model named like the table in the Models namespace', function () {
+        $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(tableResource(Tables\Book::make())['rows'])->toBe([
+            ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
+        ])->and(Tables\Book::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Book::class);
+    });
+
+    it('keeps the sub-namespace and ignores a Table suffix', function () {
+        $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+
+        expect(AudioBookTable::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Library\AudioBook::class);
+    });
+
+    it('does not infer the singular model from a plural name, and names the model it looked for', function () {
+        expect(fn () => tableResource(Tables\Books::make()))
+            ->toThrow(LogicException::class, '[Larasell\Admin\Tests\Fixtures\Models\Books]');
+    });
 });
 
 class FrankHerbertBooksTable extends Table
