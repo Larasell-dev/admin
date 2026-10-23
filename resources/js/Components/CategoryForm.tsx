@@ -1,7 +1,9 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import { useFormContext } from "@inertiajs/react";
 import { Checkbox, Error, Field, Input, Stack } from "@larasell-dev/ui";
-import { useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { slugify } from "../utils/slugify";
+import { truncate } from "../utils/truncate";
 
 type Category = Pick<Larasell.Admin.Data.ViewModel.CategoryDetailData, "name" | "slug" | "visible">;
 
@@ -11,6 +13,7 @@ type Category = Pick<Larasell.Admin.Data.ViewModel.CategoryDetailData, "name" | 
  */
 export default function CategoryForm({ category }: { category?: Category }) {
   const errors = useFormContext()?.errors ?? {};
+  const slug = useCoupledField([slugify, truncate(255), slugify], { enabled: !category });
 
   return (
     <Stack spacing={5}>
@@ -19,11 +22,16 @@ export default function CategoryForm({ category }: { category?: Category }) {
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
           <Field label="Name" name="name" error={errors.name}>
-            <Input defaultValue={category?.name} autoComplete="off" />
+            <Input {...slug.source} defaultValue={category?.name} autoComplete="off" />
           </Field>
 
           <Field label="Slug" name="slug" error={errors.slug}>
-            <Input defaultValue={category?.slug} autoComplete="off" spellCheck={false} />
+            <Input
+              {...slug.target}
+              defaultValue={category?.slug}
+              autoComplete="off"
+              spellCheck={false}
+            />
           </Field>
         </div>
       </div>
@@ -37,6 +45,51 @@ export default function CategoryForm({ category }: { category?: Category }) {
       </BaseField.Root>
     </Stack>
   );
+}
+
+/**
+ * Fills the target input with the source input's value as it's typed in, passed through each
+ * transform in turn. Editing the target uncouples them, until the target is cleared or the form
+ * is reset. Without `enabled`, they're never coupled.
+ */
+function useCoupledField(
+  transforms: ((value: string) => string)[],
+  { enabled }: { enabled: boolean },
+) {
+  const target = useRef<HTMLInputElement>(null);
+  const coupled = useRef(enabled);
+
+  useEffect(() => {
+    // Inertia dispatches the event once it has set the inputs back to their defaults.
+    const form = target.current?.form;
+    const couple = () => {
+      coupled.current = enabled;
+    };
+    form?.addEventListener("reset", couple);
+    return () => form?.removeEventListener("reset", couple);
+  }, [enabled]);
+
+  return {
+    source: {
+      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+        if (!coupled.current || !target.current) return;
+        target.current.value = transforms.reduce(
+          (value, transform) => transform(value),
+          event.currentTarget.value,
+        );
+        // The form already compared its data against the defaults before this handler ran, with
+        // the old target value. Another input event has it check again. React doesn't see it as
+        // a change, since it tracks the value set above, so it doesn't uncouple the target.
+        target.current.dispatchEvent(new Event("input", { bubbles: true }));
+      },
+    },
+    target: {
+      ref: target,
+      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+        coupled.current = enabled && event.currentTarget.value === "";
+      },
+    },
+  };
 }
 
 /**
