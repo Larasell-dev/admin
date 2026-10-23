@@ -1,6 +1,7 @@
 import { AlertDialog, Field, Input } from "@larasell-dev/ui";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { TableAction } from "../types";
+import Freeze from "./Freeze";
 
 type Props = {
   /** The action waiting for confirmation, or null when the dialog is closed. */
@@ -13,17 +14,16 @@ type Props = {
 
 /** Asks the admin to confirm a table action, optionally by typing a given text. */
 export default function ConfirmActionDialog({ action, ...props }: Props) {
-  // Keep showing the last action while the dialog animates out, so its copy
-  // does not go blank as soon as the action is cleared.
-  const shown = useRef(action);
-  if (action) shown.current = action;
-
   return (
     <AlertDialog.Root open={action !== null} onOpenChange={(open) => !open && props.onCancel()}>
-      {shown.current?.confirm && (
-        // Keyed by the action, so the typed text starts empty for each one.
-        <Confirmation key={shown.current.url} action={shown.current} {...props} />
-      )}
+      {/* Keeps the last action and its state while the dialog animates out, so its copy does not
+          go blank once the action is cleared, nor its button stop loading once the request ends. */}
+      <Freeze frozen={action === null}>
+        {action?.confirm && (
+          // Keyed by the action, so the typed text starts empty for each one.
+          <Confirmation key={action.url} action={action} {...props} />
+        )}
+      </Freeze>
     </AlertDialog.Root>
   );
 }
