@@ -1,9 +1,8 @@
 name: CI
 
 on:
+  # Any base branch, so pull requests stacked on another pull request's branch are checked too.
   pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
