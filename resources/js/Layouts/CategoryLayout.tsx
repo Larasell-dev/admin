@@ -80,7 +80,9 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
       open={open}
       onOpenChange={(open) => setOpenOn(open ? url : null)}
     >
-      <Dialog.Portal>
+      {/* Kept mounted, so the tree remembers its open categories between openings,
+          like the panel beside the page does across visits. */}
+      <Dialog.Portal keepMounted>
         {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
         <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
         <Dialog.Popup
