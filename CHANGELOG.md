@@ -1,5 +1,54 @@
 # Changelog
 
+## [0.4.0](https://github.com/Larasell-dev/admin/compare/v0.3.2...v0.4.0) (2026-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* infer the model a table lists from its class name ([#101](https://github.com/Larasell-dev/admin/issues/101))
+* give every admin page its own title ([#99](https://github.com/Larasell-dev/admin/issues/99))
+
+### Features
+
+* add a category tree ([#89](https://github.com/Larasell-dev/admin/issues/89)) ([708fe19](https://github.com/Larasell-dev/admin/commit/708fe193f0f440e6df3e3b273b20970234ea6b24))
+* add a headless tree component ([#88](https://github.com/Larasell-dev/admin/issues/88)) ([b4e13f5](https://github.com/Larasell-dev/admin/commit/b4e13f5d537d2fbc5e956a73b04b919459ff62a1))
+* add a log in as admin button to the login page in local ([dc4732e](https://github.com/Larasell-dev/admin/commit/dc4732eb8b26f3d06d3bc571c42ae5dfedf16419))
+* add a subcategory from the category tree ([cea1408](https://github.com/Larasell-dev/admin/commit/cea140834496e22b5a3796612b8a5c19fcb81a1c))
+* add an unsaved changes toast for Inertia forms ([835b0e4](https://github.com/Larasell-dev/admin/commit/835b0e4fc3a5d05c0000616aa99dbeb340b5648f))
+* add category pages ([#90](https://github.com/Larasell-dev/admin/issues/90)) ([8c97b5e](https://github.com/Larasell-dev/admin/commit/8c97b5e1ae99c14c105064c3a9f8b6b643f6cfa7))
+* add Section, SectionStack and Inset layout components ([9745bbf](https://github.com/Larasell-dev/admin/commit/9745bbf9ad31dd11c94091abc81307180689a984))
+* always show the category menu button ([#105](https://github.com/Larasell-dev/admin/issues/105)) ([514f7bf](https://github.com/Larasell-dev/admin/commit/514f7bfff5c809b532044ad0c525781d69f20199))
+* create and edit categories ([5d6c67c](https://github.com/Larasell-dev/admin/commit/5d6c67c2c21ad4f3493f5c48d223c2ed886bb719))
+* delete a category with all categories below it ([b8f5607](https://github.com/Larasell-dev/admin/commit/b8f56078de9153426ef7ca7ff59dd8dfec0f59c8))
+* give every admin page its own title ([#99](https://github.com/Larasell-dev/admin/issues/99)) ([6de6534](https://github.com/Larasell-dev/admin/commit/6de6534d2a971f3019462ef2924ee10212ce68f7))
+* give the panel's own tables larasell: slugs ([07e59a7](https://github.com/Larasell-dev/admin/commit/07e59a7d409257b246c9c6419b6d1180ff82d9ad))
+* infer the model a table lists from its class name ([#101](https://github.com/Larasell-dev/admin/issues/101)) ([9e3bbd6](https://github.com/Larasell-dev/admin/commit/9e3bbd69c498c112e18096865985ff119ca461d8))
+* let tables take constructor arguments for their actions ([#93](https://github.com/Larasell-dev/admin/issues/93)) ([aec3460](https://github.com/Larasell-dev/admin/commit/aec3460fb75427ec0211c2e77fc6def561a94dbc))
+* list, add and remove a category's products ([d913115](https://github.com/Larasell-dev/admin/commit/d913115a91441d4fed122f44e22e8ef4e91b45c1))
+* move categories by dragging them in the tree ([436323f](https://github.com/Larasell-dev/admin/commit/436323f96b01d29975a4bd3338fe96bb9e36ad88))
+* offer to add the first category when there are none ([50c6876](https://github.com/Larasell-dev/admin/commit/50c687643a9d76485e636328e69a52648b5b428f))
+* open categories with a chevron and show their number of children ([#106](https://github.com/Larasell-dev/admin/issues/106)) ([7588d1a](https://github.com/Larasell-dev/admin/commit/7588d1ad8d52b62d393b004d02291ee30878788b))
+* open the category tree in a dialog on mobile ([#98](https://github.com/Larasell-dev/admin/issues/98)) ([3ef1c06](https://github.com/Larasell-dev/admin/commit/3ef1c0650518bb8c4a343477c08f046e27253133))
+* open the current category instead of the clicked one ([#107](https://github.com/Larasell-dev/admin/issues/107)) ([46c791e](https://github.com/Larasell-dev/admin/commit/46c791e727bb9c575a28983049d0685e21d98d4c))
+* position built-in nav items via the NavItem enum ([#103](https://github.com/Larasell-dev/admin/issues/103)) ([40094b6](https://github.com/Larasell-dev/admin/commit/40094b6b9123c0b7ceae251ca0efad44326f1193))
+* show an empty state for a category that no longer exists ([#102](https://github.com/Larasell-dev/admin/issues/102)) ([c8c4610](https://github.com/Larasell-dev/admin/commit/c8c461048a11db3d1b917e5173a65923735d7271))
+
+
+### Bug Fixes
+
+* align the mobile header with the sidebar content ([15b9cc7](https://github.com/Larasell-dev/admin/commit/15b9cc7cdd6cc440339da5c7f7c449dba747a7d0))
+* clear the category tree's scroll fade once it no longer scrolls ([#111](https://github.com/Larasell-dev/admin/issues/111)) ([bf517e6](https://github.com/Larasell-dev/admin/commit/bf517e695a60efabb660dcbbff5f4ff074645229))
+* flush every prefetched page after a change ([67eb6b9](https://github.com/Larasell-dev/admin/commit/67eb6b9735d5dc5950942f85a968e3d87a366c37))
+* keep deeply nested category names readable in the tree ([#110](https://github.com/Larasell-dev/admin/issues/110)) ([b84b397](https://github.com/Larasell-dev/admin/commit/b84b39797d3f5cccd3d2aae15d7335a37ceca7c1))
+* keep the mobile category tree unchanged while its dialog closes ([#108](https://github.com/Larasell-dev/admin/issues/108)) ([9157791](https://github.com/Larasell-dev/admin/commit/9157791b8ee251d9f59d9f455f889e037b9596b3))
+* open the path to the current category on every page load ([a652495](https://github.com/Larasell-dev/admin/commit/a652495dbb5a6adf61b9778120ad22ac9f4d0982))
+* remember the mobile category tree's open categories ([#109](https://github.com/Larasell-dev/admin/issues/109)) ([da08fd1](https://github.com/Larasell-dev/admin/commit/da08fd18f4fe79868192643721cf1a105f9d09a6))
+
+
+### Miscellaneous Chores
+
+* fix the Amp orb setup when it runs without root ([9dcd95e](https://github.com/Larasell-dev/admin/commit/9dcd95e4618caa6f3e9cd6daa8f0390736657273))
+
 ## [0.3.2](https://github.com/Larasell-dev/admin/compare/v0.3.1...v0.3.2) (2026-10-20)
 
 
