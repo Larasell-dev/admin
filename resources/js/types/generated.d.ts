@@ -16,6 +16,7 @@ declare namespace Larasell.Admin.Data.View {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
     createUrl: string;
     storeUrl: string;
+    indexUrl: string;
     parent: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
   };
   export type CustomersPageData = {

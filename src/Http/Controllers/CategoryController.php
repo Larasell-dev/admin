@@ -90,6 +90,7 @@ class CategoryController
             categories: $this->tree(),
             createUrl: route('larasell.admin.categories.create'),
             storeUrl: route('larasell.admin.categories.store'),
+            indexUrl: route('larasell.admin.categories.index'),
             parent: $parent ? CategoryDetailData::fromModel($parent) : null,
         ));
     }
