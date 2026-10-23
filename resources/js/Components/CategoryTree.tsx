@@ -1,6 +1,7 @@
 import { Link, router } from "@inertiajs/react";
 import { Icon, Menu } from "@larasell-dev/ui";
 import {
+  ArrowRightSLine,
   DeleteBinLine,
   EyeLine,
   EyeOffLine,
@@ -18,7 +19,8 @@ import {
   useDraggable,
   useDroppable,
 } from "@dnd-kit/react";
-import { type ReactNode, useMemo, useRef, useState } from "react";
+import { MotionConfig, motion } from "motion/react";
+import { type ComponentProps, type ReactNode, useMemo, useRef, useState } from "react";
 import type { TableAction } from "../types";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
@@ -171,33 +173,42 @@ export default function CategoryTree({
   };
 
   return (
-    <DragDropProvider
-      sensors={sensors}
-      plugins={plugins}
-      onDragOver={openAfterHovering}
-      onDragEnd={drop}
-    >
-      <RootDropZone accepts={(id) => canMove(id, null)}>
-        <Tree
-          aria-labelledby={labelledBy}
-          items={categories}
-          getLabel={(category) => category.name}
-          expandedIds={expandedIds}
-          onExpandedIdsChange={setExpandedIds}
-          // Not selectable: this only makes the current category the tree's tab stop.
-          selectedId={currentId}
-          renderItem={(category, { expanded, tabbable }) => (
-            <CategoryRow
-              category={category}
-              current={category.id === currentId}
-              expanded={expanded}
-              tabbable={tabbable}
-              accepts={(id) => canMove(id, category.id)}
-            />
-          )}
-        />
-      </RootDropZone>
-    </DragDropProvider>
+    <MotionConfig reducedMotion="user">
+      <DragDropProvider
+        sensors={sensors}
+        plugins={plugins}
+        onDragOver={openAfterHovering}
+        onDragEnd={drop}
+      >
+        <RootDropZone accepts={(id) => canMove(id, null)}>
+          <Tree
+            aria-labelledby={labelledBy}
+            items={categories}
+            getLabel={(category) => category.name}
+            expandedIds={expandedIds}
+            onExpandedIdsChange={setExpandedIds}
+            // Not selectable: this only makes the current category the tree's tab stop.
+            selectedId={currentId}
+            renderItem={(category, { expanded, tabbable }) => (
+              <CategoryRow
+                category={category}
+                current={category.id === currentId}
+                expanded={expanded}
+                tabbable={tabbable}
+                accepts={(id) => canMove(id, category.id)}
+                onToggle={() =>
+                  setExpandedIds((current) => {
+                    const next = new Set(current);
+                    if (!next.delete(category.id)) next.add(category.id);
+                    return next;
+                  })
+                }
+              />
+            )}
+          />
+        </RootDropZone>
+      </DragDropProvider>
+    </MotionConfig>
   );
 }
 
@@ -239,7 +250,8 @@ function RootDropZone({
 
 /**
  * A category's row: its link is what drags, and the whole row is where others drop.
- * The menu sits next to the link, not inside it, so clicking it never follows the link or drags.
+ * The chevron and the menu sit next to the link, not inside it, so clicking them never
+ * follows the link or drags.
  */
 function CategoryRow({
   category,
@@ -247,12 +259,14 @@ function CategoryRow({
   expanded,
   tabbable,
   accepts,
+  onToggle,
 }: {
   category: Category;
   current: boolean;
   expanded: boolean | undefined;
   tabbable: boolean;
   accepts: (id: number) => boolean;
+  onToggle: () => void;
 }) {
   const draggable = useDraggable({ id: category.id });
   const droppable = useDroppable({
@@ -276,7 +290,9 @@ function CategoryRow({
         data-dragging={draggable.isDragging || undefined}
         className={cn(
           // Row
-          "type-body-md flex cursor-pointer items-center gap-1.5 py-2 pr-10 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none dark:text-mauve-50",
+          "type-body-md flex cursor-pointer items-center gap-1.5 py-2 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none dark:text-mauve-50",
+          // Room for the controls on the right
+          expanded === undefined ? "pr-10" : "pr-28",
           "group-hover/row:bg-mauve-50 dark:group-hover/row:bg-mauve-900",
           "focus-visible:focus-ring focus-visible:-outline-offset-2",
           "aria-[current=page]:bg-mauve-100 dark:aria-[current=page]:bg-mauve-900",
@@ -300,8 +316,46 @@ function CategoryRow({
           {category.name}
         </span>
       </TreeItem>
-      <CategoryMenu category={category} tabbable={tabbable} />
+      <div className="pointer-events-none absolute top-0 right-0 flex items-center">
+        {expanded !== undefined && (
+          <>
+            <span className="type-body-md pointer-events-none pr-1 text-mauve-500 tabular-nums dark:text-mauve-400">
+              ({category.children.length})
+            </span>
+            {/* Out of the tab order: the row itself opens and closes with the arrow keys. */}
+            <RowButton
+              aria-label={`${expanded ? "Close" : "Open"} ${category.name}`}
+              tabIndex={-1}
+              onClick={onToggle}
+            >
+              <motion.span
+                className="flex"
+                initial={false}
+                animate={{ rotate: expanded ? 90 : 0 }}
+                transition={{ type: "spring", bounce: 0, visualDuration: 0.15 }}
+              >
+                <Icon icon={ArrowRightSLine} />
+              </motion.span>
+            </RowButton>
+          </>
+        )}
+        <CategoryMenu category={category} tabbable={tabbable} />
+      </div>
     </div>
+  );
+}
+
+/** A square icon button at the end of a category's row. */
+function RowButton({ className, ...props }: ComponentProps<"button">) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "pointer-events-auto inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
@@ -368,7 +422,7 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
         <Menu.Trigger
           aria-label={`Actions for ${category.name}`}
           tabIndex={tabbable ? 0 : -1}
-          className="absolute top-0 right-0 inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800"
+          render={<RowButton />}
         >
           <Icon icon={More2Fill} />
         </Menu.Trigger>

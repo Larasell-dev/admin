@@ -140,6 +140,47 @@ describe("category menu", () => {
   });
 });
 
+describe("opening categories", () => {
+  const chevron = (name: string) => page.getByRole("button", { name: `Open ${name}`, exact: true });
+
+  it("opens and closes a category with its chevron, without following its link", async () => {
+    await renderTree();
+
+    await chevron("Clothing").click();
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
+    await expect.element(item("Shirts")).toBeVisible();
+
+    await page.getByRole("button", { name: "Close Clothing", exact: true }).click();
+    await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
+    await expect.element(item("Shirts")).not.toBeInTheDocument();
+    expect(router.visit).not.toHaveBeenCalled();
+  });
+
+  it("shows the number of direct children next to the chevron, and neither without children", async () => {
+    render(
+      <>
+        <h2 id="heading">Categories</h2>
+        <CategoryTree
+          labelledBy="heading"
+          categories={[
+            category(1, "Clothing", true, [
+              category(2, "Shirts", true, [category(3, "Polos"), category(4, "Tees")]),
+              category(5, "Pants"),
+            ]),
+            category(6, "Toys"),
+          ]}
+        />
+      </>,
+    );
+
+    // Clothing has four categories below it, but only two directly.
+    await expect.element(page.getByText("(2)", { exact: true })).toBeVisible();
+    await expect.element(chevron("Clothing")).toBeVisible();
+    await expect.element(chevron("Toys")).not.toBeInTheDocument();
+    await expect.element(page.getByText("(0)", { exact: true })).not.toBeInTheDocument();
+  });
+});
+
 describe("keyboard navigation with menus", () => {
   it("moves through the items with the arrow keys and never onto a menu button", async () => {
     await renderTree();
