@@ -13,12 +13,15 @@ use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
+use Laravel\Head\HeadServiceProvider;
 
 class AdminServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/admin.php', 'larasell-admin');
+
+        $this->app->register(HeadServiceProvider::class);
 
         $this->app->singleton(AdminPanel::class);
     }

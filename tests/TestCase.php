@@ -45,8 +45,8 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
-            HeadServiceProvider::class,
             AdminServiceProvider::class,
+            HeadServiceProvider::class,
             InertiaServiceProvider::class,
             LarasellServiceProvider::class,
             LaravelDataServiceProvider::class,
