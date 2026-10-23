@@ -44,6 +44,8 @@ export type TreeProps<T, TId extends string | number> = Label &
     /** Controls which nodes are open; pair it with `onExpandedIdsChange`. */
     expandedIds?: ReadonlySet<NoInfer<TId>>;
     onExpandedIdsChange?: (ids: Set<NoInfer<TId>>) => void;
+    /** Whether clicking a parent node opens or closes it. Defaults to true. */
+    toggleOnClick?: boolean;
     selectedId?: NoInfer<TId> | null;
     /** Makes nodes selectable: Enter, Space and click select the node. */
     onSelectedIdChange?: (id: NoInfer<TId>) => void;
@@ -88,6 +90,7 @@ export default function Tree<
   defaultExpandedIds = [],
   expandedIds,
   onExpandedIdsChange,
+  toggleOnClick = true,
   selectedId = null,
   onSelectedIdChange,
   className,
@@ -210,7 +213,7 @@ export default function Tree<
 
   const onItemClick = (entry: Entry<T, TId>) => {
     focus(entry.id);
-    if (entry.hasChildren) setOpen([entry.id], !expanded.has(entry.id));
+    if (toggleOnClick && entry.hasChildren) setOpen([entry.id], !expanded.has(entry.id));
     if (selectable) onSelectedIdChange(entry.id);
   };
 

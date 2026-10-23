@@ -98,7 +98,8 @@ const plugins = (defaults: typeof defaultPreset.plugins) =>
 
 /**
  * The store's categories as a tree of links to their pages. It starts closed, except
- * for the path to the current category. Hidden categories are greyed out.
+ * for the current category and the path to it. Clicking a category only follows its
+ * link; its chevron opens and closes it. Hidden categories are greyed out.
  *
  * Dragging a category onto another moves it inside that one, and onto the space below
  * the tree moves it to the root. Hovering a closed category for a moment while dragging opens it.
@@ -113,11 +114,14 @@ export default function CategoryTree({
   currentId?: number | null;
 }) {
   const pathIds = (ids: Iterable<number>) =>
-    new Set([...ids, ...(currentId === null ? [] : ancestorIds(categories, currentId))]);
+    new Set([
+      ...ids,
+      ...(currentId === null ? [] : [...ancestorIds(categories, currentId), currentId]),
+    ]);
   const [expandedIds, setExpandedIds] = useState(() => pathIds([]));
 
   // The layout stays mounted across visits, so every page load, a new current category
-  // or fresh props for this one, opens the path to the current category again. Closing it
+  // or fresh props for this one, opens the current category and the path to it again. Closing it
   // in between still works, as that changes neither.
   const [loaded, setLoaded] = useState({ categories, currentId });
   if (loaded.categories !== categories || loaded.currentId !== currentId) {
@@ -188,6 +192,7 @@ export default function CategoryTree({
             getLabel={(category) => category.name}
             expandedIds={expandedIds}
             onExpandedIdsChange={setExpandedIds}
+            toggleOnClick={false}
             // Not selectable: this only makes the current category the tree's tab stop.
             selectedId={currentId}
             renderItem={(category, { expanded, tabbable }) => (
