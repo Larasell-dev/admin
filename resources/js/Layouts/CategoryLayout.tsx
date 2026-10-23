@@ -82,12 +82,16 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
     >
       {/* Kept mounted, so the tree remembers its open categories between openings,
           like the panel beside the page does across visits. */}
-      <Dialog.Portal keepMounted>
+      {/* Base UI's own invisible backdrop, which blocks the page, also starts below the
+          mobile nav, so the nav stays usable while the dialog is open. */}
+      <Dialog.Portal keepMounted className="[&>[data-base-ui-inert]]:top-14!">
         {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
         <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
+        {/* Base UI leaves out the backdrop of a dialog opened from this one, such as the delete
+            confirmation, so the panel draws the same dimming over itself instead. */}
         <Dialog.Popup
           aria-label="Categories"
-          className="fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full lg:hidden dark:bg-mauve-950"
+          className="fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none transition-transform duration-300 after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:-right-px after:z-20 after:bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] after:opacity-0 after:backdrop-blur-[2px] after:transition-opacity after:duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-nested-dialog-open:after:opacity-100 lg:hidden dark:bg-mauve-950"
         >
           {/* Following a link closes the dialog in the same render that makes another category
               current, which would open it while the panel slides out. */}
