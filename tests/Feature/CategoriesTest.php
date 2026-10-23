@@ -194,7 +194,8 @@ it('shows the create page next to the tree', function () {
             ->component('Category/Create', shouldExist: false)
             ->where('categories.0.name', 'Clothing')
             ->where('createUrl', url('/admin/categories/create'))
-            ->where('storeUrl', url('/admin/categories')));
+            ->where('storeUrl', url('/admin/categories'))
+            ->where('indexUrl', url('/admin/categories')));
 });
 
 it('creates a root category and opens it', function (Visibility $status) {

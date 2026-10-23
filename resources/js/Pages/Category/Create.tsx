@@ -1,5 +1,6 @@
-import { Form } from "@inertiajs/react";
-import { Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Form, Link } from "@inertiajs/react";
+import { Icon, Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { ArrowLeftLine } from "@larasell-dev/ui/icons";
 import { useRef } from "react";
 
 import CategoryForm from "../../Components/CategoryForm";
@@ -10,17 +11,26 @@ import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CreateCategoryPageData;
 
-export default function Create({ storeUrl, parent }: Props) {
+export default function Create({ categories, storeUrl, indexUrl, parent }: Props) {
   const contentScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(contentScroll);
 
   return (
     <>
-      <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border px-6">
-        <h2 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">
+      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border px-6">
+        {categories.length === 0 && (
+          <Link
+            href={indexUrl}
+            aria-label="Back to categories"
+            className="-ml-1.5 -mr-2 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring lg:hidden dark:text-mauve-100 dark:hover:bg-mauve-800 [&_svg]:size-5"
+          >
+            <Icon icon={ArrowLeftLine} />
+          </Link>
+        )}
+        <h2 className="flex-1 truncate type-body-md text-mauve-950 dark:text-mauve-50">
           {parent ? `New category in ${parent.name}` : "New category"}
         </h2>
-        <CategoryTreeTrigger />
+        {categories.length > 0 && <CategoryTreeTrigger />}
       </header>
       <div
         ref={contentScroll}
