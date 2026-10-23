@@ -11,4 +11,13 @@
     color-scheme: dark;
     background-color: var(--color-mauve-950);
   }
+
+  /* Each Base UI portal is one layer, so a dialog or menu opened later covers earlier ones,
+     backdrop included: its backdrop (z-40) and popup (z-50) only rank within the portal.
+     A portal opened from inside another one is nested in it, after its popup, so the same
+     z-index puts it on top. */
+  [data-base-ui-portal] {
+    position: relative;
+    z-index: 50;
+  }
 }

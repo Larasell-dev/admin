@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import CategoryLayout, { CategoryTreeTrigger } from "./CategoryLayout";
+import SidebarLayout from "./SidebarLayout";
 
 type Category = Larasell.Admin.Data.ViewModel.CategoryData;
 
@@ -22,9 +23,11 @@ const category = (id: number, name: string, children: Category[] = []) => ({
 
 function CategoryPage() {
   return (
-    <CategoryLayout>
-      <CategoryTreeTrigger />
-    </CategoryLayout>
+    <SidebarLayout>
+      <CategoryLayout>
+        <CategoryTreeTrigger />
+      </CategoryLayout>
+    </SidebarLayout>
   );
 }
 
@@ -35,6 +38,13 @@ function renderIndex() {
     url: "/admin/categories",
     version: null,
     props: {
+      navigation: [
+        { id: "home", label: "Home", url: "/admin", icon: "Home" },
+        { id: "categories", label: "Categories", url: "/admin/categories", icon: "Folders" },
+      ],
+      admin: { name: "Ada Admin", email: "ada@example.com", avatarUrl: null },
+      profileUrl: "/admin/profile",
+      logoutUrl: "/admin/logout",
       categories: [category(1, "Clothing", [category(2, "Shirts")]), category(3, "Toys")],
       createUrl: "/admin/categories/create",
     },
@@ -69,4 +79,50 @@ it("keeps the mobile tree's open categories when the dialog closes and opens aga
 
   await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
   await expect.element(item("Shirts")).toBeVisible();
+});
+
+// Whether a click at the middle of the element would reach it, rather than something on top.
+function isClickable(target: Element) {
+  const box = target.getBoundingClientRect();
+  const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+  return hit !== null && target.contains(hit);
+}
+
+// A modal dialog hides the rest of the page from assistive technology but not from the
+// pointer, so the elements are taken before anything else opens.
+async function openCategories() {
+  await renderIndex();
+  await page.getByRole("button", { name: "Open categories" }).click();
+  const categories = page.getByRole("dialog", { name: "Categories" });
+  // At the panel's right edge, which the narrower navigation drawer leaves uncovered.
+  const actions = categories.getByRole("button", { name: "Actions for Toys" });
+  await expect.poll(() => isClickable(actions.element())).toBe(true);
+
+  return { actions: actions.element() };
+}
+
+it("puts the navigation drawer above the open category dialog", async () => {
+  const { actions } = await openCategories();
+  const openMenu = page.getByLabelText("Open menu").element();
+
+  await userEvent.click(openMenu);
+  await expect.element(page.getByRole("dialog", { name: "Navigation" })).toBeVisible();
+
+  await expect.poll(() => isClickable(actions)).toBe(false);
+});
+
+it("puts the delete dialog above the category dialog it was opened from", async () => {
+  const { actions } = await openCategories();
+  const openMenu = page.getByLabelText("Open menu").element();
+
+  await userEvent.click(actions);
+  await page.getByRole("menuitem", { name: "Delete" }).click();
+  const confirm = page.getByRole("alertdialog", { name: "Delete category" });
+  await expect.element(confirm).toBeVisible();
+
+  await expect.poll(() => isClickable(actions)).toBe(false);
+  await expect.poll(() => isClickable(openMenu)).toBe(false);
+  await expect
+    .poll(() => isClickable(confirm.getByRole("button", { name: "Cancel" }).element()))
+    .toBe(true);
 });

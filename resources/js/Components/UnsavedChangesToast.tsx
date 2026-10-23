@@ -151,7 +151,7 @@ export function UnsavedChangesToastHost() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
             transition={{ type: "spring", bounce: 0.05, visualDuration: 0.16 }}
-            // Above the page, but under dialog backdrops (z-40) and menus and popups (z-50).
+            // Above the page, but under dialogs, menus and popups (z-50).
             className="fixed z-30"
           >
             <ToastContent toast={toast} />
