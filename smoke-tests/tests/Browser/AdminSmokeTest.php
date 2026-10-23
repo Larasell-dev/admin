@@ -77,9 +77,9 @@ it('signs an admin in and renders the panel', function () {
         ->assertSee('Dashboard')
         ->assertSee(smokeEnv('SMOKE_ADMIN_EMAIL'))
         ->assertVisible('#main-content')
-        ->assertVisible('aside nav')
-        ->assertSeeIn('aside nav', 'Categories')
-        ->assertSeeIn('aside nav', 'Customers')
+        ->assertVisible('aside > nav')
+        ->assertSeeIn('aside > nav', 'Categories')
+        ->assertSeeIn('aside > nav', 'Customers')
         // app.tsx defines window.LarasellAdmin; it is missing when the panel's bundle failed to load.
         ->assertScript("typeof window.LarasellAdmin === 'object'")
         ->assertNoSmoke();
@@ -99,11 +99,11 @@ it('signs an admin in and renders the panel', function () {
 
 it('navigates between the main pages', function () {
     $page = signIn()
-        ->click('aside nav a[href$="/categories"]')
+        ->click('aside > nav a[href$="/categories"]')
         ->assertPathIs(adminPath('categories'))
         ->assertTitle('Categories - Admin')
         ->assertSee('No categories yet')
-        ->click('aside nav a[href$="/customers"]')
+        ->click('aside > nav a[href$="/customers"]')
         ->assertPathIs(adminPath('customers'))
         ->assertTitle('Customers - Admin')
         ->assertSee('No customers yet')
