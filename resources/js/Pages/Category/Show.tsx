@@ -1,5 +1,13 @@
-import { Form } from "@inertiajs/react";
-import { Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Form, Link } from "@inertiajs/react";
+import {
+  Button,
+  EmptyState,
+  Icon,
+  Section,
+  SectionStack,
+  useScrollMaskScrollbar,
+} from "@larasell-dev/ui";
+import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
 import { useRef } from "react";
 
 import CategoryForm from "../../Components/CategoryForm";
@@ -11,6 +19,8 @@ import SidebarLayout from "../../Layouts/SidebarLayout";
 type Props = Larasell.Admin.Data.View.CategoryPageData;
 
 export default function Show({
+  categories,
+  createUrl,
   category,
   updateUrl,
   products,
@@ -19,6 +29,47 @@ export default function Show({
 }: Props) {
   const contentScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(contentScroll);
+
+  // The server sends no category, and none of its urls, when the address names one that is gone.
+  if (
+    category === null ||
+    updateUrl === null ||
+    products === null ||
+    availableProductsUrl === null ||
+    addProductUrl === null
+  ) {
+    return (
+      <>
+        <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border px-6">
+          <h2 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">
+            Category not found
+          </h2>
+          {categories.length > 0 && <CategoryTreeTrigger />}
+        </header>
+        <div className="flex flex-1 items-center justify-center px-6 py-12">
+          <EmptyState
+            icon={FolderUnknowLine}
+            title="This category doesn't exist anymore"
+            description={
+              categories.length > 0
+                ? "It may have been deleted, or the link you followed is out of date. Pick another category from the list or add a new one."
+                : "It may have been deleted, or the link you followed is out of date. Add a category to start organizing your products."
+            }
+          >
+            <Button
+              nativeButton={false}
+              // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
+              role="link"
+              render={<Link href={createUrl} prefetch />}
+            >
+              <Icon icon={AddLine} />
+              Add category
+            </Button>
+          </EmptyState>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

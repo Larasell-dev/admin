@@ -6,11 +6,11 @@ declare namespace Larasell.Admin.Data.View {
   export type CategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
     createUrl: string;
-    category: Larasell.Admin.Data.ViewModel.CategoryDetailData;
-    updateUrl: string;
-    products: import("./index").TableResource;
-    availableProductsUrl: string;
-    addProductUrl: string;
+    category: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
+    updateUrl: string | null;
+    products: import("./index").TableResource | null;
+    availableProductsUrl: string | null;
+    addProductUrl: string | null;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;

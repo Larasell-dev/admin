@@ -19,6 +19,7 @@ use Larasell\Admin\Tables\Panel\CategoryProducts;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CategoryController
@@ -40,8 +41,24 @@ class CategoryController
         ));
     }
 
-    public function show(Category $category): Response
+    /**
+     * Shows the category to edit. A category that no longer exists, such as one deleted in
+     * another tab, keeps the tree and explains itself on the page instead of a bare 404 page.
+     */
+    public function show(Request $request, string $category): SymfonyResponse
     {
+        $category = Category::query()->find($category);
+
+        if ($category === null) {
+            Head::title('Category not found');
+
+            // Inertia still renders a page that comes with an error status.
+            return Inertia::render('Category/Show', new CategoryPageData(
+                categories: $this->tree(),
+                createUrl: route('larasell.admin.categories.create'),
+            ))->toResponse($request)->setStatusCode(404);
+        }
+
         Head::title($category->name->get());
 
         return Inertia::render('Category/Show', new CategoryPageData(
@@ -52,7 +69,7 @@ class CategoryController
             products: CategoryProducts::make($category),
             availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
             addProductUrl: route('larasell.admin.categories.products.store', $category),
-        ));
+        ))->toResponse($request);
     }
 
     /**
