@@ -37,6 +37,13 @@ a page as a signed-in admin. Hit `/admin/__dev` to discover any newly added
 shortcuts. When adding a new dev shortcut, put it in the `__dev` group in
 `routes/web.php` so it is listed automatically and inherits the local-only guard.
 
+## Best-before markers
+
+A comment like `BEST-BEFORE YYYY-MM-DD: what to revisit` is a to-do with a deadline, in any
+file and language. The note can continue on the following comment lines. After the date,
+the `Best before` CI job (`npm run best-before`) fails until the work is done or the date
+moves. See `scripts/best-before.mjs`.
+
 ## Breaking changes
 
 Every breaking change needs an upgrade note in `breaking-changes/` and a `!` in

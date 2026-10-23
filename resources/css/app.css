@@ -16,6 +16,8 @@
      backdrop included: its backdrop (z-40) and popup (z-50) only rank within the portal.
      A portal opened from inside another one is nested in it, after its popup, so the same
      z-index puts it on top. */
+  /* BEST-BEFORE 2027-02-23: Decide on whether we should define this in the ui package. Also
+     think about tokens for z-index and enforce them via linting. */
   [data-base-ui-portal] {
     position: relative;
     z-index: 50;
