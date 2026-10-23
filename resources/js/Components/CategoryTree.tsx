@@ -314,11 +314,7 @@ function withVisibility(categories: Category[], id: number, visible: boolean): C
   }));
 }
 
-/**
- * A category's actions. The button shows while its row is hovered or has keyboard focus, or the menu
- * is open. It is transparent rather than invisible otherwise, so the menu can always return
- * focus to it, and only the tree's tab stop row puts it in the tab order.
- */
+/** A category's actions. Only the tree's tab stop row puts its button in the tab order. */
 function CategoryMenu({ category, tabbable }: { category: Category; tabbable: boolean }) {
   // Shows the new visibility at once; Inertia rolls it back if the request fails.
   const post = (url: string, visible: boolean) =>
@@ -372,7 +368,7 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
         <Menu.Trigger
           aria-label={`Actions for ${category.name}`}
           tabIndex={tabbable ? 0 : -1}
-          className="absolute top-0 right-0 inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 opacity-0 select-none group-has-[:focus-visible]/row:opacity-100 group-hover/row:opacity-100 hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 data-popup-open:opacity-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800"
+          className="absolute top-0 right-0 inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800"
         >
           <Icon icon={More2Fill} />
         </Menu.Trigger>

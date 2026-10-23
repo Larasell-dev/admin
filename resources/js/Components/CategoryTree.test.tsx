@@ -48,7 +48,7 @@ async function renderTree() {
 
 const item = (name: string) => page.getByRole("treeitem", { name, exact: true });
 const trigger = (name: string) => page.getByRole("button", { name: `Actions for ${name}` });
-// Hidden menu buttons are transparent, which toBeVisible() does not treat as hidden.
+// toBeVisible() ignores opacity, so check that the menu buttons are not transparent.
 const shown = (name: string) =>
   expect.poll(() => getComputedStyle(trigger(name).element()).opacity);
 
@@ -65,30 +65,13 @@ describe("category menu", () => {
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("only shows the menu button while its item is hovered or focused", async () => {
+  it("shows every menu button without hover or focus", async () => {
     await renderTree();
     // The pointer stays where the previous test left it, possibly over a row.
     await page.getByRole("heading", { name: "Categories" }).hover();
 
-    await shown("Clothing").toBe("0");
-
-    await item("Sale").hover();
-    await shown("Sale").toBe("1");
-    await shown("Clothing").toBe("0");
-
-    await userEvent.tab();
-    await expect.element(item("Clothing")).toHaveFocus();
     await shown("Clothing").toBe("1");
-  });
-
-  it("does not show the menu button for an item focused by a click", async () => {
-    await renderTree();
-
-    await item("Sale").click();
-    await expect.element(item("Sale")).toHaveFocus();
-    await page.getByRole("heading", { name: "Categories" }).hover();
-
-    await shown("Sale").toBe("0");
+    await shown("Sale").toBe("1");
   });
 
   it("puts only the focused item's menu button in the tab order", async () => {
@@ -121,17 +104,6 @@ describe("category menu", () => {
 
     await expect.element(page.getByRole("menu")).not.toBeInTheDocument();
     await expect.element(trigger("Clothing")).toHaveFocus();
-  });
-
-  it("stays visible while open", async () => {
-    await renderTree();
-
-    await item("Clothing").hover();
-    await trigger("Clothing").click();
-    // The open menu covers the page, so move the pointer off the row with force.
-    await page.getByRole("heading", { name: "Categories" }).hover({ force: true });
-
-    await shown("Clothing").toBe("1");
   });
 
   it("hides a visible category", async () => {
