@@ -110,6 +110,22 @@ function TreePanel({
 }: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number; className: string }) {
   const treeScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(treeScroll);
+
+  // The fade follows the scroll position through a scroll-driven animation. Once opening or
+  // closing categories leaves nothing to scroll, its timeline goes inactive and the browser
+  // keeps the last fade, so it restarts whenever the tree changes size.
+  useEffect(() => {
+    const element = treeScroll.current;
+    const content = element?.firstElementChild;
+    if (!element || !content) return;
+    const observer = new ResizeObserver(() => {
+      element.style.animation = "none";
+      void element.offsetHeight;
+      element.style.animation = "";
+    });
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, []);
   // The dialog renders a second panel, so each needs its own heading id.
   const headingId = useId();
 
