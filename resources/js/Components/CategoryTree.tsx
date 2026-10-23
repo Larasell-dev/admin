@@ -284,7 +284,9 @@ function CategoryRow({
     <div
       ref={droppable.ref}
       data-drop-target={droppable.isDropTarget || undefined}
-      className="group/row relative data-drop-target:outline-1 data-drop-target:-outline-offset-1 data-drop-target:outline-primary-500"
+      // As wide as the panel, unless a deeply nested row needs more to keep its name's minimum
+      // width; that row then pushes its controls out of line, and the panel scrolls sideways.
+      className="group/row relative w-fit min-w-full data-drop-target:outline-1 data-drop-target:-outline-offset-1 data-drop-target:outline-primary-500"
     >
       <TreeItem
         // A native link drag would take over the pointer before ours starts. While dragging,
@@ -317,7 +319,8 @@ function CategoryRow({
           <Icon icon={expanded ? FolderOpenLine : FolderLine} />
         </span>
         <span
-          className={`truncate ${category.visible ? "" : "text-mauve-500 dark:text-mauve-400"}`}
+          // Zero width, so only the minimum, not the whole name, widens the row.
+          className={`w-0 min-w-32 flex-1 truncate ${category.visible ? "" : "text-mauve-500 dark:text-mauve-400"}`}
         >
           {category.name}
         </span>
