@@ -13,8 +13,6 @@ type Category = Pick<Larasell.Admin.Data.ViewModel.CategoryDetailData, "name" | 
  */
 export default function CategoryForm({ category }: { category?: Category }) {
   const errors = useFormContext()?.errors ?? {};
-  // Only a new category's slug follows its name. An existing one is already in the store's URLs.
-  // The server allows 255 characters, and slugifying again trims a dash the cut leaves at the end.
   const slug = useCoupledField([slugify, truncate(255), slugify], { enabled: !category });
 
   return (
