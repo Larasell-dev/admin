@@ -278,7 +278,7 @@ abstract class Table implements JsonSerializable
 
     public function title(): string
     {
-        return Str::ucfirst(Str::lower(Str::headline(class_basename(static::class))));
+        return Str::ucfirst(Str::lower(Str::headline(Str::replaceEnd('Table', '', class_basename(static::class)))));
     }
 
     /**

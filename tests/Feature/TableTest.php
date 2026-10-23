@@ -164,8 +164,9 @@ it('links each row to the url returned by rowLink, or not at all when it returns
     ]);
 });
 
-it('derives a sentence case title from the class name', function () {
-    expect(tableResource(BookAuthorsTable::make())['title'])->toBe('Book authors table');
+it('derives a sentence case title from the class name without its Table suffix', function () {
+    expect(tableResource(BookAuthorsTable::make())['title'])->toBe('Book authors')
+        ->and(Tables\Books::make()->title())->toBe('Books');
 });
 
 it('returns no rows when there are no models', function () {

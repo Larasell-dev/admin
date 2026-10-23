@@ -86,7 +86,7 @@ it('titles app routes with their own title, their table, or Admin', function (st
 
     expect(pageTitle($this->get($uri)))->toBe($title);
 })->with([
-    'table' => ['/admin/reading-list', 'Reading list table - Admin'],
+    'table' => ['/admin/reading-list', 'Reading list - Admin'],
     'without a title' => ['/admin/untitled', 'Admin'],
     'with a title' => ['/admin/titled', 'Reports - Admin'],
 ]);
