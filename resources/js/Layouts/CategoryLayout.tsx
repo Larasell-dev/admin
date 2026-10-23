@@ -2,7 +2,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
 import CategoryTree from "../Components/CategoryTree";
 import Freeze from "../Components/Freeze";
 import type { Page } from "../types";
@@ -110,22 +110,7 @@ function TreePanel({
 }: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number; className: string }) {
   const treeScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(treeScroll);
-
-  // The fade follows the scroll position through a scroll-driven animation. Once opening or
-  // closing categories leaves nothing to scroll, its timeline goes inactive and the browser
-  // keeps the last fade, so it restarts whenever the tree changes size.
-  useEffect(() => {
-    const element = treeScroll.current;
-    const content = element?.firstElementChild;
-    if (!element || !content) return;
-    const observer = new ResizeObserver(() => {
-      element.style.animation = "none";
-      void element.offsetHeight;
-      element.style.animation = "";
-    });
-    observer.observe(content);
-    return () => observer.disconnect();
-  }, []);
+  useScrollMaskReset(treeScroll);
   // The dialog renders a second panel, so each needs its own heading id.
   const headingId = useId();
 
@@ -154,4 +139,24 @@ function TreePanel({
       </div>
     </section>
   );
+}
+
+/**
+ * The fade follows the scroll position through a scroll-driven animation. Once opening or
+ * closing categories leaves nothing to scroll, its timeline goes inactive and the browser
+ * keeps the last fade, so this restarts it whenever the element's content changes size.
+ */
+function useScrollMaskReset(ref: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const element = ref.current;
+    const content = element?.firstElementChild;
+    if (!element || !content) return;
+    const observer = new ResizeObserver(() => {
+      element.style.animation = "none";
+      void element.offsetHeight;
+      element.style.animation = "";
+    });
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [ref]);
 }
