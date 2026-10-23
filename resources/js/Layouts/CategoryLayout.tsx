@@ -2,6 +2,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
+import { cn } from "cn";
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
 import CategoryTree from "../Components/CategoryTree";
 import Freeze from "../Components/Freeze";
@@ -87,11 +88,18 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
       <Dialog.Portal keepMounted className="[&>[data-base-ui-inert]]:top-14!">
         {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
         <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
-        {/* Base UI leaves out the backdrop of a dialog opened from this one, such as the delete
-            confirmation, so the panel draws the same dimming over itself instead. */}
         <Dialog.Popup
           aria-label="Categories"
-          className="fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none transition-transform duration-300 after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:-right-px after:z-20 after:bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] after:opacity-0 after:backdrop-blur-[2px] after:transition-opacity after:duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-nested-dialog-open:after:opacity-100 lg:hidden dark:bg-mauve-950"
+          className={cn(
+            // Panel
+            "fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none lg:hidden dark:bg-mauve-950",
+            // Slides in from the left
+            "transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
+            // Base UI leaves out the backdrop of a dialog opened from this one, such as the delete
+            // confirmation, so the panel draws the same dimming over itself instead
+            "after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:-right-px after:z-20 after:bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] after:opacity-0 after:backdrop-blur-[2px] after:transition-opacity after:duration-300",
+            "data-nested-dialog-open:after:opacity-100",
+          )}
         >
           {/* Following a link closes the dialog in the same render that makes another category
               current, which would open it while the panel slides out. */}
