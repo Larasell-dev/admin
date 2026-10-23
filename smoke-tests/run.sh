@@ -124,7 +124,8 @@ echo "Installable commit: $package_sha (code under test $tested_sha plus built a
 
 # --- 2. Fresh Laravel application (https://larasell.dev/docs/installation) ---
 step "Creating a new Laravel application"
-(cd "$work_dir" && laravel new example-store --no-interaction --database=sqlite --pest --npm --no-boost)
+# --verbose streams each command's output; otherwise the installer's spinner hides why one failed.
+(cd "$work_dir" && laravel new example-store --no-interaction --verbose --database=sqlite --pest --npm --no-boost)
 cd "$app_dir"
 
 if [ -n "$laravel_version" ]; then
