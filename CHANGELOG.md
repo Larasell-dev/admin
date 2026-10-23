@@ -49,6 +49,80 @@
 
 * fix the Amp orb setup when it runs without root ([9dcd95e](https://github.com/Larasell-dev/admin/commit/9dcd95e4618caa6f3e9cd6daa8f0390736657273))
 
+### Upgrade guide
+
+#### Admin page titles now come from Laravel Head
+
+Every admin page now has its own title, such as "Customers - Admin", set on the
+server with [Laravel Head](https://laravel.com/framework/docs/head) instead of
+Inertia's `<Head>` component. The admin panel no longer adds " - Admin" to
+titles set with `<Head title="...">`.
+
+##### Who is affected
+
+Apps with their own admin pages, registered in `resources/js/admin/pages`, that
+set a title with Inertia's `<Head>` component. Such a title now shows without
+the " - Admin" suffix and competes with the title Laravel Head sets. Apps that
+only use `Route::index()` table pages are not affected: those pages are titled
+after their table.
+
+##### How to upgrade
+
+Remove the `<Head>` component from your page and set the title on its route in
+`routes/admin.php` instead. The admin panel adds the " - Admin" suffix.
+
+```tsx
+// Before: resources/js/admin/pages/Reports.tsx
+<Head title="Reports" />
+```
+
+```php
+// After: routes/admin.php
+Route::get('reports', ReportController::class)
+    ->name('reports')
+    ->withHead(title: 'Reports');
+```
+
+For a title that depends on the request, call `Head::title()` in the controller:
+
+```php
+use Laravel\Head\Facades\Head;
+
+Head::title($report->name);
+```
+
+#### Default table titles no longer end in "table"
+
+A table's default title now leaves out a `Table` suffix in its class name, so
+`ProductReviewsTable` is titled "Product reviews" instead of "Product reviews
+table". Tables can now be named with the suffix they infer their model from,
+like `ProductReviewTable`, without it showing up in the title.
+
+##### Who is affected
+
+Tables whose class name ends in `Table` and that don't override `title()`. The
+new title also shows up in the page title of their `Route::index` route. Tables
+without the suffix, and tables that define `title()`, are not affected.
+
+##### How to upgrade
+
+To keep the old title, return it from `title()`:
+
+```php
+use Larasell\Admin\Tables\Table;
+
+class ProductReviewsTable extends Table
+{
+    // Before: no title() method, titled "Product reviews table"
+
+    // After
+    public function title(): string
+    {
+        return 'Product reviews table';
+    }
+}
+```
+
 ## [0.3.2](https://github.com/Larasell-dev/admin/compare/v0.3.1...v0.3.2) (2026-10-20)
 
 
