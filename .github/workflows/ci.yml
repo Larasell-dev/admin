@@ -164,3 +164,54 @@ jobs:
 
       - name: Run Pest
         run: composer test
+
+  smoke-tests:
+    name: Smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # The pull request's own commit rather than the merge commit, so the installed package is
+      # exactly the branch under review.
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # The prerequisites step of https://larasell.dev/docs/installation. It adds its bin directory
+      # to the shell profile, which later steps don't read, so export it for them instead.
+      - name: Install PHP, Composer and the Laravel CLI
+        run: |
+          /bin/bash -c "$(curl -fsSL https://larasell.dev/install/linux)"
+          echo "$HOME/.config/larasell/bin" >> "$GITHUB_PATH"
+          echo "PHP_INI_SCAN_DIR=$HOME/.config/larasell/bin" >> "$GITHUB_ENV"
+
+      # Downloaded archives only; the Laravel application is created from scratch on every run.
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: smoke-composer-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: smoke-composer-${{ runner.os }}-
+
+      - name: Run smoke tests
+        # Every package is public on Packagist, so Composer needs no token. Composer rejects some
+        # GITHUB_TOKEN values as malformed, which made runs fail at random.
+        env:
+          SMOKE_ARTIFACTS_DIR: ${{ runner.temp }}/smoke-tests
+          SMOKE_PLAYWRIGHT_WITH_DEPS: "1"
+        run: smoke-tests/run.sh
+
+      - name: Upload screenshots, traces and logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: smoke-tests
+          path: ${{ runner.temp }}/smoke-tests
+          if-no-files-found: ignore
