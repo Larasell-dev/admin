@@ -201,8 +201,9 @@ jobs:
           restore-keys: smoke-composer-${{ runner.os }}-
 
       - name: Run smoke tests
+        # Every package is public on Packagist, so Composer needs no token. Composer rejects some
+        # GITHUB_TOKEN values as malformed, which made runs fail at random.
         env:
-          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
           SMOKE_ARTIFACTS_DIR: ${{ runner.temp }}/smoke-tests
           SMOKE_PLAYWRIGHT_WITH_DEPS: "1"
         run: smoke-tests/run.sh
