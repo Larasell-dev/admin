@@ -6,8 +6,6 @@ name: Breaking changes
 
 on:
   pull_request:
-    branches:
-      - main
     types: [opened, edited, synchronize, reopened]
 
 permissions:
