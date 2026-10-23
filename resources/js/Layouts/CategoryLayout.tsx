@@ -4,7 +4,7 @@ import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
 import { cn } from "cn";
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
-import CategoryTree from "../Components/CategoryTree";
+import CategoryTree, { CategoryDeletion } from "../Components/CategoryTree";
 import Freeze from "../Components/Freeze";
 import type { Page } from "../types";
 
@@ -29,25 +29,26 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
   );
 
   return (
-    // Below lg the 3.5rem mobile nav sits above the layout, so it takes the rest of the viewport.
-    <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh">
-      {/* Without categories there is no tree to show; the page offers to add the first one.
-          Below lg the tree moves into a dialog, opened by CategoryTreeTrigger in the page header. */}
-      {categories.length > 0 && (
-        <>
+    <CategoryDeletion>
+      {/* Below lg the 3.5rem mobile nav sits above the layout, so it takes the rest of the viewport. */}
+      <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh">
+        {/* Without categories there is no tree to show; the page offers to add the first one. */}
+        {categories.length > 0 && (
           <TreePanel
             categories={categories}
             createUrl={createUrl}
             currentId={category?.id}
             className="hidden border-r border-border lg:flex"
           />
-          <TreeDialog categories={categories} createUrl={createUrl} currentId={category?.id} />
-        </>
-      )}
+        )}
+        {/* Below lg the tree moves into a dialog, opened by CategoryTreeTrigger in the page header.
+            It stays mounted without categories, so deleting the last one still lets it slide out. */}
+        <TreeDialog categories={categories} createUrl={createUrl} currentId={category?.id} />
 
-      {/* Pages scroll their own content area so their header stays put, like the tree's. */}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
-    </div>
+        {/* Pages scroll their own content area so their header stays put, like the tree's. */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+      </div>
+    </CategoryDeletion>
   );
 }
 
@@ -87,7 +88,9 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
           mobile nav, so the nav stays usable while the dialog is open. */}
       <Dialog.Portal keepMounted className="[&>[data-base-ui-inert]]:top-14!">
         {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
-        <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
+        {/* Gives way to the backdrop of a confirmation opened on top, such as deleting a
+            category, which covers the page as well, so the page isn't dimmed twice. */}
+        <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
         <Dialog.Popup
           aria-label="Categories"
           className={cn(
@@ -95,10 +98,6 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
             "fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none lg:hidden dark:bg-mauve-950",
             // Slides in from the left
             "transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
-            // Base UI leaves out the backdrop of a dialog opened from this one, such as the delete
-            // confirmation, so the panel draws the same dimming over itself instead
-            "after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:-right-px after:z-20 after:bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] after:opacity-0 after:backdrop-blur-[2px] after:transition-opacity after:duration-300",
-            "data-nested-dialog-open:after:opacity-100",
           )}
         >
           {/* Following a link closes the dialog in the same render that makes another category

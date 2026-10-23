@@ -1,6 +1,5 @@
 import { Drawer } from "@base-ui/react/drawer";
 import { Link, router, usePage } from "@inertiajs/react";
-import { cn } from "cn";
 import { useEffect, useState } from "react";
 import { arrayFirst, assertDefined } from "ts-extras";
 import type { Page } from "../types";
@@ -17,15 +16,7 @@ export default function MobileNav() {
 
   return (
     <Drawer.Root open={open} onOpenChange={setOpen} swipeDirection="left">
-      <header
-        className={cn(
-          "relative box-border h-14 border-b border-border bg-white dark:bg-mauve-950",
-          // Dimmed like the category panel while a dialog opened from it is open, since Base UI
-          // leaves out that dialog's backdrop
-          "after:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:-bottom-px after:bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] after:opacity-0 after:backdrop-blur-[2px] after:transition-opacity after:duration-300",
-          "[body:has([data-nested-dialog-open])_&]:after:opacity-100",
-        )}
-      >
+      <header className="box-border h-14 border-b border-border bg-white dark:bg-mauve-950">
         <div className="flex h-full items-center justify-between px-6">
           <Link
             href={home.url}
