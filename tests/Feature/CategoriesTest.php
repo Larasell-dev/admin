@@ -123,7 +123,7 @@ it('shows the tree without a category, with a 404, for a category that does not 
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Show', shouldExist: false)
             ->where('category', null)
-            ->where('updateUrl', null)
+            ->missing('updateUrl')
             ->where('categories.0.name', 'Clothing'));
 });
 

@@ -12,6 +12,7 @@ use Larasell\Admin\Actions\DeleteCategory;
 use Larasell\Admin\Data\View\CategoriesPageData;
 use Larasell\Admin\Data\View\CategoryPageData;
 use Larasell\Admin\Data\View\CreateCategoryPageData;
+use Larasell\Admin\Data\View\MissingCategoryPageData;
 use Larasell\Admin\Data\ViewModel\CategoryData;
 use Larasell\Admin\Data\ViewModel\CategoryDetailData;
 use Larasell\Admin\Http\Requests\CategoryRequest;
@@ -53,7 +54,7 @@ class CategoryController
             Head::title('Category not found');
 
             // Inertia still renders a page that comes with an error status.
-            return Inertia::render('Category/Show', new CategoryPageData(
+            return Inertia::render('Category/Show', new MissingCategoryPageData(
                 categories: $this->tree(),
                 createUrl: route('larasell.admin.categories.create'),
             ))->toResponse($request)->setStatusCode(404);

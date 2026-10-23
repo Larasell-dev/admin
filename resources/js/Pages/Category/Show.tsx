@@ -16,28 +16,18 @@ import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.CategoryPageData;
+// The server sends a null category, and none of its urls, when the address names one that is gone.
+type Props =
+  | Larasell.Admin.Data.View.CategoryPageData
+  | Larasell.Admin.Data.View.MissingCategoryPageData;
 
-export default function Show({
-  categories,
-  createUrl,
-  category,
-  updateUrl,
-  products,
-  availableProductsUrl,
-  addProductUrl,
-}: Props) {
+export default function Show(props: Props) {
   const contentScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(contentScroll);
 
-  // The server sends no category, and none of its urls, when the address names one that is gone.
-  if (
-    category === null ||
-    updateUrl === null ||
-    products === null ||
-    availableProductsUrl === null ||
-    addProductUrl === null
-  ) {
+  if (props.category === null) {
+    const { categories, createUrl } = props;
+
     return (
       <>
         <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border px-6">
@@ -70,6 +60,8 @@ export default function Show({
       </>
     );
   }
+
+  const { category, updateUrl, products, availableProductsUrl, addProductUrl } = props;
 
   return (
     <>

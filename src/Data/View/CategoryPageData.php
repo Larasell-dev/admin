@@ -9,9 +9,6 @@ use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/**
- * Everything about the category is null when it does not exist (anymore).
- */
 #[TypeScript]
 class CategoryPageData extends Data
 {
@@ -19,11 +16,11 @@ class CategoryPageData extends Data
         /** @var array<int, CategoryData> */
         public array $categories,
         public string $createUrl,
-        public ?CategoryDetailData $category = null,
-        public ?string $updateUrl = null,
-        #[LiteralTypeScriptType('import("./index").TableResource | null')]
-        public ?CategoryProducts $products = null,
-        public ?string $availableProductsUrl = null,
-        public ?string $addProductUrl = null,
+        public CategoryDetailData $category,
+        public string $updateUrl,
+        #[LiteralTypeScriptType('import("./index").TableResource')]
+        public CategoryProducts $products,
+        public string $availableProductsUrl,
+        public string $addProductUrl,
     ) {}
 }
