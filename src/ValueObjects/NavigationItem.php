@@ -4,10 +4,11 @@ namespace Larasell\Admin\ValueObjects;
 
 use Closure;
 use Illuminate\Support\Str;
-use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Data\ViewModel\NavigationItemData;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
+use Larasell\Admin\Navigation;
 use Larasell\Admin\NavigationGroup;
 use LogicException;
 
@@ -37,7 +38,7 @@ class NavigationItem
         public string $label,
         public string $route,
         Icon|string $icon,
-        protected ?AdminPanel $panel = null,
+        protected ?Navigation $navigation = null,
     ) {
         if (trim($label) === '') {
             throw InvalidNavigationItem::emptyLabel();
@@ -110,11 +111,11 @@ class NavigationItem
      */
     public function children(Closure $define): static
     {
-        if ($this->panel === null) {
-            throw new LogicException("Navigation item [{$this->id()}] was not registered through the admin panel, so it cannot have children.");
+        if ($this->navigation === null) {
+            throw new LogicException("Navigation item [{$this->id()}] was not registered through the navigation, so it cannot have children.");
         }
 
-        $define(new NavigationGroup($this->panel, $this->id()));
+        $define(new NavigationGroup($this->navigation, $this->id()));
 
         return $this;
     }
@@ -133,18 +134,21 @@ class NavigationItem
     }
 
     /**
-     * The icon is sent as its case name, which @larasell-dev/ui/icons exports with a Fill or Line suffix.
+     * The item as the sidebar receives it. The icon is sent as its case name, which
      *
-     * @return array{id: string, label: string, url: string, icon: string}
+     * @larasell-dev/ui/icons exports with a Fill or Line suffix.
+     *
+     * @param  list<NavigationItemData>  $children
      */
-    public function toArray(): array
+    public function toData(array $children = []): NavigationItemData
     {
-        return [
-            'id' => $this->id(),
-            'label' => $this->label,
-            'url' => route($this->route),
-            'icon' => $this->icon->name,
-        ];
+        return new NavigationItemData(
+            id: $this->id(),
+            label: $this->label,
+            url: route($this->route),
+            icon: $this->icon->name,
+            children: $children,
+        );
     }
 
     protected function resolveIcon(string $icon): Icon

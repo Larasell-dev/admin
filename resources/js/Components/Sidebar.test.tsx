@@ -5,7 +5,7 @@ import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import Sidebar from "./Sidebar";
 
-type Item = { id: string; label: string; url: string; icon: string; children: Item[] };
+type Item = Larasell.Admin.Data.ViewModel.NavigationItemData;
 
 const item = (label: string, path: string, children: Item[] = []): Item => ({
   id: label.toLowerCase(),

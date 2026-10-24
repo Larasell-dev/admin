@@ -11,15 +11,15 @@ use Larasell\Admin\ValueObjects\NavigationItem;
 class NavigationGroup
 {
     public function __construct(
-        protected AdminPanel $panel,
+        protected Navigation $navigation,
         protected string $parent,
     ) {}
 
     /**
-     * Registers an item nested under this group's parent; same arguments as AdminPanel::add().
+     * Registers an item nested under this group's parent; same arguments as Navigation::add().
      */
     public function add(string $label, string $route, Icon|string $icon): NavigationItem
     {
-        return $this->panel->add($label, $route, $icon)->under($this->parent);
+        return $this->navigation->add($label, $route, $icon)->under($this->parent);
     }
 }
