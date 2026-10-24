@@ -24,6 +24,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->register(HeadServiceProvider::class);
 
         $this->app->singleton(AdminPanel::class);
+        $this->app->singleton(Navigation::class);
     }
 
     public function boot(): void

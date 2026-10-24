@@ -33,11 +33,12 @@ it('resolves an icon passed as its Remix name', function (string $name, string $
 it('converts a navigation item to an array with the resolved url and icon', function () {
     $item = new NavigationItem('Home', 'larasell.admin.home', '24-hours');
 
-    expect($item->toArray())->toBe([
+    expect($item->toData()->toArray())->toBe([
         'id' => 'larasell.admin.home',
         'label' => 'Home',
         'url' => route('larasell.admin.home'),
         'icon' => 'TwentyFourHours',
+        'children' => [],
     ]);
 });
 

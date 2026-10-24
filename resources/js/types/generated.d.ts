@@ -70,6 +70,13 @@ declare namespace Larasell.Admin.Data.ViewModel {
     ordersCount: number;
     createdAt: string | null;
   };
+  export type NavigationItemData = {
+    id: string;
+    label: string;
+    url: string;
+    icon: string;
+    children: Array<Larasell.Admin.Data.ViewModel.NavigationItemData>;
+  };
   export type PaginatedCustomersData = {
     data: Array<Larasell.Admin.Data.ViewModel.CustomerData>;
     current_page: number;

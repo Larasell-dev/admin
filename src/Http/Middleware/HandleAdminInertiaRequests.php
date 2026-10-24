@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Navigation;
 use Symfony\Component\HttpFoundation\Response;
 
 class HandleAdminInertiaRequests extends Middleware
@@ -32,11 +33,9 @@ class HandleAdminInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $panel = app(AdminPanel::class);
-
         return [
             ...parent::share($request),
-            'navigation' => fn (): array => $panel->navigationItems(),
+            'navigation' => fn (): array => app(Navigation::class)->tree(),
             'admin' => function () use ($request): ?array {
                 $admin = $request->user('larasell-admin');
 
