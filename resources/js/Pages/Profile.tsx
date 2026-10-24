@@ -13,17 +13,12 @@ import {
   SectionStack,
   Stack,
 } from "@larasell-dev/ui";
-import {
-  formatForDisplay,
-  useAppHotkeys,
-  useCustomHotkeys,
-  useHotkeyHint,
-  useHotkeyRecorder,
-} from "@tanstack/react-hotkeys";
+import { formatForDisplay, useHotkeyHint } from "@tanstack/react-hotkeys";
 import { useEffect, useId, useRef, useState } from "react";
 import { assertDefined } from "ts-extras";
 import UnsavedChangesToast from "../Components/UnsavedChangesToast";
 import SidebarLayout from "../Layouts/SidebarLayout";
+import { appHotkeys } from "../utils/hotkeys";
 import { initials } from "../utils/initials";
 import { nextTheme, setTheme, Theme, themeLabels, useTheme } from "../utils/theme";
 import type { Page } from "../types";
@@ -185,9 +180,9 @@ function AvatarInput({ error }: { error?: string }) {
 
 function PreferenceSection() {
   const theme = useTheme();
-  const cycleHotkey = useAppHotkeys()["theme.cycle"];
+  const cycleHotkey = appHotkeys["theme.cycle"];
   // While the shortcut's modifiers are held, marks the theme it switches to.
-  const showHint = useHotkeyHint(cycleHotkey) && cycleHotkey.hotkey !== null;
+  const showHint = useHotkeyHint(cycleHotkey);
 
   return (
     <Section.Root>
@@ -214,85 +209,15 @@ function PreferenceSection() {
               </span>
               {themeLabels[value]}
               {showHint && value === nextTheme(theme) && (
-                <Kbd>{formatForDisplay(cycleHotkey.hotkey!)}</Kbd>
+                <span className="type-body-sm text-mauve-500 dark:text-mauve-400">
+                  {formatForDisplay(cycleHotkey.defaultHotkey)}
+                </span>
               )}
             </span>
           </Radio.Root>
         ))}
       </RadioGroup>
-      <ThemeShortcut />
     </Section.Root>
-  );
-}
-
-/** Shows the shortcut that cycles the theme and records a new one. */
-function ThemeShortcut() {
-  const { hotkey, defaultHotkey } = useAppHotkeys()["theme.cycle"];
-  const { setCustomHotkey, resetCustomHotkey } = useCustomHotkeys();
-  const [error, setError] = useState<string | null>(null);
-  const recorder = useHotkeyRecorder({
-    recordBy: "key",
-    // Ignores this shortcut's own registration, so recording the current binding again is fine.
-    detectConflicts: {
-      exclude: (registration) => registration.options.appHotkeyId === "theme.cycle",
-    },
-    onReject: (rejection) =>
-      setError(
-        rejection.reason === "conflict" ? "That shortcut is already in use." : rejection.message,
-      ),
-    onRecord: (recorded) => {
-      setError(null);
-      setCustomHotkey("theme.cycle", recorded);
-    },
-    onClear: () => {
-      setError(null);
-      setCustomHotkey("theme.cycle", null);
-    },
-    onCancel: () => setError(null),
-  });
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="type-label-md text-mauve-950 dark:text-mauve-50">Cycle theme</span>
-        {recorder.isRecording ? (
-          <span className="type-body-md text-mauve-600 dark:text-mauve-400">
-            Press a shortcut, Backspace to remove it, or Escape to cancel…
-          </span>
-        ) : hotkey ? (
-          <Kbd>{formatForDisplay(hotkey)}</Kbd>
-        ) : (
-          <span className="type-body-md text-mauve-600 dark:text-mauve-400">Unassigned</span>
-        )}
-        <div className="ml-auto flex gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={recorder.isRecording ? recorder.cancelRecording : recorder.startRecording}
-          >
-            {recorder.isRecording ? "Cancel" : "Change"}
-          </Button>
-          {!recorder.isRecording && hotkey !== defaultHotkey && (
-            <Button
-              type="button"
-              variant="tertiary"
-              onClick={() => resetCustomHotkey("theme.cycle")}
-            >
-              Reset
-            </Button>
-          )}
-        </div>
-      </div>
-      {error && <p className="type-body-md text-red-600 dark:text-red-400">{error}</p>}
-    </div>
-  );
-}
-
-function Kbd({ children }: { children: string }) {
-  return (
-    <kbd className="border border-border px-1.5 py-0.5 font-sans text-xs leading-none text-mauve-600 dark:text-mauve-300">
-      {children}
-    </kbd>
   );
 }
 
