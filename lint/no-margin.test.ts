@@ -17,6 +17,9 @@ ruleTester.run("no-margin", plugin.rules["no-margin"], {
     '<div className="md:-mt-2 [&_aside]:-ml-[100vw] data-[open]:-mb-1 !-mt-2 -mt-2!" />',
     '<div className="mt-[-3px] [margin-top:-3px]" />',
     'cn("flex", active && "-ml-2")',
+    // Centering
+    '<div className="mx-auto md:mx-auto !mx-auto" />',
+    'clsx("p-2", "mx-auto")',
     "<div style={{ marginTop: -4, marginLeft: -offset }} />",
     '<div style={{ margin: "-4px -8px", "margin-top": "-1rem", marginInline: `-2px` }} />',
     // Utilities that only look like margins
@@ -38,10 +41,10 @@ ruleTester.run("no-margin", plugin.rules["no-margin"], {
     },
     {
       // Every margin utility and both sides of the class list
-      code: '<div className="m-4 mx-auto my-1 mt-px mr-2 mb-0 ml-7 ms-3 me-3 mbs-2 mbe-2" />',
+      code: '<div className="m-4 mx-4 my-1 mt-px mr-2 mb-0 ml-7 ms-3 me-3 mbs-2 mbe-2" />',
       errors: [
         "m-4",
-        "mx-auto",
+        "mx-4",
         "my-1",
         "mt-px",
         "mr-2",
@@ -82,9 +85,9 @@ ruleTester.run("no-margin", plugin.rules["no-margin"], {
       errors: [classError("mt-2"), classError("mb-4")],
     },
     {
-      // Class helpers outside JSX
-      code: 'const classes = clsx("p-2", "mx-auto");',
-      errors: [classError("mx-auto")],
+      // Class helpers outside JSX; only mx-auto is allowed, not other auto margins
+      code: 'const classes = clsx("p-2", "mx-auto", "ml-auto", "my-auto");',
+      errors: [classError("ml-auto"), classError("my-auto")],
     },
     {
       code: '<div style={{ margin: 8, marginTop: "4px", marginInlineStart: offset, "margin-left": "1rem" }} />',

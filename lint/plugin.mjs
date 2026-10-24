@@ -1,8 +1,9 @@
 // Oxlint JS plugin with the project's own lint rules. See
 // https://oxc.rs/docs/guide/usage/linter/writing-js-plugins.html
 
-// Tailwind margin utilities: m-4, mx-auto, mt-[3px], mbs-2, …, and arbitrary properties like
+// Tailwind margin utilities: m-4, mt-[3px], mbs-2, …, and arbitrary properties like
 // [margin-top:3px]. A leading "-" (-mt-2) or a negative value (mt-[-3px]) is a negative margin.
+// mx-auto is allowed: it centers a block horizontally, which gap or padding can't do.
 const MARGIN_UTILITY = /^(-?)m(?:[xytrblse]|b[se])?-(.+)$/;
 const MARGIN_PROPERTY = /^\[margin(?:-[a-z-]+)?:(.+)\]$/;
 
@@ -26,6 +27,7 @@ function utilityOf(token) {
 
 function isMarginClass(token) {
   const utility = utilityOf(token);
+  if (utility === "mx-auto") return false;
   const property = MARGIN_PROPERTY.exec(utility);
   if (property) return !property[1].startsWith("-");
   const match = MARGIN_UTILITY.exec(utility);
