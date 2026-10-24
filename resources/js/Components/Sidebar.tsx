@@ -5,6 +5,7 @@ import { ArrowRightSLine } from "@larasell-dev/ui/icons";
 import { motion } from "motion/react";
 import { Fragment, type ReactNode, useId, useState } from "react";
 import { RovingFocusGroup, RovingFocusItem } from "@roving-focus/react";
+import { cn } from "cn";
 import { arrayFirst, assertDefined } from "ts-extras";
 import type { NavigationItem, Page } from "../types";
 import { navigationIcon } from "../utils/navigationIcon";
@@ -96,16 +97,23 @@ function NavigationLink({
         <Link
           href={item.url}
           aria-current={active ? "page" : undefined}
-          className={`type-body-md flex items-center gap-3 px-6 py-2 outline-none focus-visible:focus-ring focus-visible:-outline-offset-2 ${
-            toggle ? "pr-10" : ""
-          } ${
-            active
-              ? "bg-mauve-100 text-mauve-950 dark:bg-mauve-900 dark:text-mauve-50"
-              : "text-mauve-600 group-hover/row:bg-mauve-50 group-hover/row:text-mauve-950 dark:text-mauve-400 dark:group-hover/row:bg-mauve-900 dark:group-hover/row:text-mauve-50"
-          }`}
+          className={cn(
+            // Row
+            "type-body-md flex items-center gap-3 px-6 py-2",
+            // Room for the group toggle on the right
+            toggle && "pr-10",
+            // Focus
+            "outline-none focus-visible:focus-ring focus-visible:-outline-offset-2",
+            // Current page
+            active && "bg-mauve-100 text-mauve-950 dark:bg-mauve-900 dark:text-mauve-50",
+            // Other pages, highlighted while the row, toggle included, is hovered
+            !active && "text-mauve-600 dark:text-mauve-400",
+            !active &&
+              "group-hover/row:bg-mauve-50 group-hover/row:text-mauve-950 dark:group-hover/row:bg-mauve-900 dark:group-hover/row:text-mauve-50",
+          )}
         >
           {/* Children line up under their parent's label; the MobileNav overrides the link's own padding. */}
-          <span className={`flex text-base ${nested ? "ml-7" : ""}`}>
+          <span className={cn("flex text-base", nested && "ml-7")}>
             <Icon icon={navigationIcon(item.icon, active)} />
           </span>
           {item.label}
@@ -135,7 +143,16 @@ function GroupToggle({
         aria-expanded={open}
         aria-controls={open ? controls : undefined}
         onClick={onClick}
-        className="inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 outline-none select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 dark:text-mauve-100 dark:hover:bg-mauve-800"
+        className={cn(
+          // Square icon button
+          "inline-flex size-9 cursor-pointer items-center justify-center select-none",
+          // Colors
+          "text-mauve-950 dark:text-mauve-100",
+          // Hover
+          "hover:bg-mauve-100 dark:hover:bg-mauve-800",
+          // Focus
+          "outline-none focus-visible:focus-ring focus-visible:-outline-offset-2",
+        )}
       >
         <motion.span
           className="flex"
