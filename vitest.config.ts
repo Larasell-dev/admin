@@ -4,14 +4,29 @@ import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
   test: {
-    include: ["resources/js/**/*.test.{ts,tsx}"],
-    browser: {
-      enabled: true,
-      provider: playwright(),
-      headless: true,
-      instances: [{ browser: "chromium" }],
-    },
+    projects: [
+      {
+        plugins: [react(), tailwindcss()],
+        test: {
+          name: "frontend",
+          include: ["resources/js/**/*.test.{ts,tsx}"],
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            headless: true,
+            instances: [{ browser: "chromium" }],
+          },
+        },
+      },
+      {
+        // Oxlint's RuleTester runs the linter natively, so these tests run in Node.
+        test: {
+          name: "lint",
+          include: ["lint/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+    ],
   },
 });
