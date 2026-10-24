@@ -124,4 +124,54 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
             fix: 'Anchor at least one of these items to an item outside the cycle.',
         );
     }
+
+    public static function selfParent(string $id): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.self-parent',
+            message: "Navigation item [{$id}] cannot be nested under itself.",
+            why: "The navigation item [{$id}] passed its own id to under().",
+            fix: 'Pass the id of a top-level navigation item.',
+        );
+    }
+
+    public static function alreadyNested(string $id, string $parent): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.already-nested',
+            message: "Navigation item [{$id}] is already nested under [{$parent}].",
+            why: "The navigation item [{$id}] received a second parent, from under() or from being added inside children().",
+            fix: 'Nest each navigation item under one parent only.',
+        );
+    }
+
+    public static function unknownParent(string $id, string $parent): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.unknown-parent',
+            message: "Navigation item [{$id}] is nested under unknown item [{$parent}].",
+            why: "No navigation item with the id [{$parent}] is registered.",
+            fix: 'Pass the id of a registered top-level navigation item or a NavItem enum case.',
+        );
+    }
+
+    public static function nestedTooDeep(string $id, string $parent): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.nested-too-deep',
+            message: "Navigation item [{$id}] is nested under [{$parent}], which is itself nested.",
+            why: 'The navigation supports one level of nesting: top-level items and their children.',
+            fix: "Nest [{$id}] under a top-level item instead of [{$parent}].",
+        );
+    }
+
+    public static function targetNotSibling(string $id, string $target): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.target-not-sibling',
+            message: "Navigation item [{$id}] cannot be placed relative to [{$target}], which is not in the same group.",
+            why: 'before() and after() order an item among its siblings: top-level items, or the children of one parent.',
+            fix: "Target an item with the same parent as [{$id}], or nest both under the same item.",
+        );
+    }
 }
