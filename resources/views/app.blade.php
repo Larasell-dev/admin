@@ -4,11 +4,19 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Runs before the first paint, so dark mode never flashes light. --}}
+        {{-- Runs before the first paint, so dark mode never flashes light. The theme chosen on
+             the profile page is stored per device (see resources/js/utils/theme.ts); without
+             one, the system setting decides. --}}
         <script>
             (() => {
                 const query = window.matchMedia('(prefers-color-scheme: dark)');
-                const apply = () => document.documentElement.classList.toggle('dark', query.matches);
+                const apply = () => {
+                    const theme = localStorage.getItem('larasell-admin-theme');
+                    document.documentElement.classList.toggle(
+                        'dark',
+                        theme === 'dark' || (theme !== 'light' && query.matches),
+                    );
+                };
 
                 apply();
                 query.addEventListener('change', apply);
