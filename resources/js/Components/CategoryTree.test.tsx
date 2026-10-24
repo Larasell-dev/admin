@@ -1,6 +1,6 @@
 import "../../css/app.css";
 import { router } from "@inertiajs/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import CategoryTree from "./CategoryTree";
@@ -27,9 +27,12 @@ const categories = [
   category(4, "Toys"),
 ];
 
+let visit: MockInstance<typeof router.visit>;
+let post: MockInstance<typeof router.post>;
+
 beforeEach(() => {
-  vi.spyOn(router, "visit").mockImplementation(() => {});
-  vi.spyOn(router, "post").mockImplementation(() => {});
+  visit = vi.spyOn(router, "visit").mockImplementation(() => {});
+  post = vi.spyOn(router, "post").mockImplementation(() => {});
   vi.spyOn(router, "prefetch").mockImplementation(() => {});
 });
 
@@ -49,8 +52,7 @@ async function renderTree() {
 const item = (name: string) => page.getByRole("treeitem", { name, exact: true });
 const trigger = (name: string) => page.getByRole("button", { name: `Actions for ${name}` });
 // toBeVisible() ignores opacity, so check that the menu buttons are not transparent.
-const shown = (name: string) =>
-  expect.poll(() => getComputedStyle(trigger(name).element()).opacity);
+const opacity = (name: string) => getComputedStyle(trigger(name).element()).opacity;
 
 describe("category menu", () => {
   it("does not follow the category's link when its menu is clicked", async () => {
@@ -60,7 +62,7 @@ describe("category menu", () => {
     await trigger("Clothing").click();
 
     await expect.element(page.getByRole("menu")).toBeVisible();
-    expect(router.visit).not.toHaveBeenCalled();
+    expect(visit).not.toHaveBeenCalled();
     // The tree's own click handling does not run either: Clothing stays closed.
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
   });
@@ -70,12 +72,12 @@ describe("category menu", () => {
     // The pointer stays where the previous test left it, possibly over a row.
     await page.getByRole("heading", { name: "Categories" }).hover();
 
-    await shown("Clothing").toBe("1");
-    await shown("Sale").toBe("1");
+    await expect.poll(() => opacity("Clothing")).toBe("1");
+    await expect.poll(() => opacity("Sale")).toBe("1");
   });
 
   it("puts only the focused item's menu button in the tab order", async () => {
-    render(
+    await render(
       <>
         <h2 id="heading">Categories</h2>
         <CategoryTree categories={categories} labelledBy="heading" />
@@ -116,12 +118,12 @@ describe("category menu", () => {
       .not.toBeInTheDocument();
     await page.getByRole("menuitem", { name: "Hide" }).click();
 
-    expect(router.post).toHaveBeenCalledExactlyOnceWith(
+    expect(post).toHaveBeenCalledExactlyOnceWith(
       "/admin/categories/1/hide",
       {},
       expect.objectContaining({ preserveScroll: true }),
     );
-    expect(router.visit).not.toHaveBeenCalled();
+    expect(visit).not.toHaveBeenCalled();
   });
 
   it("makes a hidden category visible again", async () => {
@@ -132,7 +134,7 @@ describe("category menu", () => {
     await expect.element(page.getByRole("menuitem", { name: "Hide" })).not.toBeInTheDocument();
     await page.getByRole("menuitem", { name: "Make visible" }).click();
 
-    expect(router.post).toHaveBeenCalledExactlyOnceWith(
+    expect(post).toHaveBeenCalledExactlyOnceWith(
       "/admin/categories/3/unhide",
       {},
       expect.objectContaining({ preserveScroll: true }),
@@ -153,11 +155,11 @@ describe("opening categories", () => {
     await page.getByRole("button", { name: "Close Clothing", exact: true }).click();
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
     await expect.element(item("Shirts")).not.toBeInTheDocument();
-    expect(router.visit).not.toHaveBeenCalled();
+    expect(visit).not.toHaveBeenCalled();
   });
 
   it("shows the number of direct children next to the chevron, and neither without children", async () => {
-    render(
+    await render(
       <>
         <h2 id="heading">Categories</h2>
         <CategoryTree
@@ -185,7 +187,7 @@ describe("opening categories", () => {
 
     await item("Clothing").click();
 
-    expect(router.visit).toHaveBeenCalledWith("/admin/categories/1", expect.anything());
+    expect(visit).toHaveBeenCalledWith("/admin/categories/1", expect.anything());
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
   });
 });

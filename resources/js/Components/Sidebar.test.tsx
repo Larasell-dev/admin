@@ -1,6 +1,6 @@
 import "../../css/app.css";
 import { App, router } from "@inertiajs/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import Sidebar from "./Sidebar";
@@ -121,11 +121,13 @@ it.each([
   expect(current()).toEqual([label]);
 });
 
+let visit: MockInstance<typeof router.visit>;
+
 describe("expanding a group", () => {
   const toggle = (name: string) => page.getByRole("button", { name, exact: true });
 
   beforeEach(() => {
-    vi.spyOn(router, "visit").mockImplementation(() => {});
+    visit = vi.spyOn(router, "visit").mockImplementation(() => {});
     vi.spyOn(router, "prefetch").mockImplementation(() => {});
   });
 
@@ -179,11 +181,11 @@ describe("expanding a group", () => {
     await toggle("Open Settings").click();
     await toggle("Close Settings").click();
 
-    expect(router.visit).not.toHaveBeenCalled();
+    expect(visit).not.toHaveBeenCalled();
     expect(current()).toEqual(["Customers"]);
 
     // Control: the spy does see a navigation, so its silence above means something.
     await page.getByRole("link", { name: "Settings", exact: true }).click();
-    expect(router.visit).toHaveBeenCalledOnce();
+    expect(visit).toHaveBeenCalledOnce();
   });
 });

@@ -15,5 +15,7 @@ export function useFrozen<T>(value: T, frozen: boolean): T {
   useEffect(() => {
     if (!frozen) last.current = value;
   });
+  // Reading the ref during render is the point: it returns the value from the last unfrozen render.
+  // oxlint-disable-next-line react/refs
   return frozen ? last.current : value;
 }

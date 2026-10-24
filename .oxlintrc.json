@@ -5,6 +5,9 @@
   "options": {
     "typeAware": true
   },
+  "categories": {
+    "correctness": "error"
+  },
   "rules": {
     "larasell/no-margin": "error"
   },
