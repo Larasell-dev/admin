@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 /**
  * Keeps rendering its children as they were when `frozen` turned on, so content leaving
@@ -11,8 +11,11 @@ export default function Freeze({ frozen, children }: { frozen: boolean; children
 
 /** The value as it was when `frozen` turned on, for content that reads it from context. */
 export function useFrozen<T>(value: T, frozen: boolean): T {
-  // Kept in state rather than a ref, so render never reads a value that changes outside React.
-  const [kept, setKept] = useState(value);
-  if (!frozen && kept !== value) setKept(value);
-  return frozen ? kept : value;
+  const last = useRef(value);
+  useEffect(() => {
+    if (!frozen) last.current = value;
+  });
+  // Reading the ref during render is the point: it returns the value from the last unfrozen render.
+  // oxlint-disable-next-line react/refs
+  return frozen ? last.current : value;
 }
