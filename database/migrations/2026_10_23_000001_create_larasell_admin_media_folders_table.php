@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('larasell_admin_media_folders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('larasell_admin_media_folders');
             $table->string('name');
             $table->timestamps();
         });
