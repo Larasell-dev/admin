@@ -11,6 +11,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 class AdminsPageData extends Data
 {
     public function __construct(
+        public string $createUrl,
         #[LiteralTypeScriptType('import("./index").TableResource')]
         public Admins $admins,
     ) {}

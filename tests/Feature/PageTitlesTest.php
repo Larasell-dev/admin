@@ -59,6 +59,7 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'customers' => ['/admin/customers', 'Customers - Admin'],
     'profile' => ['/admin/profile', 'Profile - Admin'],
     'admins' => ['/admin/settings/admins', 'Admins - Admin'],
+    'new admin' => ['/admin/settings/admins/create', 'New admin - Admin'],
 ]);
 
 it('titles category pages with the category name', function (string $uri, string $title) {

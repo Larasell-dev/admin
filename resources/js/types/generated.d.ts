@@ -1,5 +1,6 @@
 declare namespace Larasell.Admin.Data.View {
   export type AdminsPageData = {
+    createUrl: string;
     admins: import("./index").TableResource;
   };
   export type CategoriesPageData = {
@@ -14,6 +15,10 @@ declare namespace Larasell.Admin.Data.View {
     products: import("./index").TableResource;
     availableProductsUrl: string;
     addProductUrl: string;
+  };
+  export type CreateAdminPageData = {
+    storeUrl: string;
+    indexUrl: string;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
