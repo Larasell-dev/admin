@@ -11,7 +11,8 @@ import { cycleTheme } from "./theme";
 /** Every app hotkey. Admins can rebind them; their choices are saved on this device. */
 export const appHotkeys = defineAppHotkeys({
   "theme.cycle": {
-    hotkey: "Mod+Shift+L",
+    // Meta, not Mod: Mod is Control on Windows and Linux, which would leave plain Ctrl+A.
+    hotkey: "Control+Meta+A",
     meta: { name: "Cycle theme", description: "Switch between light, dark and system." },
   },
 });
