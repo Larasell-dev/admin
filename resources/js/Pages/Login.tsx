@@ -1,5 +1,5 @@
 import { Form } from "@inertiajs/react";
-import { Button, Container, Field, Input, Stack } from "@larasell-dev/ui";
+import { Button, Container, Field, Input, PasswordInput, Stack } from "@larasell-dev/ui";
 
 export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.View.LoginPageData) {
   return (
@@ -23,7 +23,7 @@ export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.Vie
                     </Field>
 
                     <Field label="Password" name="password" error={errors.password}>
-                      <Input type="password" autoComplete="current-password" />
+                      <PasswordInput autoComplete="current-password" />
                     </Field>
                   </Stack>
 
