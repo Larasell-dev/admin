@@ -34,12 +34,8 @@ export function setTheme(theme: Theme) {
 
 /** Moves to the next theme in the order light, dark, system. */
 export function cycleTheme() {
-  setTheme(nextTheme(storedTheme()));
-}
-
-export function nextTheme(theme: Theme): Theme {
   const themes = Object.values(Theme);
-  return themes[(themes.indexOf(theme) + 1) % themes.length];
+  setTheme(themes[(themes.indexOf(storedTheme()) + 1) % themes.length]);
 }
 
 /** The stored theme, updated whenever `setTheme` changes it. */

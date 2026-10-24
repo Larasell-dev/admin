@@ -13,14 +13,12 @@ import {
   SectionStack,
   Stack,
 } from "@larasell-dev/ui";
-import { formatForDisplay, useHotkeyHint } from "@tanstack/react-hotkeys";
 import { useEffect, useId, useRef, useState } from "react";
 import { assertDefined } from "ts-extras";
 import UnsavedChangesToast from "../Components/UnsavedChangesToast";
 import SidebarLayout from "../Layouts/SidebarLayout";
-import { appHotkeys } from "../utils/hotkeys";
 import { initials } from "../utils/initials";
-import { nextTheme, setTheme, Theme, themeLabels, useTheme } from "../utils/theme";
+import { setTheme, Theme, themeLabels, useTheme } from "../utils/theme";
 import type { Page } from "../types";
 
 type ProfilePageProps = Larasell.Admin.Data.View.ProfilePageData;
@@ -180,9 +178,6 @@ function AvatarInput({ error }: { error?: string }) {
 
 function PreferenceSection() {
   const theme = useTheme();
-  const cycleHotkey = appHotkeys["theme.cycle"];
-  // While the shortcut's modifiers are held, marks the theme it switches to.
-  const showHint = useHotkeyHint(cycleHotkey);
 
   return (
     <Section.Root>
@@ -208,11 +203,6 @@ function PreferenceSection() {
                 <Radio.Indicator className="size-1.5 rounded-full bg-white dark:bg-mauve-950" />
               </span>
               {themeLabels[value]}
-              {showHint && value === nextTheme(theme) && (
-                <span className="type-body-sm text-mauve-500 dark:text-mauve-400">
-                  {formatForDisplay(cycleHotkey.defaultHotkey)}
-                </span>
-              )}
             </span>
           </Radio.Root>
         ))}
