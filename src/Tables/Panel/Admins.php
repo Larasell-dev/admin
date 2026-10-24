@@ -21,6 +21,11 @@ class Admins extends Table
         ];
     }
 
+    public function rowLink(Admin $admin): string
+    {
+        return route('larasell.admin.settings.admins.edit', $admin);
+    }
+
     public function actions(): array
     {
         return [

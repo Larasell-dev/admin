@@ -62,6 +62,12 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'new admin' => ['/admin/settings/admins/create', 'New admin - Admin'],
 ]);
 
+it('titles an admin\'s page with their name', function () {
+    signedInAdmin();
+
+    expect(pageTitle($this->get('/admin/settings/admins/1/edit')))->toBe('Ada Lovelace - Admin');
+});
+
 it('titles category pages with the category name', function (string $uri, string $title) {
     signedInAdmin();
 
