@@ -119,6 +119,17 @@ it('throws when the relative target does not exist', function () {
     $navigation->tree();
 })->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.notes] targets unknown item [larasell.admin.missing].');
 
+it('throws when an item route is not registered', function (Closure $register) {
+    $navigation = new Navigation;
+    $navigation->add('Home', 'home', 'home');
+    $register($navigation);
+
+    $navigation->tree();
+})->with([
+    'top-level item' => [fn ($navigation) => $navigation->add('Reports', 'reports', 'file-list-3')],
+    'child' => [fn ($navigation) => $navigation->add('Reports', 'reports', 'file-list-3')->under('larasell.admin.home')],
+])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.reports] route is not registered.');
+
 it('throws when relative placements form a cycle', function () {
     $navigation = new Navigation;
 
