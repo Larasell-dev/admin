@@ -15,22 +15,24 @@ const item = (label: string, path: string, children: Item[] = []): Item => ({
   children,
 });
 
+const defaultNavigation = [
+  item("Home", "/admin"),
+  item("Categories", "/admin/categories"),
+  item("Customers", "/admin/customers"),
+  item("Settings", "/admin/settings", [
+    item("Taxes", "/admin/settings/taxes"),
+    item("Shipping", "/admin/settings/shipping"),
+  ]),
+];
+
 // Renders through Inertia's App, so the sidebar reads the page from usePage() as in the panel.
-function renderAt(url: string) {
+function renderAt(url: string, navigation: Item[] = defaultNavigation) {
   const initialPage = {
     component: "Sidebar",
     url,
     version: null,
     props: {
-      navigation: [
-        item("Home", "/admin"),
-        item("Categories", "/admin/categories"),
-        item("Customers", "/admin/customers"),
-        item("Settings", "/admin/settings", [
-          item("Taxes", "/admin/settings/taxes"),
-          item("Shipping", "/admin/settings/shipping"),
-        ]),
-      ],
+      navigation,
       admin: { name: "Ada Lovelace", email: "ada@example.com", avatarUrl: null },
       profileUrl: "/admin/profile",
       logoutUrl: "/admin/logout",
@@ -102,6 +104,21 @@ it("lists children in a group named after their parent", async () => {
       .elements()
       .map((link) => link.textContent),
   ).toEqual(["Taxes", "Shipping"]);
+});
+
+// Archive is Settings' child, but its URL sits under Categories.
+it.each([
+  ["/admin/categories/12", "Categories"],
+  ["/admin/categories/archive", "Archive"],
+  ["/admin/categories/archive/3", "Archive"],
+])("only lets items in the same group shadow an item, at %s", async (url, label) => {
+  await renderAt(url, [
+    item("Home", "/admin"),
+    item("Categories", "/admin/categories"),
+    item("Settings", "/admin/settings", [item("Archive", "/admin/categories/archive")]),
+  ]);
+
+  expect(current()).toEqual([label]);
 });
 
 describe("expanding a group", () => {

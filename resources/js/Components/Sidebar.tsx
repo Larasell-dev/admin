@@ -202,28 +202,29 @@ const isUnder = (path: string, parent: string) => path.startsWith(`${parent}/`);
 /**
  * The navigation item for the current page: the item with its exact path, or else the
  * one with the longest path above it, so `/admin/categories/12` belongs to Categories.
- * An item with other items under it, such as Home at `/admin`, only matches its own page;
- * its own children don't count, so `/admin/settings/42` still belongs to Settings.
- * Children take part like any other item, so `/admin/settings/taxes` belongs to Taxes.
+ * An item with a sibling under it, such as Home at `/admin`, only matches its own page.
+ * Only siblings count: top-level items for a top-level item, the other children of the
+ * same parent for a child. So neither an item's own children nor another group's child
+ * stop Categories from matching `/admin/categories/12`.
  */
 function useActiveNavigationItem(): NavigationItem | null {
   const { props, url } = usePage<Page>();
   const path = pathOf(url);
-  const items = props.navigation.flatMap((item) => [item, ...item.children]);
-  const paths = items.map((item) => pathOf(item.url));
+  const groups = [props.navigation, ...props.navigation.map((item) => item.children)];
   let best: NavigationItem | null = null;
   let bestLength = -1;
 
-  for (const [index, item] of items.entries()) {
-    const itemPath = paths[index];
-    if (itemPath === path) return item;
-    const othersUnder = paths.some(
-      (other, otherIndex) => isUnder(other, itemPath) && !item.children.includes(items[otherIndex]),
-    );
-    if (!isUnder(path, itemPath) || othersUnder) continue;
-    if (itemPath.length > bestLength) {
-      best = item;
-      bestLength = itemPath.length;
+  for (const siblings of groups) {
+    const paths = siblings.map((item) => pathOf(item.url));
+
+    for (const [index, item] of siblings.entries()) {
+      const itemPath = paths[index];
+      if (itemPath === path) return item;
+      if (!isUnder(path, itemPath) || paths.some((other) => isUnder(other, itemPath))) continue;
+      if (itemPath.length > bestLength) {
+        best = item;
+        bestLength = itemPath.length;
+      }
     }
   }
 
