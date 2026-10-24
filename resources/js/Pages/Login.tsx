@@ -1,7 +1,10 @@
 import { Form } from "@inertiajs/react";
 import { Button, Container, Field, Input, PasswordInput, Stack } from "@larasell-dev/ui";
+import { useState } from "react";
 
 export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.View.LoginPageData) {
+  const [devLoginLoading, setDevLoginLoading] = useState(false);
+
   return (
     <main className="flex min-h-dvh items-center bg-white dark:bg-mauve-950">
       <Container>
@@ -36,7 +39,8 @@ export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.Vie
                       variant="secondary"
                       fullWidth
                       nativeButton={false}
-                      render={<a href={devLoginUrl} />}
+                      loading={devLoginLoading}
+                      render={<a href={devLoginUrl} onClick={() => setDevLoginLoading(true)} />}
                     >
                       Log in as admin
                     </Button>
