@@ -1,6 +1,10 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "react", "react-perf", "vitest"],
   "jsPlugins": ["./lint/plugin.mjs"],
+  "options": {
+    "typeAware": true
+  },
   "rules": {
     "larasell/no-margin": "error"
   },
