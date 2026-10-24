@@ -15,6 +15,7 @@ use Larasell\Admin\Http\Controllers\HideCategoryController;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
+use Larasell\Admin\Http\Controllers\Media\FolderController;
 use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Controllers\SearchProductsNotInCategoryController;
@@ -48,6 +49,7 @@ Route::middleware(Authenticate::class)->group(function () {
 
     if (config('larasell.media.enabled')) {
         Route::index('media', Media::class);
+        Route::get('media/folders/{folder}', [FolderController::class, 'show'])->name('media.folders.show');
     }
 
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
