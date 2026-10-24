@@ -15,6 +15,7 @@ use Larasell\Larasell\Models\ProductImage;
  * @property string $name The folder's name, or the product image's file path.
  * @property MediaType $type
  * @property int $type_order 0 for folders, 1 for product images, to list folders first.
+ * @property int|null $folder_id The folder it is in, or null at the top level. Product images are always at the top level.
  */
 class MediaItem extends Model
 {
@@ -37,12 +38,12 @@ class MediaItem extends Model
         // A scope, so it applies after the builder sets the table as the query's source.
         static::addGlobalScope('folders and product images', function (Builder $query): void {
             $folders = Folder::query()->toBase()
-                ->select(['id', 'name'])
+                ->select(['id', 'name', 'parent_id as folder_id'])
                 ->selectRaw('? as type, 0 as type_order', [MediaType::Folder->value]);
 
             $productImages = ProductImage::query()->toBase()
                 ->select(['id', 'file as name'])
-                ->selectRaw('? as type, 1 as type_order', [MediaType::ProductImage->value]);
+                ->selectRaw('null as folder_id, ? as type, 1 as type_order', [MediaType::ProductImage->value]);
 
             $query->fromSub($folders->unionAll($productImages), $query->getModel()->getTable());
         });

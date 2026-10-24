@@ -49,6 +49,8 @@ export type TableEmptyState = {
 
 export type TableResource = {
   title: string;
+  /** Where the header's back button goes; null for no back button. */
+  backLink: { url: string; label: string } | null;
   /** Shown when there are no rows; null for the default. */
   emptyState: TableEmptyState | null;
   columns: TableColumn[];

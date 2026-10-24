@@ -276,6 +276,17 @@ abstract class Table implements JsonSerializable
         return (Icon::tryFrom($icon) ?? throw InvalidTableEmptyState::unknownIcon(static::class, $icon))->name;
     }
 
+    /**
+     * Where the page's back button goes: a 'url' and an accessible 'label', e.g.
+     * "Back to Media". Return null for a page without one.
+     *
+     * @return array{url: string, label: string}|null
+     */
+    public function backLink(): ?array
+    {
+        return null;
+    }
+
     public function title(): string
     {
         return Str::ucfirst(Str::lower(Str::headline(Str::replaceEnd('Table', '', class_basename(static::class)))));
@@ -345,7 +356,7 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string}|null, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
+     * @return array{title: string, backLink: array{url: string, label: string}|null, emptyState: array{title: string, description: ?string, icon: ?string}|null, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
      */
     public function jsonSerialize(): array
     {
@@ -406,6 +417,7 @@ abstract class Table implements JsonSerializable
 
         return [
             'title' => $this->title(),
+            'backLink' => $this->backLink(),
             'emptyState' => $this->resolveEmptyState(),
             'columns' => $columns,
             'rows' => $rows->all(),

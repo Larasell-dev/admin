@@ -35,6 +35,7 @@ const resource = (
   pagination: TablePagination = { page: 1, pageSize: 25, total: rows.length },
 ): TableResource => ({
   title: "Books",
+  backLink: null,
   emptyState: null,
   columns: [
     { name: "title", label: "Title", type: "text" },
