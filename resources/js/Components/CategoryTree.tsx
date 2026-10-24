@@ -31,6 +31,7 @@ import {
   useState,
 } from "react";
 import type { TableAction } from "../types";
+import { overlayExclusive } from "../utils/hotkeys";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
 import { cn } from "cn";
@@ -411,7 +412,7 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
         }
       />
       <Menu.Popup>
-        <HotkeysProvider scope="category-actions-menu" exclusive>
+        <HotkeysProvider scope="category-actions-menu" exclusive={overlayExclusive}>
           <Menu.Item
             icon={FolderAddLine}
             render={<Link href={category.createChildUrl} prefetch="hover" />}

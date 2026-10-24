@@ -18,6 +18,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { TableAction, TableResource } from "../types";
 import { abortPrevious } from "../utils/abortPrevious";
 import { debounce } from "../utils/debounce";
+import { overlayExclusive } from "../utils/hotkeys";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 
@@ -172,7 +173,10 @@ export default function ProductsTable(props: Props) {
                             }
                           />
                           <Menu.Popup>
-                            <HotkeysProvider scope="product-actions-menu" exclusive>
+                            <HotkeysProvider
+                              scope="product-actions-menu"
+                              exclusive={overlayExclusive}
+                            >
                               {row._actions.map((action) => (
                                 <Menu.Item
                                   key={action.name}
@@ -319,7 +323,7 @@ function AddProductBar({
             <Combobox.Portal>
               <Combobox.Positioner sideOffset={4} align="start" className="z-50 w-(--anchor-width)">
                 <Combobox.Popup className="max-h-72 overflow-y-auto border border-border bg-white py-1 shadow-lg dark:bg-mauve-900">
-                  <HotkeysProvider scope="product-search" exclusive>
+                  <HotkeysProvider scope="product-search" exclusive={overlayExclusive}>
                     <Combobox.Empty className="px-3.5 py-2 type-body-md text-mauve-600 empty:hidden dark:text-mauve-400">
                       {searching ? "Searching…" : "No products found."}
                     </Combobox.Empty>

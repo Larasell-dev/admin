@@ -7,6 +7,7 @@ import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import type { ComponentProps } from "react";
 import { assertPresent } from "ts-extras";
 import type { Page } from "../types";
+import { overlayExclusive } from "../utils/hotkeys";
 import { initials } from "../utils/initials";
 
 export default function UserMenu() {
@@ -42,7 +43,7 @@ export default function UserMenu() {
           className="z-50 w-58"
         >
           <Menu.Popup className="origin-(--transform-origin) border border-border bg-white bg-clip-padding shadow-lg outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0 dark:bg-mauve-900">
-            <HotkeysProvider scope="user-menu" exclusive>
+            <HotkeysProvider scope="user-menu" exclusive={overlayExclusive}>
               <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
                 Profile
               </UserMenuItem>
