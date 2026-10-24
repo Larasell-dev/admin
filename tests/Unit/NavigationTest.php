@@ -62,14 +62,15 @@ it('puts unpositioned items below positioned ones', function () {
     expect(labels($navigation))->toBe(['Home', 'Notes', 'Settings']);
 });
 
-it('sorts items with the same position alphabetically by label', function () {
+it('sorts items with the same position by id, so translated labels keep the order', function () {
     $navigation = new Navigation;
 
-    $navigation->add('Settings', 'larasell.admin.settings', 'settings-3')->position(100);
-    $navigation->add('Notes', 'larasell.admin.notes', 'sticky-note')->position(100);
-    $navigation->add('Home', 'larasell.admin.home', 'home')->position(100);
+    // Label order (Accounts, Start, Zettel) differs from id order (home, notes, settings).
+    $navigation->add('Accounts', 'larasell.admin.settings', 'settings-3')->position(100);
+    $navigation->add('Zettel', 'larasell.admin.notes', 'sticky-note')->position(100);
+    $navigation->add('Start', 'larasell.admin.home', 'home')->position(100);
 
-    expect(labels($navigation))->toBe(['Home', 'Notes', 'Settings']);
+    expect(labels($navigation))->toBe(['Start', 'Zettel', 'Accounts']);
 });
 
 it('places a navigation item before another item by id', function () {
@@ -267,14 +268,14 @@ describe('nested navigation', function () {
         expect(tree($navigation))->toBe(['Settings' => ['Shipping', 'Taxes', 'Payments']]);
     });
 
-    it('sorts children with the same position alphabetically by label', function () {
+    it('sorts children with the same position by id', function () {
         $navigation = new Navigation;
 
         $navigation->add('Settings', 'settings', 'settings-3');
-        $navigation->add('Taxes', 'taxes', 'percent')->under('larasell.admin.settings')->position(1);
-        $navigation->add('Payments', 'payments', 'bank-card')->under('larasell.admin.settings')->position(1);
+        $navigation->add('Abgaben', 'taxes', 'percent')->under('larasell.admin.settings')->position(1);
+        $navigation->add('Zahlungen', 'payments', 'bank-card')->under('larasell.admin.settings')->position(1);
 
-        expect(tree($navigation))->toBe(['Settings' => ['Payments', 'Taxes']]);
+        expect(tree($navigation))->toBe(['Settings' => ['Zahlungen', 'Abgaben']]);
     });
 
     it('places a child before or after a sibling', function () {
