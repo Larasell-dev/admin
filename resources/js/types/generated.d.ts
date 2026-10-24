@@ -1,4 +1,7 @@
 declare namespace Larasell.Admin.Data.View {
+  export type AdminsPageData = {
+    admins: import("./index").TableResource;
+  };
   export type CategoriesPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
     createUrl: string;

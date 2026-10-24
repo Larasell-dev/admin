@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
+use Larasell\Admin\Http\Controllers\AdminController;
 use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Http\Controllers\CategoryController;
 use Larasell\Admin\Http\Controllers\CategoryProductController;
@@ -17,10 +18,12 @@ use Larasell\Admin\Http\Controllers\LogoutController;
 use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Controllers\SearchProductsNotInCategoryController;
+use Larasell\Admin\Http\Controllers\SettingsController;
 use Larasell\Admin\Http\Controllers\TableActionController;
 use Larasell\Admin\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
+use Larasell\Admin\NavigationGroup;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');
@@ -43,6 +46,8 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->withHead(title: 'Customers');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('settings', SettingsController::class)->name('settings');
+    Route::get('settings/admins', [AdminController::class, 'index'])->name('settings.admins.index')->withHead(title: 'Admins');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::post('logout', LogoutController::class)->name('logout');
@@ -60,3 +65,8 @@ if (app()->environment('local')) {
 Navigation::add(NavItem::Home->label(), NavItem::Home->value, icon: Icon::Home)->position(NavItem::Home->position());
 Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
 Navigation::add(NavItem::Customers->label(), NavItem::Customers->value, icon: Icon::Group)->position(NavItem::Customers->position());
+Navigation::add(NavItem::Settings->label(), NavItem::Settings->value, icon: Icon::Settings)
+    ->position(NavItem::Settings->position())
+    ->children(function (NavigationGroup $settings): void {
+        $settings->add('Admins', 'larasell.admin.settings.admins.index', Icon::Team);
+    });
