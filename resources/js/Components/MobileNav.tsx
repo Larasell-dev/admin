@@ -1,6 +1,7 @@
 import { Drawer } from "@base-ui/react/drawer";
 import { Link, router, usePage } from "@inertiajs/react";
-import { IconButton } from "@larasell-dev/ui";
+import { Icon, IconButton } from "@larasell-dev/ui";
+import { MenuLine } from "@larasell-dev/ui/icons";
 import { useEffect, useState } from "react";
 import { arrayFirst, assertDefined } from "ts-extras";
 import type { Page } from "../types";
@@ -27,16 +28,7 @@ export default function MobileNav() {
           <Drawer.Trigger
             render={
               <IconButton variant="tertiary" size="sm" aria-label="Open menu">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  className="size-5"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <Icon icon={MenuLine} />
               </IconButton>
             }
           />
