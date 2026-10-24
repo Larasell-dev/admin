@@ -114,8 +114,9 @@ class Navigation
     }
 
     /**
-     * Orders one group of siblings: positioned items first (by position, then label), then
-     * unpositioned items in registration order, then relative items inserted next to their targets.
+     * Orders one group of siblings: positioned items first (by position, then id, so translated
+     * labels don't change the order), then unpositioned items in registration order, then
+     * relative items inserted next to their targets.
      * Targets are already known to be in the group.
      *
      * @param  list<NavigationItem>  $items
@@ -124,7 +125,7 @@ class Navigation
     protected function ordered(array $items): array
     {
         $positioned = array_values(array_filter($items, fn (NavigationItem $item): bool => $item->position !== null));
-        usort($positioned, fn (NavigationItem $a, NavigationItem $b): int => [$a->position, $a->label] <=> [$b->position, $b->label]);
+        usort($positioned, fn (NavigationItem $a, NavigationItem $b): int => [$a->position, $a->id()] <=> [$b->position, $b->id()]);
 
         $unpositioned = array_filter($items, fn (NavigationItem $item): bool => ! $item->isPlaced());
         $ordered = [...$positioned, ...array_values($unpositioned)];
