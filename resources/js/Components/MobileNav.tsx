@@ -10,9 +10,7 @@ export default function MobileNav() {
   const { props } = usePage<Page>();
   const home = arrayFirst(props.navigation);
   assertDefined(home, "The admin panel needs at least one navigation item.");
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => router.on("success", () => setOpen(false)), []);
+  const { open, setOpen, frozen } = useDrawer();
 
   return (
     <Drawer.Root open={open} onOpenChange={setOpen} swipeDirection="left">
@@ -51,10 +49,25 @@ export default function MobileNav() {
             aria-label="Navigation"
             className="pointer-events-auto h-full w-fit translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0 [&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_nav_a]:pl-[calc(100vw+1.5rem)] [&_aside>button]:pl-[calc(100vw+1.5rem)]"
           >
-            <Sidebar />
+            <Sidebar frozen={frozen} />
           </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>
     </Drawer.Root>
   );
+}
+
+/**
+ * The drawer's open state, closing once the next page has loaded. `frozen` holds the sidebar
+ * from the start of a visit, before the page changes, until the drawer has slid out.
+ */
+function useDrawer() {
+  const [open, setOpen] = useState(false);
+  const [visiting, setVisiting] = useState(false);
+
+  useEffect(() => router.on("success", () => setOpen(false)), []);
+  useEffect(() => router.on("start", () => setVisiting(true)), []);
+  useEffect(() => router.on("finish", () => setVisiting(false)), []);
+
+  return { open, setOpen, frozen: !open || visiting };
 }
