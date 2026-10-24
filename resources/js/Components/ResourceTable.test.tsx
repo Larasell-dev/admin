@@ -1,6 +1,6 @@
 import "../../css/app.css";
 import { router } from "@inertiajs/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import type { TableAction, TablePagination, TableResource, TableRow } from "../types";
@@ -44,10 +44,14 @@ const resource = (
   pagination,
 });
 
+let visit: MockInstance<typeof router.visit>;
+let post: MockInstance<typeof router.post>;
+let get: MockInstance<typeof router.get>;
+
 beforeEach(() => {
-  vi.spyOn(router, "visit").mockImplementation(() => {});
-  vi.spyOn(router, "post").mockImplementation(() => {});
-  vi.spyOn(router, "get").mockImplementation(() => {});
+  visit = vi.spyOn(router, "visit").mockImplementation(() => {});
+  post = vi.spyOn(router, "post").mockImplementation(() => {});
+  get = vi.spyOn(router, "get").mockImplementation(() => {});
 });
 
 afterEach(() => {
@@ -97,8 +101,8 @@ describe.each([
     // The link stretches over the row, so it receives the click on another field.
     await screen.getByRole(role).getByText("Author 1").click({ force: true });
 
-    expect(router.visit).toHaveBeenCalledOnce();
-    expect(String(vi.mocked(router.visit).mock.calls[0][0])).toContain("/admin/books/1");
+    expect(visit).toHaveBeenCalledOnce();
+    expect(visit.mock.calls[0][0]).toContain("/admin/books/1");
   });
 
   it("follows links to other sites as plain anchors", async () => {
@@ -118,7 +122,7 @@ describe.each([
     await expect
       .element(screen.getByRole("link", { name: "Dune" }))
       .toHaveAttribute("href", "https://books.test/1");
-    expect(router.visit).not.toHaveBeenCalled();
+    expect(visit).not.toHaveBeenCalled();
   });
 
   it("keeps the row's actions outside the link, after it in the tab order", async () => {
@@ -173,8 +177,8 @@ describe.each([
     await screen.getByRole("button", { name: "Actions for Dune" }).click();
     await page.getByRole("menuitem", { name: "Archive" }).click();
 
-    expect(router.post).toHaveBeenCalledWith(archive.url, {}, expect.anything());
-    expect(router.visit).not.toHaveBeenCalled();
+    expect(post).toHaveBeenCalledWith(archive.url, {}, expect.anything());
+    expect(visit).not.toHaveBeenCalled();
   });
 
   it("shows which page of how many is on screen", async () => {
@@ -197,9 +201,9 @@ describe.each([
 
     await screen.getByRole("button", { name: "Next page" }).click();
 
-    expect(router.get).toHaveBeenCalledOnce();
-    expect(vi.mocked(router.get).mock.calls[0][0]).toBe(window.location.pathname);
-    expect(vi.mocked(router.get).mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
-    expect(vi.mocked(router.get).mock.calls[0][2]).toMatchObject({ preserveScroll: true });
+    expect(get).toHaveBeenCalledOnce();
+    expect(get.mock.calls[0][0]).toBe(window.location.pathname);
+    expect(get.mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
+    expect(get.mock.calls[0][2]).toMatchObject({ preserveScroll: true });
   });
 });

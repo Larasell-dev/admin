@@ -29,7 +29,8 @@ const store = {
     store.state = state;
     store.listeners.forEach((listener) => listener());
   },
-  subscribe(listener: () => void) {
+  // An arrow function, so useSyncExternalStore can call it without `this`.
+  subscribe: (listener: () => void) => {
     store.listeners.add(listener);
     return () => store.listeners.delete(listener);
   },

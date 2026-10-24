@@ -5,7 +5,7 @@ beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
 it("calls once with the last arguments after calls stop for the delay", () => {
-  const fn = vi.fn();
+  const fn = vi.fn<(query: string) => void>();
   const debounced = debounce(fn, 200);
 
   debounced("s");
@@ -19,7 +19,7 @@ it("calls once with the last arguments after calls stop for the delay", () => {
 });
 
 it("drops a pending call when cancelled", () => {
-  const fn = vi.fn();
+  const fn = vi.fn<(query: string) => void>();
   const debounced = debounce(fn, 200);
 
   debounced("s");

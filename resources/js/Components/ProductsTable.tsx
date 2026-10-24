@@ -166,7 +166,7 @@ export default function ProductsTable(props: Props) {
                               <IconButton
                                 variant="tertiary"
                                 size="sm"
-                                aria-label={`Actions for ${row[table!.columns[0]?.name ?? "id"]}`}
+                                aria-label={`Actions for ${String(row[table!.columns[0]?.name ?? "id"] as string | number | null)}`}
                               >
                                 <Icon icon={More2Fill} />
                               </IconButton>

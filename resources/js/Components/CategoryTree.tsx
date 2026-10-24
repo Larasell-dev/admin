@@ -283,16 +283,16 @@ function CategoryRow({
   accepts: (id: number) => boolean;
   onToggle: () => void;
 }) {
-  const draggable = useDraggable({ id: category.id });
-  const droppable = useDroppable({
+  const { ref: dragRef, isDragging } = useDraggable({ id: category.id });
+  const { ref: dropRef, isDropTarget } = useDroppable({
     id: category.id,
     accept: (source) => accepts(source.id as number),
   });
 
   return (
     <div
-      ref={droppable.ref}
-      data-drop-target={droppable.isDropTarget || undefined}
+      ref={dropRef}
+      data-drop-target={isDropTarget || undefined}
       // As wide as the panel, unless a deeply nested row needs more to keep its name's minimum
       // width; that row then pushes its controls out of line, and the panel scrolls sideways.
       className="group/row relative w-fit min-w-full data-drop-target:outline-1 data-drop-target:-outline-offset-1 data-drop-target:outline-primary-500"
@@ -302,9 +302,9 @@ function CategoryRow({
         // dnd-kit leaves a hidden copy of the link (data-dnd-placeholder) in its old place,
         // which shows as an empty striped slot. It copies the link's
         // attributes, data-dragging too, hence the opacity reset.
-        render={<Link ref={draggable.ref} href={category.url} prefetch="hover" draggable={false} />}
+        render={<Link ref={dragRef} href={category.url} prefetch="hover" draggable={false} />}
         aria-current={current ? "page" : undefined}
-        data-dragging={draggable.isDragging || undefined}
+        data-dragging={isDragging || undefined}
         className={cn(
           // Row
           "type-body-md flex cursor-pointer items-center gap-1.5 py-2 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none dark:text-mauve-50",

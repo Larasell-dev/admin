@@ -272,7 +272,7 @@ describe("controls inside a row", () => {
     );
 
     const edit = page.getByRole("button", { name: "Edit Fruits" });
-    await edit.element().focus();
+    edit.element().focus();
     await userEvent.keyboard("{ArrowDown}{End}g");
 
     await expect.element(edit).toHaveFocus();
@@ -281,7 +281,7 @@ describe("controls inside a row", () => {
 
 describe("selection", () => {
   it("selects the focused node with Enter and Space", async () => {
-    const onSelect = vi.fn();
+    const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
     await userEvent.tab();
 
@@ -293,7 +293,7 @@ describe("selection", () => {
   });
 
   it("does not select when moving focus", async () => {
-    const onSelect = vi.fn();
+    const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
     await userEvent.tab();
 
@@ -304,7 +304,7 @@ describe("selection", () => {
 
 describe("pointer", () => {
   it("focuses and selects a clicked node", async () => {
-    const onSelect = vi.fn();
+    const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
 
     await item("Banana").getByText("Banana").click();
@@ -324,7 +324,7 @@ describe("pointer", () => {
   });
 
   it("selects only the clicked child, not its ancestors", async () => {
-    const onSelect = vi.fn();
+    const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
 
     await item("Apple").getByText("Apple").click();
@@ -370,7 +370,7 @@ describe("render prop", () => {
   });
 
   it("activates the focused item with Enter, running the tree's and the consumer's click handlers", async () => {
-    const onLinkClick = vi.fn();
+    const onLinkClick = vi.fn<(href: string) => void>();
     await renderLinkTree(onLinkClick);
     await userEvent.tab();
 
