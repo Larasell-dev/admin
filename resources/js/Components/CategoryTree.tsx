@@ -19,6 +19,7 @@ import {
   useDraggable,
   useDroppable,
 } from "@dnd-kit/react";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { MotionConfig, motion } from "motion/react";
 import {
   createContext,
@@ -30,6 +31,7 @@ import {
   useState,
 } from "react";
 import type { TableAction } from "../types";
+import { overlayExclusive } from "../utils/hotkeys";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
 import { cn } from "cn";
@@ -410,24 +412,30 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
         }
       />
       <Menu.Popup>
-        <Menu.Item
-          icon={FolderAddLine}
-          render={<Link href={category.createChildUrl} prefetch="hover" />}
-        >
-          Add subcategory
-        </Menu.Item>
-        {category.visible ? (
-          <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
-            Hide
+        <HotkeysProvider scope="category-actions-menu" exclusive={overlayExclusive}>
+          <Menu.Item
+            icon={FolderAddLine}
+            render={<Link href={category.createChildUrl} prefetch="hover" />}
+          >
+            Add subcategory
           </Menu.Item>
-        ) : (
-          <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
-            Make visible
+          {category.visible ? (
+            <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
+              Hide
+            </Menu.Item>
+          ) : (
+            <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
+              Make visible
+            </Menu.Item>
+          )}
+          <Menu.Item
+            variant="destructive"
+            icon={DeleteBinLine}
+            onClick={() => askToDelete(category)}
+          >
+            Delete
           </Menu.Item>
-        )}
-        <Menu.Item variant="destructive" icon={DeleteBinLine} onClick={() => askToDelete(category)}>
-          Delete
-        </Menu.Item>
+        </HotkeysProvider>
       </Menu.Popup>
     </Menu.Root>
   );

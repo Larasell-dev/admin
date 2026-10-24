@@ -2,11 +2,13 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Button, Icon, IconButton, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { cn } from "cn";
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
 import CategoryTree, { CategoryDeletion } from "../Components/CategoryTree";
 import Freeze from "../Components/Freeze";
 import type { Page } from "../types";
+import { overlayExclusive } from "../utils/hotkeys";
 
 // Pages of a single category also pass that category; the index and create pages don't.
 type Props = Page<
@@ -108,9 +110,12 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
         >
           {/* Following a link closes the dialog in the same render that makes another category
               current, which would open it while the panel slides out. */}
-          <Freeze frozen={!open}>
-            <TreePanel {...props} className="flex flex-1" />
-          </Freeze>
+          {/* Enabled only while open, since the dialog stays mounted when closed. */}
+          <HotkeysProvider scope="category-tree-dialog" exclusive={overlayExclusive} enabled={open}>
+            <Freeze frozen={!open}>
+              <TreePanel {...props} className="flex flex-1" />
+            </Freeze>
+          </HotkeysProvider>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

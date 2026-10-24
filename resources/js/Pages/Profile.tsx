@@ -18,7 +18,7 @@ import { assertDefined } from "ts-extras";
 import UnsavedChangesToast from "../Components/UnsavedChangesToast";
 import SidebarLayout from "../Layouts/SidebarLayout";
 import { initials } from "../utils/initials";
-import { setTheme, storedTheme, Theme, themeLabels } from "../utils/theme";
+import { setTheme, Theme, themeLabels, useTheme } from "../utils/theme";
 import type { Page } from "../types";
 
 type ProfilePageProps = Larasell.Admin.Data.View.ProfilePageData;
@@ -177,12 +177,7 @@ function AvatarInput({ error }: { error?: string }) {
 }
 
 function PreferenceSection() {
-  const [theme, setThemeState] = useState<Theme>(storedTheme);
-
-  function selectTheme(value: Theme) {
-    setTheme(value);
-    setThemeState(value);
-  }
+  const theme = useTheme();
 
   return (
     <Section.Root>
@@ -193,7 +188,7 @@ function PreferenceSection() {
       <RadioGroup
         aria-label="Theme"
         value={theme}
-        onValueChange={selectTheme}
+        onValueChange={setTheme}
         className="grid grid-cols-2 gap-8 sm:grid-cols-3"
       >
         {Object.values(Theme).map((value) => (
