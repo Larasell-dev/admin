@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Models\Media\Folder;
+use Larasell\Admin\Navigation;
 
 function productImage(string $file): int
 {
@@ -74,4 +75,18 @@ it('shows an empty state without folders or product images', function () {
 
 it('requires a signed-in admin', function () {
     $this->get('/admin/media')->assertRedirect('/admin/login');
+});
+
+it('is in the navigation by default', function () {
+    expect(config('larasell.media.enabled'))->toBeTrue()
+        ->and(array_column(Navigation::resolve()->tree(), 'id'))->toContain('larasell.admin.media.index');
+});
+
+it('leaves the admin panel when disabled', function () {
+    $this->bootingWith(fn () => config(['larasell.media.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    expect(array_column(Navigation::resolve()->tree(), 'id'))->not->toContain('larasell.admin.media.index');
+
+    $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertNotFound();
 });
