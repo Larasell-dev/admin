@@ -262,7 +262,7 @@ function ThemePreview({ theme }: { theme: Theme }) {
   );
 }
 
-function PreviewUi({ colors }: { colors: (typeof previewColors)[Theme.Light] }) {
+function PreviewUi({ colors }: { colors: (typeof previewColors)[keyof typeof previewColors] }) {
   return (
     <>
       <rect width="120" height="80" fill={colors.background} />
