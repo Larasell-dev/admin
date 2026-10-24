@@ -2,8 +2,22 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
+
+/**
+ * The admins table rows as the signed-in admin sees them.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function adminRows(Admin $viewer): array
+{
+    return test()->actingAs($viewer, 'larasell-admin')
+        ->get('/admin/settings/admins')
+        ->assertOk()
+        ->inertiaProps('admins.rows');
+}
 
 it('lists the admins by name and email in the settings', function () {
     Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
@@ -23,6 +37,62 @@ it('lists the admins by name and email in the settings', function () {
             ->where('admins.rows.0.email', 'ada@example.com')
             ->where('admins.rows.1.name', 'Alan Turing')
             ->where('admins.rows.1.email', 'alan@example.com'));
+});
+
+it('offers to delete every admin but the signed-in one', function () {
+    Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+    $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+
+    [$adaRow, $alanRow] = adminRows($alan);
+
+    expect($adaRow['_actions'][0])
+        ->toMatchArray(['label' => 'Delete', 'method' => 'post', 'destructive' => true, 'disabled' => false, 'icon' => 'DeleteBin'])
+        ->and($adaRow['_actions'][0]['confirm']['title'])->toBe('Delete admin')
+        ->and($adaRow['_actions'][0]['confirm']['confirmationText'])->toBe('ada@example.com')
+        ->and($alanRow['_actions'][0]['disabled'])->toBeTrue();
+});
+
+it('deletes another admin and their avatar', function () {
+    $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+    $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+    $disk = Storage::fake(config('larasell-admin.disk'));
+    $disk->put('avatars/ada.png', 'ada');
+    $disk->put('avatars/alan.png', 'alan');
+    $ada->update(['avatar_path' => 'avatars/ada.png']);
+    $alan->update(['avatar_path' => 'avatars/alan.png']);
+
+    $delete = adminRows($alan)[0]['_actions'][0]['url'];
+
+    $this->from('/admin/settings/admins')
+        ->post($delete, ['confirmation' => 'ada@example.com'])
+        ->assertRedirect('/admin/settings/admins');
+
+    expect(Admin::query()->pluck('email')->all())->toBe(['alan@example.com']);
+    $disk->assertMissing('avatars/ada.png');
+    $disk->assertExists('avatars/alan.png');
+});
+
+it('keeps an admin until their email is typed to confirm', function (?string $confirmation) {
+    Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+    $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+
+    $delete = adminRows($alan)[0]['_actions'][0]['url'];
+
+    $this->post($delete, ['confirmation' => $confirmation])
+        ->assertSessionHasErrors(['confirmation' => 'Type "ada@example.com" to confirm.']);
+
+    expect(Admin::query()->count())->toBe(2);
+})->with([null, 'Ada Lovelace', 'ADA@example.com']);
+
+it('refuses to delete the signed-in admin', function () {
+    Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+    $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+
+    $delete = adminRows($alan)[1]['_actions'][0]['url'];
+
+    $this->post($delete, ['confirmation' => 'alan@example.com'])->assertForbidden();
+
+    expect(Admin::query()->count())->toBe(2);
 });
 
 it('opens the first settings page from Settings', function () {
