@@ -8,16 +8,19 @@ import { RovingFocusGroup, RovingFocusItem } from "@roving-focus/react";
 import { cn } from "cn";
 import { arrayFirst, assertDefined } from "ts-extras";
 import type { Page } from "../types";
+import { useFrozen } from "./Freeze";
 import { navigationIcon } from "../utils/navigationIcon";
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
 
 type NavigationItem = Larasell.Admin.Data.ViewModel.NavigationItemData;
 
-export default function Sidebar() {
-  const { props } = usePage<Page>();
-  const activeItem = useActiveNavigationItem();
-  const [isOpen, toggle] = useOpenGroups(activeItem);
+/** `frozen` keeps showing the page as it was, such as while the mobile nav slides out. */
+export default function Sidebar({ frozen = false }: { frozen?: boolean }) {
+  const page = useFrozen(usePage<Page>(), frozen);
+  const { props } = page;
+  const activeItem = activeNavigationItem(page);
+  const [isOpen, toggle] = useOpenGroups(props.navigation, activeItem);
   const groupId = useId();
   const home = arrayFirst(props.navigation);
   assertDefined(home, "The admin panel needs at least one navigation item.");
@@ -173,9 +176,8 @@ function GroupToggle({
  * Which groups are open. The current page's group opens by default, and again whenever the
  * current page moves to another group; otherwise the toggles decide.
  */
-function useOpenGroups(activeItem: NavigationItem | null) {
-  const { props } = usePage<Page>();
-  const activeGroup = props.navigation.find(
+function useOpenGroups(navigation: NavigationItem[], activeItem: NavigationItem | null) {
+  const activeGroup = navigation.find(
     (item) => item === activeItem || item.children.some((child) => child === activeItem),
   )?.id;
   const [open, setOpen] = useState(() => new Set(activeGroup ? [activeGroup] : []));
@@ -207,8 +209,7 @@ const isUnder = (path: string, parent: string) => path.startsWith(`${parent}/`);
  * same parent for a child. So neither an item's own children nor another group's child
  * stop Categories from matching `/admin/categories/12`.
  */
-function useActiveNavigationItem(): NavigationItem | null {
-  const { props, url } = usePage<Page>();
+function activeNavigationItem({ props, url }: { props: Page; url: string }): NavigationItem | null {
   const path = pathOf(url);
   const groups = [props.navigation, ...props.navigation.map((item) => item.children)];
   let best: NavigationItem | null = null;
