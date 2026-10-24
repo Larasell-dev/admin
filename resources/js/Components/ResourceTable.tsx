@@ -130,7 +130,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
             ))}
           </DataList.Root>
         </div>
-        <div className="border-border shrink-0 border-t px-4 py-3">
+        <div className="border-border shrink-0 border-t px-6 py-3">
           <Pagination {...pagination} />
         </div>
       </div>
