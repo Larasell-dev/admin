@@ -20,6 +20,11 @@ class Navigation
     public const MAX_ITEMS = 1_000;
 
     /**
+     * Group key for top-level items; ids are route names, so never empty.
+     */
+    protected const TOP_LEVEL = '';
+
+    /**
      * In registration order, keyed by id.
      *
      * @var array<string, NavigationItem>
@@ -54,46 +59,58 @@ class Navigation
      */
     public function tree(): array
     {
-        $topLevel = [];
-        $children = [];
+        $this->assertParentsAreTopLevel();
+        $this->assertTargetsAreSiblings();
+
+        $groups = [];
         foreach ($this->items as $item) {
-            if ($item->parent !== null) {
-                $parent = $this->items[$item->parent] ?? throw InvalidNavigationItem::unknownParent($item->id(), $item->parent);
-
-                if ($parent->parent !== null) {
-                    throw InvalidNavigationItem::nestedTooDeep($item->id(), $parent->id());
-                }
-            }
-
-            $target = $item->relativeTarget();
-            if ($target !== null) {
-                $targetItem = $this->items[$target] ?? throw InvalidNavigationItem::unknownTarget($item->id(), $target);
-
-                if ($targetItem->parent !== $item->parent) {
-                    throw InvalidNavigationItem::targetNotSibling($item->id(), $target);
-                }
-            }
-
-            if ($item->parent === null) {
-                $topLevel[] = $item;
-            } else {
-                $children[$item->parent][] = $item;
-            }
+            $groups[$item->parent ?? self::TOP_LEVEL][] = $item;
         }
 
-        $tree = [];
-        $count = 0;
-        foreach ($this->ordered($topLevel) as $item) {
-            $group = $this->ordered($children[$item->id()] ?? []);
-            $count += 1 + count($group);
-
-            $tree[] = $item->toData(children: array_map(fn (NavigationItem $child): NavigationItemData => $child->toData(), $group));
-        }
+        $tree = array_map(
+            fn (NavigationItem $item): NavigationItemData => $item->toData(
+                children: array_map(fn (NavigationItem $child): NavigationItemData => $child->toData(), $this->ordered($groups[$item->id()] ?? [])),
+            ),
+            $this->ordered($groups[self::TOP_LEVEL] ?? []),
+        );
 
         // Pair assertion: every registered item appears in the tree exactly once.
+        $count = count($tree) + array_sum(array_map(fn (NavigationItemData $item): int => count($item->children), $tree));
         self::assert($count === count($this->items), 'Nesting lost or duplicated navigation items.');
 
         return $tree;
+    }
+
+    /**
+     * Every parent is registered and top-level itself, so nesting is one level deep.
+     */
+    protected function assertParentsAreTopLevel(): void
+    {
+        $parents = array_filter(array_map(fn (NavigationItem $item): ?string => $item->parent, $this->items));
+
+        foreach ($parents as $id => $parentId) {
+            $parent = $this->items[$parentId] ?? throw InvalidNavigationItem::unknownParent($id, $parentId);
+
+            if ($parent->parent !== null) {
+                throw InvalidNavigationItem::nestedTooDeep($id, $parentId);
+            }
+        }
+    }
+
+    /**
+     * Every before() or after() target is registered and has the same parent as the item.
+     */
+    protected function assertTargetsAreSiblings(): void
+    {
+        $targets = array_filter(array_map(fn (NavigationItem $item): ?string => $item->relativeTarget(), $this->items));
+
+        foreach ($targets as $id => $targetId) {
+            $target = $this->items[$targetId] ?? throw InvalidNavigationItem::unknownTarget($id, $targetId);
+
+            if ($target->parent !== $this->items[$id]->parent) {
+                throw InvalidNavigationItem::targetNotSibling($id, $targetId);
+            }
+        }
     }
 
     /**
@@ -147,13 +164,10 @@ class Navigation
             'Ordering duplicated a navigation item.',
         );
 
-        $previous = NavigationItem::POSITION_MIN;
-        foreach ($ordered as $item) {
-            if ($item->position !== null) {
-                self::assert($item->position >= $previous, 'Navigation positions are not ascending.');
-                $previous = $item->position;
-            }
-        }
+        $positions = array_values(array_filter(array_map(fn (NavigationItem $item): ?int => $item->position, $ordered), fn (?int $position): bool => $position !== null));
+        $ascending = $positions;
+        sort($ascending);
+        self::assert($positions === $ascending, 'Navigation positions are not ascending.');
 
         return $ordered;
     }

@@ -1,9 +1,7 @@
-export type NavigationItem = Larasell.Admin.Data.ViewModel.NavigationItemData;
-
 export type AdminSummary = { name: string; email: string; avatarUrl: string | null };
 
 export type SharedProps = {
-  navigation: NavigationItem[];
+  navigation: Larasell.Admin.Data.ViewModel.NavigationItemData[];
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;

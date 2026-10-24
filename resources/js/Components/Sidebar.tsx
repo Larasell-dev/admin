@@ -7,10 +7,12 @@ import { Fragment, type ReactNode, useId, useState } from "react";
 import { RovingFocusGroup, RovingFocusItem } from "@roving-focus/react";
 import { cn } from "cn";
 import { arrayFirst, assertDefined } from "ts-extras";
-import type { NavigationItem, Page } from "../types";
+import type { Page } from "../types";
 import { navigationIcon } from "../utils/navigationIcon";
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
+
+type NavigationItem = Larasell.Admin.Data.ViewModel.NavigationItemData;
 
 export default function Sidebar() {
   const { props } = usePage<Page>();
