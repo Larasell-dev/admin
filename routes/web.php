@@ -15,6 +15,7 @@ use Larasell\Admin\Http\Controllers\HideCategoryController;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
+use Larasell\Admin\Http\Controllers\Media\FolderController;
 use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Controllers\SearchProductsNotInCategoryController;
@@ -24,6 +25,7 @@ use Larasell\Admin\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 use Larasell\Admin\NavigationGroup;
+use Larasell\Admin\Tables\Panel\Media\Media;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');
@@ -44,6 +46,12 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
     Route::post('categories/{category}/move', MoveCategoryController::class)->name('categories.move');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->withHead(title: 'Customers');
+
+    if (config('larasell.media.enabled')) {
+        Route::index('media', Media::class);
+        Route::get('media/folders/{folder}', [FolderController::class, 'show'])->name('media.folders.show');
+    }
+
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('settings', SettingsController::class)->name('settings');
@@ -69,6 +77,11 @@ if (app()->environment('local')) {
 Navigation::add(NavItem::Home->label(), NavItem::Home->value, icon: Icon::Home)->position(NavItem::Home->position());
 Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
 Navigation::add(NavItem::Customers->label(), NavItem::Customers->value, icon: Icon::Group)->position(NavItem::Customers->position());
+
+if (config('larasell.media.enabled')) {
+    Navigation::add(NavItem::Media->label(), NavItem::Media->value, icon: Icon::Image)->position(NavItem::Media->position());
+}
+
 Navigation::add(NavItem::Settings->label(), NavItem::Settings->value, icon: Icon::Settings)
     ->position(NavItem::Settings->position())
     ->children(function (NavigationGroup $settings): void {
