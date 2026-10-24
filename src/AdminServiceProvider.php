@@ -2,9 +2,14 @@
 
 namespace Larasell\Admin;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RouteDefinition;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Inertia\Inertia;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
@@ -13,7 +18,9 @@ use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
+use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -41,6 +48,7 @@ class AdminServiceProvider extends ServiceProvider
             ->group(__DIR__.'/../routes/web.php');
 
         $this->registerRouteMacros();
+        $this->renderNotFoundPage();
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));
 
@@ -85,6 +93,36 @@ class AdminServiceProvider extends ServiceProvider
             return Route::get($uri, TableController::class)
                 ->defaults('table', $table)
                 ->name(str_replace('/', '.', trim($uri, '/')).'.index');
+        });
+    }
+
+    /**
+     * Signed-in admins see the panel's 404 page for admin pages that 404, such as editing an
+     * admin that does not exist, and for addresses without an admin route (the fallback route).
+     */
+    private function renderNotFoundPage(): void
+    {
+        $this->callAfterResolving(ExceptionHandler::class, function (ExceptionHandler $handler): void {
+            if (! $handler instanceof Handler) {
+                return;
+            }
+
+            $handler->renderable(function (NotFoundHttpException $e, Request $request) {
+                if (! $request->isMethod('GET')
+                    || $request->expectsJson()
+                    || ! $request->route()?->named('larasell.admin.*')
+                    || ! Auth::guard('larasell-admin')->check()) {
+                    return null;
+                }
+
+                // Route model binding 404s before the Inertia middleware runs, so run it here.
+                return app(HandleAdminInertiaRequests::class)->handle($request, function () use ($request) {
+                    Head::title('Page not found');
+
+                    // Inertia still renders a page that comes with an error status.
+                    return Inertia::render('NotFound')->toResponse($request)->setStatusCode(404);
+                });
+            });
         });
     }
 
