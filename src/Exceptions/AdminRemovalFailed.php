@@ -20,6 +20,16 @@ class AdminRemovalFailed extends RuntimeException implements StructuredError
         );
     }
 
+    public static function lastAdmin(string $email): static
+    {
+        return static::structured(
+            code: 'larasell-admin.admin.last-admin',
+            message: "Admin user [{$email}] is the last admin and cannot be removed.",
+            why: 'Without an admin, nobody could sign in to the admin panel.',
+            fix: 'Create another admin first, for example with larasell:create-admin.',
+        );
+    }
+
     public static function notDeleted(string $email): static
     {
         return static::structured(
