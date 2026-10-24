@@ -2,10 +2,14 @@
 
 namespace Larasell\Admin\ValueObjects;
 
+use Closure;
 use Illuminate\Support\Str;
+use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
+use Larasell\Admin\NavigationGroup;
+use LogicException;
 
 class NavigationItem
 {
@@ -19,6 +23,11 @@ class NavigationItem
 
     public ?string $after = null;
 
+    /**
+     * The id of the top-level item this item is nested under, if any.
+     */
+    public ?string $parent = null;
+
     public Icon $icon;
 
     /**
@@ -28,6 +37,7 @@ class NavigationItem
         public string $label,
         public string $route,
         Icon|string $icon,
+        protected ?AdminPanel $panel = null,
     ) {
         if (trim($label) === '') {
             throw InvalidNavigationItem::emptyLabel();
@@ -68,6 +78,43 @@ class NavigationItem
     public function after(NavItem|string $target): static
     {
         $this->after = $this->resolveTarget($target);
+
+        return $this;
+    }
+
+    /**
+     * Nests this item one level under a top-level item. Its position, before() and after()
+     * then apply among that item's children only.
+     */
+    public function under(NavItem|string $parent): static
+    {
+        $id = $parent instanceof NavItem ? $parent->value : $parent;
+
+        if ($this->parent !== null) {
+            throw InvalidNavigationItem::alreadyNested($this->id(), $this->parent);
+        }
+
+        if ($id === $this->id()) {
+            throw InvalidNavigationItem::selfParent($this->id());
+        }
+
+        $this->parent = $id;
+
+        return $this;
+    }
+
+    /**
+     * Registers children of this item: each item added to the group is nested under this one.
+     *
+     * @param  Closure(NavigationGroup): mixed  $define
+     */
+    public function children(Closure $define): static
+    {
+        if ($this->panel === null) {
+            throw new LogicException("Navigation item [{$this->id()}] was not registered through the admin panel, so it cannot have children.");
+        }
+
+        $define(new NavigationGroup($this->panel, $this->id()));
 
         return $this;
     }

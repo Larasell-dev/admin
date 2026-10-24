@@ -39,8 +39,14 @@ function renderIndex() {
     version: null,
     props: {
       navigation: [
-        { id: "home", label: "Home", url: "/admin", icon: "Home" },
-        { id: "categories", label: "Categories", url: "/admin/categories", icon: "Folders" },
+        { id: "home", label: "Home", url: "/admin", icon: "Home", children: [] },
+        {
+          id: "categories",
+          label: "Categories",
+          url: "/admin/categories",
+          icon: "Folders",
+          children: [],
+        },
       ],
       admin: { name: "Ada Admin", email: "ada@example.com", avatarUrl: null },
       profileUrl: "/admin/profile",

@@ -4,6 +4,8 @@ export type NavigationItem = {
   url: string;
   /** Icon case name, e.g. "Home"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
   icon: string;
+  /** Nested items; always empty for a child, since nesting is one level deep. */
+  children: NavigationItem[];
 };
 
 export type AdminSummary = { name: string; email: string; avatarUrl: string | null };
