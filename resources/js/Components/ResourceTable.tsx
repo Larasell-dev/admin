@@ -110,7 +110,8 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
     <>
       <div className="flex min-h-0 flex-1 flex-col lg:hidden">
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <DataList.Root aria-label={label}>
+          {/* px-6 like the page header, so the rows line up with its title. */}
+          <DataList.Root aria-label={label} DANGEROUS_className="[&>li]:px-6">
             {resource.rows.map((row) => (
               <DataList.Item key={row.id}>
                 <div className="flex items-start justify-between gap-2">
@@ -136,7 +137,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
       </div>
 
       <div className="hidden min-h-0 flex-1 lg:block">
-        <Table.Root aria-label={label}>
+        <Table.Root aria-label={label} DANGEROUS_className="[&_td]:px-6 [&_th]:px-6">
           <Table.Content>
             <Table.Header>
               {resource.columns.map((column) => (
