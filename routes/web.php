@@ -48,6 +48,8 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('settings', SettingsController::class)->name('settings');
     Route::get('settings/admins', [AdminController::class, 'index'])->name('settings.admins.index')->withHead(title: 'Admins');
+    Route::post('settings/admins', [AdminController::class, 'store'])->name('settings.admins.store');
+    Route::get('settings/admins/create', [AdminController::class, 'create'])->name('settings.admins.create')->withHead(title: 'New admin');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::post('logout', LogoutController::class)->name('logout');
