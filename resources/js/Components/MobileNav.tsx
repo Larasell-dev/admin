@@ -1,5 +1,6 @@
 import { Drawer } from "@base-ui/react/drawer";
 import { Link, router, usePage } from "@inertiajs/react";
+import { IconButton } from "@larasell-dev/ui";
 import { useEffect, useState } from "react";
 import { arrayFirst, assertDefined } from "ts-extras";
 import type { Page } from "../types";
@@ -24,20 +25,21 @@ export default function MobileNav() {
             <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />
           </Link>
           <Drawer.Trigger
-            aria-label="Open menu"
-            className="-mr-1.5 inline-flex size-8 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring dark:text-mauve-100 dark:hover:bg-mauve-800"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="size-5"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </Drawer.Trigger>
+            render={
+              <IconButton variant="tertiary" size="sm" aria-label="Open menu">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  className="size-5"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </IconButton>
+            }
+          />
         </div>
       </header>
 
