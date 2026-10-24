@@ -18,7 +18,7 @@ import { assertDefined } from "ts-extras";
 import UnsavedChangesToast from "../Components/UnsavedChangesToast";
 import SidebarLayout from "../Layouts/SidebarLayout";
 import { initials } from "../utils/initials";
-import { setTheme, storedTheme, type Theme } from "../utils/theme";
+import { setTheme, storedTheme, Theme, themeLabels } from "../utils/theme";
 import type { Page } from "../types";
 
 type ProfilePageProps = Larasell.Admin.Data.View.ProfilePageData;
@@ -176,12 +176,6 @@ function AvatarInput({ error }: { error?: string }) {
   );
 }
 
-const themes: { value: Theme; label: string }[] = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-  { value: "system", label: "System" },
-];
-
 function PreferenceSection() {
   const [theme, setThemeState] = useState<Theme>(storedTheme);
 
@@ -202,7 +196,7 @@ function PreferenceSection() {
         onValueChange={selectTheme}
         className="grid grid-cols-2 gap-8 sm:grid-cols-3"
       >
-        {themes.map(({ value, label }) => (
+        {Object.values(Theme).map((value) => (
           <Radio.Root
             key={value}
             value={value}
@@ -213,7 +207,7 @@ function PreferenceSection() {
               <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border bg-white group-data-checked:border-mauve-950 group-data-checked:bg-mauve-950 dark:bg-mauve-900 dark:group-data-checked:border-mauve-100 dark:group-data-checked:bg-mauve-100">
                 <Radio.Indicator className="size-1.5 rounded-full bg-white dark:bg-mauve-950" />
               </span>
-              {label}
+              {themeLabels[value]}
             </span>
           </Radio.Root>
         ))}
@@ -223,14 +217,14 @@ function PreferenceSection() {
 }
 
 const previewColors = {
-  light: {
+  [Theme.Light]: {
     background: "var(--color-white)",
     sidebar: "var(--color-mauve-100)",
     line: "var(--color-mauve-300)",
     card: "var(--color-mauve-50)",
     border: "var(--color-mauve-200)",
   },
-  dark: {
+  [Theme.Dark]: {
     background: "var(--color-mauve-950)",
     sidebar: "var(--color-mauve-900)",
     line: "var(--color-mauve-700)",
@@ -249,16 +243,16 @@ function ThemePreview({ theme }: { theme: Theme }) {
       aria-hidden
       className="block h-auto w-full group-focus-visible:focus-ring"
     >
-      {theme === "system" ? (
+      {theme === Theme.System ? (
         <>
           <defs>
             <clipPath id={clipId}>
               <rect x="60" y="0" width="60" height="80" />
             </clipPath>
           </defs>
-          <PreviewUi colors={previewColors.light} />
+          <PreviewUi colors={previewColors[Theme.Light]} />
           <g clipPath={`url(#${clipId})`}>
-            <PreviewUi colors={previewColors.dark} />
+            <PreviewUi colors={previewColors[Theme.Dark]} />
           </g>
         </>
       ) : (
@@ -268,7 +262,7 @@ function ThemePreview({ theme }: { theme: Theme }) {
   );
 }
 
-function PreviewUi({ colors }: { colors: (typeof previewColors)["light"] }) {
+function PreviewUi({ colors }: { colors: (typeof previewColors)[Theme.Light] }) {
   return (
     <>
       <rect width="120" height="80" fill={colors.background} />

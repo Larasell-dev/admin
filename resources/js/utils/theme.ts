@@ -1,20 +1,33 @@
-export type Theme = "light" | "dark" | "system";
+export enum Theme {
+  Light = "light",
+  Dark = "dark",
+  System = "system",
+}
 
-// Kept in localStorage, so each device keeps its own theme. resources/views/app.blade.php reads
-// the same key before the first paint; keep the two in sync.
-const storageKey = "larasell-admin-theme";
+/** Labels keyed by theme, like the `HasLabel` enums on the PHP side. */
+export const themeLabels: Record<Theme, string> = {
+  [Theme.Light]: "Light",
+  [Theme.Dark]: "Dark",
+  [Theme.System]: "System",
+};
+
+/**
+ * The localStorage key holding the theme, so each device keeps its own. The pre-paint script in
+ * resources/views/app.blade.php can't import this and repeats the key; keep the two in sync.
+ */
+export const themeStorageKey = "larasell-admin-theme";
 
 export function storedTheme(): Theme {
-  const theme = localStorage.getItem(storageKey);
-  return theme === "light" || theme === "dark" ? theme : "system";
+  const theme = localStorage.getItem(themeStorageKey);
+  return theme === Theme.Light || theme === Theme.Dark ? theme : Theme.System;
 }
 
 export function setTheme(theme: Theme) {
-  if (theme === "system") localStorage.removeItem(storageKey);
-  else localStorage.setItem(storageKey, theme);
+  if (theme === Theme.System) localStorage.removeItem(themeStorageKey);
+  else localStorage.setItem(themeStorageKey, theme);
 
   const dark =
-    theme === "dark" ||
-    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    theme === Theme.Dark ||
+    (theme === Theme.System && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dark", dark);
 }
