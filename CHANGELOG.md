@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.4.2](https://github.com/Larasell-dev/admin/compare/v0.4.1...v0.4.2) (2026-10-24)
+
+
+### Features
+
+* add admins from the settings ([6fa3043](https://github.com/Larasell-dev/admin/commit/6fa304318ee8ba0f1a4534392df473161a837596))
+* cycle the theme with a rebindable keyboard shortcut ([#145](https://github.com/Larasell-dev/admin/issues/145)) ([e377c01](https://github.com/Larasell-dev/admin/commit/e377c011bae1473a9ac01a8c5b19fcf0511b55a5))
+* delete admins from the admins table ([4814085](https://github.com/Larasell-dev/admin/commit/4814085b405ea9239420924937f2f3dace9d3a15))
+* edit admins from the settings ([47206f6](https://github.com/Larasell-dev/admin/commit/47206f66b4e4a81f22b845ccb49672ec9ac4a5b1))
+* fill a new category's slug from its name ([#118](https://github.com/Larasell-dev/admin/issues/118)) ([e61875f](https://github.com/Larasell-dev/admin/commit/e61875f2fe8a2d62c58871e3892f13a74e07a87d))
+* freeze the navigation once the app has booted ([#134](https://github.com/Larasell-dev/admin/issues/134)) ([9c51714](https://github.com/Larasell-dev/admin/commit/9c517149036e577a3c2de0ea940b3c0fe754c856))
+* let admins choose a light, dark, or system theme on the profile page ([87b016f](https://github.com/Larasell-dev/admin/commit/87b016f5dca87499fca86ae18fb7af0fba365fb6))
+* limit navigation items to 100 children per parent ([#132](https://github.com/Larasell-dev/admin/issues/132)) ([f7a4f57](https://github.com/Larasell-dev/admin/commit/f7a4f574d1b195bbc05e952dec9d85c29829c885))
+* list admins under a new Settings navigation item ([dc0fed7](https://github.com/Larasell-dev/admin/commit/dc0fed78a25bb9dfa43295a9d7699bff98398ef5))
+* put the profile fields in a General section ([2350974](https://github.com/Larasell-dev/admin/commit/2350974161a0f453c54da5703a2e1984450c3386))
+* render the admin 404 pages through Inertia's exception handling ([1ccf765](https://github.com/Larasell-dev/admin/commit/1ccf76550594822988a12fa8680620b0422006fd))
+* report navigation items with an unregistered route as a structured error ([#135](https://github.com/Larasell-dev/admin/issues/135)) ([7ed7c40](https://github.com/Larasell-dev/admin/commit/7ed7c40d2340a250699de242c6d4456337a67b28))
+* show a 404 page inside the admin panel ([6cb9000](https://github.com/Larasell-dev/admin/commit/6cb900069bad559efbab51703cfd4d3632cce5da))
+* show a loading state on the dev login link ([#126](https://github.com/Larasell-dev/admin/issues/126)) ([1cda394](https://github.com/Larasell-dev/admin/commit/1cda394f9bd22fe430572cdf2d7601be5a291762))
+* support nested navigation items ([#128](https://github.com/Larasell-dev/admin/issues/128)) ([efb1f9e](https://github.com/Larasell-dev/admin/commit/efb1f9e6d9bcae0e31d1737a602bef200037e3f1))
+* use PasswordInput for the login password field ([#124](https://github.com/Larasell-dev/admin/issues/124)) ([455715d](https://github.com/Larasell-dev/admin/commit/455715d5b46699c6143fc5dd7c692a3a0bac97e5))
+* use the unsaved changes toast on the profile page ([#125](https://github.com/Larasell-dev/admin/issues/125)) ([c24acf7](https://github.com/Larasell-dev/admin/commit/c24acf73ff46aae78dba59ecc5135bf6cb6e5084))
+
+
+### Bug Fixes
+
+* break navigation position ties by id instead of label ([#130](https://github.com/Larasell-dev/admin/issues/130)) ([045b94a](https://github.com/Larasell-dev/admin/commit/045b94a0ea72d177ad85734800f9813d5433ed4f))
+* freeze the mobile nav while it closes ([6a81c0e](https://github.com/Larasell-dev/admin/commit/6a81c0e9e3feb91c69516a31b23e4ea418955719))
+* keep the confirmation dialog's content unchanged while it closes ([#123](https://github.com/Larasell-dev/admin/issues/123)) ([0d6d1a0](https://github.com/Larasell-dev/admin/commit/0d6d1a0bf4c4af348873e130e0e08944d3f0c404))
+* let the category delete dialog animate out after deleting ([#122](https://github.com/Larasell-dev/admin/issues/122)) ([4dd69e5](https://github.com/Larasell-dev/admin/commit/4dd69e5abe392b5e429036654dd528c24a7d13e5))
+* only let siblings stop a navigation item from matching its pages ([#131](https://github.com/Larasell-dev/admin/issues/131)) ([60898db](https://github.com/Larasell-dev/admin/commit/60898db6ef8aff32a0720f872df6fe63c186bda0))
+* put dialogs opened later above earlier ones ([c6c87bc](https://github.com/Larasell-dev/admin/commit/c6c87bce924562d98bd5ad2c741edbe25c189652))
+* show a back link instead of the category tree trigger when there are no categories ([#121](https://github.com/Larasell-dev/admin/issues/121)) ([d7fd8b9](https://github.com/Larasell-dev/admin/commit/d7fd8b96a9bef51e9c19d9382b45d2ec5ffcbd12))
+* stack the add product search above its buttons on narrow screens ([#120](https://github.com/Larasell-dev/admin/issues/120)) ([891acd0](https://github.com/Larasell-dev/admin/commit/891acd09dd0f80b5030316a6af5800ef800875b8))
+
+
+### Miscellaneous Chores
+
+* update @larasell-dev/ui to 0.1.19 ([#138](https://github.com/Larasell-dev/admin/issues/138)) ([f50b174](https://github.com/Larasell-dev/admin/commit/f50b174ddc1dc27346e963830018324577547c7c))
+
 ## [0.4.1](https://github.com/Larasell-dev/admin/compare/v0.4.0...v0.4.1) (2026-10-23)
 
 
