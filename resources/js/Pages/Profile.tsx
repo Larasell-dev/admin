@@ -1,9 +1,10 @@
 import { Avatar } from "@base-ui/react/avatar";
 import { Field as BaseField } from "@base-ui/react/field";
-import { Form, useHttp, usePage } from "@inertiajs/react";
+import { Form, useFormContext, useHttp, usePage } from "@inertiajs/react";
 import { Button, Container, Error, Field, Input, Stack } from "@larasell-dev/ui";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { assertDefined } from "ts-extras";
+import UnsavedChangesToast from "../Components/UnsavedChangesToast";
 import SidebarLayout from "../Layouts/SidebarLayout";
 import { initials } from "../utils/initials";
 import type { Page } from "../types";
@@ -11,8 +12,6 @@ import type { Page } from "../types";
 type ProfilePageProps = Larasell.Admin.Data.View.ProfilePageData;
 
 export default function Profile({ admin, updateUrl }: ProfilePageProps) {
-  const [avatarKey, setAvatarKey] = useState(0);
-
   return (
     <Container>
       <div className="max-w-sm py-10">
@@ -20,39 +19,38 @@ export default function Profile({ admin, updateUrl }: ProfilePageProps) {
           <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">Profile</h1>
 
           <Form
+            key={admin.avatarUrl ?? "none"}
             action={updateUrl}
             method="put"
-            // Remounting the avatar input clears its selection once the upload is saved.
-            onSuccess={() => setAvatarKey((key) => key + 1)}
+            setDefaultsOnSuccess
           >
-            {({ errors, processing, recentlySuccessful }) => (
-              <Stack spacing={6}>
-                <AvatarInput key={avatarKey} error={errors.avatar} />
-
-                <Stack spacing={5}>
-                  <Field label="Name" name="name" error={errors.name}>
-                    <Input defaultValue={admin.name} autoComplete="name" />
-                  </Field>
-
-                  <Field label="Email" name="email" error={errors.email}>
-                    <Input type="email" defaultValue={admin.email} autoComplete="email" />
-                  </Field>
-                </Stack>
-
-                <Stack spacing={2}>
-                  <Button type="submit" loading={processing}>
-                    Save
-                  </Button>
-                  {recentlySuccessful && (
-                    <p className="type-body-sm text-mauve-600 dark:text-mauve-400">Saved.</p>
-                  )}
-                </Stack>
-              </Stack>
-            )}
+            <ProfileFields />
+            <UnsavedChangesToast />
           </Form>
         </Stack>
       </div>
     </Container>
+  );
+}
+
+function ProfileFields() {
+  const { admin } = usePage<Page<ProfilePageProps>>().props;
+  const errors = useFormContext()?.errors ?? {};
+
+  return (
+    <Stack spacing={6}>
+      <AvatarInput error={errors.avatar} />
+
+      <Stack spacing={5}>
+        <Field label="Name" name="name" error={errors.name}>
+          <Input defaultValue={admin.name} autoComplete="name" />
+        </Field>
+
+        <Field label="Email" name="email" error={errors.email}>
+          <Input type="email" defaultValue={admin.email} autoComplete="email" />
+        </Field>
+      </Stack>
+    </Stack>
   );
 }
 
@@ -74,6 +72,22 @@ function AvatarInput({ error }: { error?: string }) {
     change.type === "uploaded" ? change.url : change.type === "removed" ? null : admin.avatarUrl;
 
   const avatarError = upload.errors.avatar ?? error;
+  const avatarPath = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    avatarPath.current?.dispatchEvent(new Event("input", { bubbles: true }));
+  }, [change]);
+
+  useEffect(() => {
+    const form = avatarPath.current?.form;
+    if (!form) return;
+    const discard = () => {
+      upload.clearErrors();
+      setChange({ type: "unchanged" });
+    };
+    form.addEventListener("reset", discard);
+    return () => form.removeEventListener("reset", discard);
+  }, [upload]);
 
   // The file is stored right away; saving the form is what assigns it to the profile.
   async function selectFile(file: File | undefined) {
@@ -97,7 +111,12 @@ function AvatarInput({ error }: { error?: string }) {
 
   return (
     <BaseField.Root name="avatar" invalid={!!avatarError} className="flex flex-col gap-1.5">
-      <input type="hidden" name="avatar" value={change.type === "uploaded" ? change.path : ""} />
+      <input
+        ref={avatarPath}
+        type="hidden"
+        name="avatar"
+        value={change.type === "uploaded" ? change.path : ""}
+      />
       <input type="hidden" name="remove_avatar" value={change.type === "removed" ? "1" : "0"} />
 
       <div className="flex items-center gap-4">
