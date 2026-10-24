@@ -117,7 +117,7 @@ function NavigationLink({
           )}
         >
           {/* Children line up under their parent's label; the MobileNav overrides the link's own padding. */}
-          <span className={cn("flex text-base", nested && "ml-7")}>
+          <span className={cn("flex text-base", nested && "pl-7")}>
             <Icon icon={navigationIcon(item.icon, active)} />
           </span>
           {item.label}

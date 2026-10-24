@@ -300,7 +300,7 @@ function AddProductBar({
     <div className="@container border-b border-border p-3 last:border-b-0">
       <div className="flex flex-col gap-1.5 @md:flex-row @md:items-start">
         {/* Without a name: the field only shows the error, it submits nothing. */}
-        <Field.Root invalid={error !== undefined} className="min-w-0 flex-1">
+        <Field.Root invalid={error !== undefined} className="flex min-w-0 flex-1 flex-col gap-1.5">
           <Combobox.Root
             items={products}
             // The server filters by the search, so every result it returns is shown.
@@ -343,11 +343,7 @@ function AddProductBar({
               </Combobox.Positioner>
             </Combobox.Portal>
           </Combobox.Root>
-          {error && (
-            <Error match DANGEROUS_className="mt-1.5">
-              {error}
-            </Error>
-          )}
+          {error && <Error match>{error}</Error>}
         </Field.Root>
         <div className="flex shrink-0 justify-end gap-1">
           <Button type="button" variant="tertiary" disabled={posting} onClick={onCancel}>
