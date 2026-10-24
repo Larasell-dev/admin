@@ -18,25 +18,29 @@ class NavigationItem
 
     public const POSITION_MAX = 1_000_000;
 
-    public ?int $position = null;
+    /*
+     * Placement is protected, so it only changes through position(), before(), after() and
+     * under(), which check it; read it with the getters below.
+     */
+    protected ?int $position = null;
 
-    public ?string $before = null;
+    protected ?string $before = null;
 
-    public ?string $after = null;
+    protected ?string $after = null;
 
     /**
      * The id of the top-level item this item is nested under, if any.
      */
-    public ?string $parent = null;
+    protected ?string $parent = null;
 
-    public Icon $icon;
+    public readonly Icon $icon;
 
     /**
      * @param  Icon|string  $icon  A Icon case or its Remix icon name, e.g. "home"; the sidebar renders it filled when active, line otherwise.
      */
     public function __construct(
-        public string $label,
-        public string $route,
+        public readonly string $label,
+        public readonly string $route,
         Icon|string $icon,
         protected ?Navigation $navigation = null,
     ) {
@@ -65,6 +69,7 @@ class NavigationItem
         }
 
         $this->position = $position;
+        $this->assertInvariants();
 
         return $this;
     }
@@ -72,6 +77,7 @@ class NavigationItem
     public function before(NavItem|string $target): static
     {
         $this->before = $this->resolveTarget($target);
+        $this->assertInvariants();
 
         return $this;
     }
@@ -79,6 +85,7 @@ class NavigationItem
     public function after(NavItem|string $target): static
     {
         $this->after = $this->resolveTarget($target);
+        $this->assertInvariants();
 
         return $this;
     }
@@ -100,6 +107,7 @@ class NavigationItem
         }
 
         $this->parent = $id;
+        $this->assertInvariants();
 
         return $this;
     }
@@ -118,6 +126,24 @@ class NavigationItem
         $define(new NavigationGroup($this->navigation, $this->id()));
 
         return $this;
+    }
+
+    public function fixedPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    /**
+     * Whether a relative placement puts this item before its target rather than after it.
+     */
+    public function placesBefore(): bool
+    {
+        return $this->before !== null;
+    }
+
+    public function parentId(): ?string
+    {
+        return $this->parent;
     }
 
     /**
@@ -176,6 +202,27 @@ class NavigationItem
         }
 
         return $id;
+    }
+
+    /**
+     * Always-on checks of what the setters already enforce, so a future setter that skips a
+     * check fails here instead of producing a broken navigation.
+     */
+    protected function assertInvariants(): void
+    {
+        $placements = count(array_filter([$this->position, $this->before, $this->after], fn (int|string|null $value): bool => $value !== null));
+
+        if ($placements > 1) {
+            throw new LogicException("Navigation item [{$this->id()}] has more than one placement.");
+        }
+
+        if ($this->position !== null && ($this->position < self::POSITION_MIN || $this->position > self::POSITION_MAX)) {
+            throw new LogicException("Navigation item [{$this->id()}] has a position outside its range.");
+        }
+
+        if (in_array($this->id(), [$this->parent, $this->before, $this->after], true)) {
+            throw new LogicException("Navigation item [{$this->id()}] refers to itself.");
+        }
     }
 
     protected function assertUnplaced(): void
