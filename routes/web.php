@@ -57,8 +57,6 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('logout', LogoutController::class)->name('logout');
 });
 
-// Unknown admin addresses, for any method so they stay 404s rather than 405s. Outside the
-// Authenticate group so guests get a plain 404; signed-in admins get the panel's 404 page.
 Route::any('{fallbackPlaceholder}', fn () => abort(404))->where('fallbackPlaceholder', '.*')->fallback()->name('not-found');
 
 // Dev-only shortcuts. Never registered outside the local environment.

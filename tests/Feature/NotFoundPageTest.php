@@ -16,7 +16,7 @@ it('shows the 404 page in the panel for unknown admin addresses and missing reco
     $response = $this->get($uri)
         ->assertNotFound()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('NotFound')
+            ->component('NotFound', shouldExist: false)
             ->where('admin.email', 'ada@example.com')
             ->has('navigation'));
 
@@ -26,10 +26,18 @@ it('shows the 404 page in the panel for unknown admin addresses and missing reco
     'missing admin' => '/admin/settings/admins/999/edit',
 ]);
 
-it('keeps plain 404s for other methods, JSON requests and guests', function () {
+it('shows guests the 404 page without the panel', function () {
+    auth('larasell-admin')->logout();
+
+    $this->get('/admin/does-not-exist')
+        ->assertNotFound()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('GuestNotFound', shouldExist: false)
+            ->where('admin', null));
+});
+
+it('keeps plain 404s for other methods, JSON requests and other addresses', function () {
     $this->post('/admin/does-not-exist')->assertNotFound()->assertHeaderMissing('X-Inertia');
     $this->getJson('/admin/settings/admins/999/edit')->assertNotFound()->assertJsonMissingPath('component');
-
-    auth('larasell-admin')->logout();
-    $this->get('/admin/does-not-exist')->assertNotFound()->assertHeaderMissing('X-Inertia');
+    expect($this->get('/does-not-exist')->assertNotFound()->getContent())->not->toContain('data-page');
 });
