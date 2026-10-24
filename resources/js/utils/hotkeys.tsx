@@ -23,6 +23,8 @@ export const appHotkeys = defineAppHotkeys({
     // Meta, not Mod: Mod is Control on Windows and Linux, which would leave plain Ctrl+A.
     hotkey: "Control+Meta+A",
     meta: { name: "Cycle theme", description: "Switch between light, dark and system." },
+    // Fires once per press, so holding the keys doesn't flash through the themes.
+    options: { requireReset: true },
   },
 });
 
