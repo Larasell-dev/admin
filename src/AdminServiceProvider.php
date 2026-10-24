@@ -2,13 +2,11 @@
 
 namespace Larasell\Admin;
 
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Exceptions\Handler;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RouteDefinition;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Inertia\ExceptionResponse;
 use Inertia\Inertia;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
@@ -20,7 +18,6 @@ use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -97,32 +94,28 @@ class AdminServiceProvider extends ServiceProvider
     }
 
     /**
-     * Signed-in admins see the panel's 404 page for admin pages that 404, such as editing an
-     * admin that does not exist, and for addresses without an admin route (the fallback route).
+     * Admin pages that 404, such as unknown admin addresses (the fallback route) or editing an
+     * admin that does not exist, show the panel's 404 page: inside the sidebar for signed-in
+     * admins, on its own for guests. Other requests keep the application's 404.
      */
     private function renderNotFoundPage(): void
     {
-        $this->callAfterResolving(ExceptionHandler::class, function (ExceptionHandler $handler): void {
-            if (! $handler instanceof Handler) {
-                return;
+        Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
+            $request = $response->request;
+
+            if ($response->statusCode() !== 404
+                || ! $request->isMethod('GET')
+                || $request->expectsJson()
+                || ! $request->route()?->named('larasell.admin.*')) {
+                return null;
             }
 
-            $handler->renderable(function (NotFoundHttpException $e, Request $request) {
-                if (! $request->isMethod('GET')
-                    || $request->expectsJson()
-                    || ! $request->route()?->named('larasell.admin.*')
-                    || ! Auth::guard('larasell-admin')->check()) {
-                    return null;
-                }
+            Head::title('Page not found');
 
-                // Route model binding 404s before the Inertia middleware runs, so run it here.
-                return app(HandleAdminInertiaRequests::class)->handle($request, function () use ($request) {
-                    Head::title('Page not found');
-
-                    // Inertia still renders a page that comes with an error status.
-                    return Inertia::render('NotFound')->toResponse($request)->setStatusCode(404);
-                });
-            });
+            return $response
+                ->usingMiddleware(HandleAdminInertiaRequests::class)
+                ->render(Auth::guard('larasell-admin')->check() ? 'NotFound' : 'GuestNotFound')
+                ->withSharedData();
         });
     }
 
