@@ -24,6 +24,8 @@ class AdminServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/admin.php', 'larasell-admin');
+        // Keyed like Laravel loads an app's config/larasell/media.php.
+        $this->mergeConfigFrom(__DIR__.'/../config/larasell/media.php', 'larasell.media');
 
         $this->app->register(HeadServiceProvider::class);
 
