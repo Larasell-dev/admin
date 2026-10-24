@@ -1,6 +1,6 @@
 import { Dialog } from "@base-ui/react/dialog";
 import { Link, router, usePage } from "@inertiajs/react";
-import { Button, Icon, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Button, Icon, IconButton, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
 import { cn } from "cn";
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
@@ -61,11 +61,17 @@ export function CategoryTreeTrigger() {
   return (
     <Dialog.Trigger
       handle={treeDialog}
-      aria-label="Open categories"
-      className="-mr-1.5 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring lg:hidden dark:text-mauve-100 dark:hover:bg-mauve-800 [&_svg]:size-5"
-    >
-      <Icon icon={NodeTree} />
-    </Dialog.Trigger>
+      render={
+        <IconButton
+          variant="tertiary"
+          size="sm"
+          aria-label="Open categories"
+          DANGEROUS_className="lg:hidden"
+        >
+          <Icon icon={NodeTree} />
+        </IconButton>
+      }
+    />
   );
 }
 

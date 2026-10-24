@@ -6,6 +6,7 @@ import {
   EmptyState,
   Error,
   Icon,
+  IconButton,
   Input,
   Menu,
   Pagination,
@@ -159,11 +160,16 @@ export default function ProductsTable(props: Props) {
                       <td className="px-1.5 py-1.5 text-right">
                         <Menu.Root>
                           <Menu.Trigger
-                            aria-label={`Actions for ${row[table!.columns[0]?.name ?? "id"]}`}
-                            className="inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring data-popup-open:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800"
-                          >
-                            <Icon icon={More2Fill} />
-                          </Menu.Trigger>
+                            render={
+                              <IconButton
+                                variant="tertiary"
+                                size="sm"
+                                aria-label={`Actions for ${row[table!.columns[0]?.name ?? "id"]}`}
+                              >
+                                <Icon icon={More2Fill} />
+                              </IconButton>
+                            }
+                          />
                           <Menu.Popup>
                             {row._actions.map((action) => (
                               <Menu.Item

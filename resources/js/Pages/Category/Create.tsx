@@ -1,5 +1,5 @@
 import { Form, Link } from "@inertiajs/react";
-import { Icon, Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Icon, IconButton, Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { ArrowLeftLine } from "@larasell-dev/ui/icons";
 import { useRef } from "react";
 
@@ -19,13 +19,18 @@ export default function Create({ categories, storeUrl, indexUrl, parent }: Props
     <>
       <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border px-6">
         {categories.length === 0 && (
-          <Link
-            href={indexUrl}
+          <IconButton
+            variant="tertiary"
+            size="sm"
             aria-label="Back to categories"
-            className="-ml-1.5 -mr-2 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center text-mauve-950 outline-none hover:bg-mauve-100 focus-visible:focus-ring lg:hidden dark:text-mauve-100 dark:hover:bg-mauve-800 [&_svg]:size-5"
+            nativeButton={false}
+            // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
+            role="link"
+            render={<Link href={indexUrl} />}
+            DANGEROUS_className="lg:hidden"
           >
             <Icon icon={ArrowLeftLine} />
-          </Link>
+          </IconButton>
         )}
         <h2 className="flex-1 truncate type-body-md text-mauve-950 dark:text-mauve-50">
           {parent ? `New category in ${parent.name}` : "New category"}

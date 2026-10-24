@@ -1,6 +1,5 @@
-import { Button } from "@base-ui/react/button";
 import { Link, router } from "@inertiajs/react";
-import { Icon, Menu } from "@larasell-dev/ui";
+import { Icon, IconButton, Menu } from "@larasell-dev/ui";
 import {
   ArrowRightSLine,
   DeleteBinLine,
@@ -340,10 +339,13 @@ function CategoryRow({
               ({category.children.length})
             </span>
             {/* Out of the tab order: the row itself opens and closes with the arrow keys. */}
-            <RowButton
+            <IconButton
+              variant="tertiary"
+              size="sm"
               aria-label={`${expanded ? "Close" : "Open"} ${category.name}`}
               tabIndex={-1}
               onClick={onToggle}
+              DANGEROUS_className={rowButtonClassName}
             >
               <motion.span
                 className="flex"
@@ -353,7 +355,7 @@ function CategoryRow({
               >
                 <Icon icon={ArrowRightSLine} />
               </motion.span>
-            </RowButton>
+            </IconButton>
           </>
         )}
         <CategoryMenu category={category} tabbable={tabbable} />
@@ -362,21 +364,8 @@ function CategoryRow({
   );
 }
 
-/** A square icon button at the end of a category's row. */
-function RowButton({
-  className,
-  ...props
-}: Omit<Button.Props, "className"> & { className?: string }) {
-  return (
-    <Button
-      className={cn(
-        "pointer-events-auto inline-flex size-9 cursor-pointer items-center justify-center text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-800 dark:data-popup-open:bg-mauve-800",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+/** Lets the icon buttons at the end of a row take clicks and keeps their focus ring inside it. */
+const rowButtonClassName = "pointer-events-auto focus-visible:-outline-offset-2";
 
 /** A copy of the tree with the category `id` set to `visible`. */
 function withVisibility(categories: Category[], id: number, visible: boolean): Category[] {
@@ -408,12 +397,18 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
   return (
     <Menu.Root>
       <Menu.Trigger
-        aria-label={`Actions for ${category.name}`}
         tabIndex={tabbable ? 0 : -1}
-        render={<RowButton />}
-      >
-        <Icon icon={More2Fill} />
-      </Menu.Trigger>
+        render={
+          <IconButton
+            variant="tertiary"
+            size="sm"
+            aria-label={`Actions for ${category.name}`}
+            DANGEROUS_className={rowButtonClassName}
+          >
+            <Icon icon={More2Fill} />
+          </IconButton>
+        }
+      />
       <Menu.Popup>
         <Menu.Item
           icon={FolderAddLine}

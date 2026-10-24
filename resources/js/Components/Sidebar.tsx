@@ -1,6 +1,5 @@
-import { Button } from "@base-ui/react/button";
 import { Link, usePage } from "@inertiajs/react";
-import { Icon } from "@larasell-dev/ui";
+import { Icon, IconButton } from "@larasell-dev/ui";
 import { ArrowRightSLine } from "@larasell-dev/ui/icons";
 import { motion } from "motion/react";
 import { Fragment, type ReactNode, useId, useState } from "react";
@@ -143,21 +142,14 @@ function GroupToggle({
 }) {
   return (
     <RovingFocusItem asChild>
-      <Button
+      <IconButton
+        variant="tertiary"
+        size="sm"
         aria-label={`${open ? "Close" : "Open"} ${label}`}
         aria-expanded={open}
         aria-controls={open ? controls : undefined}
         onClick={onClick}
-        className={cn(
-          // Square icon button
-          "inline-flex size-9 cursor-pointer items-center justify-center select-none",
-          // Colors
-          "text-mauve-950 dark:text-mauve-100",
-          // Hover
-          "hover:bg-mauve-100 dark:hover:bg-mauve-800",
-          // Focus
-          "outline-none focus-visible:focus-ring focus-visible:-outline-offset-2",
-        )}
+        DANGEROUS_className="focus-visible:-outline-offset-2"
       >
         <motion.span
           className="flex"
@@ -167,7 +159,7 @@ function GroupToggle({
         >
           <Icon icon={ArrowRightSLine} />
         </motion.span>
-      </Button>
+      </IconButton>
     </RovingFocusItem>
   );
 }
