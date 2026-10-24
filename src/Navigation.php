@@ -36,6 +36,11 @@ class Navigation
      */
     protected array $items = [];
 
+    /**
+     * Set once the app has booted; after that, items can no longer be added or changed.
+     */
+    protected bool $frozen = false;
+
     public static function resolve(): self
     {
         return app(self::class);
@@ -47,6 +52,8 @@ class Navigation
             $route = 'larasell.admin.'.$route;
         }
 
+        $this->assertOpen($route);
+
         if (isset($this->items[$route])) {
             throw InvalidNavigationItem::duplicateId($route);
         }
@@ -54,6 +61,21 @@ class Navigation
         self::assert(count($this->items) < self::MAX_ITEMS, 'Too many navigation items.');
 
         return $this->items[$route] = new NavigationItem($label, $route, $icon, $this);
+    }
+
+    public function freeze(): void
+    {
+        $this->frozen = true;
+    }
+
+    /**
+     * Throws if the navigation is frozen; items call this before every change.
+     */
+    public function assertOpen(string $id): void
+    {
+        if ($this->frozen) {
+            throw InvalidNavigationItem::frozen($id);
+        }
     }
 
     /**

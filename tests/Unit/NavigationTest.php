@@ -152,7 +152,10 @@ it('lists NavItem labels keyed by route', function () {
 });
 
 it('places built-in navigation items at their NavItem position', function () {
-    Navigation::resolve()->add('Notes', 'larasell.admin.notes', 'sticky-note')->position(1500);
+    $this->bootingWith(function () {
+        Route::get('/admin/notes', fn () => '')->name('larasell.admin.notes');
+        NavigationFacade::add('Notes', 'larasell.admin.notes', 'sticky-note')->position(1500);
+    });
 
     expect(array_column(Navigation::resolve()->tree(), 'id'))->toBe([
         'larasell.admin.home',
@@ -161,6 +164,32 @@ it('places built-in navigation items at their NavItem position', function () {
         'larasell.admin.customers.index',
     ]);
 });
+
+it('freezes the navigation once the app has booted', function () {
+    NavigationFacade::add('Notes', 'larasell.admin.notes', 'sticky-note');
+})->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.notes] was changed after the admin panel booted.');
+
+it('throws when an item is added to a frozen navigation', function () {
+    $navigation = new Navigation;
+    $navigation->freeze();
+
+    $navigation->add('Notes', 'notes', 'sticky-note');
+})->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.notes] was changed after the admin panel booted.');
+
+it('throws when a registered item is changed after the navigation froze', function (Closure $change) {
+    $navigation = new Navigation;
+    $navigation->add('Home', 'home', 'home');
+    $notes = $navigation->add('Notes', 'notes', 'sticky-note');
+    $navigation->freeze();
+
+    $change($notes);
+})->with([
+    'position' => [fn ($item) => $item->position(1)],
+    'before' => [fn ($item) => $item->before('larasell.admin.home')],
+    'after' => [fn ($item) => $item->after('larasell.admin.home')],
+    'under' => [fn ($item) => $item->under('larasell.admin.home')],
+    'children' => [fn ($item) => $item->children(fn () => null)],
+])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.notes] was changed after the admin panel booted.');
 
 describe('nested navigation', function () {
     beforeEach(function () {

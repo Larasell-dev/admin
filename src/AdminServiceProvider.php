@@ -44,6 +44,9 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));
 
+        // Every provider and routes file has registered its navigation items by now.
+        $this->app->booted(fn () => $this->app->make(Navigation::class)->freeze());
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CreateAdminUserCommand::class,
