@@ -8,6 +8,7 @@ import * as JsxRuntime from "react/jsx-runtime";
 import { createRoot } from "react-dom/client";
 import ResourceTable from "./Components/ResourceTable";
 import SidebarLayout from "./Layouts/SidebarLayout";
+import { AppHotkeysProvider } from "./utils/hotkeys";
 
 type PageModule = { default: ResolvedComponent };
 
@@ -78,7 +79,11 @@ window.LarasellAdmin = {
         color: "var(--color-progress)",
       },
       setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+          <AppHotkeysProvider>
+            <App {...props} />
+          </AppHotkeysProvider>,
+        );
       },
     });
   },

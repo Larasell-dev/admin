@@ -1,6 +1,7 @@
 import { Link, router } from "@inertiajs/react";
 import type { PaginationChange } from "@larasell-dev/ui";
 import { DataList, Pagination, Table } from "@larasell-dev/ui";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { type ReactNode, useState } from "react";
 import type { TableAction, TableResource, TableRow } from "../types";
 import { isSameSite } from "../utils/isSameSite";
@@ -91,17 +92,19 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
         aria-label={`Actions for ${primary ? cell(row, primary.name) : row.id}`}
       />
       <Table.ActionsPopup>
-        {row._actions.map((action) => (
-          <Table.ActionsItem
-            key={action.name}
-            variant={action.destructive ? "destructive" : "default"}
-            disabled={action.disabled}
-            icon={action.icon ? navigationIcon(action.icon, false) : undefined}
-            onClick={() => choose(action)}
-          >
-            {action.label}
-          </Table.ActionsItem>
-        ))}
+        <HotkeysProvider scope="row-actions-menu" exclusive>
+          {row._actions.map((action) => (
+            <Table.ActionsItem
+              key={action.name}
+              variant={action.destructive ? "destructive" : "default"}
+              disabled={action.disabled}
+              icon={action.icon ? navigationIcon(action.icon, false) : undefined}
+              onClick={() => choose(action)}
+            >
+              {action.label}
+            </Table.ActionsItem>
+          ))}
+        </HotkeysProvider>
       </Table.ActionsPopup>
     </Table.Actions>
   );

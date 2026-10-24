@@ -3,6 +3,7 @@ import { Menu } from "@base-ui/react/menu";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Icon } from "@larasell-dev/ui";
 import { ExpandUpDownLine, LogoutBoxRLine, UserLine } from "@larasell-dev/ui/icons";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import type { ComponentProps } from "react";
 import { assertPresent } from "ts-extras";
 import type { Page } from "../types";
@@ -41,12 +42,14 @@ export default function UserMenu() {
           className="z-50 w-58"
         >
           <Menu.Popup className="origin-(--transform-origin) border border-border bg-white bg-clip-padding shadow-lg outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0 dark:bg-mauve-900">
-            <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
-              Profile
-            </UserMenuItem>
-            <UserMenuItem icon={LogoutBoxRLine} onClick={() => router.post(logoutUrl)}>
-              Log out
-            </UserMenuItem>
+            <HotkeysProvider scope="user-menu" exclusive>
+              <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
+                Profile
+              </UserMenuItem>
+              <UserMenuItem icon={LogoutBoxRLine} onClick={() => router.post(logoutUrl)}>
+                Log out
+              </UserMenuItem>
+            </HotkeysProvider>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
