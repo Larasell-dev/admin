@@ -174,4 +174,14 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
             fix: "Target an item with the same parent as [{$id}], or nest both under the same item.",
         );
     }
+
+    public static function frozen(string $id): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.frozen',
+            message: "Navigation item [{$id}] was changed after the admin panel booted.",
+            why: 'The navigation is registered once at boot and shared by every request, so a change made during a request would leak into later requests.',
+            fix: "Register and place navigation items in a service provider's boot() method or a routes file.",
+        );
+    }
 }

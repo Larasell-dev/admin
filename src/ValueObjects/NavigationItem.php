@@ -62,6 +62,8 @@ class NavigationItem
 
     public function position(int $position): static
     {
+        $this->navigation?->assertOpen($this->id());
+
         $this->assertUnplaced();
 
         if ($position < self::POSITION_MIN || $position > self::POSITION_MAX) {
@@ -76,6 +78,8 @@ class NavigationItem
 
     public function before(NavItem|string $target): static
     {
+        $this->navigation?->assertOpen($this->id());
+
         $this->before = $this->resolveTarget($target);
         $this->assertInvariants();
 
@@ -84,6 +88,8 @@ class NavigationItem
 
     public function after(NavItem|string $target): static
     {
+        $this->navigation?->assertOpen($this->id());
+
         $this->after = $this->resolveTarget($target);
         $this->assertInvariants();
 
@@ -96,6 +102,8 @@ class NavigationItem
      */
     public function under(NavItem|string $parent): static
     {
+        $this->navigation?->assertOpen($this->id());
+
         $id = $parent instanceof NavItem ? $parent->value : $parent;
 
         if ($this->parent !== null) {
@@ -119,6 +127,8 @@ class NavigationItem
      */
     public function children(Closure $define): static
     {
+        $this->navigation?->assertOpen($this->id());
+
         if ($this->navigation === null) {
             throw new LogicException("Navigation item [{$this->id()}] was not registered through the navigation, so it cannot have children.");
         }

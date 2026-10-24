@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Larasell\Admin\Tests;
 
+use Closure;
 use Illuminate\Foundation\Application;
 use Inertia\ServiceProvider as InertiaServiceProvider;
 use Larasell\Admin\AdminServiceProvider;
@@ -20,14 +21,46 @@ abstract class TestCase extends OrchestraTestCase
      */
     protected string $environment = 'testing';
 
+    /**
+     * Runs while the application boots, before the providers do; set it with bootingWith().
+     */
+    protected ?Closure $booting = null;
+
     protected function inEnvironment(string $environment): static
     {
         $this->environment = $environment;
+
+        return $this->reboot();
+    }
+
+    /**
+     * Reboots the application with $callback run before the providers boot, e.g. to register
+     * navigation items as a plugin's service provider would.
+     */
+    protected function bootingWith(Closure $callback): static
+    {
+        $this->booting = $callback;
+
+        return $this->reboot();
+    }
+
+    protected function reboot(): static
+    {
         $this->refreshApplication();
         $this->withoutVite();
         $this->artisan('migrate', ['--database' => 'testing', '--force' => true])->run();
 
         return $this;
+    }
+
+    /**
+     * @param  Application  $app
+     */
+    protected function defineEnvironment($app): void
+    {
+        if ($this->booting !== null) {
+            $app->booting($this->booting);
+        }
     }
 
     protected function setUp(): void
