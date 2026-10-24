@@ -184,4 +184,14 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
             fix: "Register and place navigation items in a service provider's boot() method or a routes file.",
         );
     }
+
+    public static function unknownRoute(string $id): static
+    {
+        return static::structured(
+            code: 'larasell-admin.navigation.unknown-route',
+            message: "Navigation item [{$id}] route is not registered.",
+            why: "No route is named [{$id}], so the sidebar cannot link to the item.",
+            fix: 'Register the route, or pass the name of an existing route; names without a dot get the larasell.admin. prefix.',
+        );
+    }
 }

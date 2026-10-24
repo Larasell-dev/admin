@@ -11,6 +11,7 @@ use Larasell\Admin\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Navigation;
 use Larasell\Admin\NavigationGroup;
 use LogicException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class NavigationItem
 {
@@ -181,10 +182,23 @@ class NavigationItem
         return new NavigationItemData(
             id: $this->id(),
             label: $this->label,
-            url: route($this->route),
+            url: $this->url(),
             icon: $this->icon->name,
             children: $children,
         );
+    }
+
+    /**
+     * Resolved when the tree is built, not when the item is added, because a plugin may
+     * register its routes after its navigation items.
+     */
+    protected function url(): string
+    {
+        try {
+            return route($this->route);
+        } catch (RouteNotFoundException) {
+            throw InvalidNavigationItem::unknownRoute($this->id());
+        }
     }
 
     protected function resolveIcon(string $icon): Icon
