@@ -9,7 +9,12 @@ use Inertia\Response;
 use Larasell\Admin\Actions\CreateAdmin;
 use Larasell\Admin\Data\View\AdminsPageData;
 use Larasell\Admin\Data\View\CreateAdminPageData;
+use Larasell\Admin\Data\View\EditAdminPageData;
+use Larasell\Admin\Data\ViewModel\AdminData;
+use Larasell\Admin\Http\Requests\AdminRequest;
+use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Tables\Panel\Admins;
+use Laravel\Head\Facades\Head;
 
 class AdminController
 {
@@ -31,8 +36,26 @@ class AdminController
 
     public function store(Request $request, CreateAdmin $createAdmin): RedirectResponse
     {
-        $createAdmin->handle($request->only(['name', 'email', 'password']));
+        $admin = $createAdmin->handle($request->only(['name', 'email', 'password']));
 
-        return redirect()->route('larasell.admin.settings.admins.index');
+        return redirect()->route('larasell.admin.settings.admins.edit', $admin);
+    }
+
+    public function edit(Admin $admin): Response
+    {
+        Head::title($admin->name);
+
+        return Inertia::render('Admin/Edit', new EditAdminPageData(
+            editedAdmin: AdminData::fromModel($admin),
+            updateUrl: route('larasell.admin.settings.admins.update', $admin),
+            indexUrl: route('larasell.admin.settings.admins.index'),
+        ));
+    }
+
+    public function update(AdminRequest $request, Admin $admin): RedirectResponse
+    {
+        $admin->update(array_filter($request->validated(), fn (mixed $value): bool => $value !== null));
+
+        return redirect()->route('larasell.admin.settings.admins.edit', $admin);
     }
 }

@@ -30,6 +30,11 @@ declare namespace Larasell.Admin.Data.View {
   export type CustomersPageData = {
     customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
   };
+  export type EditAdminPageData = {
+    editedAdmin: Larasell.Admin.Data.ViewModel.AdminData;
+    updateUrl: string;
+    indexUrl: string;
+  };
   export type HomePageData = {
     admin: Larasell.Admin.Data.ViewModel.AdminData;
   };
