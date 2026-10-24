@@ -1,0 +1,1 @@
+import{F9 as e,jn as t}from"./dist-CbzCmAVw.js";import{t as n}from"./NotFoundState-CVuFLWS5.js";var r=e(t(),1);function i(){return(0,r.jsx)(`main`,{className:`flex min-h-dvh items-center justify-center bg-white px-6 py-12 dark:bg-mauve-950`,children:(0,r.jsx)(n,{})})}export{i as default};

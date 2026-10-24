@@ -1,0 +1,1 @@
+import{F9 as e,jn as t,n,zT as r}from"./dist-CbzCmAVw.js";var i=e(t(),1);function a(){return(0,i.jsx)(n,{icon:r,title:`Page not found`,description:`The page you're looking for doesn't exist. It may have been moved or deleted, or the link you followed is out of date.`})}export{a as t};

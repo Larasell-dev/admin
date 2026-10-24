@@ -1,0 +1,1 @@
+import{F9 as e,jn as t}from"./dist-CbzCmAVw.js";import{t as n}from"./SidebarLayout-WSZQx2C1.js";import{t as r}from"./NotFoundState-CVuFLWS5.js";var i=e(t(),1);function a(){return(0,i.jsx)(`div`,{className:`flex min-h-[calc(100dvh-3.5rem)] items-center justify-center px-6 py-12 lg:min-h-dvh`,children:(0,i.jsx)(r,{})})}a.layout=[n];export{a as default};
