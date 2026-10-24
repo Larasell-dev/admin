@@ -65,7 +65,7 @@ it('throws an exception when the route is empty', function () {
 it('accepts positions at both limits', function (int $position) {
     $item = (new NavigationItem('Home', 'larasell.admin.home', 'home'))->position($position);
 
-    expect($item->position)->toBe($position);
+    expect($item->fixedPosition())->toBe($position);
 })->with([0, 1_000_000]);
 
 it('throws when the position is out of range', function (int $position) {
@@ -87,3 +87,17 @@ it('throws when an item is placed twice', function (Closure $first, Closure $sec
 it('throws when an item targets itself', function () {
     (new NavigationItem('Home', 'larasell.admin.home', 'home'))->before('larasell.admin.home');
 })->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] cannot be placed relative to itself.');
+
+it('keeps its state out of reach of outside writes', function (Closure $write) {
+    $item = new NavigationItem('Home', 'larasell.admin.home', 'home');
+
+    expect(fn () => $write($item))->toThrow(Error::class);
+})->with([
+    'label' => [fn ($item) => $item->label = 'Start'],
+    'route' => [fn ($item) => $item->route = 'larasell.admin.start'],
+    'icon' => [fn ($item) => $item->icon = Icon::Group],
+    'position' => [fn ($item) => $item->position = 5],
+    'before' => [fn ($item) => $item->before = 'larasell.admin.notes'],
+    'after' => [fn ($item) => $item->after = 'larasell.admin.notes'],
+    'parent' => [fn ($item) => $item->parent = 'larasell.admin.home'],
+]);

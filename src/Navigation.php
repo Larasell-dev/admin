@@ -69,7 +69,7 @@ class Navigation
 
         $groups = [];
         foreach ($this->items as $item) {
-            $groups[$item->parent ?? self::TOP_LEVEL][] = $item;
+            $groups[$item->parentId() ?? self::TOP_LEVEL][] = $item;
         }
 
         foreach ($groups as $parentId => $group) {
@@ -98,12 +98,12 @@ class Navigation
      */
     protected function assertParentsAreTopLevel(): void
     {
-        $parents = array_filter(array_map(fn (NavigationItem $item): ?string => $item->parent, $this->items));
+        $parents = array_filter(array_map(fn (NavigationItem $item): ?string => $item->parentId(), $this->items));
 
         foreach ($parents as $id => $parentId) {
             $parent = $this->items[$parentId] ?? throw InvalidNavigationItem::unknownParent($id, $parentId);
 
-            if ($parent->parent !== null) {
+            if ($parent->parentId() !== null) {
                 throw InvalidNavigationItem::nestedTooDeep($id, $parentId);
             }
         }
@@ -119,7 +119,7 @@ class Navigation
         foreach ($targets as $id => $targetId) {
             $target = $this->items[$targetId] ?? throw InvalidNavigationItem::unknownTarget($id, $targetId);
 
-            if ($target->parent !== $this->items[$id]->parent) {
+            if ($target->parentId() !== $this->items[$id]->parentId()) {
                 throw InvalidNavigationItem::targetNotSibling($id, $targetId);
             }
         }
@@ -136,8 +136,8 @@ class Navigation
      */
     protected function ordered(array $items): array
     {
-        $positioned = array_values(array_filter($items, fn (NavigationItem $item): bool => $item->position !== null));
-        usort($positioned, fn (NavigationItem $a, NavigationItem $b): int => [$a->position, $a->id()] <=> [$b->position, $b->id()]);
+        $positioned = array_values(array_filter($items, fn (NavigationItem $item): bool => $item->fixedPosition() !== null));
+        usort($positioned, fn (NavigationItem $a, NavigationItem $b): int => [$a->fixedPosition(), $a->id()] <=> [$b->fixedPosition(), $b->id()]);
 
         $unpositioned = array_filter($items, fn (NavigationItem $item): bool => ! $item->isPlaced());
         $ordered = [...$positioned, ...array_values($unpositioned)];
@@ -160,7 +160,7 @@ class Navigation
                     continue;
                 }
 
-                array_splice($ordered, $item->before !== null ? $index : $index + 1, 0, [$item]);
+                array_splice($ordered, $item->placesBefore() ? $index : $index + 1, 0, [$item]);
             }
 
             if (count($pending) === count($relative)) {
@@ -180,7 +180,7 @@ class Navigation
             'Ordering duplicated a navigation item.',
         );
 
-        $positions = array_values(array_filter(array_map(fn (NavigationItem $item): ?int => $item->position, $ordered), fn (?int $position): bool => $position !== null));
+        $positions = array_values(array_filter(array_map(fn (NavigationItem $item): ?int => $item->fixedPosition(), $ordered), fn (?int $position): bool => $position !== null));
         $ascending = $positions;
         sort($ascending);
         self::assert($positions === $ascending, 'Navigation positions are not ascending.');
