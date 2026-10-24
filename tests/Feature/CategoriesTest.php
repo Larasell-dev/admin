@@ -515,6 +515,43 @@ it('deletes a category with all its descendants but keeps its parent, siblings a
         ->and($coat->categories()->count())->toBe(0);
 });
 
+it('fires the model events for every deleted category, children before their parent', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $men = category('Men', $clothing);
+    $jackets = category('Jackets', $men);
+    $rain = category('Rain jackets', $jackets);
+    $shirts = category('Shirts', $men);
+    category('Women', $clothing);
+
+    $deleting = [];
+    $deleted = [];
+    Category::deleting(function (Category $category) use (&$deleting) {
+        // The parent still exists while its children go, so listeners see the tree intact.
+        $deleting[] = [$category->id, $category->fresh()?->parent_id];
+    });
+    Category::deleted(function (Category $category) use (&$deleted) {
+        $deleted[] = $category->id;
+    });
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->delete("/admin/categories/{$men->id}", ['confirmation' => 'Men'])
+        ->assertSessionHasNoErrors();
+
+    $position = array_flip($deleted);
+
+    expect($deleted)->toEqualCanonicalizing([$men->id, $jackets->id, $rain->id, $shirts->id])
+        ->and($deleting)->toEqualCanonicalizing([
+            [$men->id, $clothing->id],
+            [$jackets->id, $men->id],
+            [$rain->id, $jackets->id],
+            [$shirts->id, $men->id],
+        ])
+        ->and($position[$rain->id])->toBeLessThan($position[$jackets->id])
+        ->and($position[$jackets->id])->toBeLessThan($position[$men->id])
+        ->and($position[$shirts->id])->toBeLessThan($position[$men->id]);
+});
+
 it('requires the category name to delete it', function (?string $typed) {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $clothing = category('Clothing');
