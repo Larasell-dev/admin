@@ -416,6 +416,25 @@ describe('nested navigation', function () {
         $navigation->tree();
     })->throws(InvalidNavigationItem::class, 'Navigation items [larasell.admin.shipping, larasell.admin.taxes] form a placement cycle.');
 
+    it('accepts up to the children limit per parent and throws beyond it', function (int $count, bool $throws) {
+        $navigation = new Navigation;
+
+        $navigation->add('Settings', 'settings', 'settings-3');
+        for ($i = 1; $i <= $count; $i++) {
+            Route::get("/admin/settings/child-{$i}", fn () => '')->name("larasell.admin.child-{$i}");
+            $navigation->add("Child {$i}", "child-{$i}", 'percent')->under('larasell.admin.settings');
+        }
+
+        $build = fn () => $navigation->tree();
+
+        $throws
+            ? expect($build)->toThrow(LogicException::class, 'Navigation item [larasell.admin.settings] has more than 100 children.')
+            : expect($build())->toHaveCount(1);
+    })->with([
+        'at the limit' => [100, false],
+        'one over' => [101, true],
+    ]);
+
     it('counts children toward the navigation limit', function () {
         $navigation = new Navigation;
 

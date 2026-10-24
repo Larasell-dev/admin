@@ -20,6 +20,11 @@ class Navigation
     public const MAX_ITEMS = 1_000;
 
     /**
+     * Upper bound on the children of one item; more would not fit a sidebar anyway.
+     */
+    public const MAX_CHILDREN = 100;
+
+    /**
      * Group key for top-level items; ids are route names, so never empty.
      */
     protected const TOP_LEVEL = '';
@@ -65,6 +70,13 @@ class Navigation
         $groups = [];
         foreach ($this->items as $item) {
             $groups[$item->parent ?? self::TOP_LEVEL][] = $item;
+        }
+
+        foreach ($groups as $parentId => $group) {
+            self::assert(
+                $parentId === self::TOP_LEVEL || count($group) <= self::MAX_CHILDREN,
+                "Navigation item [{$parentId}] has more than ".self::MAX_CHILDREN.' children.',
+            );
         }
 
         $tree = array_map(
@@ -133,7 +145,10 @@ class Navigation
         $relative = array_values(array_filter($items, fn (NavigationItem $item): bool => $item->relativeTarget() !== null));
 
         // Each pass places every item whose target is already placed; a pass without progress is a cycle.
+        // So there are at most as many passes as relative items.
+        $passesLeft = count($relative);
         while ($relative !== []) {
+            self::assert($passesLeft-- > 0, 'Navigation placement did not finish within its pass limit.');
             $pending = [];
 
             foreach ($relative as $item) {
