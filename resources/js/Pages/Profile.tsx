@@ -38,7 +38,13 @@ export default function Profile({ admin, updateUrl }: ProfilePageProps) {
               setDefaultsOnSuccess
               className="max-w-sm"
             >
-              <ProfileFields />
+              <Section.Root>
+                <Section.Header
+                  title="General"
+                  description="Your name, email address, and profile picture."
+                />
+                <ProfileFields />
+              </Section.Root>
               <UnsavedChangesToast />
             </Form>
             <PreferenceSection />
