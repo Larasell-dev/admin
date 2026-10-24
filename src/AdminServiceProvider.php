@@ -34,13 +34,14 @@ class AdminServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'larasell-admin');
 
+        // Before the routes, which list some of the panel's own tables with it.
+        $this->registerRouteMacros();
+
         Route::middleware(['web', HandleAdminInertiaRequests::class])
             ->prefix(config('larasell-admin.path'))
             ->name('larasell.admin.')
             ->withHead(title: AdminPanel::TITLE)
             ->group(__DIR__.'/../routes/web.php');
-
-        $this->registerRouteMacros();
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));
 
