@@ -27,22 +27,22 @@ it('lists the products by name, stock, and a visibility badge', function () {
     $this->get('/admin/products')
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Product/Index')
-            ->where('products.title', 'Products')
-            ->where('products.columns', [
+            ->component('TablePage')
+            ->where('table.title', 'Products')
+            ->where('table.columns', [
                 ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
                 ['name' => 'stock', 'label' => 'Stock', 'type' => 'text'],
                 ['name' => 'status', 'label' => 'Visibility', 'type' => 'badge'],
             ])
-            ->where('products.pagination.total', 2)
-            ->where('products.rows.0.name', 'Boots')
-            ->where('products.rows.0.stock', 'Not tracked')
-            ->where('products.rows.0.status', 'Visible')
-            ->where('products.rows.0._variants.status', 'success')
-            ->where('products.rows.1.name', 'Socks')
-            ->where('products.rows.1.stock', '12')
-            ->where('products.rows.1.status', 'Hidden')
-            ->where('products.rows.1._variants.status', 'neutral'));
+            ->where('table.pagination.total', 2)
+            ->where('table.rows.0.name', 'Boots')
+            ->where('table.rows.0.stock', 'Not tracked')
+            ->where('table.rows.0.status', 'Visible')
+            ->where('table.rows.0._variants.status', 'success')
+            ->where('table.rows.1.name', 'Socks')
+            ->where('table.rows.1.stock', '12')
+            ->where('table.rows.1.status', 'Hidden')
+            ->where('table.rows.1._variants.status', 'neutral'));
 });
 
 it('shows a stock of zero as 0, not as untracked', function () {
@@ -51,7 +51,20 @@ it('shows a stock of zero as 0, not as untracked', function () {
     Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'stock' => 0]);
 
     $this->get('/admin/products')
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('products.rows.0.stock', '0'));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('table.rows.0.stock', '0'));
+});
+
+it('says there are no products yet when the store has none', function () {
+    signInAdmin();
+
+    $this->get('/admin/products')
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.pagination.total', 0)
+            ->where('table.emptyState', [
+                'title' => 'No products yet',
+                'description' => 'Products you add to the store show up here.',
+                'icon' => 'ShoppingBag',
+            ]));
 });
 
 it('redirects guests away from the products', function () {

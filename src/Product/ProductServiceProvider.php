@@ -8,7 +8,7 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
-use Larasell\Admin\Product\Http\Controllers\ProductController;
+use Larasell\Admin\Product\Tables\Products;
 
 /**
  * The products module. Setting larasell.admin.products.enabled to false leaves
@@ -28,7 +28,7 @@ class ProductServiceProvider extends ServiceProvider
         }
 
         $this->app->make(AdminPanel::class)->routes(function (): void {
-            Route::get('products', [ProductController::class, 'index'])->name('products.index')->withHead(title: 'Products');
+            Route::index('products', Products::class);
         });
 
         Navigation::add(NavItem::Products->label(), NavItem::Products->value, icon: Icon::ShoppingBag)->position(NavItem::Products->position());

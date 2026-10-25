@@ -12,6 +12,8 @@ const emptyStateIcon = (name: string) => navigationIcon(name, false);
 
 export default function TablePage({ table }: Props) {
   return (
+    // BEST-BEFORE 2026-11-01: Find out why pages size themselves with this calc (3.5rem is the
+    // mobile nav's h-14 header) and whether the layout should own it; pages repeat it today.
     <div className="flex h-[calc(100dvh-3.5rem)] flex-col lg:h-dvh">
       <header className="border-border flex h-14 shrink-0 items-center border-b px-6">
         <h1 className="type-body-md text-mauve-950 dark:text-mauve-50">{table.title}</h1>
