@@ -5,13 +5,14 @@ namespace Larasell\Admin\Tables\Actions;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Exceptions\InvalidTableAction;
+use Larasell\Admin\Tables\Actions\Concerns\ConfiguresAction;
 use Larasell\Admin\Tables\Table;
 use LogicException;
 
 class Action
 {
+    use ConfiguresAction;
+
     protected string|Closure|null $url = null;
 
     protected bool $confirms = false;
@@ -19,11 +20,6 @@ class Action
     protected bool $destructive = false;
 
     protected bool|Closure $disabled = false;
-
-    protected ?Icon $icon = null;
-
-    /** @var array<int, string> The configuration methods called so far, which may each be called only once. */
-    private array $configured = [];
 
     /**
      * @var array{title: ?string, message: ?string, confirmButton: ?string, cancelButton: ?string, confirmationText: string|Closure|null}
@@ -101,40 +97,6 @@ class Action
         $this->disabled = $condition;
 
         return $this;
-    }
-
-    /**
-     * Show an icon before the label: an Icon case or its Remix icon name, e.g. "delete-bin".
-     */
-    public function icon(Icon|string $icon): static
-    {
-        $this->configureOnce('icon()');
-        $this->icon = is_string($icon) ? $this->resolveIcon($icon) : $icon;
-
-        return $this;
-    }
-
-    private function configureOnce(string $method): void
-    {
-        if (in_array($method, $this->configured, true)) {
-            throw InvalidTableAction::configuredTwice($this->name(), $method);
-        }
-
-        $this->configured[] = $method;
-    }
-
-    protected function resolveIcon(string $icon): Icon
-    {
-        if (Str::trim($icon) === '') {
-            throw InvalidTableAction::emptyIcon($this->name());
-        }
-
-        // Checked before the lookup: "home-line" is not a case either, but this error says how to fix it.
-        if (Str::endsWith($icon, ['-line', '-fill'])) {
-            throw InvalidTableAction::iconStyleVariant($this->name(), $icon);
-        }
-
-        return Icon::tryFrom($icon) ?? throw InvalidTableAction::unknownIcon($this->name(), $icon);
     }
 
     public function isDisabledFor(Model $record): bool
