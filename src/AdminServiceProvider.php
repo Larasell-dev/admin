@@ -26,6 +26,9 @@ class AdminServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/larasell/admin/panel.php', 'larasell.admin.panel');
 
+        // Before the module providers, which boot first and register their routes with the macros.
+        $this->registerRouteMacros();
+
         $this->app->register(HeadServiceProvider::class);
         $this->app->register(ProductServiceProvider::class);
 
@@ -46,7 +49,6 @@ class AdminServiceProvider extends ServiceProvider
             ->withHead(title: AdminPanel::TITLE)
             ->group(__DIR__.'/../routes/web.php');
 
-        $this->registerRouteMacros();
         $this->renderNotFoundPage();
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));

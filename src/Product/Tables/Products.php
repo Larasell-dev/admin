@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Product\Tables;
 
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\BadgeColumn;
@@ -23,6 +24,15 @@ class Products extends Table
             BadgeColumn::make('status', 'Visibility')
                 ->map(fn (Visibility $status): string => $status === Visibility::Visible ? 'Visible' : 'Hidden')
                 ->variant([Visibility::Visible->value => Variant::Success]),
+        ];
+    }
+
+    public function emptyState(): array
+    {
+        return [
+            'title' => 'No products yet',
+            'description' => 'Products you add to the store show up here.',
+            'icon' => Icon::ShoppingBag,
         ];
     }
 }
