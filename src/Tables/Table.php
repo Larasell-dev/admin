@@ -274,8 +274,16 @@ abstract class Table implements JsonSerializable
         }
 
         $actions = $state['actions'] ?? [];
-        if (! is_array($actions) || ! array_is_list($actions) || array_filter($actions, fn (mixed $action): bool => ! $action instanceof TableAction) !== []) {
-            throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'a list of TableAction');
+        if (! is_array($actions)) {
+            throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'an array');
+        }
+        if (! array_is_list($actions)) {
+            throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'a list');
+        }
+        foreach ($actions as $action) {
+            if (! $action instanceof TableAction) {
+                throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'a list of TableAction');
+            }
         }
 
         return [

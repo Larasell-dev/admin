@@ -124,9 +124,26 @@ it('rejects an invalid empty state', function (array $emptyState, string $code) 
     'whitespace icon' => [['title' => 'No books yet', 'icon' => '   '], 'larasell-admin.table.empty-state.empty-icon'],
     'icon with a style suffix' => [['title' => 'No books yet', 'icon' => 'book-line'], 'larasell-admin.table.empty-state.icon-style-variant'],
     'icon of the wrong type' => [['title' => 'No books yet', 'icon' => 12], 'larasell-admin.table.empty-state.invalid-value'],
-    'actions that are not a list' => [['title' => 'No books yet', 'actions' => TableAction::make('Add book')->to('/a')], 'larasell-admin.table.empty-state.invalid-value'],
-    'action that is not a TableAction' => [['title' => 'No books yet', 'actions' => [['label' => 'Add book', 'url' => '/a']]], 'larasell-admin.table.empty-state.invalid-value'],
     'unknown key' => [['title' => 'No books yet', 'subtitle' => 'Oops'], 'larasell-admin.table.empty-state.unknown-key'],
+]);
+
+it('says which rule invalid empty state actions break', function (mixed $actions, string $expected) {
+    ShelfTable::$emptyState = ['title' => 'No books yet', 'actions' => value($actions)];
+
+    try {
+        json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR);
+    } catch (InvalidTableEmptyState $exception) {
+        expect($exception->errorCode())->toBe('larasell-admin.table.empty-state.invalid-value')
+            ->and($exception->getMessage())->toEndWith("[actions] must be {$expected}.");
+
+        return;
+    }
+
+    test()->fail('Expected an InvalidTableEmptyState exception.');
+})->with([
+    'a single action instead of an array' => [fn () => TableAction::make('Add book')->to('/a'), 'an array'],
+    'actions keyed by name' => [fn () => ['add' => TableAction::make('Add book')->to('/a')], 'a list'],
+    'an array instead of a TableAction' => [[['label' => 'Add book', 'url' => '/a']], 'a list of TableAction'],
 ]);
 
 it('sends the empty state to the table page', function () {

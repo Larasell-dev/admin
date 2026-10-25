@@ -28,7 +28,7 @@ function TableActionLink({ action, size }: { action: TableAction; size?: "sm" })
 }
 
 export default function TablePage({ table }: Props) {
-  const isEmpty = table.pagination.total === 0;
+  const hasRows = table.pagination.total > 0;
 
   return (
     // BEST-BEFORE 2026-11-01: Find out why pages size themselves with this calc (3.5rem is the
@@ -39,13 +39,15 @@ export default function TablePage({ table }: Props) {
           {table.title}
         </h1>
         {/* The empty state offers its own actions instead. */}
-        {!isEmpty &&
+        {hasRows &&
           table.headerActions.map((action) => (
             <TableActionLink key={action.url} action={action} size="sm" />
           ))}
       </header>
 
-      {isEmpty ? (
+      {hasRows ? (
+        <ResourceTable resource={table} />
+      ) : (
         <div className="flex flex-1 items-center justify-center px-6 py-12">
           <EmptyState
             icon={table.emptyState?.icon ? lineIcon(table.emptyState.icon) : InboxLine}
@@ -57,8 +59,6 @@ export default function TablePage({ table }: Props) {
             ))}
           </EmptyState>
         </div>
-      ) : (
-        <ResourceTable resource={table} />
       )}
     </div>
   );
