@@ -76,7 +76,15 @@ class BadgeColumn extends Column
 
         $key = $value instanceof BackedEnum ? $value->value : $value;
 
-        return is_int($key) || is_string($key) ? $this->variant[$key] ?? Variant::Neutral : Variant::Neutral;
+        if (is_int($key)) {
+            return $this->variant[$key] ?? Variant::Neutral;
+        }
+
+        if (is_string($key)) {
+            return $this->variant[$key] ?? Variant::Neutral;
+        }
+
+        return Variant::Neutral;
     }
 
     private function resolveVariant(mixed $variant): ?Variant

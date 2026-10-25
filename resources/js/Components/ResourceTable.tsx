@@ -20,8 +20,12 @@ const cell = (row: TableRow, column: string) => row[column] as string | number |
 function value(row: TableRow, column: TableColumn): ReactNode {
   const text = cell(row, column.name);
 
+  if (column.type !== "badge") {
+    return text;
+  }
+
   // A badge without text would show as an empty pill.
-  if (column.type !== "badge" || text === null) {
+  if (text === null) {
     return text;
   }
 
