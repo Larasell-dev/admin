@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Exceptions;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Larasell\Chronicle\HasStructuredError;
 use Larasell\Chronicle\StructuredError;
@@ -142,6 +143,18 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
             message: "Column [{$column}] image shows an icon, which has no style.",
             why: 'Icons show as they are, without a background, so rounded() and style() have nothing to shape. Only pictures at a url are round or square.',
             fix: 'Remove rounded() or style() from the image, or show a picture with url() instead of an icon.',
+        );
+    }
+
+    public static function unsupportedImageUrl(string $column, string $url): static
+    {
+        $scheme = Str::before(trim($url), ':');
+
+        return static::structured(
+            code: 'larasell-admin.table.column.unsupported-image-url',
+            message: "Column [{$column}] image url uses the [{$scheme}:] scheme, which cannot show a picture.",
+            why: 'Table cells show the url in an <img>, which only loads http(s) urls, relative urls and data urls of images. Anything else would show as a broken picture.',
+            fix: 'Pass an http(s) url, a relative url or a data:image/... url, e.g. with route() or Storage::url(), or return null for records without a picture.',
         );
     }
 }

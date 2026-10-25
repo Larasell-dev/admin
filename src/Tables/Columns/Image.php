@@ -58,6 +58,10 @@ class Image implements JsonSerializable
             throw InvalidTableColumn::emptyImageUrl($this->column);
         }
 
+        if (! self::showsAsPicture($url)) {
+            throw InvalidTableColumn::unsupportedImageUrl($this->column, $url);
+        }
+
         $this->url = $url;
 
         return $this;
@@ -141,9 +145,9 @@ class Image implements JsonSerializable
     /**
      * The icon is sent as its case name, which @larasell-dev/ui/icons exports with a Fill or Line suffix.
      *
-     * Only pictures have a style. The alt text and title are only sent when set.
+     * Every key is always sent: an icon's style is null, as is an unset alt text or title.
      *
-     * @return array{type: 'icon'|'url', icon?: string, url?: string, style?: string, alt?: string, title?: string}
+     * @return array{type: 'icon', icon: string, style: null, alt: ?string, title: ?string}|array{type: 'url', url: string, style: string, alt: ?string, title: ?string}
      */
     public function jsonSerialize(): array
     {
@@ -151,17 +155,31 @@ class Image implements JsonSerializable
             throw InvalidTableColumn::styledImageIcon($this->column);
         }
 
-        $source = match (true) {
-            $this->icon !== null => ['type' => 'icon', 'icon' => $this->icon->name],
-            $this->url !== null => ['type' => 'url', 'url' => $this->url, 'style' => ($this->style ?? ImageStyle::Square)->value],
+        return match (true) {
+            $this->icon !== null => ['type' => 'icon', 'icon' => $this->icon->name, 'style' => null, 'alt' => $this->alt, 'title' => $this->title],
+            $this->url !== null => ['type' => 'url', 'url' => $this->url, 'style' => ($this->style ?? ImageStyle::Square)->value, 'alt' => $this->alt, 'title' => $this->title],
             default => throw InvalidTableColumn::imageWithoutSource($this->column),
         };
+    }
 
-        return [
-            ...$source,
-            ...$this->alt === null ? [] : ['alt' => $this->alt],
-            ...$this->title === null ? [] : ['title' => $this->title],
-        ];
+    /**
+     * Whether an <img> can show the url: an http(s) url, a relative one, or a data url of an image.
+     */
+    private static function showsAsPicture(string $url): bool
+    {
+        // Read the scheme the way browsers do: they drop leading spaces and control
+        // characters, and tabs and newlines anywhere, so " java\tscript:" is javascript:.
+        $normalized = Str::lower((string) preg_replace('/[\t\n\r]/', '', ltrim($url, "\x00..\x20")));
+
+        if (preg_match('/^([a-z][a-z0-9+.\-]*):/', $normalized, $match) !== 1) {
+            return true;
+        }
+
+        return match ($match[1]) {
+            'http', 'https' => true,
+            'data' => str_starts_with($normalized, 'data:image/'),
+            default => false,
+        };
     }
 
     private function configureOnce(string $method): void

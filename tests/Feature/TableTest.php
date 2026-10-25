@@ -553,14 +553,14 @@ describe('column images', function () {
 
     it('shows the icon the callback picks for each record, by its case name', function () {
         expect(titleImages(fn (Book $book, Image $image) => $image->icon($book->author_name === 'Anonymous' ? Icon::QuestionMark : Icon::QuillPen)))->toBe([
-            'Dune' => ['type' => 'icon', 'icon' => 'QuillPen'],
-            'Beowulf' => ['type' => 'icon', 'icon' => 'QuestionMark'],
+            'Dune' => ['type' => 'icon', 'icon' => 'QuillPen', 'style' => null, 'alt' => null, 'title' => null],
+            'Beowulf' => ['type' => 'icon', 'icon' => 'QuestionMark', 'style' => null, 'alt' => null, 'title' => null],
         ]);
     });
 
     it('takes an icon by its Remix icon name', function () {
         expect(titleImages(fn (Book $book, Image $image) => $image->icon('book-open'))['Dune'])
-            ->toBe(['type' => 'icon', 'icon' => 'BookOpen']);
+            ->toBe(['type' => 'icon', 'icon' => 'BookOpen', 'style' => null, 'alt' => null, 'title' => null]);
     });
 
     it('rejects an icon name that is not a Remix icon', function (string $icon, string $code) {
@@ -576,8 +576,8 @@ describe('column images', function () {
 
     it('shows the image at the url the callback picks for each record', function () {
         expect(titleImages(fn (Book $book, Image $image) => $image->url("https://covers.test/{$book->title}.jpg")))->toBe([
-            'Dune' => ['type' => 'url', 'url' => 'https://covers.test/Dune.jpg', 'style' => 'square'],
-            'Beowulf' => ['type' => 'url', 'url' => 'https://covers.test/Beowulf.jpg', 'style' => 'square'],
+            'Dune' => ['type' => 'url', 'url' => 'https://covers.test/Dune.jpg', 'style' => 'square', 'alt' => null, 'title' => null],
+            'Beowulf' => ['type' => 'url', 'url' => 'https://covers.test/Beowulf.jpg', 'style' => 'square', 'alt' => null, 'title' => null],
         ]);
     });
 
@@ -585,6 +585,39 @@ describe('column images', function () {
         expect(titleImages(fn (Book $book, Image $image) => $image->to('https://covers.test/dune.jpg'))['Dune']['url'])
             ->toBe('https://covers.test/dune.jpg');
     });
+
+    it('takes a url a browser can show as a picture', function (string $url) {
+        expect(titleImages(fn (Book $book, Image $image) => $image->url($url))['Dune']['url'])->toBe($url);
+    })->with([
+        'https' => 'https://covers.test/dune.jpg',
+        'http' => 'http://covers.test/dune.jpg',
+        'uppercase scheme' => 'HTTPS://covers.test/dune.jpg',
+        'root-relative' => '/covers/dune.jpg',
+        'path-relative' => 'covers/dune.jpg',
+        'protocol-relative' => '//covers.test/dune.jpg',
+        'colon in the path' => '/covers/dune:messiah.jpg',
+        'data image' => 'data:image/png;base64,iVBORw0KGgo=',
+        'data svg image' => 'data:image/svg+xml,%3Csvg%2F%3E',
+    ]);
+
+    it('rejects a url with a scheme that is not a picture', function (string $url) {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->url($url))));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.unsupported-image-url')
+            ->and($exception->getMessage())->toContain('[title]');
+    })->with([
+        'javascript' => 'javascript:alert(1)',
+        'javascript, mixed case' => 'JavaScript:alert(1)',
+        // Browsers drop leading spaces and control characters, and tabs and newlines anywhere, before reading the scheme.
+        'javascript, leading space' => ' javascript:alert(1)',
+        'javascript, tab in the scheme' => "java\tscript:alert(1)",
+        'vbscript' => 'vbscript:msgbox(1)',
+        'data that is not an image' => 'data:text/html,<script>alert(1)</script>',
+        'file' => 'file:///etc/passwd',
+        'ftp' => 'ftp://covers.test/dune.jpg',
+        'blob' => 'blob:https://covers.test/0b6e',
+        'mailto' => 'mailto:frank@herbert.test',
+    ]);
 
     it('rejects an empty url', function () {
         $exception = invalidColumn(fn () => tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->url(' '))));
@@ -659,7 +692,7 @@ describe('column images', function () {
 
     it('takes an alt text and title for an icon too', function () {
         expect(titleImages(fn (Book $book, Image $image) => $image->icon(Icon::QuillPen)->title('Has an author'))['Dune'])
-            ->toBe(['type' => 'icon', 'icon' => 'QuillPen', 'title' => 'Has an author']);
+            ->toBe(['type' => 'icon', 'icon' => 'QuillPen', 'style' => null, 'alt' => null, 'title' => 'Has an author']);
     });
 
     it('rejects giving an image a second alt text or title', function (Closure $callback, string $method) {
@@ -674,7 +707,7 @@ describe('column images', function () {
 
     it('shows no image for the records the callback returns null for', function () {
         expect(titleImages(fn (Book $book, Image $image) => $book->title === 'Dune' ? $image->icon(Icon::Book) : null))->toBe([
-            'Dune' => ['type' => 'icon', 'icon' => 'Book'],
+            'Dune' => ['type' => 'icon', 'icon' => 'Book', 'style' => null, 'alt' => null, 'title' => null],
             'Beowulf' => null,
         ]);
     });
