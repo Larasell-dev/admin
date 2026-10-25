@@ -28,22 +28,7 @@ function TableActionLink({ action, size }: { action: TableAction; size?: "sm" })
 }
 
 export default function TablePage({ table }: Props) {
-  // The empty state takes the whole page, header included; it offers its own actions.
-  if (table.pagination.total === 0) {
-    return (
-      <div className="flex h-[calc(100dvh-3.5rem)] items-center justify-center px-6 py-12 lg:h-dvh">
-        <EmptyState
-          icon={table.emptyState?.icon ? lineIcon(table.emptyState.icon) : InboxLine}
-          title={table.emptyState?.title ?? `No ${table.title.toLowerCase()} yet`}
-          description={table.emptyState?.description ?? undefined}
-        >
-          {table.emptyState?.actions.map((action) => (
-            <TableActionLink key={action.url} action={action} />
-          ))}
-        </EmptyState>
-      </div>
-    );
-  }
+  const isEmpty = table.pagination.total === 0;
 
   return (
     // BEST-BEFORE 2026-11-01: Find out why pages size themselves with this calc (3.5rem is the
@@ -53,11 +38,28 @@ export default function TablePage({ table }: Props) {
         <h1 className="type-body-md text-mauve-950 dark:text-mauve-50 flex-1 truncate">
           {table.title}
         </h1>
-        {table.headerActions.map((action) => (
-          <TableActionLink key={action.url} action={action} size="sm" />
-        ))}
+        {/* The empty state offers its own actions instead. */}
+        {!isEmpty &&
+          table.headerActions.map((action) => (
+            <TableActionLink key={action.url} action={action} size="sm" />
+          ))}
       </header>
-      <ResourceTable resource={table} />
+
+      {isEmpty ? (
+        <div className="flex flex-1 items-center justify-center px-6 py-12">
+          <EmptyState
+            icon={table.emptyState?.icon ? lineIcon(table.emptyState.icon) : InboxLine}
+            title={table.emptyState?.title ?? `No ${table.title.toLowerCase()} yet`}
+            description={table.emptyState?.description ?? undefined}
+          >
+            {table.emptyState?.actions.map((action) => (
+              <TableActionLink key={action.url} action={action} />
+            ))}
+          </EmptyState>
+        </div>
+      ) : (
+        <ResourceTable resource={table} />
+      )}
     </div>
   );
 }

@@ -112,8 +112,8 @@ abstract class Table implements JsonSerializable
 
     /**
      * Actions for the whole table, shown in its header, e.g. a link to add a record.
-     * The header is hidden while the table shows its empty state, which takes its
-     * own actions; return the same ones from emptyState() to offer them there too.
+     * They are hidden while the table shows its empty state, which takes its own
+     * actions; return the same ones from emptyState() to offer them there too.
      *
      * @return array<int, TableAction>
      */

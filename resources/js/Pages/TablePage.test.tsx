@@ -54,7 +54,7 @@ it("links each header action, in order, next to the title", async () => {
   ).toEqual(["Import books", "Add book"]);
 });
 
-it("shows only the empty state, with its own actions, when the table has no rows", async () => {
+it("keeps the header but swaps its actions for the empty state's when the table has no rows", async () => {
   await render(
     <TablePage
       table={table(0, {
@@ -68,7 +68,9 @@ it("shows only the empty state, with its own actions, when the table has no rows
   await expect
     .element(page.getByRole("link", { name: "Add book" }))
     .toHaveAttribute("href", "/admin/books/create");
-  expect(page.getByRole("banner").elements()).toHaveLength(0);
-  expect(page.getByRole("heading", { name: "Books" }).elements()).toHaveLength(0);
+  await expect
+    .element(page.getByRole("banner").getByRole("heading", { name: "Books" }))
+    .toBeVisible();
+  expect(page.getByRole("banner").getByRole("link").elements()).toHaveLength(0);
   expect(page.getByRole("link", { name: "Import books" }).elements()).toHaveLength(0);
 });

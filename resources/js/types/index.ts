@@ -68,7 +68,7 @@ export type TableResource = {
   title: string;
   /** Shown when there are no rows; null for the default. */
   emptyState: TableEmptyState | null;
-  /** Shown in the header, which is hidden while the empty state shows. */
+  /** Shown in the header, except while the empty state shows. */
   headerActions: TableAction[];
   columns: TableColumn[];
   /** The rows on the current page. */
