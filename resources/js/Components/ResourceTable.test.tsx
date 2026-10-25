@@ -3,10 +3,10 @@ import { router } from "@inertiajs/react";
 import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import type { TableAction, TablePagination, TableResource, TableRow } from "../types";
+import type { TableRowAction, TablePagination, TableResource, TableRow } from "../types";
 import ResourceTable from "./ResourceTable";
 
-const archive: TableAction = {
+const archive: TableRowAction = {
   name: "archive",
   label: "Archive",
   method: "post",
@@ -21,7 +21,7 @@ const row = (
   id: number,
   title: string,
   link: string | null,
-  actions: TableAction[] = [],
+  actions: TableRowAction[] = [],
 ): TableRow => ({
   id,
   title,
@@ -37,6 +37,7 @@ const resource = (
 ): TableResource => ({
   title: "Books",
   emptyState: null,
+  headerActions: [],
   columns: [
     { name: "title", label: "Title", type: "text" },
     { name: "author", label: "Author", type: "text" },

@@ -15,7 +15,7 @@ import {
 import { AddLine, More2Fill } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { useEffect, useMemo, useState } from "react";
-import type { TableAction, TableResource } from "../types";
+import type { TableRowAction, TableResource } from "../types";
 import { abortPrevious } from "../utils/abortPrevious";
 import { debounce } from "../utils/debounce";
 import { overlayExclusive } from "../utils/hotkeys";
@@ -40,11 +40,11 @@ type Props =
  */
 export default function ProductsTable(props: Props) {
   const [adding, setAdding] = useState(false);
-  const [pending, setPending] = useState<TableAction | null>(null);
+  const [pending, setPending] = useState<TableRowAction | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string>();
 
-  const perform = (action: TableAction, confirmation?: string) => {
+  const perform = (action: TableRowAction, confirmation?: string) => {
     if (action.method === "get") {
       setPending(null);
       router.visit(action.url);
@@ -60,7 +60,7 @@ export default function ProductsTable(props: Props) {
     });
   };
 
-  const choose = (action: TableAction) => {
+  const choose = (action: TableRowAction) => {
     setError(undefined);
 
     if (action.confirm) {

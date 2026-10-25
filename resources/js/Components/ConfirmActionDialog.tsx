@@ -1,13 +1,13 @@
 import { AlertDialog, Field, Input } from "@larasell-dev/ui";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { useState } from "react";
-import type { TableAction } from "../types";
+import type { TableRowAction } from "../types";
 import { overlayExclusive } from "../utils/hotkeys";
 import Freeze from "./Freeze";
 
 type Props = {
   /** The action waiting for confirmation, or null when the dialog is closed. */
-  action: TableAction | null;
+  action: TableRowAction | null;
   processing: boolean;
   error?: string;
   onConfirm: (typed: string) => void;
@@ -42,7 +42,7 @@ function Confirmation({
   processing,
   error,
   onConfirm,
-}: Omit<Props, "action" | "onCancel"> & { action: TableAction }) {
+}: Omit<Props, "action" | "onCancel"> & { action: TableRowAction }) {
   const [typed, setTyped] = useState("");
   const confirm = action.confirm!;
 
