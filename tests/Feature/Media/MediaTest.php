@@ -13,7 +13,11 @@ function productImage(string $file): int
     return DB::table('larasell_product_images')->insertGetId(['file' => $file]);
 }
 
-it('lists folders before product images, each alphabetically, linking only folders', function () {
+it('lists folders before product images, each alphabetically, linking folders to their page and images to their file', function () {
+    config([
+        'larasell.images.disk' => 'public',
+        'filesystems.disks.public.url' => 'https://cdn.example.com/media',
+    ]);
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     // Created out of order, with mixed case, and with a folder that sorts after every image by name.
@@ -39,9 +43,9 @@ it('lists folders before product images, each alphabetically, linking only folde
                 ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => []],
                 ['id' => "folder-{$banners->id}", 'name' => 'banners', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => []],
                 ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => []],
-                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'type' => 'Product image', '_actions' => [], '_link' => null, '_images' => []],
-                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'type' => 'Product image', '_actions' => [], '_link' => null, '_images' => []],
-                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'type' => 'Product image', '_actions' => [], '_link' => null, '_images' => []],
+                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => []],
+                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => []],
+                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => []],
             ]));
 });
 

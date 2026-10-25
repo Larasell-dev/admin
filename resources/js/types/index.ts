@@ -5,6 +5,8 @@ export type SharedProps = {
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;
+  /** The panel's home; only links under it are Inertia pages. */
+  panelUrl: string;
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;

@@ -32,7 +32,7 @@ it('shows the profile page with the current admin details', function () {
         );
 });
 
-it('shares the signed-in admin and profile link with every admin page', function () {
+it('shares the signed-in admin, profile link and panel url with every admin page', function () {
     $this->actingAs(profileAdmin(), 'larasell-admin')
         ->get('/admin')
         ->assertOk()
@@ -40,6 +40,7 @@ it('shares the signed-in admin and profile link with every admin page', function
             ->where('admin.name', 'Test Admin')
             ->where('admin.email', 'admin@example.com')
             ->where('profileUrl', route('larasell.admin.profile'))
+            ->where('panelUrl', route('larasell.admin.home'))
         );
 });
 

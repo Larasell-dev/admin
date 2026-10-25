@@ -36,6 +36,7 @@ function renderAt(url: string, navigation: Item[] = defaultNavigation) {
       admin: { name: "Ada Lovelace", email: "ada@example.com", avatarUrl: null },
       profileUrl: "/admin/profile",
       logoutUrl: "/admin/logout",
+      panelUrl: "/admin",
     },
   };
 

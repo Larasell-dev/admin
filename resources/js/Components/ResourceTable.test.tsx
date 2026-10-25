@@ -1,10 +1,25 @@
 import "../../css/app.css";
-import { router } from "@inertiajs/react";
+import { App, router } from "@inertiajs/react";
 import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
-import { render } from "vitest-browser-react";
+import type { ReactElement } from "react";
+import { render as renderElement } from "vitest-browser-react";
 import type { TableAction, TablePagination, TableResource, TableRow } from "../types";
 import ResourceTable from "./ResourceTable";
+
+const panelUrl = `${window.location.origin}/admin`;
+
+// Renders through Inertia's App, so the table reads the panel url from usePage() as in the panel.
+const render = (ui: ReactElement) =>
+  renderElement(
+    <App
+      initialPage={
+        { component: "Table", url: "/admin/books", version: null, props: { panelUrl } } as never
+      }
+      initialComponent={() => ui}
+      resolveComponent={() => () => ui}
+    />,
+  );
 
 const archive: TableAction = {
   name: "archive",
@@ -94,7 +109,7 @@ describe.each([
     ).toEqual(["Dune"]);
   });
 
-  it("visits same-site links with Inertia when clicking anywhere in the row", async () => {
+  it("visits links into the panel with Inertia when clicking anywhere in the row", async () => {
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1")])} />,
     );
@@ -104,6 +119,23 @@ describe.each([
 
     expect(visit).toHaveBeenCalledOnce();
     expect(visit.mock.calls[0][0]).toContain("/admin/books/1");
+  });
+
+  it("follows same-site links outside the panel, like stored files, as plain anchors", async () => {
+    const screen = await render(
+      <ResourceTable resource={resource([row(1, "dune.png", "/storage/products/dune.png")])} />,
+    );
+    // Runs after React's handlers, so Inertia would already have intercepted the click.
+    const stayOnPage = (event: Event) => event.preventDefault();
+    window.addEventListener("click", stayOnPage);
+
+    try {
+      await screen.getByRole("link", { name: "dune.png" }).click();
+    } finally {
+      window.removeEventListener("click", stayOnPage);
+    }
+
+    expect(visit).not.toHaveBeenCalled();
   });
 
   it("follows links to other sites as plain anchors", async () => {

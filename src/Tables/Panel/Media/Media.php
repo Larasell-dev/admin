@@ -9,6 +9,7 @@ use Larasell\Admin\Models\Media\Folder;
 use Larasell\Admin\Models\Media\MediaItem;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
+use Larasell\Larasell\Models\ProductImage;
 
 /**
  * The media in a folder, or at the top level without one: folders first, then product images, each by name.
@@ -61,9 +62,11 @@ class Media extends Table
 
     public function rowLink(MediaItem $item): ?string
     {
-        return $item->type === MediaType::Folder
-            ? route('larasell.admin.media.folders.show', $item->id)
-            : null;
+        return match ($item->type) {
+            MediaType::Folder => route('larasell.admin.media.folders.show', $item->id),
+            // Larasell's own url(), so the link follows its images disk; the row's name is the image's file.
+            MediaType::ProductImage => (new ProductImage)->setRawAttributes(['file' => $item->name])->url(),
+        };
     }
 
     public function emptyState(): array
