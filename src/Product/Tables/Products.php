@@ -4,6 +4,7 @@ namespace Larasell\Admin\Product\Tables;
 
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
+use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Tables\Columns\TextColumn;
@@ -24,6 +25,17 @@ class Products extends Table
             BadgeColumn::make('status', 'Visibility')
                 ->map(fn (Visibility $status): string => $status === Visibility::Visible ? 'Visible' : 'Hidden')
                 ->variant([Visibility::Visible->value => Variant::Success]),
+        ];
+    }
+
+    public function actions(): array
+    {
+        return [
+            // Variants, category links and cart items go with it; orders keep their own copy of the product.
+            Action::make('Delete', handle: fn (Product $product) => $product->delete())
+                ->confirm(message: 'It is removed from the store and every cart. Past orders keep it. This can\'t be undone.')
+                ->icon(Icon::DeleteBin)
+                ->destructive(),
         ];
     }
 

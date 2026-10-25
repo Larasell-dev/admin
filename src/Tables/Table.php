@@ -43,8 +43,11 @@ abstract class Table implements JsonSerializable
     /** @var array<class-string, class-string<Model>|false> */
     protected static array $cachedModelAttributes = [];
 
-    /** The namespace of the panel's own tables, whose slugs start with "larasell:". */
-    private const string PANEL_NAMESPACE = 'Larasell\\Admin\\Tables\\Panel\\';
+    /** The namespaces of the panel's own tables, by the prefix their slugs start with. */
+    private const array PANEL_NAMESPACES = [
+        'larasell:' => 'Larasell\\Admin\\Tables\\Panel\\',
+        'larasell-product:' => 'Larasell\\Admin\\Product\\Tables\\',
+    ];
 
     public static function make(mixed ...$arguments): static
     {
@@ -129,8 +132,10 @@ abstract class Table implements JsonSerializable
     public static function slug(): ?string
     {
         // Can't clash with an app table, since a kebab-cased class name never contains a colon.
-        if (str_starts_with(static::class, self::PANEL_NAMESPACE)) {
-            return 'larasell:'.self::path(Str::after(static::class, self::PANEL_NAMESPACE));
+        foreach (self::PANEL_NAMESPACES as $prefix => $namespace) {
+            if (str_starts_with(static::class, $namespace)) {
+                return $prefix.self::path(Str::after(static::class, $namespace));
+            }
         }
 
         $namespace = trim((string) config('larasell.admin.panel.tables.namespace'), '\\').'\\';
@@ -152,10 +157,16 @@ abstract class Table implements JsonSerializable
      */
     public static function fromSlug(string $slug): ?string
     {
-        $namespace = str_starts_with($slug, 'larasell:')
-            ? rtrim(self::PANEL_NAMESPACE, '\\')
-            : trim((string) config('larasell.admin.panel.tables.namespace'), '\\');
-        $class = $namespace.'\\'.implode('\\', array_map(fn (string $segment): string => Str::studly($segment), explode('.', Str::after($slug, 'larasell:'))));
+        $namespace = trim((string) config('larasell.admin.panel.tables.namespace'), '\\').'\\';
+        $path = $slug;
+
+        foreach (self::PANEL_NAMESPACES as $prefix => $panelNamespace) {
+            if (str_starts_with($slug, $prefix)) {
+                [$namespace, $path] = [$panelNamespace, Str::after($slug, $prefix)];
+            }
+        }
+
+        $class = $namespace.implode('\\', array_map(fn (string $segment): string => Str::studly($segment), explode('.', $path)));
 
         if (! class_exists($class) || ! is_subclass_of($class, self::class) || $class::slug() !== $slug) {
             return null;
