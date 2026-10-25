@@ -16,8 +16,6 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $product = $this->route('product');
-
         return [
             'name' => ['required', 'string', 'max:255'],
             'slug' => [
@@ -25,9 +23,9 @@ class ProductRequest extends FormRequest
                 'string',
                 'max:255',
                 new Slug,
-                // The storefront finds products by their slug in the current locale.
-                Rule::unique(Product::class, 'slug->'.App::currentLocale())
-                    ->ignore($product instanceof Product ? $product->id : null),
+                // The storefront finds products by their slug in the current locale. Updating
+                // ignores the product's own slug; creating has no product, so ignores nothing.
+                Rule::unique(Product::class, 'slug->'.App::currentLocale())->ignore($this->route('product')),
             ],
             'status' => ['required', Rule::enum(Visibility::class)],
         ];
