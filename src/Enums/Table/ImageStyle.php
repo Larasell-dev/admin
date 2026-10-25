@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Enums;
+namespace Larasell\Admin\Enums\Table;
 
 /**
  * The shape of an image in a table cell.

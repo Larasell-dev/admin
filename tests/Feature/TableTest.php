@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Enums\ImageStyle;
+use Larasell\Admin\Enums\Table\ImageStyle;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\Image;

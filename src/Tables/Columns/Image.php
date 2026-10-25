@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Enums\ImageStyle;
+use Larasell\Admin\Enums\Table\ImageStyle;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 
 /**
