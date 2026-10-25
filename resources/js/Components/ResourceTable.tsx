@@ -1,11 +1,11 @@
-import { Link, router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import type { PaginationChange } from "@larasell-dev/ui";
 import { DataList, Pagination, Table } from "@larasell-dev/ui";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { type ReactNode, useState } from "react";
-import type { TableAction, TableResource, TableRow } from "../types";
+import type { Page, TableAction, TableResource, TableRow } from "../types";
 import { overlayExclusive } from "../utils/hotkeys";
-import { isSameSite } from "../utils/isSameSite";
+import { isPanelUrl } from "../utils/isPanelUrl";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 
@@ -16,8 +16,8 @@ type Props = {
 
 const cell = (row: TableRow, column: string) => row[column] as string | number | null;
 
-function visit(url: string) {
-  if (isSameSite(url)) {
+function visit(url: string, panelUrl: string) {
+  if (isPanelUrl(url, panelUrl)) {
     router.visit(url);
   } else {
     window.location.assign(url);
@@ -26,6 +26,7 @@ function visit(url: string) {
 
 /** Renders a PHP-defined table: a data list on small screens, the UI table from `lg` up. */
 export default function ResourceTable({ resource, "aria-label": ariaLabel }: Props) {
+  const { panelUrl } = usePage<Page>().props;
   const label = ariaLabel ?? resource.title;
   const [primary, ...rest] = resource.columns;
   const hasActions = resource.rows.some((row) => row._actions.length > 0);
@@ -54,7 +55,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
   const perform = (action: TableAction, confirmation?: string) => {
     if (action.method === "get") {
       setPending(null);
-      visit(action.url);
+      visit(action.url, panelUrl);
       return;
     }
 
@@ -80,7 +81,11 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
   /** Links the row through its primary cell's value; the link stretches over the whole row. */
   const linked = (row: TableRow, RowLink: typeof Table.Link, value: ReactNode) =>
     row._link ? (
-      <RowLink render={isSameSite(row._link) ? <Link href={row._link} /> : <a href={row._link} />}>
+      <RowLink
+        render={
+          isPanelUrl(row._link, panelUrl) ? <Link href={row._link} /> : <a href={row._link} />
+        }
+      >
         {value}
       </RowLink>
     ) : (

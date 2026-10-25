@@ -1,0 +1,238 @@
+<?php
+
+declare(strict_types=1);
+
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Inertia\Testing\AssertableInertia;
+use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Models\Media\Folder;
+use Larasell\Admin\Models\Media\ProductImageThumbnail;
+use Larasell\Admin\Navigation;
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function productImage(string $file, array $attributes = []): int
+{
+    return DB::table('larasell_product_images')->insertGetId(['file' => $file, 'created_at' => now(), 'updated_at' => now(), ...$attributes]);
+}
+
+it('lists folders before product images, each alphabetically, linking folders to their page and images to their file', function () {
+    $this->travelTo(Carbon::parse('2026-10-20 09:30:00', 'UTC'));
+    config([
+        'larasell.images.disk' => 'public',
+        'filesystems.disks.public.url' => 'https://cdn.example.com/media',
+    ]);
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    // Created out of order, with mixed case, and with a folder that sorts after every image by name.
+    $zoo = Folder::create(['name' => 'Zoo']);
+    $banners = Folder::create(['name' => 'banners']);
+    $archive = Folder::create(['name' => 'Archive']);
+    $zebra = productImage('products/zebra.jpg');
+    $apple = productImage('products/Apple.png');
+    $mango = productImage('products/mango.webp');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/media')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Media/Index')
+            ->where('table.title', 'Media')
+            ->where('table.columns', [
+                ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
+                ['name' => 'added_at', 'label' => 'Added at', 'type' => 'text'],
+            ])
+            ->where('table.pagination.total', 6)
+            ->where('table.rows', [
+                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$archive->id}"), '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$banners->id}"), '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$zoo->id}"), '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$apple}"), '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => ['name' => ['type' => 'icon', 'icon' => 'Image', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$mango}"), '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => ['name' => ['type' => 'icon', 'icon' => 'Image', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$zebra}"), '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => ['name' => ['type' => 'icon', 'icon' => 'Image', 'style' => null, 'alt' => null, 'title' => null]]],
+            ]));
+});
+
+it('lists only top-level folders and product images at the root', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+    Folder::create(['name' => 'Summer', 'parent_id' => $campaigns->id]);
+    productImage('products/apple.png');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/media')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.pagination.total', 2)
+            ->where('table.rows.0.name', 'Campaigns')
+            ->where('table.rows.1.name', 'apple.png'));
+});
+
+it('lists only the folders directly inside a folder on its page', function () {
+    $this->travelTo(Carbon::parse('2026-10-20 09:30:00', 'UTC'));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+    $winter = Folder::create(['name' => 'Winter', 'parent_id' => $campaigns->id]);
+    $summer = Folder::create(['name' => 'Summer', 'parent_id' => $campaigns->id]);
+    Folder::create(['name' => 'Beach', 'parent_id' => $summer->id]);
+    Folder::create(['name' => 'Brand']);
+    productImage('products/apple.png');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/media/folders/{$campaigns->id}")
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Media/Index')
+            ->where('table.title', 'Campaigns')
+            ->where('table.pagination.total', 2)
+            ->where('table.rows', [
+                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$summer->id}"), '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$winter->id}"), '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+            ]));
+});
+
+it('shows the thumbnail of a product image, else its low-quality placeholder, else an image icon', function () {
+    config([
+        'larasell.images.disk' => 'public',
+        'filesystems.disks.public.url' => 'https://cdn.example.com/media',
+    ]);
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $lqip = ['type' => 'lqip', 'value' => 'data:image/jpeg;base64,/9j/4AAQ', 'color' => '#112233'];
+
+    $withThumbnail = productImage('products/a.jpg', ['placeholder' => json_encode($lqip)]);
+    ProductImageThumbnail::create(['product_image_id' => $withThumbnail, 'path' => 'products/thumbnails/a.webp']);
+    productImage('products/b.jpg', ['placeholder' => json_encode($lqip)]);
+    productImage('products/c.jpg', ['placeholder' => json_encode(['type' => 'color', 'value' => '#112233', 'color' => '#112233'])]);
+    productImage('products/d.jpg');
+
+    $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.rows.0._images.name.url', 'https://cdn.example.com/media/products/thumbnails/a.webp')
+        ->where('table.rows.1._images.name.url', 'data:image/jpeg;base64,/9j/4AAQ')
+        ->where('table.rows.2._images.name.icon', 'Image')
+        ->where('table.rows.3._images.name.icon', 'Image'));
+});
+
+it('lists the product images in a folder on its page and not at the root', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+    $brand = Folder::create(['name' => 'Brand']);
+    $summer = Folder::create(['name' => 'Summer', 'parent_id' => $campaigns->id]);
+    $campaigns->productImages()->attach(productImage('products/zebra.jpg'));
+    $campaigns->productImages()->attach(productImage('products/apple.png'));
+    $brand->productImages()->attach(productImage('products/logo.png'));
+    productImage('products/mango.webp');
+
+    $this->actingAs($admin, 'larasell-admin');
+
+    $this->get("/admin/media/folders/{$campaigns->id}")->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.pagination.total', 3)
+        ->where('table.rows.0.id', "folder-{$summer->id}")
+        ->where('table.rows.1.name', 'apple.png')
+        ->where('table.rows.2.name', 'zebra.jpg'));
+
+    $this->get('/admin/media')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.pagination.total', 3)
+        ->where('table.rows.0.name', 'Brand')
+        ->where('table.rows.1.name', 'Campaigns')
+        ->where('table.rows.2.name', 'mango.webp'));
+});
+
+it('shows the empty state for a folder without contents', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+    Folder::create(['name' => 'Brand']);
+    productImage('products/apple.png');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/media/folders/{$campaigns->id}")
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('table.rows', []));
+});
+
+it('shows the media page without a table, with a 404, for a folder that does not exist', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/media/folders/999')
+        ->assertNotFound()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Media/Index', shouldExist: false)
+            ->where('table', null));
+});
+
+it('requires a signed-in admin for a folder page', function () {
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+
+    $this->get("/admin/media/folders/{$campaigns->id}")->assertRedirect('/admin/login');
+});
+
+it('links each folder page back to its parent, and the root to nothing', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+    $summer = Folder::create(['name' => 'Summer', 'parent_id' => $campaigns->id]);
+    $this->actingAs($admin, 'larasell-admin');
+
+    $this->get('/admin/media')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.backLink', null));
+
+    $this->get("/admin/media/folders/{$campaigns->id}")->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.backLink', ['url' => url('/admin/media'), 'label' => 'Back to Media']));
+
+    $this->get("/admin/media/folders/{$summer->id}")->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.backLink', ['url' => url("/admin/media/folders/{$campaigns->id}"), 'label' => 'Back to Campaigns']));
+});
+
+it('keeps folders first across pages', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    productImage('products/a.jpg');
+    foreach (range(1, 25) as $number) {
+        Folder::create(['name' => sprintf('Folder %02d', $number)]);
+    }
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/media?page=2')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.pagination.total', 26)
+            ->where('table.rows.0.name', 'a.jpg')
+            ->count('table.rows', 1));
+});
+
+it('shows an empty state without folders or product images', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/media')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.rows', [])
+            ->where('table.emptyState.title', 'No media yet'));
+});
+
+it('requires a signed-in admin', function () {
+    $this->get('/admin/media')->assertRedirect('/admin/login');
+});
+
+it('is in the navigation by default', function () {
+    expect(config('larasell.media.enabled'))->toBeTrue()
+        ->and(array_column(Navigation::resolve()->tree(), 'id'))->toContain('larasell.admin.media.index');
+});
+
+it('leaves the admin panel when disabled', function () {
+    $this->bootingWith(fn () => config(['larasell.media.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    expect(array_column(Navigation::resolve()->tree(), 'id'))->not->toContain('larasell.admin.media.index');
+
+    $folder = Folder::create(['name' => 'Campaigns']);
+
+    $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->get("/admin/media/folders/{$folder->id}")->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->post('/admin/media/folders', ['name' => 'Banners'])->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->post('/admin/media/product-images', ['files' => []])->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->delete("/admin/media/folders/{$folder->id}")->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->delete('/admin/media/product-images/'.productImage('a.jpg'))->assertNotFound();
+});

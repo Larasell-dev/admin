@@ -51,6 +51,7 @@ function renderIndex() {
       admin: { name: "Ada Admin", email: "ada@example.com", avatarUrl: null },
       profileUrl: "/admin/profile",
       logoutUrl: "/admin/logout",
+      panelUrl: "/admin",
       categories: [category(1, "Clothing", [category(2, "Shirts")]), category(3, "Toys")],
       createUrl: "/admin/categories/create",
     },

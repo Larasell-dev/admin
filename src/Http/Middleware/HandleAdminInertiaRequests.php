@@ -47,6 +47,8 @@ class HandleAdminInertiaRequests extends Middleware
             },
             'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),
+            // Links under it are Inertia pages; anything else, like stored files, needs a full page load.
+            'panelUrl' => fn (): string => route('larasell.admin.home'),
         ];
     }
 }
