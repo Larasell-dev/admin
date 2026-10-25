@@ -49,6 +49,7 @@ function renderMedia(total: number | null) {
     version: null,
     props: {
       table,
+      createFolderUrl: "/admin/media/folders",
       uploadUrl: "/admin/media/product-images",
       folderId: 7,
       navigation: [
@@ -78,6 +79,27 @@ function renderMedia(total: number | null) {
 
 const uploadButtons = () => page.getByRole("button", { name: "Upload" }).elements();
 
+it("offers to upload a file or create a folder in the header", async () => {
+  await renderMedia(1);
+
+  // With rows there is no empty state, so the only buttons are the header's.
+  await expect.element(page.getByRole("button", { name: "Upload" })).toBeVisible();
+  expect(uploadButtons()).toHaveLength(1);
+
+  await page.getByRole("button", { name: "More actions" }).click();
+  await expect.element(page.getByRole("menuitem", { name: "New folder" })).toBeVisible();
+});
+
+it("offers the same buttons in the empty state", async () => {
+  await renderMedia(0);
+
+  await expect.element(page.getByText("No media yet")).toBeVisible();
+  expect(uploadButtons()).toHaveLength(2);
+
+  await page.getByRole("button", { name: "More actions" }).last().click();
+  await expect.element(page.getByRole("menuitem", { name: "New folder" })).toBeVisible();
+});
+
 it("explains a folder that does not exist, without offering to add media", async () => {
   await renderMedia(null);
 
@@ -86,6 +108,31 @@ it("explains a folder that does not exist, without offering to add media", async
     .toBeVisible();
   await expect.element(page.getByText("This folder doesn't exist anymore")).toBeVisible();
   expect(uploadButtons()).toHaveLength(0);
+  expect(page.getByRole("button", { name: "More actions" }).elements()).toHaveLength(0);
+});
+
+it("asks for the new folder's name in a dialog", async () => {
+  await renderMedia(1);
+
+  await page.getByRole("button", { name: "More actions" }).click();
+  await page.getByRole("menuitem", { name: "New folder" }).click();
+
+  const dialog = page.getByRole("dialog", { name: "New folder" });
+  await expect.element(dialog).toBeVisible();
+  await expect.element(dialog.getByRole("textbox", { name: "Name" })).toHaveFocus();
+  await expect.element(dialog.getByRole("button", { name: "Create" })).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+});
+
+it("opens the same dialog from the empty state", async () => {
+  await renderMedia(0);
+
+  await page.getByRole("button", { name: "More actions" }).last().click();
+  await page.getByRole("menuitem", { name: "New folder" }).click();
+
+  await expect.element(page.getByRole("dialog", { name: "New folder" })).toBeVisible();
 });
 
 afterEach(() => {
@@ -98,6 +145,63 @@ type VisitCallbacks = {
   onError?: (errors: Record<string, string>) => void;
   onFinish?: () => void;
 };
+
+/** Stubs the request, handing back what was sent and the callbacks to play the server's part. */
+function stubPost() {
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  return {
+    post,
+    callbacks: () => post.mock.calls[0][2] as VisitCallbacks,
+  };
+}
+
+async function openNewFolderDialog() {
+  await page.getByRole("button", { name: "More actions" }).first().click();
+  await page.getByRole("menuitem", { name: "New folder" }).click();
+  return page.getByRole("dialog", { name: "New folder" });
+}
+
+it("creates the folder inside the current one and closes the dialog", async () => {
+  const { post, callbacks } = stubPost();
+  await renderMedia(1);
+
+  const dialog = await openNewFolderDialog();
+  await dialog.getByRole("textbox", { name: "Name" }).fill("Lookbook");
+  await dialog.getByRole("button", { name: "Create" }).click();
+
+  expect(post).toHaveBeenCalledTimes(1);
+  expect(post.mock.calls[0][0]).toBe("/admin/media/folders");
+  expect(post.mock.calls[0][1]).toEqual({ name: "Lookbook", parent_id: 7 });
+
+  callbacks().onStart?.();
+  await expect
+    .element(dialog.getByRole("button", { name: "Create" }))
+    .toHaveAttribute("aria-busy", "true");
+
+  await callbacks().onSuccess?.();
+  callbacks().onFinish?.();
+  await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+
+  // The next folder starts with an empty name.
+  await expect
+    .element((await openNewFolderDialog()).getByRole("textbox", { name: "Name" }))
+    .toHaveValue("");
+});
+
+it("keeps the dialog open with the server's error for the name", async () => {
+  const { callbacks } = stubPost();
+  await renderMedia(1);
+
+  const dialog = await openNewFolderDialog();
+  await dialog.getByRole("button", { name: "Create" }).click();
+
+  callbacks().onStart?.();
+  callbacks().onError?.({ name: "The name field is required." });
+  callbacks().onFinish?.();
+
+  await expect.element(dialog.getByText("The name field is required.")).toBeVisible();
+  await expect.element(dialog).toBeVisible();
+});
 
 it("links folders to their page and product images to their file", async () => {
   await renderMedia(2);

@@ -1,7 +1,24 @@
-import { Link, router } from "@inertiajs/react";
-import { Button, Dialog, EmptyState, Icon, IconButton } from "@larasell-dev/ui";
-import { ArrowLeftLine, FolderUnknowLine, ImageLine, UploadLine } from "@larasell-dev/ui/icons";
-import { type ChangeEvent, useRef, useState } from "react";
+import { Link, router, useForm } from "@inertiajs/react";
+import {
+  Button,
+  ButtonGroup,
+  Dialog,
+  EmptyState,
+  Field,
+  Icon,
+  IconButton,
+  Input,
+  Menu,
+} from "@larasell-dev/ui";
+import {
+  ArrowDownSLine,
+  ArrowLeftLine,
+  FolderAddLine,
+  FolderUnknowLine,
+  ImageLine,
+  UploadLine,
+} from "@larasell-dev/ui/icons";
+import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Freeze from "../../Components/Freeze";
 import MediaTable, { type MediaTableResource } from "../../Components/Media/MediaTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
@@ -11,14 +28,16 @@ type Props =
   | { table: null }
   | {
       table: MediaTableResource;
+      createFolderUrl: string;
       /** Where to post product images as `files[]`. */
       uploadUrl: string;
-      /** The folder on this page, which uploads go into; null at the top level. */
+      /** The folder on this page, which new folders and uploads go into; null at the top level. */
       folderId: number | null;
     };
 
-/** The media at the top level or in a folder, with buttons to upload more. */
+/** The media at the top level or in a folder, with buttons to add more. */
 export default function Index(props: Props) {
+  const [creatingFolder, setCreatingFolder] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
@@ -82,15 +101,32 @@ export default function Index(props: Props) {
         <h1 className="flex-1 truncate type-body-md text-mauve-950 dark:text-mauve-50">
           {table.title}
         </h1>
-        <Button
-          variant="secondary"
-          size="sm"
-          loading={uploading}
-          onClick={() => fileInput.current?.click()}
-        >
-          <Icon icon={UploadLine} />
-          Upload
-        </Button>
+        <ButtonGroup label="Add media" size="sm">
+          <Button
+            variant="secondary"
+            loading={uploading}
+            onClick={() => fileInput.current?.click()}
+          >
+            <Icon icon={UploadLine} />
+            Upload
+          </Button>
+          <Menu.Root>
+            <Menu.Trigger
+              // Nothing else to start while files upload.
+              disabled={uploading}
+              render={
+                <IconButton variant="secondary" aria-label="More actions">
+                  <Icon icon={ArrowDownSLine} />
+                </IconButton>
+              }
+            />
+            <Menu.Popup>
+              <Menu.Item icon={FolderAddLine} onClick={() => setCreatingFolder(true)}>
+                New folder
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Root>
+        </ButtonGroup>
       </header>
       {/* Opened by both Upload buttons. The types match the server's: raster images only. */}
       <input
@@ -109,14 +145,32 @@ export default function Index(props: Props) {
             title={table.emptyState?.title ?? "No media yet"}
             description={table.emptyState?.description ?? undefined}
           >
-            <Button
-              variant="primary"
-              loading={uploading}
-              onClick={() => fileInput.current?.click()}
-            >
-              <Icon icon={UploadLine} />
-              Upload
-            </Button>
+            <ButtonGroup label="Add media">
+              <Button
+                variant="primary"
+                loading={uploading}
+                onClick={() => fileInput.current?.click()}
+              >
+                <Icon icon={UploadLine} />
+                Upload
+              </Button>
+              <Menu.Root>
+                <Menu.Trigger
+                  // Nothing else to start while files upload.
+                  disabled={uploading}
+                  render={
+                    <IconButton variant="primary" aria-label="More actions">
+                      <Icon icon={ArrowDownSLine} />
+                    </IconButton>
+                  }
+                />
+                <Menu.Popup>
+                  <Menu.Item icon={FolderAddLine} onClick={() => setCreatingFolder(true)}>
+                    New folder
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Root>
+            </ButtonGroup>
           </EmptyState>
         </div>
       ) : (
@@ -144,8 +198,75 @@ export default function Index(props: Props) {
           </Dialog.Popup>
         </Freeze>
       </Dialog.Root>
+
+      <NewFolderDialog
+        open={creatingFolder}
+        onOpenChange={setCreatingFolder}
+        url={props.createFolderUrl}
+        parentId={props.folderId}
+      />
     </div>
   );
 }
 
 Index.layout = [SidebarLayout];
+
+type NewFolderDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  url: string;
+  parentId: number | null;
+};
+
+/** Asks for a name and creates the folder inside the given parent, or at the top level. */
+function NewFolderDialog({ open, onOpenChange, url, parentId }: NewFolderDialogProps) {
+  const form = useForm<{ name: string; parent_id: number | null }>({ name: "", parent_id: null });
+
+  function changeOpen(open: boolean) {
+    onOpenChange(open);
+
+    // Unseen while the popup is frozen, so the next folder starts without the last one's name or errors.
+    if (!open) {
+      form.reset();
+      form.clearErrors();
+    }
+  }
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    // The parent comes from the page, which Inertia reuses when moving between folders.
+    form.transform((data) => ({ ...data, parent_id: parentId }));
+    form.post(url, { preserveScroll: true, onSuccess: () => changeOpen(false) });
+  }
+
+  return (
+    <Dialog.Root open={open} onOpenChange={changeOpen}>
+      {/* Keeps the name, errors and loading button as they were while the popup animates out. */}
+      <Freeze frozen={!open}>
+        <Dialog.Popup title="New folder">
+          <form className="grid gap-4" onSubmit={submit}>
+            <Field
+              label="Name"
+              name="name"
+              required
+              // A parent deleted in another tab has no field of its own, so it shows here.
+              error={form.errors.name ?? form.errors.parent_id}
+            >
+              <Input
+                autoComplete="off"
+                value={form.data.name}
+                onChange={(event) => form.setData("name", event.currentTarget.value)}
+              />
+            </Field>
+            <Dialog.Actions>
+              <Dialog.Close>Cancel</Dialog.Close>
+              <Button type="submit" loading={form.processing}>
+                Create
+              </Button>
+            </Dialog.Actions>
+          </form>
+        </Dialog.Popup>
+      </Freeze>
+    </Dialog.Root>
+  );
+}

@@ -4,8 +4,10 @@ namespace Larasell\Admin\Http\Controllers\Media;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Larasell\Admin\Actions\Media\CreateFolder;
 use Larasell\Admin\Actions\Media\DeleteFolder;
 use Larasell\Admin\Models\Media\Folder;
 use Larasell\Admin\Tables\Panel\Media\Media;
@@ -37,9 +39,29 @@ class FolderController
 
         return Inertia::render('Media/Index', [
             'table' => $table,
+            'createFolderUrl' => route('larasell.admin.media.folders.store'),
             'uploadUrl' => route('larasell.admin.media.product-images.store'),
             'folderId' => $folder->id,
         ])->toResponse($request);
+    }
+
+    /**
+     * Creates a folder inside the folder given as parent_id, or at the top level without one,
+     * and returns to the page the folder was created on. CreateFolder validates the name.
+     */
+    public function store(Request $request, CreateFolder $createFolder): RedirectResponse
+    {
+        $validated = $request->validate([
+            'parent_id' => ['nullable', 'integer', Rule::exists(Folder::class, 'id')],
+        ]);
+
+        $parentId = isset($validated['parent_id']) ? (int) $validated['parent_id'] : null;
+
+        $createFolder->handle((string) $request->input('name'), $parentId);
+
+        return $parentId === null
+            ? redirect()->route('larasell.admin.media.index')
+            : redirect()->route('larasell.admin.media.folders.show', $parentId);
     }
 
     /**

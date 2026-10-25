@@ -203,6 +203,7 @@ it('leaves the admin panel when disabled', function () {
 
     $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->get("/admin/media/folders/{$folder->id}")->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->post('/admin/media/folders', ['name' => 'Banners'])->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->post('/admin/media/product-images', ['files' => []])->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->delete("/admin/media/folders/{$folder->id}")->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->delete('/admin/media/product-images/'.productImage('a.jpg'))->assertNotFound();

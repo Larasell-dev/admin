@@ -50,6 +50,7 @@ Route::middleware(Authenticate::class)->group(function () {
 
     if (config('larasell.media.enabled')) {
         Route::get('media', [MediaController::class, 'index'])->name('media.index');
+        Route::post('media/folders', [FolderController::class, 'store'])->name('media.folders.store');
         Route::get('media/folders/{folder}', [FolderController::class, 'show'])->name('media.folders.show');
         Route::delete('media/folders/{folder}', [FolderController::class, 'destroy'])->name('media.folders.destroy');
         Route::post('media/product-images', [ProductImageController::class, 'store'])->name('media.product-images.store');

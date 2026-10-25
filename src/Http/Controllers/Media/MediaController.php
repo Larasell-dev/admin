@@ -17,6 +17,7 @@ class MediaController
 
         return Inertia::render('Media/Index', [
             'table' => $table,
+            'createFolderUrl' => route('larasell.admin.media.folders.store'),
             'uploadUrl' => route('larasell.admin.media.product-images.store'),
             'folderId' => null,
         ]);
