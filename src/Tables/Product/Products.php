@@ -1,7 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Product\Tables;
+namespace Larasell\Admin\Tables\Product;
 
+use Larasell\Admin\Actions\Product\DeleteProduct;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Tables\Actions\Action;
@@ -31,8 +32,7 @@ class Products extends Table
     public function actions(): array
     {
         return [
-            // Variants, category links and cart items go with it; orders keep their own copy of the product.
-            Action::make('Delete', handle: fn (Product $product) => $product->delete())
+            Action::make('Delete', handle: fn (Product $product) => app(DeleteProduct::class)->handle($product))
                 ->confirm(message: 'It is removed from the store and every cart. Past orders keep it. This can\'t be undone.')
                 ->icon(Icon::DeleteBin)
                 ->destructive(),

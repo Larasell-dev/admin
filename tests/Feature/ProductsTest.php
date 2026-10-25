@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
 use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\Translatable;
 
 function signInAdmin(): Admin
 {
@@ -94,6 +96,23 @@ it('deletes a product with its variants and keeps the others', function () {
 
     expect(Product::query()->pluck('slug')->map->get()->all())->toBe(['socks'])
         ->and(DB::table('larasell_product_variants')->where('product_id', $boots->id)->exists())->toBeFalse();
+});
+
+it('removes a deleted product from its categories and keeps the categories', function () {
+    signInAdmin();
+
+    $shoes = Category::create(['name' => Translatable::fromString('Shoes'), 'slug' => Translatable::fromString('shoes')]);
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $socks = Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500)]);
+    $boots->categories()->attach($shoes);
+    $socks->categories()->attach($shoes);
+
+    $delete = $this->get('/admin/products')->inertiaProps('table.rows.0._actions.0.url');
+
+    $this->from('/admin/products')->post($delete)->assertRedirect('/admin/products');
+
+    expect(DB::table('larasell_category_product')->where('product_id', $boots->id)->exists())->toBeFalse()
+        ->and($shoes->fresh()?->products()->pluck('larasell_products.id')->all())->toBe([$socks->id]);
 });
 
 it('redirects guests away from the products', function () {

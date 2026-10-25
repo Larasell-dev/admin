@@ -16,7 +16,7 @@ use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Product\ProductServiceProvider;
+use Larasell\Admin\ServiceProviders\ProductServiceProvider;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
 
