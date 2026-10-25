@@ -34,7 +34,7 @@ class AdminPanel
     public function routes(Closure $routes): void
     {
         Route::middleware(['web', HandleAdminInertiaRequests::class, Authenticate::class])
-            ->prefix(config('larasell-admin.path'))
+            ->prefix(config('larasell.admin.panel.path'))
             ->name('larasell.admin.')
             ->withHead(title: self::TITLE)
             ->group($routes);

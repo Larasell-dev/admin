@@ -46,6 +46,6 @@ class WorkbenchServiceProvider extends ServiceProvider
         config(['filesystems.disks.public.url' => '/storage']);
 
         // Portals open at the site root; send it to the panel.
-        Route::redirect('/', '/'.config('larasell-admin.path'));
+        Route::redirect('/', '/'.config('larasell.admin.panel.path'));
     }
 }

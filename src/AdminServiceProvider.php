@@ -23,7 +23,7 @@ class AdminServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/admin.php', 'larasell-admin');
+        $this->mergeConfigFrom(__DIR__.'/../config/larasell/admin/panel.php', 'larasell.admin.panel');
 
         $this->app->register(HeadServiceProvider::class);
 
@@ -39,7 +39,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'larasell-admin');
 
         Route::middleware(['web', HandleAdminInertiaRequests::class])
-            ->prefix(config('larasell-admin.path'))
+            ->prefix(config('larasell.admin.panel.path'))
             ->name('larasell.admin.')
             ->withHead(title: AdminPanel::TITLE)
             ->group(__DIR__.'/../routes/web.php');
@@ -53,6 +53,10 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->booted(fn () => $this->app->make(Navigation::class)->freeze());
 
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/larasell/admin' => config_path('larasell/admin'),
+            ], 'larasell-admin-config');
+
             $this->commands([
                 CreateAdminUserCommand::class,
                 LinkAdminAssetsCommand::class,

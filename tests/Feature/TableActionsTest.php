@@ -79,7 +79,7 @@ function actionUrl(Book $book, string $action): string
 }
 
 beforeEach(function () {
-    config(['larasell-admin.tables.namespace' => 'Larasell\\Admin\\Tests\\Fixtures']);
+    config(['larasell.admin.panel.tables.namespace' => 'Larasell\\Admin\\Tests\\Fixtures']);
     Book::createTable();
 
     $this->dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);

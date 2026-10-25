@@ -132,7 +132,7 @@ abstract class Table implements JsonSerializable
             return 'larasell:'.self::path(Str::after(static::class, self::PANEL_NAMESPACE));
         }
 
-        $namespace = trim((string) config('larasell-admin.tables.namespace'), '\\').'\\';
+        $namespace = trim((string) config('larasell.admin.panel.tables.namespace'), '\\').'\\';
 
         if (! str_starts_with(static::class, $namespace)) {
             return null;
@@ -153,7 +153,7 @@ abstract class Table implements JsonSerializable
     {
         $namespace = str_starts_with($slug, 'larasell:')
             ? rtrim(self::PANEL_NAMESPACE, '\\')
-            : trim((string) config('larasell-admin.tables.namespace'), '\\');
+            : trim((string) config('larasell.admin.panel.tables.namespace'), '\\');
         $class = $namespace.'\\'.implode('\\', array_map(fn (string $segment): string => Str::studly($segment), explode('.', Str::after($slug, 'larasell:'))));
 
         if (! class_exists($class) || ! is_subclass_of($class, self::class) || $class::slug() !== $slug) {
@@ -168,7 +168,7 @@ abstract class Table implements JsonSerializable
         $state = $this->state();
 
         $slug = static::slug() ?? throw new LogicException(
-            static::class.' must live in the '.config('larasell-admin.tables.namespace').' namespace to run actions.',
+            static::class.' must live in the '.config('larasell.admin.panel.tables.namespace').' namespace to run actions.',
         );
 
         return route('larasell.admin.tables.actions', [

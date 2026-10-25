@@ -64,7 +64,7 @@ it('refuses to remove the last admin', function () {
 });
 
 it('deletes the avatar of the removed admin', function () {
-    $disk = Storage::fake(config('larasell-admin.disk'));
+    $disk = Storage::fake(config('larasell.admin.panel.disk'));
     $disk->put('avatars/ada.png', 'ada');
     $disk->put('avatars/grace.png', 'grace');
     Admin::query()->where('email', 'ada@example.com')->update(['avatar_path' => 'avatars/ada.png']);
