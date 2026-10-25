@@ -18,7 +18,7 @@
     "@dnd-kit/dom": "^0.5.1",
     "@dnd-kit/react": "^0.5.1",
     "@inertiajs/react": "^3.5.0",
-    "@larasell-dev/ui": "^0.1.20",
+    "@larasell-dev/ui": "^0.1.23",
     "@roving-focus/react": "^2.0.0",
     "@tanstack/react-hotkeys": "^0.17.0",
     "cn": "^0.4.0",

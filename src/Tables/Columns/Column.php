@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
+use LogicException;
 
 abstract class Column implements JsonSerializable
 {
@@ -15,6 +16,11 @@ abstract class Column implements JsonSerializable
      * Takes the value and a record of the table's model, which map() lets callers type as that model.
      */
     protected ?Closure $map = null;
+
+    /**
+     * Takes a record of the table's model and an Image, and returns the IconImage or PictureImage it makes, or null.
+     */
+    protected ?Closure $image = null;
 
     final public function __construct(
         protected string $name,
@@ -77,13 +83,71 @@ abstract class Column implements JsonSerializable
         }
 
         $mapped = ($this->map)($value, $record);
-
-        // Actions and rowLink() get the same record, so a change here would leak into them.
-        if ($record->isDirty()) {
-            throw InvalidTableColumn::recordModified($this->name, array_keys($record->getDirty()));
-        }
+        $this->assertUnmodified($record, 'map()');
 
         return $mapped;
+    }
+
+    /**
+     * Show an image before the column's value: an icon, or a picture at a url.
+     * The callback receives the record and an Image, and returns the image it
+     * makes with it, or null to show none for the record:
+     *
+     *     TextColumn::make('title')->image(fn (Book $book, Image $image) => $image->url($book->cover_url))
+     *     TextColumn::make('author')->image(fn (Book $book, Image $image) => $image->icon($book->author_id === null ? Icon::QuestionMark : Icon::QuillPen))
+     *
+     * The record is always an instance of the table's model, so the callback
+     * may type it as that model.
+     *
+     * @template TModel of Model
+     *
+     * @param  Closure(TModel, Image): ?CellImage  $callback
+     */
+    public function image(Closure $callback): static
+    {
+        if ($this->image !== null) {
+            throw InvalidTableColumn::configuredTwice($this->name, 'image()');
+        }
+
+        $this->image = $callback;
+
+        return $this;
+    }
+
+    public function hasImage(): bool
+    {
+        return $this->image !== null;
+    }
+
+    /**
+     * The image the column shows for the record, or null when the callback shows none for it.
+     * Only for columns that have an image; see hasImage().
+     */
+    public function imageFor(Model $record): ?CellImage
+    {
+        // The table decides which columns have an image, with hasImage(), and only asks those.
+        if ($this->image === null) {
+            throw new LogicException("Column [{$this->name}] has no image(); check hasImage() before calling imageFor().");
+        }
+
+        $image = ($this->image)($record, new Image($this->name));
+        $this->assertUnmodified($record, 'image()');
+
+        if ($image !== null && ! $image instanceof CellImage) {
+            throw InvalidTableColumn::invalidImage($this->name, get_debug_type($image));
+        }
+
+        return $image;
+    }
+
+    /**
+     * Actions and rowLink() get the same record, so a change a callback makes would leak into them.
+     */
+    private function assertUnmodified(Model $record, string $method): void
+    {
+        if ($record->isDirty()) {
+            throw InvalidTableColumn::recordModified($this->name, array_keys($record->getDirty()), $method);
+        }
     }
 
     /**

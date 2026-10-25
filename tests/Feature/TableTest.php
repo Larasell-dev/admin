@@ -7,8 +7,15 @@ use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
+use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Enums\Table\ImageStyle;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
+use Larasell\Admin\Tables\Columns\IconImage;
+use Larasell\Admin\Tables\Columns\Image;
+use Larasell\Admin\Tables\Columns\PictureImage;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
@@ -147,8 +154,8 @@ it('returns a row per model with the value of each column', function () {
     $emma = Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
 
     expect(tableResource(BooksTable::make())['rows'])->toBe([
-        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert', '_actions' => [], '_link' => null],
-        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen', '_actions' => [], '_link' => null],
+        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert', '_actions' => [], '_link' => null, '_images' => []],
+        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen', '_actions' => [], '_link' => null, '_images' => []],
     ]);
 });
 
@@ -177,7 +184,7 @@ it('lists the model declared with the UseModel attribute', function () {
     $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
-        ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
+        ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => []],
     ]);
 });
 
@@ -186,7 +193,7 @@ describe('inferred model', function () {
         $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
         expect(tableResource(Tables\Book::make())['rows'])->toBe([
-            ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null],
+            ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => []],
         ])->and(Tables\Book::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Book::class);
     });
 
@@ -332,7 +339,7 @@ describe('column names', function () {
         }
 
         test()->fail('Expected an InvalidTableColumn exception.');
-    })->with(['_actions', '_link']);
+    })->with(['_actions', '_link', '_images']);
 
     it('rejects column names before there are any rows', function () {
         tableResource(tableWithColumns([TextColumn::make('title'), TextColumn::make('title')]));
@@ -490,6 +497,285 @@ describe('mapped text columns', function () {
         'array' => [['Dune'], 'array'],
         'object without __toString' => [new stdClass, 'stdClass'],
     ]);
+});
+
+/**
+ * A table whose title column shows the image the given callback configures, next to an author column without one.
+ */
+function imageTitleTable(Closure $image): Table
+{
+    ImageTitleTable::$image = $image;
+
+    return ImageTitleTable::make();
+}
+
+class ImageTitleTable extends Table
+{
+    public static Closure $image;
+
+    protected ?string $model = Book::class;
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title')->image(static::$image), TextColumn::make('author_name')];
+    }
+}
+
+/**
+ * The title column's image of each row, keyed by title.
+ *
+ * @return array<string, array<string, string>|null>
+ */
+function titleImages(Closure $image): array
+{
+    $rows = tableResource(imageTitleTable($image))['rows'];
+
+    return array_combine(array_column($rows, 'title'), array_map(fn (array $row): ?array => $row['_images']['title'], $rows));
+}
+
+/**
+ * Runs the callback and returns the InvalidTableColumn it throws, failing the test when it throws none.
+ */
+function invalidColumn(Closure $callback): InvalidTableColumn
+{
+    try {
+        $callback();
+    } catch (InvalidTableColumn $exception) {
+        return $exception;
+    }
+
+    test()->fail('Expected an InvalidTableColumn exception.');
+}
+
+describe('column images', function () {
+    beforeEach(function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+        Book::create(['title' => 'Beowulf', 'author_name' => 'Anonymous']);
+    });
+
+    it('shows the icon the callback picks for each record, by its case name', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $image->icon($book->author_name === 'Anonymous' ? Icon::QuestionMark : Icon::QuillPen)))->toBe([
+            'Dune' => ['type' => 'icon', 'icon' => 'QuillPen', 'style' => null, 'alt' => null, 'title' => null],
+            'Beowulf' => ['type' => 'icon', 'icon' => 'QuestionMark', 'style' => null, 'alt' => null, 'title' => null],
+        ]);
+    });
+
+    it('takes an icon by its Remix icon name', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $image->icon('book-open'))['Dune'])
+            ->toBe(['type' => 'icon', 'icon' => 'BookOpen', 'style' => null, 'alt' => null, 'title' => null]);
+    });
+
+    it('rejects an icon name that is not a Remix icon', function (string $icon, string $code) {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->icon($icon))));
+
+        expect($exception->errorCode())->toBe($code)
+            ->and($exception->getMessage())->toContain('[title]');
+    })->with([
+        'empty' => ['  ', 'larasell-admin.table.column.empty-image-icon'],
+        'style variant' => ['book-open-line', 'larasell-admin.table.column.image-icon-style-variant'],
+        'unknown' => ['BookOpen', 'larasell-admin.table.column.unknown-image-icon'],
+    ]);
+
+    it('shows the image at the url the callback picks for each record', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $image->url("https://covers.test/{$book->title}.jpg")))->toBe([
+            'Dune' => ['type' => 'url', 'url' => 'https://covers.test/Dune.jpg', 'style' => 'square', 'alt' => null, 'title' => null],
+            'Beowulf' => ['type' => 'url', 'url' => 'https://covers.test/Beowulf.jpg', 'style' => 'square', 'alt' => null, 'title' => null],
+        ]);
+    });
+
+    it('takes the url with to()', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $image->to('https://covers.test/dune.jpg'))['Dune']['url'])
+            ->toBe('https://covers.test/dune.jpg');
+    });
+
+    it('takes a url a browser can show as a picture', function (string $url) {
+        expect(titleImages(fn (Book $book, Image $image) => $image->url($url))['Dune']['url'])->toBe($url);
+    })->with([
+        'https' => 'https://covers.test/dune.jpg',
+        'http' => 'http://covers.test/dune.jpg',
+        'uppercase scheme' => 'HTTPS://covers.test/dune.jpg',
+        'root-relative' => '/covers/dune.jpg',
+        'path-relative' => 'covers/dune.jpg',
+        'protocol-relative' => '//covers.test/dune.jpg',
+        'colon in the path' => '/covers/dune:messiah.jpg',
+        'data image' => 'data:image/png;base64,iVBORw0KGgo=',
+        'data svg image' => 'data:image/svg+xml,%3Csvg%2F%3E',
+    ]);
+
+    it('rejects a url with a scheme that is not a picture', function (string $url) {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->url($url))));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.unsupported-image-url')
+            ->and($exception->getMessage())->toContain('[title]');
+    })->with([
+        'javascript' => 'javascript:alert(1)',
+        'javascript, mixed case' => 'JavaScript:alert(1)',
+        // Browsers drop leading spaces and control characters, and tabs and newlines anywhere, before reading the scheme.
+        'javascript, leading space' => ' javascript:alert(1)',
+        'javascript, tab in the scheme' => "java\tscript:alert(1)",
+        'vbscript' => 'vbscript:msgbox(1)',
+        'data that is not an image' => 'data:text/html,<script>alert(1)</script>',
+        'file' => 'file:///etc/passwd',
+        'ftp' => 'ftp://covers.test/dune.jpg',
+        'blob' => 'blob:https://covers.test/0b6e',
+        'mailto' => 'mailto:frank@herbert.test',
+    ]);
+
+    it('rejects an empty url', function () {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->url(' '))));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.empty-image-url')
+            ->and($exception->getMessage())->toContain('[title]');
+    });
+
+    describe('routes', function () {
+        beforeEach(function () {
+            Route::get('covers/{book}', fn () => '')->name('books.cover');
+            Route::getRoutes()->refreshNameLookups();
+        });
+
+        it('builds the url of a named route', function () {
+            $dune = Book::where('title', 'Dune')->sole();
+
+            expect(titleImages(fn (Book $book, Image $image) => $image->route('books.cover', $book))['Dune']['url'])
+                ->toBe("http://localhost/covers/{$dune->id}");
+        });
+
+        it('builds a relative url of a named route', function () {
+            $dune = Book::where('title', 'Dune')->sole();
+
+            expect(titleImages(fn (Book $book, Image $image) => $image->route('books.cover', $book, absolute: false))['Dune']['url'])
+                ->toBe("/covers/{$dune->id}");
+        });
+
+        it('builds a signed url of a named route', function () {
+            $url = titleImages(fn (Book $book, Image $image) => $image->signedRoute('books.cover', $book))['Dune']['url'];
+
+            expect(URL::hasValidSignature(Request::create($url)))->toBeTrue()
+                ->and($url)->not->toContain('expires=');
+        });
+
+        it('builds a signed url of a named route that expires', function () {
+            $this->travelTo('2026-10-20 12:00:00');
+            $url = titleImages(fn (Book $book, Image $image) => $image->temporarySignedRoute('books.cover', now()->addHour(), $book))['Dune']['url'];
+
+            $this->travelTo('2026-10-20 12:59:00');
+            expect(URL::hasValidSignature(Request::create($url)))->toBeTrue();
+
+            $this->travelTo('2026-10-20 13:01:00');
+            expect(URL::hasValidSignature(Request::create($url)))->toBeFalse();
+        });
+    });
+
+    it('shows a picture round or square', function () {
+        $cover = 'https://covers.test/dune.jpg';
+
+        expect(titleImages(fn (Book $book, Image $image) => $image->url($cover)->rounded())['Dune']['style'])->toBe('round')
+            ->and(titleImages(fn (Book $book, Image $image) => $image->url($cover)->style(ImageStyle::Round))['Dune']['style'])->toBe('round')
+            ->and(titleImages(fn (Book $book, Image $image) => $image->url($cover)->style(ImageStyle::Square))['Dune']['style'])->toBe('square');
+    });
+
+    // A style on an icon is then an undefined method, which IDEs and PHPStan flag as it is written.
+    it('gives only pictures a style, so an icon cannot take one', function () {
+        $images = [];
+        titleImages(function (Book $book, Image $image) use (&$images): IconImage|PictureImage {
+            $images['factory'] = $image;
+
+            return $images[$book->title] = $book->title === 'Dune' ? $image->icon(Icon::Book) : $image->url('https://covers.test/beowulf.jpg');
+        });
+
+        expect($images['Dune'])->toBeInstanceOf(IconImage::class)
+            ->and($images['Beowulf'])->toBeInstanceOf(PictureImage::class)
+            ->and(array_map(fn (string $method): array => [
+                method_exists($images['factory'], $method),
+                method_exists($images['Dune'], $method),
+                method_exists($images['Beowulf'], $method),
+            ], ['rounded', 'style']))->toBe([[false, false, true], [false, false, true]]);
+    });
+
+    it('sends the alt text and title of each record\'s image', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $image->url("https://covers.test/{$book->title}.jpg")->alt("Cover of {$book->title}")->title($book->author_name)))->toBe([
+            'Dune' => ['type' => 'url', 'url' => 'https://covers.test/Dune.jpg', 'style' => 'square', 'alt' => 'Cover of Dune', 'title' => 'Frank Herbert'],
+            'Beowulf' => ['type' => 'url', 'url' => 'https://covers.test/Beowulf.jpg', 'style' => 'square', 'alt' => 'Cover of Beowulf', 'title' => 'Anonymous'],
+        ]);
+    });
+
+    it('takes an alt text and title for an icon too', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $image->icon(Icon::QuillPen)->title('Has an author'))['Dune'])
+            ->toBe(['type' => 'icon', 'icon' => 'QuillPen', 'style' => null, 'alt' => null, 'title' => 'Has an author']);
+    });
+
+    it('rejects giving an image a second alt text or title', function (Closure $callback, string $method) {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable($callback)));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.configured-twice')
+            ->and($exception->getMessage())->toContain($method);
+    })->with([
+        'two alts' => [fn (Book $book, Image $image) => $image->icon(Icon::Book)->alt('a')->alt('b'), 'alt()'],
+        'two titles' => [fn (Book $book, Image $image) => $image->icon(Icon::Book)->title('a')->title('b'), 'title()'],
+    ]);
+
+    it('shows no image for the records the callback returns null for', function () {
+        expect(titleImages(fn (Book $book, Image $image) => $book->title === 'Dune' ? $image->icon(Icon::Book) : null))->toBe([
+            'Dune' => ['type' => 'icon', 'icon' => 'Book', 'style' => null, 'alt' => null, 'title' => null],
+            'Beowulf' => null,
+        ]);
+    });
+
+    it('lists only the columns that have an image', function () {
+        expect(tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->icon(Icon::Book)))['rows'][0]['_images'])
+            ->toHaveKeys(['title'])
+            ->not->toHaveKey('author_name');
+    });
+
+    it('rejects a callback that returns something other than the image', function (Closure $callback, string $type) {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable($callback)));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.invalid-image')
+            ->and($exception->getMessage())->toContain('[title]')
+            ->and($exception->getMessage())->toContain($type);
+    })->with([
+        'a url' => [fn () => 'https://covers.test/dune.jpg', 'string'],
+        'an icon' => [fn () => Icon::Book, Icon::class],
+        'the Image, without an icon or a url' => [fn (Book $book, Image $image) => $image, Image::class],
+    ]);
+
+    it('rejects giving an image a second source or style', function (Closure $callback, string $method) {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable($callback)));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.configured-twice')
+            ->and($exception->getMessage())->toContain('[title]')
+            ->and($exception->getMessage())->toContain($method);
+    })->with([
+        // Only one of the two images could be returned, so the other would silently not show.
+        'icon and url' => [fn (Book $book, Image $image) => [$image->icon(Icon::Book), $image->url('https://covers.test/dune.jpg')][1], 'icon(), url() or a route method'],
+        'two urls' => [fn (Book $book, Image $image) => [$image->to('https://covers.test/a.jpg'), $image->url('https://covers.test/b.jpg')][1], 'icon(), url() or a route method'],
+        'two styles' => [fn (Book $book, Image $image) => $image->url('https://covers.test/dune.jpg')->rounded()->style(ImageStyle::Square), 'rounded() or style()'],
+    ]);
+
+    it('rejects a callback that changes the record', function () {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable(function (Book $book, Image $image): IconImage {
+            $book->title = 'Changed';
+
+            return $image->icon(Icon::Book);
+        })));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.record-modified')
+            ->and($exception->getMessage())->toContain('[title]')
+            ->and($exception->getMessage())->toContain('image()');
+    });
+
+    it('rejects calling image() twice on a column', function () {
+        $exception = invalidColumn(fn () => TextColumn::make('title')->image(fn () => null)->image(fn () => null));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.configured-twice')
+            ->and($exception->getMessage())->toContain('image()');
+    });
+
+    it('keeps the column text next to the image', function () {
+        expect(tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->icon(Icon::Book)))['rows'][0])
+            ->toMatchArray(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+    });
 });
 
 describe('pagination', function () {
