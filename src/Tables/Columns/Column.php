@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
+use LogicException;
 
 abstract class Column implements JsonSerializable
 {
@@ -119,12 +120,14 @@ abstract class Column implements JsonSerializable
     }
 
     /**
-     * The image the column shows for the record, or null when it shows none.
+     * The image the column shows for the record, or null when the callback shows none for it.
+     * Only for columns that have an image; see hasImage().
      */
     public function imageFor(Model $record): ?Image
     {
+        // The table decides which columns have an image, with hasImage(), and only asks those.
         if ($this->image === null) {
-            return null;
+            throw new LogicException("Column [{$this->name}] has no image(); check hasImage() before calling imageFor().");
         }
 
         $image = ($this->image)($record, new Image($this->name));
