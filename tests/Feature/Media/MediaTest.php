@@ -98,10 +98,15 @@ it('shows the empty state for a folder without contents', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.rows', []));
 });
 
-it('returns not found for a folder that does not exist', function () {
+it('shows the media page without a table, with a 404, for a folder that does not exist', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
-    $this->actingAs($admin, 'larasell-admin')->get('/admin/media/folders/999')->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')
+        ->get('/admin/media/folders/999')
+        ->assertNotFound()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Media/Index', shouldExist: false)
+            ->where('table', null));
 });
 
 it('requires a signed-in admin for a folder page', function () {

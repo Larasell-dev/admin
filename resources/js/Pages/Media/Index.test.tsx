@@ -6,40 +6,43 @@ import { render } from "vitest-browser-react";
 import type { MediaTableResource } from "../../Components/Media/MediaTable";
 import Index from "./Index";
 
-function renderMedia(total: number) {
-  const table: MediaTableResource = {
-    title: "Media",
-    backLink: null,
-    emptyState: { title: "No media yet", description: null, icon: null },
-    columns: [
-      { name: "name", label: "Name", type: "text" },
-      { name: "type", label: "Type", type: "text" },
-    ],
-    rows:
-      total === 0
-        ? []
-        : [
-            {
-              id: "folder-1",
-              name: "Campaigns",
-              type: "Folder",
-              _actions: [],
-              _link: "/admin/media/folders/1",
-              _type: "folder",
-              _deleteUrl: "/admin/media/folders/1",
-            },
-            {
-              id: "product-image-4",
-              name: "apple.jpg",
-              type: "Product image",
-              _actions: [],
-              _link: "https://cdn.example.com/products/apple.jpg",
-              _type: "product-image",
-              _deleteUrl: "/admin/media/product-images/4",
-            },
+function renderMedia(total: number | null) {
+  const table: MediaTableResource | null =
+    total === null
+      ? null
+      : {
+          title: "Media",
+          backLink: null,
+          emptyState: { title: "No media yet", description: null, icon: null },
+          columns: [
+            { name: "name", label: "Name", type: "text" },
+            { name: "type", label: "Type", type: "text" },
           ],
-    pagination: { page: 1, pageSize: 25, total },
-  };
+          rows:
+            total === 0
+              ? []
+              : [
+                  {
+                    id: "folder-1",
+                    name: "Campaigns",
+                    type: "Folder",
+                    _actions: [],
+                    _link: "/admin/media/folders/1",
+                    _type: "folder",
+                    _deleteUrl: "/admin/media/folders/1",
+                  },
+                  {
+                    id: "product-image-4",
+                    name: "apple.jpg",
+                    type: "Product image",
+                    _actions: [],
+                    _link: "https://cdn.example.com/products/apple.jpg",
+                    _type: "product-image",
+                    _deleteUrl: "/admin/media/product-images/4",
+                  },
+                ],
+          pagination: { page: 1, pageSize: 25, total },
+        };
   const initialPage = {
     component: "Media/Index",
     url: "/admin/media",
@@ -70,6 +73,15 @@ function renderMedia(total: number) {
     />,
   );
 }
+
+it("explains a folder that does not exist", async () => {
+  await renderMedia(null);
+
+  await expect
+    .element(page.getByRole("heading", { level: 1, name: "Folder not found" }))
+    .toBeVisible();
+  await expect.element(page.getByText("This folder doesn't exist anymore")).toBeVisible();
+});
 
 afterEach(() => {
   vi.restoreAllMocks();
