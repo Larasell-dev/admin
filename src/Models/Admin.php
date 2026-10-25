@@ -34,6 +34,6 @@ class Admin extends Authenticatable
             return null;
         }
 
-        return Storage::disk(config('larasell-admin.disk'))->url($this->avatar_path);
+        return Storage::disk(config('larasell.admin.panel.disk'))->url($this->avatar_path);
     }
 }

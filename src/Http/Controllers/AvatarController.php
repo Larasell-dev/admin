@@ -16,7 +16,7 @@ class AvatarController
 
     public function store(AvatarRequest $request): JsonResponse
     {
-        $disk = Storage::disk(config('larasell-admin.disk'));
+        $disk = Storage::disk(config('larasell.admin.panel.disk'));
 
         // Only the latest upload can be saved, so an earlier unsaved one is no longer needed.
         $previous = $request->session()->pull(self::PENDING_SESSION_KEY);
@@ -25,7 +25,7 @@ class AvatarController
             $disk->delete($previous);
         }
 
-        $path = $request->file('avatar')->storePublicly('avatars', ['disk' => config('larasell-admin.disk')]);
+        $path = $request->file('avatar')->storePublicly('avatars', ['disk' => config('larasell.admin.panel.disk')]);
 
         if ($path === false) {
             throw new RuntimeException('Unable to store the avatar.');

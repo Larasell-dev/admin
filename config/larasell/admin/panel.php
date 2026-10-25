@@ -2,6 +2,10 @@
 
 return [
 
+    /*
+     * The URL path the admin panel is served under, for example "admin" for
+     * https://example.com/admin.
+     */
     'path' => env('LARASELL_ADMIN_PATH', 'admin'),
 
     /*

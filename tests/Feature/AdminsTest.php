@@ -58,7 +58,7 @@ it('offers to delete every admin but the signed-in one', function () {
 it('deletes another admin and their avatar', function () {
     $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
-    $disk = Storage::fake(config('larasell-admin.disk'));
+    $disk = Storage::fake(config('larasell.admin.panel.disk'));
     $disk->put('avatars/ada.png', 'ada');
     $disk->put('avatars/alan.png', 'alan');
     $ada->update(['avatar_path' => 'avatars/ada.png']);

@@ -27,7 +27,7 @@ class DeleteAdmin
             throw AdminRemovalFailed::stillExists($admin->email);
         }
 
-        if ($admin->avatar_path !== null && ! Storage::disk(config('larasell-admin.disk'))->delete($admin->avatar_path)) {
+        if ($admin->avatar_path !== null && ! Storage::disk(config('larasell.admin.panel.disk'))->delete($admin->avatar_path)) {
             throw AdminRemovalFailed::avatarNotDeleted($admin->email, $admin->avatar_path);
         }
     }

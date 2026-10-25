@@ -56,7 +56,7 @@ class AdminRemovalFailed extends RuntimeException implements StructuredError
             code: 'larasell-admin.admin.avatar-not-deleted',
             message: "Avatar [{$path}] of the removed admin [{$email}] could not be deleted.",
             why: 'The admin was removed, but the filesystem disk refused to delete the avatar file.',
-            fix: 'Check the permissions of the configured larasell-admin.disk and delete the file manually.',
+            fix: 'Check the permissions of the configured larasell.admin.panel.disk and delete the file manually.',
         );
     }
 }

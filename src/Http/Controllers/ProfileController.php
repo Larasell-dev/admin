@@ -26,7 +26,7 @@ class ProfileController
     public function update(ProfileRequest $request, #[CurrentUser('larasell-admin')] Admin $admin): RedirectResponse
     {
         $attributes = $request->safe()->only(['name', 'email']);
-        $disk = Storage::disk(config('larasell-admin.disk'));
+        $disk = Storage::disk(config('larasell.admin.panel.disk'));
         $previousAvatar = $admin->avatar_path;
 
         if ($request->filled('avatar')) {

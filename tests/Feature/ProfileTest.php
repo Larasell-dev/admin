@@ -119,7 +119,7 @@ it('only shows and updates the authenticated admin', function () {
 
 it('uploads an avatar without assigning it', function () {
     Storage::fake('avatars');
-    config(['larasell-admin.disk' => 'avatars']);
+    config(['larasell.admin.panel.disk' => 'avatars']);
     $admin = profileAdmin();
 
     $response = $this->actingAs($admin, 'larasell-admin')
