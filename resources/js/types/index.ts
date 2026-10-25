@@ -47,6 +47,7 @@ export type TableRow = {
 
 /** The JSON shape of a Larasell\Admin\Tables\Actions\TableAction: an action for the whole table. */
 export type TableAction = {
+  /** Unique among the actions of the same list. */
   label: string;
   /** Only links for now. */
   method: "get";

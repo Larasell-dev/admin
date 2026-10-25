@@ -41,7 +41,7 @@ export default function TablePage({ table }: Props) {
         {/* The empty state offers its own actions instead. */}
         {hasRows &&
           table.headerActions.map((action) => (
-            <TableActionLink key={action.url} action={action} size="sm" />
+            <TableActionLink key={action.label} action={action} size="sm" />
           ))}
       </header>
 
@@ -55,7 +55,7 @@ export default function TablePage({ table }: Props) {
             description={table.emptyState?.description ?? undefined}
           >
             {table.emptyState?.actions.map((action) => (
-              <TableActionLink key={action.url} action={action} />
+              <TableActionLink key={action.label} action={action} />
             ))}
           </EmptyState>
         </div>

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Exceptions\InvalidTableAction;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Tables\Actions\TableAction;
@@ -130,20 +131,28 @@ it('rejects an invalid empty state', function (array $emptyState, string $code) 
 it('says which rule invalid empty state actions break', function (mixed $actions, string $expected) {
     ShelfTable::$emptyState = ['title' => 'No books yet', 'actions' => value($actions)];
 
-    try {
-        json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR);
-    } catch (InvalidTableEmptyState $exception) {
-        expect($exception->errorCode())->toBe('larasell-admin.table.empty-state.invalid-value')
-            ->and($exception->getMessage())->toEndWith("[actions] must be {$expected}.");
-
-        return;
-    }
-
-    test()->fail('Expected an InvalidTableEmptyState exception.');
+    expect(fn () => json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR))
+        ->toThrow(function (InvalidTableAction $exception) use ($expected) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.action.invalid-list')
+                ->and($exception->getMessage())->toBe("Table [ShelfTable] emptyState() actions must be {$expected}.");
+        });
 })->with([
     'a single action instead of an array' => [fn () => TableAction::make('Add book')->to('/a'), 'an array'],
     'actions keyed by name' => [fn () => ['add' => TableAction::make('Add book')->to('/a')], 'a list'],
     'an array instead of a TableAction' => [[['label' => 'Add book', 'url' => '/a']], 'a list of TableAction'],
+]);
+
+it('rejects empty state actions without a link or with the same label', function (Closure $actions, string $message) {
+    ShelfTable::$emptyState = ['title' => 'No books yet', 'actions' => $actions()];
+
+    expect(fn () => json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR))
+        ->toThrow(InvalidTableAction::class, $message);
+})->with([
+    'no link' => [fn () => [TableAction::make('Add book')], 'Table [ShelfTable] action [Add book] needs a link'],
+    'same label' => [
+        fn () => [TableAction::make('Add book')->to('/a'), TableAction::make('Add book')->to('/b')],
+        'Table [ShelfTable] emptyState() actions has more than one action labelled [Add book]',
+    ],
 ]);
 
 it('sends the empty state to the table page', function () {

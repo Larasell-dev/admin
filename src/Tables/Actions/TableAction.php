@@ -27,7 +27,12 @@ final class TableAction implements JsonSerializable
     /** @var array<int, string> The configuration methods called so far, which may each be called only once. */
     private array $configured = [];
 
-    private function __construct(private string $label) {}
+    private function __construct(private string $label)
+    {
+        if (Str::trim($label) === '') {
+            throw InvalidTableAction::emptyLabel();
+        }
+    }
 
     public static function make(string $label): self
     {
@@ -37,6 +42,11 @@ final class TableAction implements JsonSerializable
     public function to(string $url): self
     {
         $this->configureOnce('to() or route()');
+
+        if (Str::trim($url) === '') {
+            throw InvalidTableAction::emptyUrl($this->label);
+        }
+
         $this->url = $url;
 
         return $this;
@@ -59,6 +69,23 @@ final class TableAction implements JsonSerializable
         $this->icon = is_string($icon) ? $this->resolveIcon($icon) : $icon;
 
         return $this;
+    }
+
+    /**
+     * Throws unless the action has everything it needs to be sent to the page.
+     *
+     * @param  class-string  $table  The table the action belongs to, named in the error.
+     */
+    public function assertConfigured(string $table): void
+    {
+        if ($this->url === null) {
+            throw InvalidTableAction::missingLink($table, $this->label);
+        }
+    }
+
+    public function label(): string
+    {
+        return $this->label;
     }
 
     public function name(): string
@@ -99,7 +126,8 @@ final class TableAction implements JsonSerializable
         return [
             'label' => $this->label,
             'method' => 'get',
-            'url' => $this->url ?? throw new LogicException("Action [{$this->name()}] needs a link: call to() or route()."),
+            // Paired with assertConfigured(), which the table calls first and which names the table.
+            'url' => $this->url ?? throw new LogicException("Action [{$this->label}] needs a link: call to() or route()."),
             'icon' => $this->icon?->name,
         ];
     }

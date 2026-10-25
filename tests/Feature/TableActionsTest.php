@@ -543,13 +543,48 @@ describe('header actions', function () {
         expect(headerActions(fn () => [TableAction::make('Add book')->to('/a')]))->toHaveCount(1);
     });
 
-    it('needs a link', function () {
+    it('needs a link, and says which table the action belongs to', function () {
         headerActions(fn () => [TableAction::make('Add book')]);
-    })->throws(LogicException::class, 'Action [add-book] needs a link');
+    })->throws(InvalidTableAction::class, 'Table [BookHeaderActionsTable] action [Add book] needs a link');
 
-    it('rejects configuring the same thing twice', function () {
-        TableAction::make('Add book')->to('/a')->to('/b');
-    })->throws(InvalidTableAction::class, 'calls to() or route() more than once');
+    it('rejects configuring the same thing twice', function (Closure $configure, string $method) {
+        Route::get('/books/new', fn () => '')->name('books.create');
+
+        expect(fn () => $configure(TableAction::make('Add book')))
+            ->toThrow(InvalidTableAction::class, "calls {$method} more than once");
+    })->with([
+        'to() twice' => [fn (TableAction $action) => $action->to('/a')->to('/b'), 'to() or route()'],
+        'route() after to()' => [fn (TableAction $action) => $action->to('/a')->route('books.create'), 'to() or route()'],
+        'to() after route()' => [fn (TableAction $action) => $action->route('books.create')->to('/a'), 'to() or route()'],
+        'icon() twice' => [fn (TableAction $action) => $action->icon(Icon::Add)->icon('upload'), 'icon()'],
+    ]);
+
+    it('rejects an empty label', function (string $label) {
+        TableAction::make($label);
+    })->with(['empty' => '', 'whitespace' => '   '])
+        ->throws(InvalidTableAction::class, 'needs a label');
+
+    it('rejects an empty link', function (string $url) {
+        TableAction::make('Add book')->to($url);
+    })->with(['empty' => '', 'whitespace' => '   '])
+        ->throws(InvalidTableAction::class, 'Action [Add book] link cannot be empty');
+
+    it('rejects anything but a list of TableAction', function (Closure $actions, string $expected) {
+        expect(fn () => headerActions($actions))->toThrow(function (InvalidTableAction $exception) use ($expected) {
+            expect($exception->errorCode())->toBe('larasell-admin.table.action.invalid-list')
+                ->and($exception->getMessage())->toBe("Table [BookHeaderActionsTable] headerActions() must be {$expected}.");
+        });
+    })->with([
+        'a row action' => [fn () => [Action::make('Add book')->to('/a')], 'a list of TableAction'],
+        'actions keyed by name' => [fn () => ['add' => TableAction::make('Add book')->to('/a')], 'a list'],
+    ]);
+
+    it('rejects two actions with the same label', function () {
+        headerActions(fn () => [
+            TableAction::make('Add book')->to('/a'),
+            TableAction::make('Add book')->to('/b'),
+        ]);
+    })->throws(InvalidTableAction::class, 'Table [BookHeaderActionsTable] headerActions() has more than one action labelled [Add book]');
 
     it('rejects an unknown icon', function () {
         TableAction::make('Add book')->icon('not-an-icon');

@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use JsonException;
 use JsonSerializable;
 use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Exceptions\InvalidTableAction;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
@@ -273,25 +274,45 @@ abstract class Table implements JsonSerializable
             throw InvalidTableEmptyState::invalidValue(static::class, 'description', 'a string');
         }
 
-        $actions = $state['actions'] ?? [];
-        if (! is_array($actions)) {
-            throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'an array');
-        }
-        if (! array_is_list($actions)) {
-            throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'a list');
-        }
-        foreach ($actions as $action) {
-            if (! $action instanceof TableAction) {
-                throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'a list of TableAction');
-            }
-        }
-
         return [
             'title' => $title,
             'description' => $description,
             'icon' => $this->resolveEmptyStateIcon($state['icon'] ?? null),
-            'actions' => $actions,
+            'actions' => $this->resolveTableActions('emptyState() actions', $state['actions'] ?? []),
         ];
+    }
+
+    /**
+     * Checks the header's or the empty state's actions, which share these rules: a
+     * list of TableAction, each with a link, and no two with the same label, since
+     * the page tells them apart by it.
+     *
+     * @return array<int, TableAction>
+     */
+    private function resolveTableActions(string $source, mixed $actions): array
+    {
+        if (! is_array($actions)) {
+            throw InvalidTableAction::invalidList(static::class, $source, 'an array');
+        }
+        if (! array_is_list($actions)) {
+            throw InvalidTableAction::invalidList(static::class, $source, 'a list');
+        }
+
+        $labels = [];
+        foreach ($actions as $action) {
+            if (! $action instanceof TableAction) {
+                throw InvalidTableAction::invalidList(static::class, $source, 'a list of TableAction');
+            }
+
+            $action->assertConfigured(static::class);
+
+            if (in_array($action->label(), $labels, true)) {
+                throw InvalidTableAction::duplicateLabel(static::class, $source, $action->label());
+            }
+            $labels[] = $action->label();
+        }
+
+        return $actions;
     }
 
     protected function resolveEmptyStateIcon(mixed $icon): ?string
@@ -453,7 +474,7 @@ abstract class Table implements JsonSerializable
         return [
             'title' => $this->title(),
             'emptyState' => $this->resolveEmptyState(),
-            'headerActions' => $this->headerActions(),
+            'headerActions' => $this->resolveTableActions('headerActions()', $this->headerActions()),
             'columns' => $columns,
             'rows' => $rows->all(),
             'pagination' => [
