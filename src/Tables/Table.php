@@ -16,6 +16,7 @@ use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Attributes\Remember;
 use Larasell\Admin\Tables\Attributes\UseModel;
+use Larasell\Admin\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Tables\Columns\Column;
 use LogicException;
 use ReflectionClass;
@@ -360,7 +361,7 @@ abstract class Table implements JsonSerializable
         foreach (array_unique(array_diff_assoc($columnNames, array_unique($columnNames))) as $duplicate) {
             throw InvalidTableColumn::duplicateName(static::class, $duplicate);
         }
-        foreach (array_intersect($columnNames, ['_actions', '_link', '_images']) as $reserved) {
+        foreach (array_intersect($columnNames, ['_actions', '_link', '_images', '_variants']) as $reserved) {
             throw InvalidTableColumn::reservedName(static::class, $reserved);
         }
 
@@ -387,6 +388,7 @@ abstract class Table implements JsonSerializable
         $rows = $paginator->getCollection()->map(function (Model $record) use ($columns, $actions): array {
             $row = ['id' => $record->getKey()];
             $images = [];
+            $variants = [];
 
             foreach ($columns as $column) {
                 $row[$column->name()] = $column->value($record);
@@ -394,12 +396,17 @@ abstract class Table implements JsonSerializable
                 if ($column->hasImage()) {
                     $images[$column->name()] = $column->imageFor($record);
                 }
+
+                if ($column instanceof BadgeColumn) {
+                    $variants[$column->name()] = $column->variantFor($record);
+                }
             }
 
             $row['_actions'] = array_map(fn (Action $action): array => $action->toRow($this, $record), $actions);
             $row['_link'] = method_exists($this, 'rowLink') ? $this->rowLink($record) : null;
             // An object, so a table without images still sends {} rather than [].
             $row['_images'] = (object) $images;
+            $row['_variants'] = (object) $variants;
 
             return $row;
         });

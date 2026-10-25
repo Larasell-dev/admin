@@ -1,9 +1,9 @@
 import { Link, router } from "@inertiajs/react";
 import type { PaginationChange } from "@larasell-dev/ui";
-import { DataList, Pagination, Table } from "@larasell-dev/ui";
+import { Badge, DataList, Pagination, Table } from "@larasell-dev/ui";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { type ReactNode, useState } from "react";
-import type { TableAction, TableResource, TableRow } from "../types";
+import type { TableAction, TableColumn, TableResource, TableRow } from "../types";
 import { overlayExclusive } from "../utils/hotkeys";
 import { isSameSite } from "../utils/isSameSite";
 import { navigationIcon } from "../utils/navigationIcon";
@@ -15,6 +15,22 @@ type Props = {
 };
 
 const cell = (row: TableRow, column: string) => row[column] as string | number | null;
+
+/** What a column shows for the row: its text, in a badge for badge columns. */
+function value(row: TableRow, column: TableColumn): ReactNode {
+  const text = cell(row, column.name);
+
+  if (column.type !== "badge") {
+    return text;
+  }
+
+  // A badge without text would show as an empty pill.
+  if (text === null) {
+    return text;
+  }
+
+  return <Badge variant={row._variants[column.name]}>{text}</Badge>;
+}
 
 function visit(url: string) {
   if (isSameSite(url)) {
@@ -120,14 +136,14 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
                 <div className="flex items-start justify-between gap-2">
                   {primary && (
                     <DataList.Title>
-                      {linked(row, DataList.Link, cell(row, primary.name))}
+                      {linked(row, DataList.Link, value(row, primary))}
                     </DataList.Title>
                   )}
                   {hasActions && actionsMenu(row)}
                 </div>
                 {rest.map((column) => (
                   <DataList.Field key={column.name} label={column.label}>
-                    {cell(row, column.name)}
+                    {value(row, column)}
                   </DataList.Field>
                 ))}
               </DataList.Item>
@@ -154,8 +170,8 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
                   {resource.columns.map((column) => (
                     <Table.Cell key={column.name}>
                       {column === primary
-                        ? linked(row, Table.Link, cell(row, column.name))
-                        : cell(row, column.name)}
+                        ? linked(row, Table.Link, value(row, column))
+                        : value(row, column)}
                     </Table.Cell>
                   ))}
                   {hasActions && <Table.Cell>{actionsMenu(row)}</Table.Cell>}

@@ -71,21 +71,33 @@ abstract class Column implements JsonSerializable
 
     public function value(Model $record): mixed
     {
-        if ($this->map === null) {
-            return $record->getAttribute($this->name);
-        }
+        $value = $this->attribute($record);
 
-        try {
-            $value = $record->getAttribute($this->name);
-        } catch (MissingAttributeException) {
-            // A computed column need not be an attribute, even on strict models.
-            $value = null;
+        if ($this->map === null) {
+            return $value;
         }
 
         $mapped = ($this->map)($value, $record);
         $this->assertUnmodified($record, 'map()');
 
         return $mapped;
+    }
+
+    /**
+     * The (cast) attribute by the column's name, before map().
+     */
+    protected function attribute(Model $record): mixed
+    {
+        if ($this->map === null) {
+            return $record->getAttribute($this->name);
+        }
+
+        try {
+            return $record->getAttribute($this->name);
+        } catch (MissingAttributeException) {
+            // A computed column need not be an attribute, even on strict models.
+            return null;
+        }
     }
 
     /**
@@ -143,7 +155,7 @@ abstract class Column implements JsonSerializable
     /**
      * Actions and rowLink() get the same record, so a change a callback makes would leak into them.
      */
-    private function assertUnmodified(Model $record, string $method): void
+    protected function assertUnmodified(Model $record, string $method): void
     {
         if ($record->isDirty()) {
             throw InvalidTableColumn::recordModified($this->name, array_keys($record->getDirty()), $method);

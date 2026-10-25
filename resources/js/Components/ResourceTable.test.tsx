@@ -28,6 +28,7 @@ const row = (
   author: `Author ${id}`,
   _actions: actions,
   _link: link,
+  _variants: {},
 });
 
 const resource = (
@@ -91,6 +92,28 @@ describe.each([
         .elements()
         .map((link) => link.textContent),
     ).toEqual(["Dune"]);
+  });
+
+  it("shows a badge column's value as its text, not its variant", async () => {
+    const screen = await render(
+      <ResourceTable
+        resource={{
+          ...resource([
+            { ...row(1, "Dune", null), status: "Paid", _variants: { status: "success" } },
+            { ...row(2, "Emma", null), status: null, _variants: { status: "neutral" } },
+          ]),
+          columns: [
+            { name: "title", label: "Title", type: "text" },
+            { name: "status", label: "Status", type: "badge" },
+          ],
+        }}
+      />,
+    );
+
+    const list = screen.getByRole(role);
+    await expect.element(list.getByText("Paid", { exact: true })).toBeVisible();
+    // The variant only colours the badge; it is never shown as text.
+    expect(list.getByText(/success|neutral/).elements()).toHaveLength(0);
   });
 
   it("visits same-site links with Inertia when clicking anywhere in the row", async () => {

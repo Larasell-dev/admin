@@ -9,7 +9,10 @@ export type SharedProps = {
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;
 
-export type TableColumn = { name: string; label: string; type: "text" };
+import type { BadgeVariant } from "@larasell-dev/ui";
+
+/** A "badge" column shows its value in a Badge, coloured by the row's `_variants`. */
+export type TableColumn = { name: string; label: string; type: "text" | "badge" };
 
 export type TableActionConfirmation = {
   title: string;
@@ -37,7 +40,9 @@ export type TableRow = {
   _actions: TableAction[];
   /** Where the row links to; null when it links nowhere. */
   _link: string | null;
-} & Record<string, string | number | null | TableAction[]>;
+  /** The badge variant of each badge column, by column name. */
+  _variants: Record<string, BadgeVariant>;
+} & Record<string, string | number | null | TableAction[] | Record<string, BadgeVariant>>;
 
 /** The JSON shape of a Larasell\Admin\Tables\Table. */
 export type TableEmptyState = {

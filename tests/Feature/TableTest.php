@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\ImageStyle;
+use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
+use Larasell\Admin\Tables\Columns\BadgeColumn;
+use Larasell\Admin\Tables\Columns\Column;
 use Larasell\Admin\Tables\Columns\IconImage;
 use Larasell\Admin\Tables\Columns\Image;
 use Larasell\Admin\Tables\Columns\PictureImage;
@@ -154,8 +157,8 @@ it('returns a row per model with the value of each column', function () {
     $emma = Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
 
     expect(tableResource(BooksTable::make())['rows'])->toBe([
-        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert', '_actions' => [], '_link' => null, '_images' => []],
-        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen', '_actions' => [], '_link' => null, '_images' => []],
+        ['id' => $dune->id, 'title' => 'Dune', 'author_name' => 'Frank Herbert', '_actions' => [], '_link' => null, '_images' => [], '_variants' => []],
+        ['id' => $emma->id, 'title' => 'Emma', 'author_name' => 'Jane Austen', '_actions' => [], '_link' => null, '_images' => [], '_variants' => []],
     ]);
 });
 
@@ -184,7 +187,7 @@ it('lists the model declared with the UseModel attribute', function () {
     $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
     expect(tableResource(AttributedBooksTable::make())['rows'])->toBe([
-        ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => []],
+        ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => [], '_variants' => []],
     ]);
 });
 
@@ -193,7 +196,7 @@ describe('inferred model', function () {
         $dune = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
         expect(tableResource(Tables\Book::make())['rows'])->toBe([
-            ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => []],
+            ['id' => $dune->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => [], '_variants' => []],
         ])->and(Tables\Book::make()->findRecord((string) $dune->id))->toBeInstanceOf(Models\Book::class);
     });
 
@@ -288,7 +291,7 @@ it('lists the records of a relationship returned from model()', function () {
 
 class ColumnsTable extends Table
 {
-    /** @var array<int, TextColumn> */
+    /** @var array<int, Column> */
     public static array $definedColumns = [];
 
     protected ?string $model = Book::class;
@@ -300,7 +303,7 @@ class ColumnsTable extends Table
 }
 
 /**
- * @param  array<int, TextColumn>  $columns
+ * @param  array<int, Column>  $columns
  */
 function tableWithColumns(array $columns): Table
 {
@@ -339,7 +342,7 @@ describe('column names', function () {
         }
 
         test()->fail('Expected an InvalidTableColumn exception.');
-    })->with(['_actions', '_link', '_images']);
+    })->with(['_actions', '_link', '_images', '_variants']);
 
     it('rejects column names before there are any rows', function () {
         tableResource(tableWithColumns([TextColumn::make('title'), TextColumn::make('title')]));
@@ -775,6 +778,237 @@ describe('column images', function () {
     it('keeps the column text next to the image', function () {
         expect(tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->icon(Icon::Book)))['rows'][0])
             ->toMatchArray(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+    });
+});
+
+enum BookAuthor: string
+{
+    case FrankHerbert = 'Frank Herbert';
+    case Anonymous = 'Anonymous';
+    case JaneAusten = 'Jane Austen';
+}
+
+/**
+ * A book whose author is cast to an enum.
+ */
+class AuthorCastBook extends Book
+{
+    protected $table = 'books';
+
+    protected $casts = ['author_name' => BookAuthor::class];
+}
+
+/**
+ * A book whose author is cast to the type in $cast, e.g. to turn a column that worked with a map into one it can't match.
+ */
+class AuthorRecastBook extends Book
+{
+    public static string $cast = 'string';
+
+    protected $table = 'books';
+
+    protected function casts(): array
+    {
+        return ['author_name' => static::$cast];
+    }
+}
+
+class AuthorRecastBooksTable extends Table
+{
+    public static BadgeColumn $badge;
+
+    protected ?string $model = AuthorRecastBook::class;
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title'), static::$badge];
+    }
+}
+
+class AuthorCastBooksTable extends Table
+{
+    public static BadgeColumn $badge;
+
+    protected ?string $model = AuthorCastBook::class;
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title'), static::$badge];
+    }
+}
+
+/**
+ * The badge variant of each row's author column, keyed by title.
+ *
+ * @return array<string, string>
+ */
+function authorVariants(BadgeColumn $badge, ?Table $table = null): array
+{
+    $rows = tableResource($table ?? tableWithColumns([TextColumn::make('title'), $badge]))['rows'];
+
+    return array_combine(array_column($rows, 'title'), array_map(fn (array $row): string => $row['_variants']['author_name'], $rows));
+}
+
+describe('badge columns', function () {
+    beforeEach(function () {
+        Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+        Book::create(['title' => 'Beowulf', 'author_name' => 'Anonymous']);
+        Book::create(['title' => 'Emma', 'author_name' => 'Jane Austen']);
+    });
+
+    it('describes itself as a badge column', function () {
+        expect(tableResource(tableWithColumns([BadgeColumn::make('author_name', 'Author')]))['columns'])
+            ->toBe([['name' => 'author_name', 'label' => 'Author', 'type' => 'badge']]);
+    });
+
+    it('shows the value as its text, like a text column', function () {
+        expect(tableResource(tableWithColumns([TextColumn::make('title'), BadgeColumn::make('author_name')]))['rows'][0])
+            ->toMatchArray(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
+    });
+
+    it('rejects a map() result that is not text, like a text column', function () {
+        $exception = invalidColumn(fn () => tableResource(tableWithColumns([BadgeColumn::make('author_name')->map(fn () => true)])));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.invalid-mapped-value')
+            ->and($exception->getMessage())->toContain('[author_name]')
+            ->and($exception->getMessage())->toContain('bool');
+    });
+
+    it('picks the variant mapped to the value, from a case or its name', function () {
+        expect(authorVariants(BadgeColumn::make('author_name')->variant([
+            'Frank Herbert' => Variant::Success,
+            'Anonymous' => 'warning',
+        ])))->toBe(['Dune' => 'success', 'Beowulf' => 'warning', 'Emma' => 'neutral']);
+    });
+
+    it('is neutral without a variant', function () {
+        expect(authorVariants(BadgeColumn::make('author_name')))
+            ->toBe(['Dune' => 'neutral', 'Beowulf' => 'neutral', 'Emma' => 'neutral']);
+    });
+
+    it('picks the variant the callback returns for the value and record, as a case, a name or null', function () {
+        expect(authorVariants(BadgeColumn::make('author_name')->variant(fn (string $author, Book $book) => match ($book->title) {
+            'Dune' => Variant::Info,
+            'Beowulf' => $author === 'Anonymous' ? 'danger' : 'success',
+            default => null,
+        })))->toBe(['Dune' => 'info', 'Beowulf' => 'danger', 'Emma' => 'neutral']);
+    });
+
+    it('picks the variant by the value, not the text map() shows', function () {
+        $badge = BadgeColumn::make('author_name')
+            ->map(fn (string $author) => strtoupper($author))
+            ->variant(['Anonymous' => Variant::Warning]);
+
+        $rows = tableResource(tableWithColumns([TextColumn::make('title'), $badge]))['rows'];
+
+        expect($rows[1])->toMatchArray(['author_name' => 'ANONYMOUS', '_variants' => ['author_name' => 'warning']]);
+    });
+
+    it('picks the variant mapped to the value of an enum cast attribute', function () {
+        AuthorCastBooksTable::$badge = BadgeColumn::make('author_name')
+            ->map(fn (BookAuthor $author) => $author->name)
+            ->variant([BookAuthor::Anonymous->value => Variant::Warning]);
+
+        expect(authorVariants(AuthorCastBooksTable::$badge, AuthorCastBooksTable::make()))
+            ->toBe(['Dune' => 'neutral', 'Beowulf' => 'warning', 'Emma' => 'neutral']);
+    });
+
+    it('passes the cast value to the callback', function () {
+        AuthorCastBooksTable::$badge = BadgeColumn::make('author_name')
+            ->map(fn (BookAuthor $author) => $author->name)
+            ->variant(fn (BookAuthor $author) => $author === BookAuthor::JaneAusten ? Variant::Success : null);
+
+        expect(authorVariants(AuthorCastBooksTable::$badge, AuthorCastBooksTable::make()))
+            ->toBe(['Dune' => 'neutral', 'Beowulf' => 'neutral', 'Emma' => 'success']);
+    });
+
+    it('sends no variants for columns that are not badges', function () {
+        expect(tableResource(tableWithColumns([TextColumn::make('title'), BadgeColumn::make('author_name')]))['rows'][0]['_variants'])
+            ->toBe(['author_name' => 'neutral']);
+    });
+
+    it('rejects an unknown variant name in the map before there are any rows', function () {
+        $exception = invalidColumn(fn () => BadgeColumn::make('author_name')->variant(['Anonymous' => 'warn']));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.invalid-variant')
+            ->and($exception->getMessage())->toContain('[author_name]')
+            ->and($exception->getMessage())->toContain('"warn"');
+    });
+
+    it('rejects a map value that is not a variant', function () {
+        $exception = invalidColumn(fn () => BadgeColumn::make('author_name')->variant(['Anonymous' => 3]));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.invalid-variant')
+            ->and($exception->getMessage())->toContain('int');
+    });
+
+    it('rejects a callback result that is not a variant', function (mixed $result, string $shown) {
+        $exception = invalidColumn(fn () => authorVariants(BadgeColumn::make('author_name')->variant(fn () => $result)));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.invalid-variant')
+            ->and($exception->getMessage())->toContain('[author_name]')
+            ->and($exception->getMessage())->toContain($shown);
+    })->with([
+        'unknown name' => ['Success', '"Success"'],
+        'bool' => [true, 'bool'],
+        'other enum' => [ImageStyle::Round, ImageStyle::class],
+    ]);
+
+    it('rejects a callback that changes the record', function () {
+        $exception = invalidColumn(fn () => authorVariants(BadgeColumn::make('author_name')->variant(function (string $author, Book $book) {
+            $book->title = 'Changed';
+
+            return null;
+        })));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.record-modified')
+            ->and($exception->getMessage())->toContain('variant()');
+    });
+
+    it('rejects a map once the value can no longer match it, e.g. after a cast', function (string $cast, string $type) {
+        $badge = fn () => BadgeColumn::make('author_name')->variant(['Frank Herbert' => Variant::Success]);
+
+        // Valid: the string value matches the map.
+        expect(authorVariants($badge()))->toBe(['Dune' => 'success', 'Beowulf' => 'neutral', 'Emma' => 'neutral']);
+
+        // Invalid: the same column, with the attribute cast to a type no array key can equal.
+        AuthorRecastBook::$cast = $cast;
+        AuthorRecastBooksTable::$badge = $badge();
+        $exception = invalidColumn(fn () => authorVariants(AuthorRecastBooksTable::$badge, AuthorRecastBooksTable::make()));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.unmatchable-variant-value')
+            ->and($exception->getMessage())->toContain('[author_name]')
+            ->and($exception->getMessage())->toContain($type);
+    })->with([
+        'bool' => ['boolean', 'bool'],
+        'float' => ['float', 'float'],
+    ]);
+
+    it('lets a callback handle a value a map cannot match', function () {
+        AuthorRecastBook::$cast = 'boolean';
+        AuthorRecastBooksTable::$badge = BadgeColumn::make('author_name')
+            ->map(fn (bool $value) => $value ? 'Yes' : 'No')
+            ->variant(fn (bool $value) => $value ? Variant::Success : null);
+
+        expect(authorVariants(AuthorRecastBooksTable::$badge, AuthorRecastBooksTable::make()))
+            ->toBe(['Dune' => 'success', 'Beowulf' => 'success', 'Emma' => 'success']);
+    });
+
+    it('is neutral for a missing value, even with a map', function () {
+        $badge = BadgeColumn::make('status')
+            ->map(fn ($value) => $value ?? 'Unknown')
+            ->variant(['Unknown' => Variant::Danger]);
+
+        $rows = tableResource(tableWithColumns([TextColumn::make('title'), $badge]))['rows'];
+
+        expect(array_column($rows, '_variants'))->toBe(array_fill(0, 3, ['status' => 'neutral']));
+    });
+
+    it('rejects calling variant() twice on a column', function () {
+        $exception = invalidColumn(fn () => BadgeColumn::make('author_name')->variant([])->variant(fn () => null));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.configured-twice')
+            ->and($exception->getMessage())->toContain('variant()');
     });
 });
 
