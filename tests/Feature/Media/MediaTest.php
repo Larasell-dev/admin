@@ -7,11 +7,15 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Models\Media\Folder;
+use Larasell\Admin\Models\Media\ProductImageThumbnail;
 use Larasell\Admin\Navigation;
 
-function productImage(string $file): int
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function productImage(string $file, array $attributes = []): int
 {
-    return DB::table('larasell_product_images')->insertGetId(['file' => $file, 'created_at' => now(), 'updated_at' => now()]);
+    return DB::table('larasell_product_images')->insertGetId(['file' => $file, 'created_at' => now(), 'updated_at' => now(), ...$attributes]);
 }
 
 it('lists folders before product images, each alphabetically, linking folders to their page and images to their file', function () {
@@ -42,12 +46,12 @@ it('lists folders before product images, each alphabetically, linking folders to
             ])
             ->where('table.pagination.total', 6)
             ->where('table.rows', [
-                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$archive->id}")],
-                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$banners->id}")],
-                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$zoo->id}")],
-                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => ['name' => ['type' => 'url', 'url' => 'https://cdn.example.com/media/products/Apple.png', 'style' => 'square', 'alt' => null, 'title' => null]], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$apple}")],
-                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => ['name' => ['type' => 'url', 'url' => 'https://cdn.example.com/media/products/mango.webp', 'style' => 'square', 'alt' => null, 'title' => null]], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$mango}")],
-                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => ['name' => ['type' => 'url', 'url' => 'https://cdn.example.com/media/products/zebra.jpg', 'style' => 'square', 'alt' => null, 'title' => null]], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$zebra}")],
+                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$archive->id}"), '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$banners->id}"), '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$zoo->id}"), '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$apple}"), '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => ['name' => ['type' => 'icon', 'icon' => 'Image', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$mango}"), '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => ['name' => ['type' => 'icon', 'icon' => 'Image', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$zebra}"), '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => ['name' => ['type' => 'icon', 'icon' => 'Image', 'style' => null, 'alt' => null, 'title' => null]]],
             ]));
 });
 
@@ -84,9 +88,30 @@ it('lists only the folders directly inside a folder on its page', function () {
             ->where('table.title', 'Campaigns')
             ->where('table.pagination.total', 2)
             ->where('table.rows', [
-                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$summer->id}")],
-                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$winter->id}")],
+                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$summer->id}"), '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
+                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$winter->id}"), '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => ['name' => ['type' => 'icon', 'icon' => 'Folder', 'style' => null, 'alt' => null, 'title' => null]]],
             ]));
+});
+
+it('shows the thumbnail of a product image, else its low-quality placeholder, else an image icon', function () {
+    config([
+        'larasell.images.disk' => 'public',
+        'filesystems.disks.public.url' => 'https://cdn.example.com/media',
+    ]);
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $lqip = ['type' => 'lqip', 'value' => 'data:image/jpeg;base64,/9j/4AAQ', 'color' => '#112233'];
+
+    $withThumbnail = productImage('products/a.jpg', ['placeholder' => json_encode($lqip)]);
+    ProductImageThumbnail::create(['product_image_id' => $withThumbnail, 'path' => 'products/thumbnails/a.webp']);
+    productImage('products/b.jpg', ['placeholder' => json_encode($lqip)]);
+    productImage('products/c.jpg', ['placeholder' => json_encode(['type' => 'color', 'value' => '#112233', 'color' => '#112233'])]);
+    productImage('products/d.jpg');
+
+    $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.rows.0._images.name.url', 'https://cdn.example.com/media/products/thumbnails/a.webp')
+        ->where('table.rows.1._images.name.url', 'data:image/jpeg;base64,/9j/4AAQ')
+        ->where('table.rows.2._images.name.icon', 'Image')
+        ->where('table.rows.3._images.name.icon', 'Image'));
 });
 
 it('lists the product images in a folder on its page and not at the root', function () {

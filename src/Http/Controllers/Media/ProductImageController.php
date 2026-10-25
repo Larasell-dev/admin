@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationException;
 use Larasell\Admin\Actions\Media\DeleteProductImage;
+use Larasell\Admin\Jobs\Media\GenerateProductImageThumbnail;
 use Larasell\Admin\Models\Media\Folder;
 use Larasell\Larasell\Models\ProductImage;
 
@@ -35,12 +36,21 @@ class ProductImageController
 
         $folder = isset($validated['folder_id']) ? Folder::query()->findOrFail((int) $validated['folder_id']) : null;
 
-        DB::transaction(function () use ($validated, $folder): void {
+        $images = DB::transaction(function () use ($validated, $folder): array {
+            $images = [];
+
             foreach ($validated['files'] as $file) {
-                $image = ProductImage::query()->create(['file' => $file]);
+                $images[] = $image = ProductImage::query()->create(['file' => $file]);
                 $folder?->productImages()->attach($image);
             }
+
+            return $images;
         });
+
+        // After the transaction, so a worker never looks for an image that isn't committed yet.
+        foreach ($images as $image) {
+            GenerateProductImageThumbnail::dispatch($image);
+        }
 
         return back();
     }

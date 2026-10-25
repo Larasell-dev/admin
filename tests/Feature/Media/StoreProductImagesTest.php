@@ -3,13 +3,18 @@
 declare(strict_types=1);
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Jobs\Media\GenerateProductImageThumbnail;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Models\Media\Folder;
+use Larasell\Admin\Models\Media\ProductImageThumbnail;
 use Larasell\Larasell\Models\ProductImage;
 
 beforeEach(function () {
     Storage::fake(config('larasell.images.disk'));
+    // Laravel's default, so thumbnails are made during the request, as in a project without a queue.
+    config(['queue.default' => 'sync']);
 });
 
 function uploadingAdmin(): Admin
@@ -116,4 +121,43 @@ it('names the rejected file in its error', function () {
             'files.1' => '"notes.pdf" isn\'t an image.',
             'files.2' => '"huge.jpg" is larger than 10 MB.',
         ]);
+});
+
+it('queues a thumbnail for each uploaded image', function () {
+    Queue::fake();
+
+    $this->actingAs(uploadingAdmin(), 'larasell-admin')
+        ->post('/admin/media/product-images', ['files' => [
+            UploadedFile::fake()->image('apple.jpg'),
+            UploadedFile::fake()->image('mango.png'),
+        ]])
+        ->assertSessionHasNoErrors();
+
+    $ids = ProductImage::query()->orderBy('id')->pluck('id')->all();
+    Queue::assertPushed(GenerateProductImageThumbnail::class, 2);
+    foreach ($ids as $id) {
+        Queue::assertPushed(GenerateProductImageThumbnail::class, fn (GenerateProductImageThumbnail $job): bool => $job->image->id === $id);
+    }
+});
+
+it('queues no thumbnail when the upload is rejected', function () {
+    Queue::fake();
+
+    $this->actingAs(uploadingAdmin(), 'larasell-admin')
+        ->post('/admin/media/product-images', ['files' => [
+            UploadedFile::fake()->image('apple.jpg'),
+            UploadedFile::fake()->create('notes.pdf', 10, 'application/pdf'),
+        ]]);
+
+    Queue::assertNothingPushed();
+});
+
+it('has the thumbnail right away without a queue worker, on the sync connection', function () {
+    $this->actingAs(uploadingAdmin(), 'larasell-admin')
+        ->post('/admin/media/product-images', ['files' => [UploadedFile::fake()->image('apple.jpg', 800, 600)]])
+        ->assertSessionHasNoErrors();
+
+    $thumbnail = ProductImageThumbnail::query()->sole();
+    expect($thumbnail->product_image_id)->toBe(ProductImage::query()->sole()->id);
+    Storage::disk(config('larasell.images.disk'))->assertExists($thumbnail->path);
 });

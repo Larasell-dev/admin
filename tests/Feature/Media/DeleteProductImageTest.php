@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Larasell\Admin\Actions\Media\DeleteProductImage;
 use Larasell\Admin\Models\Media\Folder;
+use Larasell\Admin\Models\Media\ProductImageThumbnail;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Price;
@@ -60,4 +61,21 @@ it('takes the image out of its folder but keeps the folder', function () {
     // Read from the link table itself: a join through the relation would hide a leftover link.
     expect(DB::table('larasell_admin_media_folder_product_image')->pluck('product_image_id')->all())->toBe([$other->id])
         ->and(Folder::query()->whereKey($folder->id)->exists())->toBeTrue();
+});
+
+it('deletes the thumbnail of the image and its file', function () {
+    $image = storedProductImage('apple.jpg');
+    $other = storedProductImage('mango.jpg');
+    $disk = Storage::disk(config('larasell.images.disk'));
+    $disk->put('thumbs/apple.webp', 'a');
+    $disk->put('thumbs/mango.webp', 'm');
+    ProductImageThumbnail::create(['product_image_id' => $image->id, 'path' => 'thumbs/apple.webp']);
+    ProductImageThumbnail::create(['product_image_id' => $other->id, 'path' => 'thumbs/mango.webp']);
+
+    app(DeleteProductImage::class)->handle($image);
+
+    // Read from the table itself, as with the folder links.
+    expect(DB::table('larasell_admin_media_product_image_thumbnails')->pluck('product_image_id')->all())->toBe([$other->id]);
+    $disk->assertMissing('thumbs/apple.webp');
+    $disk->assertExists('thumbs/mango.webp');
 });

@@ -12,6 +12,7 @@ use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
 use Larasell\Admin\Console\MakeTableCommand;
+use Larasell\Admin\Console\Media\GenerateProductImageThumbnailsCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
@@ -57,6 +58,7 @@ class AdminServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CreateAdminUserCommand::class,
+                GenerateProductImageThumbnailsCommand::class,
                 LinkAdminAssetsCommand::class,
                 ListAdminsCommand::class,
                 MakeTableCommand::class,

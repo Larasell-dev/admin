@@ -4,6 +4,7 @@ namespace Larasell\Admin\Tables\Panel\Media;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Media\MediaType;
@@ -63,7 +64,7 @@ class Media extends Table
                 ->map(fn (string $name, MediaItem $item): string => $item->type === MediaType::ProductImage ? basename($name) : $name)
                 ->image(fn (MediaItem $item, Image $image): CellImage => match ($item->type) {
                     MediaType::Folder => $image->icon(Icon::Folder),
-                    MediaType::ProductImage => $image->url($this->productImageUrl($item)),
+                    MediaType::ProductImage => $this->productImageThumbnail($item, $image),
                 }),
             // An ISO timestamp, so the browser shows it in the admin's own locale and timezone.
             TextColumn::make('added_at')->map(fn (?Carbon $addedAt): ?string => $addedAt?->toIso8601String()),
@@ -76,6 +77,23 @@ class Media extends Table
             MediaType::Folder => route('larasell.admin.media.folders.show', $item->id),
             MediaType::ProductImage => $this->productImageUrl($item),
         };
+    }
+
+    /**
+     * Never the full image, which can be megabytes: the thumbnail, or until its job ran, Larasell's
+     * tiny placeholder, inlined as a data url. An image icon when there is neither, e.g. for an SVG.
+     */
+    private function productImageThumbnail(MediaItem $item, Image $image): CellImage
+    {
+        if ($item->thumbnail !== null) {
+            return $image->url(Storage::disk(config('larasell.images.disk'))->url($item->thumbnail));
+        }
+
+        if ($item->placeholder?->type === 'lqip') {
+            return $image->url($item->placeholder->value);
+        }
+
+        return $image->icon(Icon::Image);
     }
 
     /**
