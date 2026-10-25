@@ -18,7 +18,7 @@ abstract class Column implements JsonSerializable
     protected ?Closure $map = null;
 
     /**
-     * Takes a record of the table's model and an Image, and returns that image or null.
+     * Takes a record of the table's model and an Image, and returns the IconImage or PictureImage it makes, or null.
      */
     protected ?Closure $image = null;
 
@@ -90,8 +90,8 @@ abstract class Column implements JsonSerializable
 
     /**
      * Show an image before the column's value: an icon, or a picture at a url.
-     * The callback receives the record and an Image to configure, and returns
-     * that image, or null to show none for the record:
+     * The callback receives the record and an Image, and returns the image it
+     * makes with it, or null to show none for the record:
      *
      *     TextColumn::make('title')->image(fn (Book $book, Image $image) => $image->url($book->cover_url))
      *     TextColumn::make('author')->image(fn (Book $book, Image $image) => $image->icon($book->author_id === null ? Icon::QuestionMark : Icon::QuillPen))
@@ -101,7 +101,7 @@ abstract class Column implements JsonSerializable
      *
      * @template TModel of Model
      *
-     * @param  Closure(TModel, Image): ?Image  $callback
+     * @param  Closure(TModel, Image): ?CellImage  $callback
      */
     public function image(Closure $callback): static
     {
@@ -123,7 +123,7 @@ abstract class Column implements JsonSerializable
      * The image the column shows for the record, or null when the callback shows none for it.
      * Only for columns that have an image; see hasImage().
      */
-    public function imageFor(Model $record): ?Image
+    public function imageFor(Model $record): ?CellImage
     {
         // The table decides which columns have an image, with hasImage(), and only asks those.
         if ($this->image === null) {
@@ -133,7 +133,7 @@ abstract class Column implements JsonSerializable
         $image = ($this->image)($record, new Image($this->name));
         $this->assertUnmodified($record, 'image()');
 
-        if ($image !== null && ! $image instanceof Image) {
+        if ($image !== null && ! $image instanceof CellImage) {
             throw InvalidTableColumn::invalidImage($this->name, get_debug_type($image));
         }
 

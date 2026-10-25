@@ -13,7 +13,9 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\ImageStyle;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Tables\Attributes\UseModel;
+use Larasell\Admin\Tables\Columns\IconImage;
 use Larasell\Admin\Tables\Columns\Image;
+use Larasell\Admin\Tables\Columns\PictureImage;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
@@ -673,15 +675,23 @@ describe('column images', function () {
             ->and(titleImages(fn (Book $book, Image $image) => $image->url($cover)->style(ImageStyle::Square))['Dune']['style'])->toBe('square');
     });
 
-    it('rejects giving an icon a style, which only pictures have', function (Closure $callback) {
-        $exception = invalidColumn(fn () => tableResource(imageTitleTable($callback)));
+    // A style on an icon is then an undefined method, which IDEs and PHPStan flag as it is written.
+    it('gives only pictures a style, so an icon cannot take one', function () {
+        $images = [];
+        titleImages(function (Book $book, Image $image) use (&$images): IconImage|PictureImage {
+            $images['factory'] = $image;
 
-        expect($exception->errorCode())->toBe('larasell-admin.table.column.styled-image-icon')
-            ->and($exception->getMessage())->toContain('[title]');
-    })->with([
-        'rounded() after icon()' => [fn (Book $book, Image $image) => $image->icon(Icon::Book)->rounded()],
-        'style() before icon()' => [fn (Book $book, Image $image) => $image->style(ImageStyle::Square)->icon(Icon::Book)],
-    ]);
+            return $images[$book->title] = $book->title === 'Dune' ? $image->icon(Icon::Book) : $image->url('https://covers.test/beowulf.jpg');
+        });
+
+        expect($images['Dune'])->toBeInstanceOf(IconImage::class)
+            ->and($images['Beowulf'])->toBeInstanceOf(PictureImage::class)
+            ->and(array_map(fn (string $method): array => [
+                method_exists($images['factory'], $method),
+                method_exists($images['Dune'], $method),
+                method_exists($images['Beowulf'], $method),
+            ], ['rounded', 'style']))->toBe([[false, false, true], [false, false, true]]);
+    });
 
     it('sends the alt text and title of each record\'s image', function () {
         expect(titleImages(fn (Book $book, Image $image) => $image->url("https://covers.test/{$book->title}.jpg")->alt("Cover of {$book->title}")->title($book->author_name)))->toBe([
@@ -727,14 +737,8 @@ describe('column images', function () {
     })->with([
         'a url' => [fn () => 'https://covers.test/dune.jpg', 'string'],
         'an icon' => [fn () => Icon::Book, Icon::class],
+        'the Image, without an icon or a url' => [fn (Book $book, Image $image) => $image, Image::class],
     ]);
-
-    it('rejects an image without an icon or a url', function () {
-        $exception = invalidColumn(fn () => tableResource(imageTitleTable(fn (Book $book, Image $image) => $image->rounded())));
-
-        expect($exception->errorCode())->toBe('larasell-admin.table.column.image-without-source')
-            ->and($exception->getMessage())->toContain('[title]');
-    });
 
     it('rejects giving an image a second source or style', function (Closure $callback, string $method) {
         $exception = invalidColumn(fn () => tableResource(imageTitleTable($callback)));
@@ -743,13 +747,14 @@ describe('column images', function () {
             ->and($exception->getMessage())->toContain('[title]')
             ->and($exception->getMessage())->toContain($method);
     })->with([
-        'icon and url' => [fn (Book $book, Image $image) => $image->icon(Icon::Book)->url('https://covers.test/dune.jpg'), 'icon(), url() or a route method'],
-        'two urls' => [fn (Book $book, Image $image) => $image->to('https://covers.test/a.jpg')->url('https://covers.test/b.jpg'), 'icon(), url() or a route method'],
+        // Only one of the two images could be returned, so the other would silently not show.
+        'icon and url' => [fn (Book $book, Image $image) => [$image->icon(Icon::Book), $image->url('https://covers.test/dune.jpg')][1], 'icon(), url() or a route method'],
+        'two urls' => [fn (Book $book, Image $image) => [$image->to('https://covers.test/a.jpg'), $image->url('https://covers.test/b.jpg')][1], 'icon(), url() or a route method'],
         'two styles' => [fn (Book $book, Image $image) => $image->url('https://covers.test/dune.jpg')->rounded()->style(ImageStyle::Square), 'rounded() or style()'],
     ]);
 
     it('rejects a callback that changes the record', function () {
-        $exception = invalidColumn(fn () => tableResource(imageTitleTable(function (Book $book, Image $image): Image {
+        $exception = invalidColumn(fn () => tableResource(imageTitleTable(function (Book $book, Image $image): IconImage {
             $book->title = 'Changed';
 
             return $image->icon(Icon::Book);

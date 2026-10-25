@@ -70,19 +70,9 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
     {
         return static::structured(
             code: 'larasell-admin.table.column.invalid-image',
-            message: "Column [{$column}] image() returned {$type}, not an Image.",
-            why: "The image() callback of [{$column}] must return the Image it receives, configured, or null for no image, but it returned {$type}.",
-            fix: 'Configure the Image the callback receives and return it, e.g. fn ($record, Image $image) => $image->url($record->cover_url), or return null.',
-        );
-    }
-
-    public static function imageWithoutSource(string $column): static
-    {
-        return static::structured(
-            code: 'larasell-admin.table.column.image-without-source',
-            message: "Column [{$column}] image() returned an Image without an icon or a url.",
-            why: "The image() callback of [{$column}] returned an Image, but never said what it shows, so there is nothing to render.",
-            fix: 'Call icon(), url(), to() or a route method on the Image, or return null to show no image for the record.',
+            message: "Column [{$column}] image() returned {$type}, not an image.",
+            why: "The image() callback of [{$column}] must return the image it makes with the Image it receives, or null for no image, but it returned {$type}.",
+            fix: 'Return what icon(), url() or a route method on the Image returns, e.g. fn ($record, Image $image) => $image->url($record->cover_url), or return null.',
         );
     }
 
@@ -133,16 +123,6 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
             message: "Column [{$column}] image icon [{$icon}] is not a Remix icon.",
             why: 'Only the Remix icons @larasell-dev/ui ships can be shown, and they are named in lowercase kebab case.',
             fix: 'Pass an Icon case, or a lowercase Remix icon name from https://remixicon.com such as "book-open".',
-        );
-    }
-
-    public static function styledImageIcon(string $column): static
-    {
-        return static::structured(
-            code: 'larasell-admin.table.column.styled-image-icon',
-            message: "Column [{$column}] image shows an icon, which has no style.",
-            why: 'Icons show as they are, without a background, so rounded() and style() have nothing to shape. Only pictures at a url are round or square.',
-            fix: 'Remove rounded() or style() from the image, or show a picture with url() instead of an icon.',
         );
     }
 
