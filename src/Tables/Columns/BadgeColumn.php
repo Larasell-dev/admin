@@ -39,7 +39,8 @@ class BadgeColumn extends Column
      *
      * The value is the attribute's (cast) value, before map(), so the badge's
      * text may differ from what picks its colour. Map an enum cast attribute by
-     * its backing value.
+     * its backing value. A map only matches int and string values, so use a
+     * callback for other values, e.g. bools.
      *
      * @template TModel of Model
      *
@@ -84,7 +85,12 @@ class BadgeColumn extends Column
             return $this->variant[$key] ?? Variant::Neutral;
         }
 
-        return Variant::Neutral;
+        if ($key === null) {
+            return Variant::Neutral;
+        }
+
+        // Array keys are only ints and strings, so a map would silently show every badge as neutral.
+        throw InvalidTableColumn::unmatchableVariantValue($this->name, get_debug_type($key));
     }
 
     private function resolveVariant(mixed $variant): ?Variant

@@ -798,6 +798,33 @@ class AuthorCastBook extends Book
     protected $casts = ['author_name' => BookAuthor::class];
 }
 
+/**
+ * A book whose author is cast to the type in $cast, e.g. to turn a column that worked with a map into one it can't match.
+ */
+class AuthorRecastBook extends Book
+{
+    public static string $cast = 'string';
+
+    protected $table = 'books';
+
+    protected function casts(): array
+    {
+        return ['author_name' => static::$cast];
+    }
+}
+
+class AuthorRecastBooksTable extends Table
+{
+    public static BadgeColumn $badge;
+
+    protected ?string $model = AuthorRecastBook::class;
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title'), static::$badge];
+    }
+}
+
 class AuthorCastBooksTable extends Table
 {
     public static BadgeColumn $badge;
@@ -936,6 +963,45 @@ describe('badge columns', function () {
 
         expect($exception->errorCode())->toBe('larasell-admin.table.column.record-modified')
             ->and($exception->getMessage())->toContain('variant()');
+    });
+
+    it('rejects a map once the value can no longer match it, e.g. after a cast', function (string $cast, string $type) {
+        $badge = fn () => BadgeColumn::make('author_name')->variant(['Frank Herbert' => Variant::Success]);
+
+        // Valid: the string value matches the map.
+        expect(authorVariants($badge()))->toBe(['Dune' => 'success', 'Beowulf' => 'neutral', 'Emma' => 'neutral']);
+
+        // Invalid: the same column, with the attribute cast to a type no array key can equal.
+        AuthorRecastBook::$cast = $cast;
+        AuthorRecastBooksTable::$badge = $badge();
+        $exception = invalidColumn(fn () => authorVariants(AuthorRecastBooksTable::$badge, AuthorRecastBooksTable::make()));
+
+        expect($exception->errorCode())->toBe('larasell-admin.table.column.unmatchable-variant-value')
+            ->and($exception->getMessage())->toContain('[author_name]')
+            ->and($exception->getMessage())->toContain($type);
+    })->with([
+        'bool' => ['boolean', 'bool'],
+        'float' => ['float', 'float'],
+    ]);
+
+    it('lets a callback handle a value a map cannot match', function () {
+        AuthorRecastBook::$cast = 'boolean';
+        AuthorRecastBooksTable::$badge = BadgeColumn::make('author_name')
+            ->map(fn (bool $value) => $value ? 'Yes' : 'No')
+            ->variant(fn (bool $value) => $value ? Variant::Success : null);
+
+        expect(authorVariants(AuthorRecastBooksTable::$badge, AuthorRecastBooksTable::make()))
+            ->toBe(['Dune' => 'success', 'Beowulf' => 'success', 'Emma' => 'success']);
+    });
+
+    it('is neutral for a missing value, even with a map', function () {
+        $badge = BadgeColumn::make('status')
+            ->map(fn ($value) => $value ?? 'Unknown')
+            ->variant(['Unknown' => Variant::Danger]);
+
+        $rows = tableResource(tableWithColumns([TextColumn::make('title'), $badge]))['rows'];
+
+        expect(array_column($rows, '_variants'))->toBe(array_fill(0, 3, ['status' => 'neutral']));
     });
 
     it('rejects calling variant() twice on a column', function () {

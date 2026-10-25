@@ -147,4 +147,14 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
             fix: 'Use a Variant case, e.g. Variant::Success, or its name: "neutral", "info", "success", "warning" or "danger". Return null from a callback for a neutral badge.',
         );
     }
+
+    public static function unmatchableVariantValue(string $column, string $type): static
+    {
+        return static::structured(
+            code: 'larasell-admin.table.column.unmatchable-variant-value',
+            message: "Badge column [{$column}] has a {$type} value, which a variant() map cannot match.",
+            why: 'Array keys are only ints and strings, so no map entry can equal this value, and every badge would be neutral.',
+            fix: 'Pass a callback to variant() instead, e.g. ->variant(fn (bool $approved) => $approved ? Variant::Success : Variant::Warning).',
+        );
+    }
 }
