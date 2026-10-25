@@ -56,6 +56,7 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'dashboard' => ['/admin', 'Dashboard - Admin'],
     'categories without any' => ['/admin/categories', 'Categories - Admin'],
     'new category' => ['/admin/categories/create', 'New category - Admin'],
+    'products' => ['/admin/products', 'Products - Admin'],
     'customers' => ['/admin/customers', 'Customers - Admin'],
     'profile' => ['/admin/profile', 'Profile - Admin'],
     'admins' => ['/admin/settings/admins', 'Admins - Admin'],

@@ -97,3 +97,8 @@ declare namespace Larasell.Admin.Data.ViewModel {
     total: number;
   };
 }
+declare namespace Larasell.Admin.Product.Data.View {
+  export type ProductsPageData = {
+    products: import("./index").TableResource;
+  };
+}
