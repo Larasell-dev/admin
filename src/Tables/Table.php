@@ -14,6 +14,7 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Tables\Actions\Action;
+use Larasell\Admin\Tables\Actions\TableAction;
 use Larasell\Admin\Tables\Attributes\Remember;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\BadgeColumn;
@@ -105,6 +106,18 @@ abstract class Table implements JsonSerializable
      * @return array<int, Action>
      */
     public function actions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Actions for the whole table, shown in its header, e.g. a link to add a record.
+     * The header is hidden while the table shows its empty state, which takes its
+     * own actions; return the same ones from emptyState() to offer them there too.
+     *
+     * @return array<int, TableAction>
+     */
+    public function headerActions(): array
     {
         return [];
     }
@@ -219,7 +232,8 @@ abstract class Table implements JsonSerializable
 
     /**
      * What to show when the table has no rows: a 'title', and optionally a
-     * 'description' and an 'icon' (an Icon case or its Remix icon name).
+     * 'description', an 'icon' (an Icon case or its Remix icon name), and
+     * 'actions' (a list of TableAction that resolve it, e.g. adding a record).
      * Return null for the default empty state.
      *
      * @return array<string, mixed>|null
@@ -230,7 +244,7 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return array{title: string, description: ?string, icon: ?string}|null
+     * @return array{title: string, description: ?string, icon: ?string, actions: array<int, TableAction>}|null
      */
     protected function resolveEmptyState(): ?array
     {
@@ -241,7 +255,7 @@ abstract class Table implements JsonSerializable
         }
 
         foreach (array_keys($state) as $key) {
-            if (! in_array($key, ['title', 'description', 'icon'], true)) {
+            if (! in_array($key, ['title', 'description', 'icon', 'actions'], true)) {
                 throw InvalidTableEmptyState::unknownKey(static::class, (string) $key);
             }
         }
@@ -259,10 +273,16 @@ abstract class Table implements JsonSerializable
             throw InvalidTableEmptyState::invalidValue(static::class, 'description', 'a string');
         }
 
+        $actions = $state['actions'] ?? [];
+        if (! is_array($actions) || ! array_is_list($actions) || array_filter($actions, fn (mixed $action): bool => ! $action instanceof TableAction) !== []) {
+            throw InvalidTableEmptyState::invalidValue(static::class, 'actions', 'a list of TableAction');
+        }
+
         return [
             'title' => $title,
             'description' => $description,
             'icon' => $this->resolveEmptyStateIcon($state['icon'] ?? null),
+            'actions' => $actions,
         ];
     }
 
@@ -357,7 +377,7 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string}|null, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
+     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string, actions: array<int, TableAction>}|null, headerActions: array<int, TableAction>, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
      */
     public function jsonSerialize(): array
     {
@@ -425,6 +445,7 @@ abstract class Table implements JsonSerializable
         return [
             'title' => $this->title(),
             'emptyState' => $this->resolveEmptyState(),
+            'headerActions' => $this->headerActions(),
             'columns' => $columns,
             'rows' => $rows->all(),
             'pagination' => [

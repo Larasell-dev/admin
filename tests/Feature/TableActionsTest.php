@@ -7,6 +7,7 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidTableAction;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Tables\Actions\Action;
+use Larasell\Admin\Tables\Actions\TableAction;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\AudioBook;
@@ -49,6 +50,37 @@ class OutsideNamespaceTable extends Table
 class ForgetfulAuthorBookActionsTable extends BookActionsTable
 {
     public function __construct(public string $author) {}
+}
+
+/**
+ * Lets each test define its own header actions without declaring a table class per test.
+ */
+class BookHeaderActionsTable extends Table
+{
+    /** @var Closure(): array<int, TableAction> */
+    public static Closure $headerActions;
+
+    protected ?string $model = Book::class;
+
+    public function columns(): array
+    {
+        return [TextColumn::make('title')];
+    }
+
+    public function headerActions(): array
+    {
+        return (static::$headerActions)();
+    }
+}
+
+/**
+ * @return array<int, array<string, mixed>>
+ */
+function headerActions(Closure $actions): array
+{
+    BookHeaderActionsTable::$headerActions = $actions;
+
+    return json_decode(json_encode(BookHeaderActionsTable::make()), true)['headerActions'];
 }
 
 function withActions(Closure $actions): void
@@ -468,4 +500,58 @@ describe('stateful tables', function () {
         expect(json_decode(json_encode(ForgetfulAuthorBookActionsTable::make('Jane Austen')), true)['rows'][0]['_actions'][0]['url'])
             ->toBe('https://example.com');
     });
+});
+
+describe('header actions', function () {
+    it('sends an empty list when the table defines none', function () {
+        expect(json_decode(json_encode(BooksWithoutActionsTable::make()), true)['headerActions'])->toBe([]);
+    });
+
+    it('links to a fixed url', function () {
+        expect(headerActions(fn () => [TableAction::make('Add book')->to('/admin/books/create')]))->toBe([
+            ['label' => 'Add book', 'method' => 'get', 'url' => '/admin/books/create', 'icon' => null],
+        ]);
+    });
+
+    it('links to a named route with its parameters', function () {
+        Route::get('/books/{shelf}/new', fn () => '')->name('books.create');
+
+        expect(headerActions(fn () => [TableAction::make('Add book')->route('books.create', ['shelf' => 'classics'])])[0]['url'])
+            ->toBe(url('/books/classics/new'));
+    });
+
+    it('shows an icon, given as an Icon case or a Remix icon name', function () {
+        expect(headerActions(fn () => [
+            TableAction::make('Add book')->to('/a')->icon(Icon::Add),
+            TableAction::make('Import books')->to('/b')->icon('upload'),
+        ]))->sequence(
+            fn ($action) => $action->icon->toBe('Add'),
+            fn ($action) => $action->icon->toBe('Upload'),
+        );
+    });
+
+    it('keeps the order the table defines', function () {
+        expect(array_column(headerActions(fn () => [
+            TableAction::make('Import books')->to('/b'),
+            TableAction::make('Add book')->to('/a'),
+        ]), 'label'))->toBe(['Import books', 'Add book']);
+    });
+
+    it('is sent even when the table has no rows', function () {
+        Book::query()->delete();
+
+        expect(headerActions(fn () => [TableAction::make('Add book')->to('/a')]))->toHaveCount(1);
+    });
+
+    it('needs a link', function () {
+        headerActions(fn () => [TableAction::make('Add book')]);
+    })->throws(LogicException::class, 'Action [add-book] needs a link');
+
+    it('rejects configuring the same thing twice', function () {
+        TableAction::make('Add book')->to('/a')->to('/b');
+    })->throws(InvalidTableAction::class, 'calls to() or route() more than once');
+
+    it('rejects an unknown icon', function () {
+        TableAction::make('Add book')->icon('not-an-icon');
+    })->throws(InvalidTableAction::class, 'is not a Remix icon');
 });

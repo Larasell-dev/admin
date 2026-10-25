@@ -23,7 +23,8 @@ export type TableActionConfirmation = {
   confirmationText: string | null;
 };
 
-export type TableAction = {
+/** An action on one row of a table. */
+export type TableRowAction = {
   name: string;
   label: string;
   method: "get" | "post";
@@ -37,25 +38,38 @@ export type TableAction = {
 
 export type TableRow = {
   id: string | number;
-  _actions: TableAction[];
+  _actions: TableRowAction[];
   /** Where the row links to; null when it links nowhere. */
   _link: string | null;
   /** The badge variant of each badge column, by column name. */
   _variants: Record<string, BadgeVariant>;
-} & Record<string, string | number | null | TableAction[] | Record<string, BadgeVariant>>;
+} & Record<string, string | number | null | TableRowAction[] | Record<string, BadgeVariant>>;
 
-/** The JSON shape of a Larasell\Admin\Tables\Table. */
+/** The JSON shape of a Larasell\Admin\Tables\Actions\TableAction: an action for the whole table. */
+export type TableAction = {
+  label: string;
+  /** Only links for now. */
+  method: "get";
+  url: string;
+  /** Icon case name, e.g. "Add"; shown in its line style before the label. */
+  icon: string | null;
+};
+
 export type TableEmptyState = {
   title: string;
   description: string | null;
   /** Icon case name, e.g. "Book"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
   icon: string | null;
+  actions: TableAction[];
 };
 
+/** The JSON shape of a Larasell\Admin\Tables\Table. */
 export type TableResource = {
   title: string;
   /** Shown when there are no rows; null for the default. */
   emptyState: TableEmptyState | null;
+  /** Shown in the header, which is hidden while the empty state shows. */
+  headerActions: TableAction[];
   columns: TableColumn[];
   /** The rows on the current page. */
   rows: TableRow[];

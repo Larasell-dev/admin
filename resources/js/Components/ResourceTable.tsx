@@ -3,7 +3,7 @@ import type { PaginationChange } from "@larasell-dev/ui";
 import { Badge, DataList, Pagination, Table } from "@larasell-dev/ui";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { type ReactNode, useState } from "react";
-import type { TableAction, TableColumn, TableResource, TableRow } from "../types";
+import type { TableRowAction, TableColumn, TableResource, TableRow } from "../types";
 import { overlayExclusive } from "../utils/hotkeys";
 import { isSameSite } from "../utils/isSameSite";
 import { navigationIcon } from "../utils/navigationIcon";
@@ -46,7 +46,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
   const [primary, ...rest] = resource.columns;
   const hasActions = resource.rows.some((row) => row._actions.length > 0);
 
-  const [pending, setPending] = useState<TableAction | null>(null);
+  const [pending, setPending] = useState<TableRowAction | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string>();
   const [isPaginating, setIsPaginating] = useState(false);
@@ -67,7 +67,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
       ),
   };
 
-  const perform = (action: TableAction, confirmation?: string) => {
+  const perform = (action: TableRowAction, confirmation?: string) => {
     if (action.method === "get") {
       setPending(null);
       visit(action.url);
@@ -83,7 +83,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
     });
   };
 
-  const choose = (action: TableAction) => {
+  const choose = (action: TableRowAction) => {
     setError(undefined);
 
     if (action.confirm) {

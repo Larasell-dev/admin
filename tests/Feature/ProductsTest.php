@@ -67,6 +67,7 @@ it('says there are no products yet when the store has none', function () {
                 'title' => 'No products yet',
                 'description' => 'Products you add to the store show up here.',
                 'icon' => 'ShoppingBag',
+                'actions' => [],
             ]));
 });
 

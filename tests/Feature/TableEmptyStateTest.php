@@ -8,6 +8,7 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidTableEmptyState;
 use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Tables\Actions\TableAction;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
@@ -68,6 +69,7 @@ it('describes the empty state with an Icon case', function () {
         'title' => 'No books yet',
         'description' => 'Books appear here once you add them.',
         'icon' => 'Book',
+        'actions' => [],
     ]);
 });
 
@@ -84,6 +86,18 @@ it('only needs a title', function () {
         'title' => 'No books yet',
         'description' => null,
         'icon' => null,
+        'actions' => [],
+    ]);
+});
+
+it('offers actions that resolve the empty state', function () {
+    ShelfTable::$emptyState = [
+        'title' => 'No books yet',
+        'actions' => [TableAction::make('Add book')->to('/admin/books/create')->icon(Icon::Add)],
+    ];
+
+    expect(emptyStateOf(ShelfTable::make())['actions'])->toBe([
+        ['label' => 'Add book', 'method' => 'get', 'url' => '/admin/books/create', 'icon' => 'Add'],
     ]);
 });
 
@@ -110,6 +124,8 @@ it('rejects an invalid empty state', function (array $emptyState, string $code) 
     'whitespace icon' => [['title' => 'No books yet', 'icon' => '   '], 'larasell-admin.table.empty-state.empty-icon'],
     'icon with a style suffix' => [['title' => 'No books yet', 'icon' => 'book-line'], 'larasell-admin.table.empty-state.icon-style-variant'],
     'icon of the wrong type' => [['title' => 'No books yet', 'icon' => 12], 'larasell-admin.table.empty-state.invalid-value'],
+    'actions that are not a list' => [['title' => 'No books yet', 'actions' => TableAction::make('Add book')->to('/a')], 'larasell-admin.table.empty-state.invalid-value'],
+    'action that is not a TableAction' => [['title' => 'No books yet', 'actions' => [['label' => 'Add book', 'url' => '/a']]], 'larasell-admin.table.empty-state.invalid-value'],
     'unknown key' => [['title' => 'No books yet', 'subtitle' => 'Oops'], 'larasell-admin.table.empty-state.unknown-key'],
 ]);
 
@@ -126,5 +142,5 @@ it('sends the empty state to the table page', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('TablePage')
-            ->where('table.emptyState', ['title' => 'No books yet', 'description' => null, 'icon' => 'Book']));
+            ->where('table.emptyState', ['title' => 'No books yet', 'description' => null, 'icon' => 'Book', 'actions' => []]));
 });

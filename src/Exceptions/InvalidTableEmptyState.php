@@ -35,7 +35,7 @@ class InvalidTableEmptyState extends InvalidArgumentException implements Structu
         return static::structured(
             code: 'larasell-admin.table.empty-state.unknown-key',
             message: "Table [{$table}] empty state has an unknown key [{$key}].",
-            why: "An empty state only supports 'title', 'description' and 'icon', so [{$key}] would be ignored.",
+            why: "An empty state only supports 'title', 'description', 'icon' and 'actions', so [{$key}] would be ignored.",
             fix: "Remove [{$key}] from emptyState(), or check it for a typo.",
         );
     }

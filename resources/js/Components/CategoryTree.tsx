@@ -30,7 +30,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { TableAction } from "../types";
+import type { TableRowAction } from "../types";
 import { overlayExclusive } from "../utils/hotkeys";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
@@ -454,7 +454,7 @@ export function CategoryDeletion({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string>();
 
   // The admin types the name to confirm; the server checks it again.
-  const deletion: TableAction | null = deleting && {
+  const deletion: TableRowAction | null = deleting && {
     name: "delete",
     label: "Delete",
     method: "post",
