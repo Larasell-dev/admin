@@ -60,8 +60,8 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
     {
         return static::structured(
             code: 'larasell-admin.table.column.invalid-mapped-value',
-            message: "Text column [{$column}] map() returned {$type}, not text.",
-            why: "A text column shows its value as text, but the map() callback of [{$column}] returned {$type}, which has no clear text form.",
+            message: "Column [{$column}] map() returned {$type}, not text.",
+            why: "Column [{$column}] shows its value as text, but its map() callback returned {$type}, which has no clear text form.",
             fix: 'Return a string, a number, a Stringable or null from map(), e.g. $value ? \'Yes\' : \'No\' for a bool.',
         );
     }
@@ -135,6 +135,16 @@ class InvalidTableColumn extends InvalidArgumentException implements StructuredE
             message: "Column [{$column}] image url uses the [{$scheme}:] scheme, which cannot show a picture.",
             why: 'Table cells show the url in an <img>, which only loads http(s) urls, relative urls and data urls of images. Anything else would show as a broken picture.',
             fix: 'Pass an http(s) url, a relative url or a data:image/... url, e.g. with route() or Storage::url(), or return null for records without a picture.',
+        );
+    }
+
+    public static function invalidVariant(string $column, string $variant): static
+    {
+        return static::structured(
+            code: 'larasell-admin.table.column.invalid-variant',
+            message: "Badge column [{$column}] variant() gave {$variant}, which is not a variant.",
+            why: 'A badge is coloured by one of the Variant cases, so anything else has no colour to show.',
+            fix: 'Use a Variant case, e.g. Variant::Success, or its name: "neutral", "info", "success", "warning" or "danger". Return null from a callback for a neutral badge.',
         );
     }
 }
