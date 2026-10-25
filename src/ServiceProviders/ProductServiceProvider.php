@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Product;
+namespace Larasell\Admin\ServiceProviders;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -8,7 +8,7 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
-use Larasell\Admin\Product\Tables\Products;
+use Larasell\Admin\Tables\Product\Products;
 
 /**
  * The products module. Setting larasell.admin.products.enabled to false leaves

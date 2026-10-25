@@ -46,7 +46,7 @@ abstract class Table implements JsonSerializable
     /** The namespaces of the panel's own tables, by the prefix their slugs start with. */
     private const array PANEL_NAMESPACES = [
         'larasell:' => 'Larasell\\Admin\\Tables\\Panel\\',
-        'larasell-product:' => 'Larasell\\Admin\\Product\\Tables\\',
+        'larasell-product:' => 'Larasell\\Admin\\Tables\\Product\\',
     ];
 
     public static function make(mixed ...$arguments): static
