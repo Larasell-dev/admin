@@ -1,0 +1,29 @@
+<?php
+
+namespace Larasell\Admin\Data\ViewModel;
+
+use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Models\Product;
+use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+#[TypeScript]
+class ProductDetailData extends Data
+{
+    public function __construct(
+        public int $id,
+        public string $name,
+        public string $slug,
+        public bool $visible,
+    ) {}
+
+    public static function fromModel(Product $product): self
+    {
+        return new self(
+            id: $product->id,
+            name: $product->name->get(),
+            slug: $product->slug->get(),
+            visible: $product->status === Visibility::Visible,
+        );
+    }
+}

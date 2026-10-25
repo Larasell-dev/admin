@@ -6,6 +6,7 @@ use Larasell\Admin\Actions\Product\DeleteProduct;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Tables\Actions\Action;
+use Larasell\Admin\Tables\Actions\TableAction;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Tables\Columns\TextColumn;
@@ -29,6 +30,18 @@ class Products extends Table
         ];
     }
 
+    public function rowLink(Product $product): string
+    {
+        return route('larasell.admin.products.edit', $product);
+    }
+
+    public function headerActions(): array
+    {
+        return [
+            TableAction::make('Add product')->route('larasell.admin.products.create')->icon(Icon::Add),
+        ];
+    }
+
     public function actions(): array
     {
         return [
@@ -45,6 +58,7 @@ class Products extends Table
             'title' => 'No products yet',
             'description' => 'Products you add to the store show up here.',
             'icon' => Icon::ShoppingBag,
+            'actions' => $this->headerActions(),
         ];
     }
 }
