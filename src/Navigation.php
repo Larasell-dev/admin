@@ -2,9 +2,11 @@
 
 namespace Larasell\Admin;
 
+use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Data\ViewModel\NavigationItemData;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Exceptions\InvalidNavigationItem;
+use Larasell\Admin\Tables\Table;
 use Larasell\Admin\ValueObjects\NavigationItem;
 use LogicException;
 
@@ -61,6 +63,24 @@ class Navigation
         self::assert(count($this->items) < self::MAX_ITEMS, 'Too many navigation items.');
 
         return $this->items[$route] = new NavigationItem($label, $route, $icon, $this);
+    }
+
+    /**
+     * Registers a Route::index() table page as an admin route and adds it to the navigation.
+     *
+     * @param  class-string<Table>  $table
+     */
+    public function index(string $label, string $uri, string $table, Icon|string $icon): NavigationItem
+    {
+        $route = null;
+
+        AdminPanel::resolve()->routes(function () use ($uri, $table, &$route): void {
+            $route = Route::index($uri, $table);
+        });
+
+        $name = $route?->getName() ?? throw new LogicException("Index route [{$uri}] was not registered with a name.");
+
+        return $this->add($label, $name, $icon);
     }
 
     public function freeze(): void
