@@ -1,0 +1,73 @@
+<?php
+
+namespace Larasell\Admin\Http\Controllers;
+
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\App;
+use Inertia\Inertia;
+use Inertia\Response;
+use Larasell\Admin\Data\View\CreateProductPageData;
+use Larasell\Admin\Data\View\EditProductPageData;
+use Larasell\Admin\Data\ViewModel\ProductDetailData;
+use Larasell\Admin\Http\Requests\ProductRequest;
+use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Price;
+use Larasell\Larasell\Translatable;
+use Laravel\Head\Facades\Head;
+
+/**
+ * Creates and edits products. The index is the Products table, which Navigation::index registers.
+ */
+class ProductController
+{
+    public function create(): Response
+    {
+        return Inertia::render('Product/Create', new CreateProductPageData(
+            storeUrl: route('larasell.admin.products.store'),
+            indexUrl: route('larasell.admin.products.index'),
+        ));
+    }
+
+    /**
+     * Creates a product with the name and slug in the current locale. The form has no price
+     * yet, and every product needs one, so it starts at 0.
+     */
+    public function store(ProductRequest $request): RedirectResponse
+    {
+        $product = Product::create([
+            'name' => Translatable::fromString($request->validated('name')),
+            'slug' => Translatable::fromString($request->validated('slug')),
+            'status' => $request->validated('status'),
+            'price' => Price::of(0),
+        ]);
+
+        return redirect()->route('larasell.admin.products.edit', $product);
+    }
+
+    public function edit(Product $product): Response
+    {
+        Head::title($product->name->get());
+
+        return Inertia::render('Product/Edit', new EditProductPageData(
+            product: ProductDetailData::fromModel($product),
+            updateUrl: route('larasell.admin.products.update', $product),
+            indexUrl: route('larasell.admin.products.index'),
+        ));
+    }
+
+    /**
+     * Changes the name and slug in the current locale and keeps their other translations.
+     */
+    public function update(ProductRequest $request, Product $product): RedirectResponse
+    {
+        $locale = App::currentLocale();
+
+        $product->update([
+            'name' => $product->name->with($locale, $request->validated('name')),
+            'slug' => $product->slug->with($locale, $request->validated('slug')),
+            'status' => $request->validated('status'),
+        ]);
+
+        return redirect()->route('larasell.admin.products.edit', $product);
+    }
+}

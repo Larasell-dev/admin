@@ -27,11 +27,20 @@ declare namespace Larasell.Admin.Data.View {
     indexUrl: string;
     parent: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
   };
+  export type CreateProductPageData = {
+    storeUrl: string;
+    indexUrl: string;
+  };
   export type CustomersPageData = {
     customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
   };
   export type EditAdminPageData = {
     editedAdmin: Larasell.Admin.Data.ViewModel.AdminData;
+    updateUrl: string;
+    indexUrl: string;
+  };
+  export type EditProductPageData = {
+    product: Larasell.Admin.Data.ViewModel.ProductDetailData;
     updateUrl: string;
     indexUrl: string;
   };
@@ -95,5 +104,11 @@ declare namespace Larasell.Admin.Data.ViewModel {
     current_page: number;
     per_page: number;
     total: number;
+  };
+  export type ProductDetailData = {
+    id: number;
+    name: string;
+    slug: string;
+    visible: boolean;
   };
 }
