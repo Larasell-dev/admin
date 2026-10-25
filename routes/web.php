@@ -16,6 +16,8 @@ use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
 use Larasell\Admin\Http\Controllers\Media\FolderController;
+use Larasell\Admin\Http\Controllers\Media\MediaController;
+use Larasell\Admin\Http\Controllers\Media\ProductImageController;
 use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
 use Larasell\Admin\Http\Controllers\SearchProductsNotInCategoryController;
@@ -25,7 +27,6 @@ use Larasell\Admin\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 use Larasell\Admin\NavigationGroup;
-use Larasell\Admin\Tables\Panel\Media\Media;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');
@@ -48,8 +49,10 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->withHead(title: 'Customers');
 
     if (config('larasell.media.enabled')) {
-        Route::index('media', Media::class);
+        Route::get('media', [MediaController::class, 'index'])->name('media.index');
         Route::get('media/folders/{folder}', [FolderController::class, 'show'])->name('media.folders.show');
+        Route::delete('media/folders/{folder}', [FolderController::class, 'destroy'])->name('media.folders.destroy');
+        Route::delete('media/product-images/{productImage}', [ProductImageController::class, 'destroy'])->name('media.product-images.destroy');
     }
 
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');

@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Tables\Panel\Media;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Media\MediaType;
 use Larasell\Admin\Models\Media\Folder;
@@ -67,6 +68,31 @@ class Media extends Table
             // Larasell's own url(), so the link follows its images disk; the row's name is the image's file.
             MediaType::ProductImage => (new ProductImage)->setRawAttributes(['file' => $item->name])->url(),
         };
+    }
+
+    /**
+     * Each row also names its type and where to delete it, since the media page draws its own actions.
+     */
+    public function jsonSerialize(): array
+    {
+        $table = parent::jsonSerialize();
+
+        $table['rows'] = array_map(function (array $row): array {
+            // The key is the type and id, e.g. "product-image-12".
+            $type = MediaType::from(Str::beforeLast($row['id'], '-'));
+            $id = Str::afterLast($row['id'], '-');
+
+            return [
+                ...$row,
+                '_type' => $type->value,
+                '_deleteUrl' => match ($type) {
+                    MediaType::Folder => route('larasell.admin.media.folders.destroy', $id),
+                    MediaType::ProductImage => route('larasell.admin.media.product-images.destroy', $id),
+                },
+            ];
+        }, $table['rows']);
+
+        return $table;
     }
 
     public function emptyState(): array

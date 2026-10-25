@@ -32,7 +32,7 @@ it('lists folders before product images, each alphabetically, linking folders to
         ->get('/admin/media')
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Media/Index')
             ->where('table.title', 'Media')
             ->where('table.columns', [
                 ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
@@ -40,12 +40,12 @@ it('lists folders before product images, each alphabetically, linking folders to
             ])
             ->where('table.pagination.total', 6)
             ->where('table.rows', [
-                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => []],
-                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => []],
-                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => []],
-                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => []],
-                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => []],
-                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => []],
+                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$archive->id}")],
+                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$banners->id}")],
+                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$zoo->id}")],
+                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$apple}")],
+                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$mango}")],
+                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$zebra}")],
             ]));
 });
 
@@ -77,12 +77,12 @@ it('lists only the folders directly inside a folder on its page', function () {
         ->get("/admin/media/folders/{$campaigns->id}")
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Media/Index')
             ->where('table.title', 'Campaigns')
             ->where('table.pagination.total', 2)
             ->where('table.rows', [
-                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => []],
-                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => []],
+                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$summer->id}")],
+                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$winter->id}")],
             ]));
 });
 
@@ -173,4 +173,6 @@ it('leaves the admin panel when disabled', function () {
 
     $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->get("/admin/media/folders/{$folder->id}")->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->delete("/admin/media/folders/{$folder->id}")->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->delete('/admin/media/product-images/'.productImage('a.jpg'))->assertNotFound();
 });
