@@ -100,6 +100,8 @@ abstract class TestCase extends OrchestraTestCase
                 'driver' => 'sqlite',
                 'database' => ':memory:',
                 'prefix' => '',
+                // Like production databases, so deletes cascade as the migrations define.
+                'foreign_key_constraints' => true,
             ],
         ]);
     }

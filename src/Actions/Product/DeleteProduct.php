@@ -9,8 +9,8 @@ class DeleteProduct
 {
     /**
      * Deletes the product, its variants and its category links. Past orders keep their own copy
-     * of the product. They're removed here, not left to the foreign keys, because SQLite only
-     * cascades when foreign keys are switched on.
+     * of the product. Categories and variants are removed here explicitly rather than left to
+     * the database's cascading foreign keys.
      */
     public function handle(Product $product): void
     {
