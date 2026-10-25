@@ -2,9 +2,7 @@
 
 namespace Larasell\Admin\ServiceProviders;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
@@ -27,10 +25,6 @@ class ProductServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app->make(AdminPanel::class)->routes(function (): void {
-            Route::index('products', Products::class);
-        });
-
-        Navigation::add(NavItem::Products->label(), NavItem::Products->value, icon: Icon::ShoppingBag)->position(NavItem::Products->position());
+        Navigation::index(NavItem::Products->label(), 'products', Products::class, icon: Icon::ShoppingBag)->position(NavItem::Products->position());
     }
 }
