@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Larasell\Admin\Actions\Media\DeleteFolder;
 use Larasell\Admin\Models\Media\Folder;
+use Larasell\Larasell\Models\ProductImage;
 
 function folder(string $name, ?Folder $parent = null): Folder
 {
@@ -94,4 +97,24 @@ it('fires the events for folders before their parent, while the parent still exi
         ->and($position('deleted', $august->id))->toBeLessThan($position('deleting', $summer->id))
         ->and(array_column(array_filter($events, fn (array $entry): bool => $entry[0] === 'deleting'), 2))
         ->each->toBeTrue();
+});
+
+it('deletes the product images in the folder and below it, with their files', function () {
+    Storage::fake(config('larasell.images.disk'));
+    $disk = Storage::disk(config('larasell.images.disk'));
+    $image = fn (string $name): ProductImage => ProductImage::create(['file' => UploadedFile::fake()->image($name)]);
+
+    $campaigns = folder('Campaigns');
+    $summer = folder('Summer', $campaigns);
+    $beach = folder('Beach', $summer);
+    $summer->productImages()->attach($inSummer = $image('summer.jpg'));
+    $beach->productImages()->attach($inBeach = $image('beach.jpg'));
+    $campaigns->productImages()->attach($inCampaigns = $image('campaigns.jpg'));
+    $topLevel = $image('top.jpg');
+
+    app(DeleteFolder::class)->handle($summer);
+
+    expect(ProductImage::query()->orderBy('id')->pluck('id')->all())->toBe([$inCampaigns->id, $topLevel->id]);
+    $disk->assertMissing([$inSummer->file, $inBeach->file]);
+    $disk->assertExists([$inCampaigns->file, $topLevel->file]);
 });

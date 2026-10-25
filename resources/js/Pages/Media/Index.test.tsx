@@ -49,6 +49,8 @@ function renderMedia(total: number | null) {
     version: null,
     props: {
       table,
+      uploadUrl: "/admin/media/product-images",
+      folderId: 7,
       navigation: [
         {
           id: "media",
@@ -74,13 +76,16 @@ function renderMedia(total: number | null) {
   );
 }
 
-it("explains a folder that does not exist", async () => {
+const uploadButtons = () => page.getByRole("button", { name: "Upload" }).elements();
+
+it("explains a folder that does not exist, without offering to add media", async () => {
   await renderMedia(null);
 
   await expect
     .element(page.getByRole("heading", { level: 1, name: "Folder not found" }))
     .toBeVisible();
   await expect.element(page.getByText("This folder doesn't exist anymore")).toBeVisible();
+  expect(uploadButtons()).toHaveLength(0);
 });
 
 afterEach(() => {

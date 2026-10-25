@@ -52,6 +52,7 @@ Route::middleware(Authenticate::class)->group(function () {
         Route::get('media', [MediaController::class, 'index'])->name('media.index');
         Route::get('media/folders/{folder}', [FolderController::class, 'show'])->name('media.folders.show');
         Route::delete('media/folders/{folder}', [FolderController::class, 'destroy'])->name('media.folders.destroy');
+        Route::post('media/product-images', [ProductImageController::class, 'store'])->name('media.product-images.store');
         Route::delete('media/product-images/{productImage}', [ProductImageController::class, 'destroy'])->name('media.product-images.destroy');
     }
 

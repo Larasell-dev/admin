@@ -86,6 +86,31 @@ it('lists only the folders directly inside a folder on its page', function () {
             ]));
 });
 
+it('lists the product images in a folder on its page and not at the root', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $campaigns = Folder::create(['name' => 'Campaigns']);
+    $brand = Folder::create(['name' => 'Brand']);
+    $summer = Folder::create(['name' => 'Summer', 'parent_id' => $campaigns->id]);
+    $campaigns->productImages()->attach(productImage('products/zebra.jpg'));
+    $campaigns->productImages()->attach(productImage('products/apple.png'));
+    $brand->productImages()->attach(productImage('products/logo.png'));
+    productImage('products/mango.webp');
+
+    $this->actingAs($admin, 'larasell-admin');
+
+    $this->get("/admin/media/folders/{$campaigns->id}")->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.pagination.total', 3)
+        ->where('table.rows.0.id', "folder-{$summer->id}")
+        ->where('table.rows.1.name', 'apple.png')
+        ->where('table.rows.2.name', 'zebra.jpg'));
+
+    $this->get('/admin/media')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('table.pagination.total', 3)
+        ->where('table.rows.0.name', 'Brand')
+        ->where('table.rows.1.name', 'Campaigns')
+        ->where('table.rows.2.name', 'mango.webp'));
+});
+
 it('shows the empty state for a folder without contents', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $campaigns = Folder::create(['name' => 'Campaigns']);
@@ -178,6 +203,7 @@ it('leaves the admin panel when disabled', function () {
 
     $this->actingAs($admin, 'larasell-admin')->get('/admin/media')->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->get("/admin/media/folders/{$folder->id}")->assertNotFound();
+    $this->actingAs($admin, 'larasell-admin')->post('/admin/media/product-images', ['files' => []])->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->delete("/admin/media/folders/{$folder->id}")->assertNotFound();
     $this->actingAs($admin, 'larasell-admin')->delete('/admin/media/product-images/'.productImage('a.jpg'))->assertNotFound();
 });

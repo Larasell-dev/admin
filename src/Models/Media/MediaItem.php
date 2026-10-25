@@ -15,7 +15,7 @@ use Larasell\Larasell\Models\ProductImage;
  * @property string $name The folder's name, or the product image's file path.
  * @property MediaType $type
  * @property int $type_order 0 for folders, 1 for product images, to list folders first.
- * @property int|null $folder_id The folder it is in, or null at the top level. Product images are always at the top level.
+ * @property int|null $folder_id The folder it is in, or null at the top level.
  */
 class MediaItem extends Model
 {
@@ -41,9 +41,11 @@ class MediaItem extends Model
                 ->select(['id', 'name', 'parent_id as folder_id'])
                 ->selectRaw('? as type, 0 as type_order', [MediaType::Folder->value]);
 
+            // An image without a row in the link table is at the top level.
             $productImages = ProductImage::query()->toBase()
-                ->select(['id', 'file as name'])
-                ->selectRaw('null as folder_id, ? as type, 1 as type_order', [MediaType::ProductImage->value]);
+                ->leftJoin('larasell_admin_media_folder_product_image as link', 'link.product_image_id', '=', 'larasell_product_images.id')
+                ->select(['larasell_product_images.id', 'larasell_product_images.file as name', 'link.folder_id'])
+                ->selectRaw('? as type, 1 as type_order', [MediaType::ProductImage->value]);
 
             $query->fromSub($folders->unionAll($productImages), $query->getModel()->getTable());
         });

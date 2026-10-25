@@ -4,6 +4,8 @@ namespace Larasell\Admin\Models\Media;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Larasell\Larasell\Models\ProductImage;
 
 /**
  * @property int $id
@@ -25,5 +27,14 @@ class Folder extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * @return BelongsToMany<ProductImage, $this>
+     */
+    public function productImages(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductImage::class, 'larasell_admin_media_folder_product_image', 'folder_id', 'product_image_id')
+            ->withTimestamps();
     }
 }

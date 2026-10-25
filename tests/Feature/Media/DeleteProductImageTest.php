@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Larasell\Admin\Actions\Media\DeleteProductImage;
+use Larasell\Admin\Models\Media\Folder;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Price;
@@ -46,4 +47,17 @@ it('removes the image from its products but keeps the products', function () {
 
     expect(Product::query()->whereKey($product->id)->exists())->toBeTrue()
         ->and(DB::table('larasell_product_product_image')->pluck('product_image_id')->all())->toBe([$other->id]);
+});
+
+it('takes the image out of its folder but keeps the folder', function () {
+    $image = storedProductImage('apple.jpg');
+    $other = storedProductImage('mango.jpg');
+    $folder = Folder::create(['name' => 'Campaigns']);
+    $folder->productImages()->attach([$image->id, $other->id]);
+
+    app(DeleteProductImage::class)->handle($image);
+
+    // Read from the link table itself: a join through the relation would hide a leftover link.
+    expect(DB::table('larasell_admin_media_folder_product_image')->pluck('product_image_id')->all())->toBe([$other->id])
+        ->and(Folder::query()->whereKey($folder->id)->exists())->toBeTrue();
 });

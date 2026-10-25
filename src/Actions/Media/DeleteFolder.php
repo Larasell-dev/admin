@@ -4,11 +4,16 @@ namespace Larasell\Admin\Actions\Media;
 
 use Illuminate\Support\Facades\DB;
 use Larasell\Admin\Models\Media\Folder;
+use Larasell\Larasell\Models\ProductImage;
 
 class DeleteFolder
 {
+    public function __construct(
+        private DeleteProductImage $deleteProductImage,
+    ) {}
+
     /**
-     * Deletes the folder and every folder below it.
+     * Deletes the folder and every folder below it, with the product images in them.
      */
     public function handle(Folder $folder): void
     {
@@ -30,6 +35,12 @@ class DeleteFolder
             ->orderByDesc('tree.depth')
             ->select('larasell_admin_media_folders.*')
             ->get();
+
+        // Images first, each with its file, so none is left behind if deleting the folders fails.
+        ProductImage::query()
+            ->whereIn('id', DB::table('larasell_admin_media_folder_product_image')->whereIn('folder_id', $folders->modelKeys())->select('product_image_id'))
+            ->get()
+            ->each(fn (ProductImage $image) => $this->deleteProductImage->handle($image));
 
         DB::transaction(fn () => $folders->each->delete());
     }
