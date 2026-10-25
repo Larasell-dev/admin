@@ -4,7 +4,8 @@ namespace Larasell\Admin\Tables\Actions;
 
 use Illuminate\Support\Str;
 use JsonSerializable;
-use Larasell\Admin\Tables\Actions\Concerns\ConfiguresAction;
+use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Exceptions\InvalidTableAction;
 use LogicException;
 
 /**
@@ -13,12 +14,18 @@ use LogicException;
  *
  * It only links for now. Its JSON names the request method, so actions that
  * run a handler can be added later without changing what links send.
+ *
+ * It shares no code with the row Action on purpose, so the two can evolve
+ * independently.
  */
 final class TableAction implements JsonSerializable
 {
-    use ConfiguresAction;
-
     private ?string $url = null;
+
+    private ?Icon $icon = null;
+
+    /** @var array<int, string> The configuration methods called so far, which may each be called only once. */
+    private array $configured = [];
 
     private function __construct(private string $label) {}
 
@@ -43,9 +50,43 @@ final class TableAction implements JsonSerializable
         return $this->to(route($name, $parameters));
     }
 
+    /**
+     * Show an icon before the label: an Icon case or its Remix icon name, e.g. "add".
+     */
+    public function icon(Icon|string $icon): self
+    {
+        $this->configureOnce('icon()');
+        $this->icon = is_string($icon) ? $this->resolveIcon($icon) : $icon;
+
+        return $this;
+    }
+
     public function name(): string
     {
         return Str::slug($this->label);
+    }
+
+    private function configureOnce(string $method): void
+    {
+        if (in_array($method, $this->configured, true)) {
+            throw InvalidTableAction::configuredTwice($this->name(), $method);
+        }
+
+        $this->configured[] = $method;
+    }
+
+    private function resolveIcon(string $icon): Icon
+    {
+        if (Str::trim($icon) === '') {
+            throw InvalidTableAction::emptyIcon($this->name());
+        }
+
+        // Checked before the lookup: "add-line" is not a case either, but this error says how to fix it.
+        if (Str::endsWith($icon, ['-line', '-fill'])) {
+            throw InvalidTableAction::iconStyleVariant($this->name(), $icon);
+        }
+
+        return Icon::tryFrom($icon) ?? throw InvalidTableAction::unknownIcon($this->name(), $icon);
     }
 
     /**
