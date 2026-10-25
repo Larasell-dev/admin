@@ -38,6 +38,8 @@ class ProductController
             'name' => Translatable::fromString($request->validated('name')),
             'slug' => Translatable::fromString($request->validated('slug')),
             'status' => $request->validated('status'),
+            'weight' => $request->weight(),
+            'dimensions' => $request->dimensions(),
             'price' => Price::of(0),
         ]);
 
@@ -66,6 +68,8 @@ class ProductController
             'name' => $product->name->with($locale, $request->validated('name')),
             'slug' => $product->slug->with($locale, $request->validated('slug')),
             'status' => $request->validated('status'),
+            'weight' => $request->weight(),
+            'dimensions' => $request->dimensions(),
         ]);
 
         return redirect()->route('larasell.admin.products.edit', $product);

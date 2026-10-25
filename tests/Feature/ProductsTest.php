@@ -6,11 +6,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
+use Larasell\Larasell\Dimensions;
+use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Enums\WeightUnit;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
+use Larasell\Larasell\Weight;
 
 function signInAdmin(): Admin
 {
@@ -131,9 +135,152 @@ it('shows the product\'s values to edit on its page', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Edit')
-            ->where('product', ['id' => $boots->id, 'name' => 'Boots', 'slug' => 'boots', 'visible' => false])
+            ->where('product', ['id' => $boots->id, 'name' => 'Boots', 'slug' => 'boots', 'visible' => false, 'weight' => null, 'dimensions' => null])
             ->where('updateUrl', url("/admin/products/{$boots->id}"))
             ->where('indexUrl', url('/admin/products')));
+});
+
+it('shows the product\'s weight and dimensions in the units they were saved in', function () {
+    signInAdmin();
+
+    $poster = Product::create([
+        'slug' => 'poster',
+        'name' => 'Poster',
+        'price' => Price::of(1999),
+        'weight' => Weight::of('12.5', 'lb'),
+        'dimensions' => Dimensions::of('50', '35.5', '0', 'in'),
+    ]);
+
+    $this->get("/admin/products/{$poster->id}/edit")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            // Strings, so decimals reach the form exactly as they were saved.
+            ->where('product.weight', ['amount' => '12.5', 'unit' => 'lb'])
+            ->where('product.dimensions', ['length' => '50', 'width' => '35.5', 'height' => '0', 'unit' => 'in']));
+});
+
+it('saves the weight and dimensions as entered, without converting them', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'Poster',
+        'slug' => 'poster',
+        'status' => 'visible',
+        'weight' => ['amount' => '1500', 'unit' => 'g'],
+        'dimensions' => ['length' => '50', 'width' => '35.5', 'height' => '0.2', 'unit' => 'mm'],
+    ])->assertSessionHasNoErrors();
+
+    $poster = Product::query()->sole();
+
+    expect($poster->weight?->amount())->toBe('1500')
+        ->and($poster->weight?->unit())->toBe(WeightUnit::Gram)
+        ->and($poster->dimensions?->length()->amount())->toBe('50')
+        ->and($poster->dimensions?->width()->amount())->toBe('35.5')
+        ->and($poster->dimensions?->height()->amount())->toBe('0.2')
+        ->and($poster->dimensions?->unit())->toBe(LengthUnit::Millimeter);
+});
+
+it('accepts a weight and dimensions of zero', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'E-book',
+        'slug' => 'e-book',
+        'status' => 'visible',
+        'weight' => ['amount' => '0', 'unit' => 'kg'],
+        'dimensions' => ['length' => '0', 'width' => '0', 'height' => '0', 'unit' => 'cm'],
+    ])->assertSessionHasNoErrors();
+
+    $book = Product::query()->sole();
+
+    expect($book->weight?->amount())->toBe('0')
+        ->and($book->dimensions?->volume())->toBe('0');
+});
+
+it('saves no weight or dimensions when their amounts are left empty, whatever the unit', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'E-book',
+        'slug' => 'e-book',
+        'status' => 'visible',
+        'weight' => ['amount' => '', 'unit' => 'kg'],
+        'dimensions' => ['length' => '', 'width' => '', 'height' => '', 'unit' => 'cm'],
+    ])->assertSessionHasNoErrors();
+
+    $book = Product::query()->sole();
+
+    expect($book->weight)->toBeNull()
+        ->and($book->dimensions)->toBeNull();
+});
+
+it('removes the weight and dimensions when they are cleared', function () {
+    signInAdmin();
+
+    $poster = Product::create([
+        'slug' => 'poster',
+        'name' => 'Poster',
+        'price' => Price::of(1999),
+        'weight' => Weight::of('2', 'kg'),
+        'dimensions' => Dimensions::of('50', '35', '5', 'cm'),
+    ]);
+
+    $this->put("/admin/products/{$poster->id}", [
+        'name' => 'Poster',
+        'slug' => 'poster',
+        'status' => 'visible',
+        'weight' => ['amount' => '', 'unit' => 'kg'],
+        'dimensions' => ['length' => '', 'width' => '', 'height' => '', 'unit' => 'cm'],
+    ])->assertSessionHasNoErrors();
+
+    $poster->refresh();
+
+    expect($poster->weight)->toBeNull()
+        ->and($poster->dimensions)->toBeNull();
+});
+
+it('rejects an invalid weight or dimensions', function (array $input, string $error) {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'Poster',
+        'slug' => 'poster',
+        'status' => 'visible',
+        'weight' => ['amount' => '2', 'unit' => 'kg'],
+        'dimensions' => ['length' => '50', 'width' => '35', 'height' => '5', 'unit' => 'cm'],
+        ...$input,
+    ])->assertSessionHasErrors($error);
+
+    expect(Product::query()->count())->toBe(0);
+})->with([
+    'negative weight' => [['weight' => ['amount' => '-1', 'unit' => 'kg']], 'weight.amount'],
+    'weight that is not a number' => [['weight' => ['amount' => 'heavy', 'unit' => 'kg']], 'weight.amount'],
+    'weight with a comma' => [['weight' => ['amount' => '1,5', 'unit' => 'kg']], 'weight.amount'],
+    'weight in exponent notation' => [['weight' => ['amount' => '1e3', 'unit' => 'kg']], 'weight.amount'],
+    'weight without a unit' => [['weight' => ['amount' => '2']], 'weight.unit'],
+    'weight in an unknown unit' => [['weight' => ['amount' => '2', 'unit' => 'stone']], 'weight.unit'],
+    'weight in a length unit' => [['weight' => ['amount' => '2', 'unit' => 'cm']], 'weight.unit'],
+    'negative length' => [['dimensions' => ['length' => '-5', 'width' => '35', 'height' => '5', 'unit' => 'cm']], 'dimensions.length'],
+    'width that is not a number' => [['dimensions' => ['length' => '50', 'width' => 'wide', 'height' => '5', 'unit' => 'cm']], 'dimensions.width'],
+    'missing height' => [['dimensions' => ['length' => '50', 'width' => '35', 'height' => '', 'unit' => 'cm']], 'dimensions.height'],
+    'only a length' => [['dimensions' => ['length' => '50', 'width' => '', 'height' => '', 'unit' => 'cm']], 'dimensions.width'],
+    'dimensions without a unit' => [['dimensions' => ['length' => '50', 'width' => '35', 'height' => '5']], 'dimensions.unit'],
+    'dimensions in a weight unit' => [['dimensions' => ['length' => '50', 'width' => '35', 'height' => '5', 'unit' => 'kg']], 'dimensions.unit'],
+]);
+
+it('explains invalid weights and dimensions in words, not field paths', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'Poster',
+        'slug' => 'poster',
+        'status' => 'visible',
+        'weight' => ['amount' => '-1', 'unit' => 'kg'],
+        'dimensions' => ['length' => '50', 'width' => 'wide', 'height' => '', 'unit' => 'cm'],
+    ])->assertSessionHasErrors([
+        'weight.amount' => 'The weight must be a number of 0 or more, with a dot for decimals.',
+        'dimensions.width' => 'The width must be a number of 0 or more, with a dot for decimals.',
+        'dimensions.height' => 'Enter a height too, or leave length, width and height empty.',
+    ]);
 });
 
 it('returns 404 for editing a product that does not exist', function () {

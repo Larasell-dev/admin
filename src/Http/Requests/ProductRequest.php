@@ -6,11 +6,18 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 use Larasell\Admin\Rules\Slug;
+use Larasell\Larasell\Dimensions;
+use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Enums\WeightUnit;
 use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Weight;
 
 class ProductRequest extends FormRequest
 {
+    /** A non-negative decimal with a dot, the only amounts the library's measurements take. */
+    private const string AMOUNT = 'regex:/^\\d+(\\.\\d+)?$/';
+
     /**
      * @return array<string, array<int, mixed>>
      */
@@ -28,6 +35,74 @@ class ProductRequest extends FormRequest
                 Rule::unique(Product::class, 'slug->'.App::currentLocale())->ignore($this->route('product')),
             ],
             'status' => ['required', Rule::enum(Visibility::class)],
+            // Optional, since digital products have neither. The units always come with the
+            // form, so only the amounts decide whether there is a weight or dimensions.
+            'weight' => ['nullable', 'array'],
+            'weight.amount' => ['nullable', 'string', self::AMOUNT],
+            'weight.unit' => ['required_with:weight.amount', Rule::enum(WeightUnit::class)],
+            'dimensions' => ['nullable', 'array'],
+            // All three or none, since Dimensions needs every axis.
+            'dimensions.length' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.width,dimensions.height'],
+            'dimensions.width' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.height'],
+            'dimensions.height' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.width'],
+            'dimensions.unit' => ['required_with:dimensions.length,dimensions.width,dimensions.height', Rule::enum(LengthUnit::class)],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        $amount = 'The :attribute must be a number of 0 or more, with a dot for decimals.';
+        $axis = 'Enter a :attribute too, or leave length, width and height empty.';
+
+        return [
+            'weight.amount.regex' => $amount,
+            'dimensions.*.regex' => $amount,
+            'dimensions.*.required_with' => $axis,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'weight.amount' => 'weight',
+            'weight.unit' => 'weight unit',
+            'dimensions.length' => 'length',
+            'dimensions.width' => 'width',
+            'dimensions.height' => 'height',
+            'dimensions.unit' => 'dimensions unit',
+        ];
+    }
+
+    /**
+     * The weight as entered, without converting it, or null when its amount is left empty.
+     */
+    public function weight(): ?Weight
+    {
+        $amount = $this->validated('weight.amount');
+
+        return $amount === null ? null : Weight::of($amount, $this->validated('weight.unit'));
+    }
+
+    /**
+     * The dimensions as entered, without converting them, or null when they are left empty.
+     */
+    public function dimensions(): ?Dimensions
+    {
+        if ($this->validated('dimensions.length') === null) {
+            return null;
+        }
+
+        return Dimensions::of(
+            $this->validated('dimensions.length'),
+            $this->validated('dimensions.width'),
+            $this->validated('dimensions.height'),
+            $this->validated('dimensions.unit'),
+        );
     }
 }

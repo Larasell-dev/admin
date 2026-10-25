@@ -92,6 +92,12 @@ declare namespace Larasell.Admin.Data.ViewModel {
     ordersCount: number;
     createdAt: string | null;
   };
+  export type DimensionsData = {
+    length: string;
+    width: string;
+    height: string;
+    unit: string;
+  };
   export type NavigationItemData = {
     id: string;
     label: string;
@@ -110,5 +116,11 @@ declare namespace Larasell.Admin.Data.ViewModel {
     name: string;
     slug: string;
     visible: boolean;
+    weight: Larasell.Admin.Data.ViewModel.WeightData | null;
+    dimensions: Larasell.Admin.Data.ViewModel.DimensionsData | null;
+  };
+  export type WeightData = {
+    amount: string;
+    unit: string;
   };
 }

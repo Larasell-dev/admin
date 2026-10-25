@@ -1,5 +1,5 @@
 import { Form, Link } from "@inertiajs/react";
-import { Icon, IconButton, Section, SectionStack, useScrollMaskScrollbar } from "@larasell-dev/ui";
+import { Icon, IconButton, useScrollMaskScrollbar } from "@larasell-dev/ui";
 import { ArrowLeftLine } from "@larasell-dev/ui/icons";
 import { useRef } from "react";
 import ProductForm from "../../Components/ProductForm";
@@ -43,15 +43,7 @@ export default function Edit({ product, updateUrl, indexUrl }: Props) {
             // The saved values become the new baseline, so the form is no longer dirty.
             setDefaultsOnSuccess
           >
-            <SectionStack>
-              <Section.Root>
-                <Section.Header
-                  title="General"
-                  description="How the product is named and found in the store."
-                />
-                <ProductForm product={product} />
-              </Section.Root>
-            </SectionStack>
+            <ProductForm product={product} />
             <UnsavedChangesToast container={contentScroll} />
           </Form>
         </div>
