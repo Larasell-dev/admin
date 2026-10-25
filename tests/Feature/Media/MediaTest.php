@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
@@ -10,10 +11,11 @@ use Larasell\Admin\Navigation;
 
 function productImage(string $file): int
 {
-    return DB::table('larasell_product_images')->insertGetId(['file' => $file]);
+    return DB::table('larasell_product_images')->insertGetId(['file' => $file, 'created_at' => now(), 'updated_at' => now()]);
 }
 
 it('lists folders before product images, each alphabetically, linking folders to their page and images to their file', function () {
+    $this->travelTo(Carbon::parse('2026-10-20 09:30:00', 'UTC'));
     config([
         'larasell.images.disk' => 'public',
         'filesystems.disks.public.url' => 'https://cdn.example.com/media',
@@ -36,16 +38,16 @@ it('lists folders before product images, each alphabetically, linking folders to
             ->where('table.title', 'Media')
             ->where('table.columns', [
                 ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
-                ['name' => 'type', 'label' => 'Type', 'type' => 'text'],
+                ['name' => 'added_at', 'label' => 'Added at', 'type' => 'text'],
             ])
             ->where('table.pagination.total', 6)
             ->where('table.rows', [
-                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$archive->id}")],
-                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$banners->id}")],
-                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$zoo->id}")],
-                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$apple}")],
-                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$mango}")],
-                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'type' => 'Product image', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$zebra}")],
+                ['id' => "folder-{$archive->id}", 'name' => 'Archive', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$archive->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$archive->id}")],
+                ['id' => "folder-{$banners->id}", 'name' => 'banners', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$banners->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$banners->id}")],
+                ['id' => "folder-{$zoo->id}", 'name' => 'Zoo', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$zoo->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$zoo->id}")],
+                ['id' => "product-image-{$apple}", 'name' => 'Apple.png', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/Apple.png', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$apple}")],
+                ['id' => "product-image-{$mango}", 'name' => 'mango.webp', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/mango.webp', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$mango}")],
+                ['id' => "product-image-{$zebra}", 'name' => 'zebra.jpg', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => 'https://cdn.example.com/media/products/zebra.jpg', '_images' => [], '_type' => 'product-image', '_deleteUrl' => url("/admin/media/product-images/{$zebra}")],
             ]));
 });
 
@@ -65,6 +67,7 @@ it('lists only top-level folders and product images at the root', function () {
 });
 
 it('lists only the folders directly inside a folder on its page', function () {
+    $this->travelTo(Carbon::parse('2026-10-20 09:30:00', 'UTC'));
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $campaigns = Folder::create(['name' => 'Campaigns']);
     $winter = Folder::create(['name' => 'Winter', 'parent_id' => $campaigns->id]);
@@ -81,8 +84,8 @@ it('lists only the folders directly inside a folder on its page', function () {
             ->where('table.title', 'Campaigns')
             ->where('table.pagination.total', 2)
             ->where('table.rows', [
-                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$summer->id}")],
-                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'type' => 'Folder', '_actions' => [], '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$winter->id}")],
+                ['id' => "folder-{$summer->id}", 'name' => 'Summer', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$summer->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$summer->id}")],
+                ['id' => "folder-{$winter->id}", 'name' => 'Winter', 'added_at' => '2026-10-20T09:30:00+00:00', '_actions' => [], '_link' => url("/admin/media/folders/{$winter->id}"), '_images' => [], '_type' => 'folder', '_deleteUrl' => url("/admin/media/folders/{$winter->id}")],
             ]));
 });
 

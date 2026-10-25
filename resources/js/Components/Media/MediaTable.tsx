@@ -10,13 +10,18 @@ import Freeze from "../Freeze";
 /** A row of Larasell\Admin\Tables\Panel\Media\Media, which also names its type and where to delete it. */
 export type MediaRow = Pick<TableRow, "id" | "_actions" | "_link"> & {
   name: string;
-  /** "Folder" or "Product image". */
-  type: string;
+  /** ISO 8601, or null when unknown. */
+  added_at: string | null;
   _type: "folder" | "product-image";
   _deleteUrl: string;
 };
 
 export type MediaTableResource = Omit<TableResource, "rows"> & { rows: MediaRow[] };
+
+const dateTime = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
+
+/** When the row was added, in the browser's locale and timezone. */
+const addedAt = (row: MediaRow) => (row.added_at ? dateTime.format(new Date(row.added_at)) : "—");
 
 /**
  * The media as a data list on small screens and a table from `lg` up. Unlike ResourceTable, it
@@ -84,7 +89,7 @@ export default function MediaTable({ table }: { table: MediaTableResource }) {
                   <DataList.Title>{linked(row, DataList.Link)}</DataList.Title>
                   {actionsMenu(row)}
                 </div>
-                <DataList.Field label="Type">{row.type}</DataList.Field>
+                <DataList.Field label="Added at">{addedAt(row)}</DataList.Field>
               </DataList.Item>
             ))}
           </DataList.Root>
@@ -99,14 +104,14 @@ export default function MediaTable({ table }: { table: MediaTableResource }) {
           <Table.Content>
             <Table.Header>
               <Table.Column>Name</Table.Column>
-              <Table.Column>Type</Table.Column>
+              <Table.Column>Added at</Table.Column>
               <Table.Column type="action">Actions</Table.Column>
             </Table.Header>
             <Table.Body>
               {table.rows.map((row) => (
                 <Table.Row key={row.id}>
                   <Table.Cell>{linked(row, Table.Link)}</Table.Cell>
-                  <Table.Cell>{row.type}</Table.Cell>
+                  <Table.Cell>{addedAt(row)}</Table.Cell>
                   <Table.Cell>{actionsMenu(row)}</Table.Cell>
                 </Table.Row>
               ))}

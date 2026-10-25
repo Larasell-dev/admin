@@ -16,7 +16,7 @@ function renderMedia(total: number | null) {
           emptyState: { title: "No media yet", description: null, icon: null },
           columns: [
             { name: "name", label: "Name", type: "text" },
-            { name: "type", label: "Type", type: "text" },
+            { name: "added_at", label: "Added at", type: "text" },
           ],
           rows:
             total === 0
@@ -25,7 +25,7 @@ function renderMedia(total: number | null) {
                   {
                     id: "folder-1",
                     name: "Campaigns",
-                    type: "Folder",
+                    added_at: "2026-10-20T09:30:00+00:00",
                     _actions: [],
                     _link: "/admin/media/folders/1",
                     _type: "folder",
@@ -34,7 +34,7 @@ function renderMedia(total: number | null) {
                   {
                     id: "product-image-4",
                     name: "apple.jpg",
-                    type: "Product image",
+                    added_at: null,
                     _actions: [],
                     _link: "https://cdn.example.com/products/apple.jpg",
                     _type: "product-image",
@@ -308,4 +308,15 @@ it("starts with an empty name for the next deletion", async () => {
   await expect
     .element(page.getByRole("textbox", { name: 'Type "apple.jpg" to confirm' }))
     .toHaveValue("");
+});
+
+it("shows when each item was added, in place of its type", async () => {
+  await page.viewport(1280, 800);
+  await renderMedia(2);
+
+  const table = page.getByRole("table");
+  await expect.element(table.getByRole("columnheader", { name: "Added at" })).toBeVisible();
+  expect(table.getByRole("columnheader", { name: "Type" }).elements()).toHaveLength(0);
+  // In the browser's own locale and timezone; the test browser runs in en-US.
+  await expect.element(table.getByText(/Oct 2[01], 2026/)).toBeVisible();
 });
