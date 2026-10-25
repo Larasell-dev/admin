@@ -1,10 +1,19 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import type { PaginationChange } from "@larasell-dev/ui";
-import { AlertDialog, DataList, Field, Input, Pagination, Table } from "@larasell-dev/ui";
+import {
+  AlertDialog,
+  DataList,
+  Field,
+  Input,
+  Pagination,
+  Table,
+  Thumbnail,
+} from "@larasell-dev/ui";
 import { DeleteBinLine } from "@larasell-dev/ui/icons";
 import { type ReactNode, useState } from "react";
 import type { Page, TableResource, TableRow } from "../../types";
 import { isPanelUrl } from "../../utils/isPanelUrl";
+import { navigationIcon } from "../../utils/navigationIcon";
 import Freeze from "../Freeze";
 
 /** A row of Larasell\Admin\Tables\Panel\Media\Media, which also names its type and where to delete it. */
@@ -13,8 +22,21 @@ export type MediaRow = Pick<TableRow, "id" | "_actions" | "_link"> & {
   /** ISO 8601, or null when unknown. */
   added_at: string | null;
   _type: "folder" | "product-image";
+  /** What the name shows before it, from the column's image(): a folder icon or the picture. */
+  _images: { name?: CellImage | null };
   _deleteUrl: string;
 };
+
+/** The JSON shape of a Larasell\\Admin\\Tables\\Columns\\CellImage. */
+type CellImage =
+  | { type: "icon"; icon: string; style: null; alt: string | null; title: string | null }
+  | {
+      type: "url";
+      url: string;
+      style: "round" | "square";
+      alt: string | null;
+      title: string | null;
+    };
 
 export type MediaTableResource = Omit<TableResource, "rows"> & { rows: MediaRow[] };
 
@@ -63,6 +85,18 @@ export default function MediaTable({ table }: { table: MediaTableResource }) {
       row.name
     );
 
+  const thumbnail = (row: MediaRow) => {
+    const image = row._images.name;
+    if (!image) return undefined;
+    const label = { alt: image.alt ?? undefined, title: image.title ?? undefined };
+
+    return image.type === "icon" ? (
+      <Thumbnail icon={navigationIcon(image.icon, false)} {...label} />
+    ) : (
+      <Thumbnail src={image.url} shape={image.style} {...label} />
+    );
+  };
+
   const actionsMenu = (row: MediaRow) => (
     <Table.Actions>
       <Table.ActionsTrigger aria-label={`Actions for ${row.name}`} />
@@ -86,7 +120,9 @@ export default function MediaTable({ table }: { table: MediaTableResource }) {
             {table.rows.map((row) => (
               <DataList.Item key={row.id}>
                 <div className="flex items-start justify-between gap-2">
-                  <DataList.Title>{linked(row, DataList.Link)}</DataList.Title>
+                  <DataList.Title media={thumbnail(row)}>
+                    {linked(row, DataList.Link)}
+                  </DataList.Title>
                   {actionsMenu(row)}
                 </div>
                 <DataList.Field label="Added at">{addedAt(row)}</DataList.Field>
@@ -110,7 +146,7 @@ export default function MediaTable({ table }: { table: MediaTableResource }) {
             <Table.Body>
               {table.rows.map((row) => (
                 <Table.Row key={row.id}>
-                  <Table.Cell>{linked(row, Table.Link)}</Table.Cell>
+                  <Table.Cell media={thumbnail(row)}>{linked(row, Table.Link)}</Table.Cell>
                   <Table.Cell>{addedAt(row)}</Table.Cell>
                   <Table.Cell>{actionsMenu(row)}</Table.Cell>
                 </Table.Row>

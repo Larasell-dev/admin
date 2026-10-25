@@ -9,6 +9,8 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Media\MediaType;
 use Larasell\Admin\Models\Media\Folder;
 use Larasell\Admin\Models\Media\MediaItem;
+use Larasell\Admin\Tables\Columns\CellImage;
+use Larasell\Admin\Tables\Columns\Image;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Larasell\Models\ProductImage;
@@ -57,7 +59,12 @@ class Media extends Table
     public function columns(): array
     {
         return [
-            TextColumn::make('name')->map(fn (string $name, MediaItem $item): string => $item->type === MediaType::ProductImage ? basename($name) : $name),
+            TextColumn::make('name')
+                ->map(fn (string $name, MediaItem $item): string => $item->type === MediaType::ProductImage ? basename($name) : $name)
+                ->image(fn (MediaItem $item, Image $image): CellImage => match ($item->type) {
+                    MediaType::Folder => $image->icon(Icon::Folder),
+                    MediaType::ProductImage => $image->url($this->productImageUrl($item)),
+                }),
             // An ISO timestamp, so the browser shows it in the admin's own locale and timezone.
             TextColumn::make('added_at')->map(fn (?Carbon $addedAt): ?string => $addedAt?->toIso8601String()),
         ];
@@ -67,9 +74,16 @@ class Media extends Table
     {
         return match ($item->type) {
             MediaType::Folder => route('larasell.admin.media.folders.show', $item->id),
-            // Larasell's own url(), so the link follows its images disk; the row's name is the image's file.
-            MediaType::ProductImage => (new ProductImage)->setRawAttributes(['file' => $item->name])->url(),
+            MediaType::ProductImage => $this->productImageUrl($item),
         };
+    }
+
+    /**
+     * Larasell's own url(), so it follows its images disk; the row's name is the image's file.
+     */
+    private function productImageUrl(MediaItem $item): string
+    {
+        return (new ProductImage)->setRawAttributes(['file' => $item->name])->url();
     }
 
     /**

@@ -1,6 +1,6 @@
 import "../../../css/app.css";
 import { App, router } from "@inertiajs/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import type { MediaTableResource } from "../../Components/Media/MediaTable";
@@ -29,6 +29,9 @@ function renderMedia(total: number | null) {
                     _actions: [],
                     _link: "/admin/media/folders/1",
                     _type: "folder",
+                    _images: {
+                      name: { type: "icon", icon: "Folder", style: null, alt: null, title: null },
+                    },
                     _deleteUrl: "/admin/media/folders/1",
                   },
                   {
@@ -38,6 +41,15 @@ function renderMedia(total: number | null) {
                     _actions: [],
                     _link: "https://cdn.example.com/products/apple.jpg",
                     _type: "product-image",
+                    _images: {
+                      name: {
+                        type: "url",
+                        url: "https://cdn.example.com/products/apple.jpg",
+                        style: "square",
+                        alt: null,
+                        title: null,
+                      },
+                    },
                     _deleteUrl: "/admin/media/product-images/4",
                   },
                 ],
@@ -319,4 +331,33 @@ it("shows when each item was added, in place of its type", async () => {
   expect(table.getByRole("columnheader", { name: "Type" }).elements()).toHaveLength(0);
   // In the browser's own locale and timezone; the test browser runs in en-US.
   await expect.element(table.getByText(/Oct 2[01], 2026/)).toBeVisible();
+});
+
+describe.each([
+  { layout: "data list", width: 400 },
+  { layout: "table", width: 1280 },
+])("in the $layout", ({ width }) => {
+  it("shows a folder icon for folders and the picture for product images", async () => {
+    await page.viewport(width, 800);
+    const screen = await renderMedia(2);
+
+    const visible = (selector: string) =>
+      [...screen.container.querySelectorAll<HTMLElement>(selector)].filter(
+        (element) => element.offsetParent !== null,
+      );
+
+    // The picture only decorates the name next to it, so it has no alt text and the link keeps its name.
+    expect(visible("img").map((img) => img.getAttribute("src"))).toEqual([
+      "https://cdn.example.com/products/apple.jpg",
+    ]);
+    await expect.element(page.getByRole("link", { name: "apple.jpg", exact: true })).toBeVisible();
+    // Both rows have the same actions trigger; only the folder's adds an icon before its name.
+    const rowOf = (name: string) =>
+      visible("a")
+        .find((a) => a.textContent === name)!
+        .closest(width < 1024 ? "li" : "tr")!;
+    const icons = (name: string) => rowOf(name).querySelectorAll("svg").length;
+    expect(icons("Campaigns")).toBe(icons("apple.jpg") + 1);
+    expect(rowOf("Campaigns").querySelector("img")).toBeNull();
+  });
 });
