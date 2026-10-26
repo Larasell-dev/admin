@@ -1,7 +1,7 @@
 import "../../css/app.css";
 import { App, Form, http } from "@inertiajs/react";
 import type { ComponentProps } from "react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import ProductForm from "./ProductForm";
@@ -60,8 +60,9 @@ const boots = {
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
 const slugInput = () => page.getByRole("textbox", { name: "Slug" });
 const visible = () => page.getByRole("checkbox", { name: "Visible in the store" });
-const submitted = () =>
-  Object.fromEntries(new FormData(page.getByTestId("form").element() as HTMLFormElement));
+/** What submitting the form would send. */
+const formData = () => new FormData(page.getByTestId("form").element() as HTMLFormElement);
+const submitted = () => Object.fromEntries(formData());
 
 it("starts a new product empty and visible, with a slug that follows the name", async () => {
   await renderForm();
@@ -146,8 +147,7 @@ describe("weight and dimensions", () => {
 
     await expect.element(unitOf("Length")).toHaveValue("in");
     await expect.element(unitOf("Width")).toHaveValue("in");
-    const form = new FormData(page.getByTestId("form").element() as HTMLFormElement);
-    expect(form.getAll("dimensions[unit]")).toEqual(["in"]);
+    expect(formData().getAll("dimensions[unit]")).toEqual(["in"]);
     await expect.element(axis("Length")).toHaveValue("50");
   });
 });
@@ -240,7 +240,7 @@ const categories = [
 const categoryItem = (name: string) => page.getByRole("treeitem", { name, exact: true });
 const openButton = (name: string) => page.getByRole("button", { name: `Open ${name}` });
 const submittedCategories = () =>
-  new FormData(page.getByTestId("form").element() as HTMLFormElement)
+  formData()
     .getAll("categories[]")
     .map(Number)
     .sort((a, b) => a - b);
@@ -392,28 +392,26 @@ const gridImages = () =>
     .elements()
     .map((image) => image.getAttribute("src"));
 const addImages = () => page.getByLabelText("Add images");
-const submittedImages = () =>
-  new FormData(page.getByTestId("form").element() as HTMLFormElement).getAll("images[]");
+/**
+ * Answers every image upload with the status and body instead of sending it to a server, and
+ * returns the uploads it answered: where each went and the names of the files it sent.
+ */
+function fakeUploads(status: number, body: unknown) {
+  const uploads: { url: string; files: string[] }[] = [];
+  vi.spyOn(http, "getClient").mockReturnValue({
+    async request({ url, data }) {
+      const files = [...(data as FormData).values()] as File[];
+      uploads.push({ url, files: files.map((file) => file.name) });
+      return { status, data: JSON.stringify(body), headers: {} };
+    },
+  });
+  return uploads;
+}
+
 const png = (name: string) => new File(["png"], name, { type: "image/png" });
 
 describe("images", () => {
-  const originalClient = http.getClient();
-  let uploads: { url: string; files: string[] }[];
-  let respond: (files: File[]) => { status: number; body: unknown };
-
-  beforeEach(() => {
-    uploads = [];
-    http.setClient({
-      async request(config) {
-        const files = [...(config.data as FormData).values()] as File[];
-        uploads.push({ url: config.url, files: files.map((file) => file.name) });
-        const { status, body } = respond(files);
-        return { status, data: JSON.stringify(body), headers: {} };
-      },
-    });
-  });
-
-  afterEach(() => http.setClient(originalClient));
+  afterEach(() => vi.restoreAllMocks());
 
   it("shows a product's images in their order, the first one as its thumbnail", async () => {
     await renderForm({
@@ -432,31 +430,28 @@ describe("images", () => {
   });
 
   it("adds the chosen images after the product's, to be linked when it's saved", async () => {
-    respond = () => ({
-      status: 201,
-      body: {
-        images: [
-          { id: 8, url: swatch("green") },
-          { id: 9, url: swatch("yellow") },
-        ],
-      },
+    const uploads = fakeUploads(201, {
+      images: [
+        { id: 8, url: swatch("green") },
+        { id: 9, url: swatch("yellow") },
+      ],
     });
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
     // A file input, so clicking the square opens the system's file picker.
     await expect.element(addImages()).toHaveAttribute("type", "file");
     await expect.element(addImages()).toHaveAttribute("multiple");
-    expect(submittedImages()).toEqual(["7"]);
+    expect(formData().getAll("images[]")).toEqual(["7"]);
 
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
     await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
     expect(uploads).toEqual([{ url: "/admin/products/images", files: ["side.png", "back.png"] }]);
-    expect(submittedImages()).toEqual(["7", "8", "9"]);
+    expect(formData().getAll("images[]")).toEqual(["7", "8", "9"]);
     await expect.element(toast()).toBeVisible();
   });
 
   it("drops the uploaded images when the changes are cancelled", async () => {
-    respond = () => ({ status: 201, body: { images: [{ id: 8, url: swatch("green") }] } });
+    fakeUploads(201, { images: [{ id: 8, url: swatch("green") }] });
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
     await userEvent.upload(addImages(), [png("side.png")]);
     await expect.element(toast()).toBeVisible();
@@ -465,16 +460,13 @@ describe("images", () => {
 
     await expect.element(toast()).not.toBeInTheDocument();
     expect(gridImages()).toEqual([swatch("red")]);
-    expect(submittedImages()).toEqual(["7"]);
+    expect(formData().getAll("images[]")).toEqual(["7"]);
   });
 
   it("says why images were rejected and keeps the product's", async () => {
-    respond = () => ({
-      status: 422,
-      body: {
-        message: "Invalid",
-        errors: { "images.1": ["Each image must be a JPG, PNG, WebP or AVIF file."] },
-      },
+    fakeUploads(422, {
+      message: "Invalid",
+      errors: { "images.1": ["Each image must be a JPG, PNG, WebP or AVIF file."] },
     });
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
 
@@ -484,26 +476,23 @@ describe("images", () => {
       .element(page.getByText("Each image must be a JPG, PNG, WebP or AVIF file."))
       .toBeVisible();
     expect(gridImages()).toEqual([swatch("red")]);
-    expect(submittedImages()).toEqual(["7"]);
+    expect(formData().getAll("images[]")).toEqual(["7"]);
   });
 
   it("adds images to a new product, the first as its thumbnail", async () => {
-    respond = () => ({
-      status: 201,
-      body: {
-        images: [
-          { id: 8, url: swatch("green") },
-          { id: 9, url: swatch("yellow") },
-        ],
-      },
+    fakeUploads(201, {
+      images: [
+        { id: 8, url: swatch("green") },
+        { id: 9, url: swatch("yellow") },
+      ],
     });
     await renderForm();
     await expect.element(addImages()).toBeVisible();
-    expect(submittedImages()).toEqual([]);
+    expect(formData().getAll("images[]")).toEqual([]);
 
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
-    await expect.poll(submittedImages).toEqual(["8", "9"]);
+    await expect.poll(() => formData().getAll("images[]")).toEqual(["8", "9"]);
     await expect.element(imageGrid().getByRole("listitem").first()).toHaveTextContent("Thumbnail");
   });
 });
