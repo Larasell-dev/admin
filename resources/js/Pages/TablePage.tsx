@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react";
 import { Button, EmptyState, Icon } from "@larasell-dev/ui";
 import { InboxLine } from "@larasell-dev/ui/icons";
+import ModuleHeader from "../Components/ModuleHeader";
 import ResourceTable from "../Components/ResourceTable";
 import { isSameSite } from "../utils/isSameSite";
 import { navigationIcon } from "../utils/navigationIcon";
@@ -34,16 +35,16 @@ export default function TablePage({ table }: Props) {
     // BEST-BEFORE 2026-11-01: Find out why pages size themselves with this calc (3.5rem is the
     // mobile nav's h-14 header) and whether the layout should own it; pages repeat it today.
     <div className="flex h-[calc(100dvh-3.5rem)] flex-col lg:h-dvh">
-      <header className="border-border flex h-14 shrink-0 items-center gap-4 border-b px-6">
-        <h1 className="type-body-md text-mauve-950 dark:text-mauve-50 flex-1 truncate">
-          {table.title}
-        </h1>
-        {/* The empty state offers its own actions instead. */}
-        {hasRows &&
+      <ModuleHeader
+        title={table.title}
+        suffix={
+          // The empty state offers its own actions instead.
+          hasRows &&
           table.headerActions.map((action) => (
             <TableActionLink key={action.label} action={action} size="sm" />
-          ))}
-      </header>
+          ))
+        }
+      />
 
       {hasRows ? (
         <ResourceTable resource={table} />
