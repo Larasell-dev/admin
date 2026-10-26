@@ -45,6 +45,9 @@ class WorkbenchServiceProvider extends ServiceProvider
         // a relative URL serves public uploads from whatever host the page uses.
         config(['filesystems.disks.public.url' => '/storage']);
 
+        // Product images default to the private local disk, which the browser can't load.
+        config(['larasell.images.disk' => 'public']);
+
         // Portals open at the site root; send it to the panel.
         Route::redirect('/', '/'.config('larasell.admin.panel.path'));
     }
