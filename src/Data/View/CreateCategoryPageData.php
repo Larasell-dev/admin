@@ -18,5 +18,7 @@ class CreateCategoryPageData extends Data
         public string $indexUrl,
         /** The category the new one goes into, or null for a root category. */
         public ?CategoryDetailData $parent,
+        /** Null while the products are turned off. */
+        public ?string $createProductUrl,
     ) {}
 }

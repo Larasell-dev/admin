@@ -18,6 +18,7 @@ use Larasell\Admin\Data\ViewModel\CategoryDetailData;
 use Larasell\Admin\Http\Requests\CategoryRequest;
 use Larasell\Admin\Tables\Panel\CategoryProducts;
 use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -70,6 +71,8 @@ class CategoryController
             products: CategoryProducts::make($category),
             availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
             addProductUrl: route('larasell.admin.categories.products.store', $category),
+            // Once the store has products, the page offers to add one of them instead.
+            createProductUrl: Product::query()->exists() ? null : $this->createProductUrl(),
         ))->toResponse($request);
     }
 
@@ -92,6 +95,7 @@ class CategoryController
             storeUrl: route('larasell.admin.categories.store'),
             indexUrl: route('larasell.admin.categories.index'),
             parent: $parent ? CategoryDetailData::fromModel($parent) : null,
+            createProductUrl: $this->createProductUrl(),
         ));
     }
 
@@ -147,6 +151,14 @@ class CategoryController
         }
 
         return back();
+    }
+
+    /**
+     * Where a product is created, or null while the products module and its routes are turned off.
+     */
+    protected function createProductUrl(): ?string
+    {
+        return Route::has('larasell.admin.products.create') ? route('larasell.admin.products.create') : null;
     }
 
     /**

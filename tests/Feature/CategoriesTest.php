@@ -742,3 +742,35 @@ it('does not let guests move a category', function () {
 
     expect($clothing->fresh()->parent_id)->toBeNull();
 });
+
+it('links to creating a product from a category\'s page and the page for adding one', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $link = fn (AssertableInertia $page) => $page->where('createProductUrl', url('/admin/products/create'));
+
+    $this->actingAs($admin, 'larasell-admin');
+    $this->get("/admin/categories/{$shoes->id}")->assertInertia($link);
+    $this->get('/admin/categories/create')->assertInertia($link);
+});
+
+it('does not link to creating a product when the products are turned off', function () {
+    $this->bootingWith(fn () => config(['larasell.admin.products.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $noLink = fn (AssertableInertia $page) => $page->where('createProductUrl', null);
+
+    $this->actingAs($admin, 'larasell-admin');
+    $this->get("/admin/categories/{$shoes->id}")->assertInertia($noLink);
+    $this->get('/admin/categories/create')->assertInertia($noLink);
+});
+
+it('stops linking to creating a product from a category\'s page once the store has products', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    // In another category: the store has a product to add, so the page offers that instead.
+    product('Socks', category('Clothing'));
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get("/admin/categories/{$shoes->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('createProductUrl', null));
+});

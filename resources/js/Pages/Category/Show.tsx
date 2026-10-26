@@ -64,6 +64,7 @@ export default function Show(props: Props) {
                 table={props.products}
                 availableProductsUrl={props.availableProductsUrl}
                 addProductUrl={props.addProductUrl}
+                createProductUrl={props.createProductUrl}
               />
             </SectionStack>
           </div>

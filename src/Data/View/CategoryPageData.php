@@ -22,5 +22,7 @@ class CategoryPageData extends Data
         public CategoryProducts $products,
         public string $availableProductsUrl,
         public string $addProductUrl,
+        /** Null once the store has products to add instead, or while the products are turned off. */
+        public ?string $createProductUrl,
     ) {}
 }
