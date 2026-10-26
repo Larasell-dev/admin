@@ -40,6 +40,8 @@ class ProductController
             'status' => $request->validated('status'),
             'weight' => $request->weight(),
             'dimensions' => $request->dimensions(),
+            'sku' => $request->validated('sku'),
+            'barcode' => $request->validated('barcode'),
             'price' => Price::of(0),
         ]);
 
@@ -70,6 +72,8 @@ class ProductController
             'status' => $request->validated('status'),
             'weight' => $request->weight(),
             'dimensions' => $request->dimensions(),
+            'sku' => $request->validated('sku'),
+            'barcode' => $request->validated('barcode'),
         ]);
 
         return redirect()->route('larasell.admin.products.edit', $product);

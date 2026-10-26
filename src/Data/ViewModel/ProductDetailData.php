@@ -17,6 +17,8 @@ class ProductDetailData extends Data
         public bool $visible,
         public ?WeightData $weight,
         public ?DimensionsData $dimensions,
+        public ?string $sku,
+        public ?string $barcode,
     ) {}
 
     public static function fromModel(Product $product): self
@@ -28,6 +30,8 @@ class ProductDetailData extends Data
             visible: $product->status === Visibility::Visible,
             weight: $product->weight === null ? null : WeightData::fromWeight($product->weight),
             dimensions: $product->dimensions === null ? null : DimensionsData::fromDimensions($product->dimensions),
+            sku: $product->sku,
+            barcode: $product->barcode,
         );
     }
 }
