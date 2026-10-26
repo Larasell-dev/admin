@@ -135,7 +135,20 @@ it('shows the product\'s values to edit on its page', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Edit')
-            ->where('product', ['id' => $boots->id, 'name' => 'Boots', 'slug' => 'boots', 'visible' => false, 'weight' => null, 'dimensions' => null, 'sku' => null, 'barcode' => null])
+            ->where('product', [
+                'id' => $boots->id,
+                'name' => 'Boots',
+                'slug' => 'boots',
+                'visible' => false,
+                'weight' => null,
+                'dimensions' => null,
+                'sku' => null,
+                'barcode' => null,
+                'stock' => null,
+                'allowBackorders' => true,
+                'minQuantity' => null,
+                'maxQuantity' => null,
+            ])
             ->where('updateUrl', url("/admin/products/{$boots->id}"))
             ->where('indexUrl', url('/admin/products')));
 });
@@ -368,6 +381,128 @@ it('explains why a barcode is invalid', function (string $barcode, string $messa
     'letters' => ['40063813339A1', 'A barcode must contain only digits.'],
     'wrong length' => ['1234567890', 'A barcode must be an EAN-8, UPC-A, EAN-13, or GTIN-14.'],
     'wrong check digit' => ['4006381333932', 'A barcode must have a valid check digit.'],
+]);
+
+it('shows the product\'s stock, backorders and quantity limits on its page', function () {
+    signInAdmin();
+
+    $socks = Product::create([
+        'slug' => 'socks',
+        'name' => 'Socks',
+        'price' => Price::of(300),
+        'stock' => 500,
+        'allow_backorders' => false,
+        'min_quantity' => 6,
+        'max_quantity' => 24,
+    ]);
+
+    $this->get("/admin/products/{$socks->id}/edit")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('product.stock', 500)
+            ->where('product.allowBackorders', false)
+            ->where('product.minQuantity', 6)
+            ->where('product.maxQuantity', 24));
+});
+
+it('saves the stock, backorders and quantity limits', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'Socks',
+        'slug' => 'socks',
+        'status' => 'visible',
+        'stock' => '500',
+        'allow_backorders' => '0',
+        'min_quantity' => '6',
+        'max_quantity' => '6',
+    ])->assertSessionHasNoErrors();
+
+    $socks = Product::query()->sole();
+    $variant = $socks->defaultVariant();
+
+    expect($socks->stock)->toBe(500)
+        ->and($socks->allow_backorders)->toBeFalse()
+        ->and($socks->min_quantity)->toBe(6)
+        ->and($socks->max_quantity)->toBe(6)
+        ->and($variant->availableStock())->toBe(500)
+        ->and($variant->allowsBackorders())->toBeFalse();
+});
+
+it('leaves the stock untracked and the quantity unlimited when they are left empty', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'E-book',
+        'slug' => 'e-book',
+        'status' => 'visible',
+        'stock' => '',
+        'allow_backorders' => '1',
+        'min_quantity' => '',
+        'max_quantity' => '',
+    ])->assertSessionHasNoErrors();
+
+    $book = Product::query()->sole();
+
+    expect($book->stock)->toBeNull()
+        ->and($book->allow_backorders)->toBeTrue()
+        ->and($book->min_quantity)->toBeNull()
+        ->and($book->max_quantity)->toBeNull();
+});
+
+it('accepts a stock of zero and below, which backorders lead to', function (string $stock, int $saved) {
+    signInAdmin();
+
+    $this->post('/admin/products', ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', 'stock' => $stock])
+        ->assertSessionHasNoErrors();
+
+    expect(Product::query()->sole()->stock)->toBe($saved);
+})->with([
+    'zero' => ['0', 0],
+    'negative' => ['-3', -3],
+]);
+
+it('changes the stock, backorders and quantity limits of a product', function () {
+    signInAdmin();
+
+    $socks = Product::create([
+        'slug' => 'socks',
+        'name' => 'Socks',
+        'price' => Price::of(300),
+        'stock' => 500,
+        'allow_backorders' => false,
+        'min_quantity' => 5,
+        'max_quantity' => 10,
+    ]);
+    $update = fn (array $input) => $this->put("/admin/products/{$socks->id}", ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', ...$input]);
+
+    // A new minimum above the old maximum, then a new maximum below the old minimum.
+    $update(['stock' => '12', 'allow_backorders' => '1', 'min_quantity' => '20', 'max_quantity' => '30'])->assertSessionHasNoErrors();
+    expect($socks->refresh()->only(['stock', 'allow_backorders', 'min_quantity', 'max_quantity']))
+        ->toBe(['stock' => 12, 'allow_backorders' => true, 'min_quantity' => 20, 'max_quantity' => 30]);
+
+    $update(['stock' => '12', 'allow_backorders' => '1', 'min_quantity' => '1', 'max_quantity' => '3'])->assertSessionHasNoErrors();
+    expect($socks->refresh()->only(['min_quantity', 'max_quantity']))->toBe(['min_quantity' => 1, 'max_quantity' => 3]);
+
+    $update(['stock' => '', 'allow_backorders' => '0', 'min_quantity' => '', 'max_quantity' => ''])->assertSessionHasNoErrors();
+    expect($socks->refresh()->only(['stock', 'allow_backorders', 'min_quantity', 'max_quantity']))
+        ->toBe(['stock' => null, 'allow_backorders' => false, 'min_quantity' => null, 'max_quantity' => null]);
+});
+
+it('rejects an invalid stock, backorders or quantity limit', function (array $input, string $error) {
+    signInAdmin();
+
+    $this->post('/admin/products', ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', ...$input])
+        ->assertSessionHasErrors($error);
+
+    expect(Product::query()->count())->toBe(0);
+})->with([
+    'stock with decimals' => [['stock' => '1.5'], 'stock'],
+    'stock that is not a number' => [['stock' => 'many'], 'stock'],
+    'backorders that are neither on nor off' => [['allow_backorders' => 'maybe'], 'allow_backorders'],
+    'minimum quantity of zero' => [['min_quantity' => '0'], 'min_quantity'],
+    'maximum quantity of zero' => [['max_quantity' => '0'], 'max_quantity'],
+    'minimum quantity with decimals' => [['min_quantity' => '2.5'], 'min_quantity'],
+    'maximum below the minimum' => [['min_quantity' => '10', 'max_quantity' => '7'], 'max_quantity'],
 ]);
 
 it('returns 404 for editing a product that does not exist', function () {

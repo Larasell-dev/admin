@@ -120,6 +120,10 @@ declare namespace Larasell.Admin.Data.ViewModel {
     dimensions: Larasell.Admin.Data.ViewModel.DimensionsData | null;
     sku: string | null;
     barcode: string | null;
+    stock: number | null;
+    allowBackorders: boolean;
+    minQuantity: number | null;
+    maxQuantity: number | null;
   };
   export type WeightData = {
     amount: string;

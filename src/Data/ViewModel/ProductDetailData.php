@@ -19,6 +19,10 @@ class ProductDetailData extends Data
         public ?DimensionsData $dimensions,
         public ?string $sku,
         public ?string $barcode,
+        public ?int $stock,
+        public bool $allowBackorders,
+        public ?int $minQuantity,
+        public ?int $maxQuantity,
     ) {}
 
     public static function fromModel(Product $product): self
@@ -32,6 +36,10 @@ class ProductDetailData extends Data
             dimensions: $product->dimensions === null ? null : DimensionsData::fromDimensions($product->dimensions),
             sku: $product->sku,
             barcode: $product->barcode,
+            stock: $product->stock,
+            allowBackorders: $product->allow_backorders,
+            minQuantity: $product->min_quantity,
+            maxQuantity: $product->max_quantity,
         );
     }
 }

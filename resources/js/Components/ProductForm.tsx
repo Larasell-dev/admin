@@ -1,10 +1,21 @@
+import { Field as BaseField } from "@base-ui/react/field";
 import { useFormContext } from "@inertiajs/react";
-import { Field, Icon, Input, Section, SectionStack, Stack } from "@larasell-dev/ui";
+import {
+  Checkbox,
+  Error,
+  Field,
+  Icon,
+  Input,
+  Section,
+  SectionStack,
+  Stack,
+} from "@larasell-dev/ui";
 import { ArrowDownSLine } from "@larasell-dev/ui/icons";
 import { type ChangeEventHandler, type Ref, useRef } from "react";
 import { slugify } from "../utils/slugify";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
+import FormCheckbox from "./FormCheckbox";
 import VisibilityField from "./VisibilityField";
 
 type Product = Omit<Larasell.Admin.Data.ViewModel.ProductDetailData, "id">;
@@ -25,6 +36,13 @@ export default function ProductForm({ product }: { product?: Product }) {
           description="How the product is named and found in the store."
         />
         <GeneralFields product={product} errors={errors} />
+      </Section.Root>
+      <Section.Root>
+        <Section.Header
+          title="Stock"
+          description="How many can be sold, and how many a customer can buy at once."
+        />
+        <StockFields product={product} errors={errors} />
       </Section.Root>
       <Section.Root>
         <Section.Header
@@ -87,6 +105,65 @@ function IdentifierFields({ product, errors }: { product?: Product; errors: Erro
         </Field>
       </div>
     </div>
+  );
+}
+
+/** Every number is optional: without a stock it isn't tracked, without a limit there is none. */
+function StockFields({ product, errors }: { product?: Product; errors: Errors }) {
+  return (
+    <Stack spacing={5}>
+      <div className="@container">
+        <div className="grid items-start gap-5 @md:grid-cols-2">
+          <Field
+            label="Stock"
+            name="stock"
+            error={errors.stock}
+            description="Leave empty to sell without counting."
+          >
+            <Input defaultValue={product?.stock ?? ""} inputMode="numeric" autoComplete="off" />
+          </Field>
+
+          <BaseField.Root
+            name="allow_backorders"
+            invalid={!!errors.allow_backorders}
+            // Relative keeps the checkbox's absolutely positioned hidden input inside the scrolling
+            // content. Beside the stock, the padding skips its label to center on its input.
+            className="relative flex flex-col gap-1.5 @md:pt-9"
+          >
+            <Checkbox.Label>
+              <FormCheckbox
+                name="allow_backorders"
+                value="1"
+                uncheckedValue="0"
+                defaultChecked={product?.allowBackorders ?? true}
+              />
+              Allow backorders
+            </Checkbox.Label>
+            {errors.allow_backorders && <Error match>{errors.allow_backorders}</Error>}
+          </BaseField.Root>
+        </div>
+      </div>
+
+      <div className="@container">
+        <div className="grid items-start gap-5 @md:grid-cols-2">
+          <Field label="Minimum quantity" name="min_quantity" error={errors.min_quantity}>
+            <Input
+              defaultValue={product?.minQuantity ?? ""}
+              inputMode="numeric"
+              autoComplete="off"
+            />
+          </Field>
+
+          <Field label="Maximum quantity" name="max_quantity" error={errors.max_quantity}>
+            <Input
+              defaultValue={product?.maxQuantity ?? ""}
+              inputMode="numeric"
+              autoComplete="off"
+            />
+          </Field>
+        </div>
+      </div>
+    </Stack>
   );
 }
 

@@ -37,6 +37,10 @@ const boots = {
   dimensions: null,
   sku: null,
   barcode: null,
+  stock: null,
+  allowBackorders: true,
+  minQuantity: null,
+  maxQuantity: null,
 };
 
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
@@ -151,5 +155,48 @@ describe("SKU and barcode", () => {
 
     await expect.element(sku()).toHaveValue("BOOT-42");
     await expect.element(barcode()).toHaveValue("4006381333931");
+  });
+});
+
+const stock = () => page.getByRole("textbox", { name: "Stock" });
+const backorders = () => page.getByRole("checkbox", { name: "Allow backorders" });
+const minQuantity = () => page.getByRole("textbox", { name: "Minimum quantity" });
+const maxQuantity = () => page.getByRole("textbox", { name: "Maximum quantity" });
+
+describe("stock", () => {
+  it("starts a new product untracked, with backorders and no quantity limits", async () => {
+    await renderForm();
+
+    await expect.element(stock()).toHaveValue("");
+    await expect.element(backorders()).toBeChecked();
+    await expect.element(minQuantity()).toHaveValue("");
+    await expect.element(maxQuantity()).toHaveValue("");
+    expect(submitted()).toMatchObject({
+      stock: "",
+      allow_backorders: "1",
+      min_quantity: "",
+      max_quantity: "",
+    });
+  });
+
+  it("shows an existing product's stock and limits, and submits backorders turned on", async () => {
+    await renderForm({
+      ...boots,
+      stock: -3,
+      allowBackorders: false,
+      minQuantity: 6,
+      maxQuantity: 24,
+    });
+
+    await expect.element(stock()).toHaveValue("-3");
+    await expect.element(backorders()).not.toBeChecked();
+    await expect.element(minQuantity()).toHaveValue("6");
+    await expect.element(maxQuantity()).toHaveValue("24");
+    expect(submitted()).toMatchObject({ allow_backorders: "0" });
+
+    await page.getByText("Allow backorders").click();
+
+    await expect.element(backorders()).toBeChecked();
+    expect(submitted()).toMatchObject({ allow_backorders: "1" });
   });
 });
