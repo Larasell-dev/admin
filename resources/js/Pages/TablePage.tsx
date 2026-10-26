@@ -17,9 +17,6 @@ function TableActionLink({ action, size }: { action: TableAction; size?: "sm" })
   return (
     <Button
       size={size}
-      nativeButton={false}
-      // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-      role="link"
       render={isSameSite(action.url) ? <Link href={action.url} /> : <a href={action.url} />}
     >
       {action.icon && <Icon icon={lineIcon(action.icon)} />}

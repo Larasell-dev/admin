@@ -38,7 +38,6 @@ export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.Vie
                     <Button
                       variant="secondary"
                       fullWidth
-                      nativeButton={false}
                       loading={devLoginLoading}
                       render={<a href={devLoginUrl} onClick={() => setDevLoginLoading(true)} />}
                     >

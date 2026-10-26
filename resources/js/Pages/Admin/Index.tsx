@@ -13,13 +13,7 @@ export default function Index({ admins, createUrl }: Props) {
       <Page.Header
         title={admins.title}
         actions={
-          <Button
-            size="sm"
-            nativeButton={false}
-            // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-            role="link"
-            render={<Link href={createUrl} prefetch="hover" />}
-          >
+          <Button size="sm" render={<Link href={createUrl} prefetch="hover" />}>
             <Icon icon={AddLine} />
             Add admin
           </Button>

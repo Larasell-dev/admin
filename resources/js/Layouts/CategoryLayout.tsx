@@ -144,13 +144,7 @@ function TreePanel({
         <h1 id={headingId} className="type-body-md text-mauve-950 dark:text-mauve-50">
           Categories
         </h1>
-        <Button
-          variant="tertiary"
-          nativeButton={false}
-          // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-          role="link"
-          render={<Link href={createUrl} prefetch="hover" />}
-        >
+        <Button variant="tertiary" render={<Link href={createUrl} prefetch="hover" />}>
           <Icon icon={AddLine} />
           Add
         </Button>
