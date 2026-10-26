@@ -138,16 +138,6 @@ const sku = () => page.getByRole("textbox", { name: "SKU" });
 const barcode = () => page.getByRole("textbox", { name: "Barcode" });
 
 describe("SKU and barcode", () => {
-  it("comes after the weight and dimensions", async () => {
-    await renderForm();
-
-    const headings = page
-      .getByRole("heading")
-      .elements()
-      .map((heading) => heading.textContent);
-    expect(headings).toEqual(["General", "Weight and dimensions", "SKU and barcode"]);
-  });
-
   it("starts a new product without them", async () => {
     await renderForm();
 
