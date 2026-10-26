@@ -119,12 +119,7 @@ export default function ProductsTable(props: Props) {
               // Only given children when it has an action; even `false` renders an empty actions row.
               {...((canAdd || createProductUrl) && {
                 children: createProductUrl ? (
-                  <Button
-                    nativeButton={false}
-                    // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-                    role="link"
-                    render={<Link href={createProductUrl} prefetch="hover" />}
-                  >
+                  <Button render={<Link href={createProductUrl} prefetch="hover" />}>
                     <Icon icon={AddLine} />
                     Create product
                   </Button>

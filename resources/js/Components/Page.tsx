@@ -24,9 +24,6 @@ function Header({ title, backLink, actions }: HeaderProps) {
             variant="tertiary"
             size="sm"
             aria-label={backLink.label}
-            nativeButton={false}
-            // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-            role="link"
             render={<Link href={backLink.href} prefetch="hover" />}
             DANGEROUS_className={backLink.mobileOnly ? "lg:hidden" : undefined}
           >

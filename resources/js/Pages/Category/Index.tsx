@@ -15,12 +15,7 @@ export default function Index({ createUrl }: Props) {
         title="No categories yet"
         description="Add a category to start organizing your products."
       >
-        <Button
-          nativeButton={false}
-          // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
-          role="link"
-          render={<Link href={createUrl} prefetch />}
-        >
+        <Button render={<Link href={createUrl} prefetch />}>
           <Icon icon={AddLine} />
           Add category
         </Button>
