@@ -671,7 +671,10 @@ it('links the submitted images to a product in their order, the first as its thu
     // The form leaves the field out when the product has no images.
     $this->put(route('larasell.admin.products.update', $boots), $valid)->assertSessionHasNoErrors();
 
-    expect($boots->images()->exists())->toBeFalse();
+    // Removing images only unlinks them; the images and their files stay.
+    expect($boots->images()->exists())->toBeFalse()
+        ->and(ProductImage::query()->count())->toBe(3);
+    Storage::disk('public')->assertExists([$front->file, $side->file, $back->file]);
 });
 
 it('links the submitted images to a new product in their order', function () {

@@ -52,6 +52,8 @@ export default function UnsavedChangesToast() {
   const [owner] = useState(() => ({}));
   // Set while the toast's own Save starts its visit, so that one isn't blocked.
   const saving = useRef(false);
+  // Rendered inside the form, so Cancel can find its element.
+  const anchor = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!form.isDirty) return;
@@ -115,7 +117,18 @@ export default function UnsavedChangesToast() {
           saving.current = false;
         }
       },
-      cancel: () => form.resetAndClearErrors(),
+      cancel() {
+        const element = anchor.current?.closest("form");
+        let announced = false;
+        const notice = () => (announced = true);
+        element?.addEventListener("reset", notice);
+        form.resetAndClearErrors();
+        element?.removeEventListener("reset", notice);
+        // Inertia only fires reset when it changed an input. Fields React rendered, like the
+        // image grid's after removing its last image, may need putting back without that, and
+        // the form only stops being dirty on reset.
+        if (!announced) element?.dispatchEvent(new Event("reset", { bubbles: true }));
+      },
     });
   });
 
@@ -127,7 +140,7 @@ export default function UnsavedChangesToast() {
     [owner],
   );
 
-  return null;
+  return <span ref={anchor} hidden />;
 }
 
 /** Draws the UnsavedChangesToast of the current page. Render it once in a persistent layout. */

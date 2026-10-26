@@ -7,13 +7,16 @@ import {
   Error,
   Field,
   Icon,
+  IconButton,
   Input,
+  Menu,
   Section,
   SectionStack,
   Spinner,
   Stack,
 } from "@larasell-dev/ui";
-import { AddLine, ArrowDownSLine } from "@larasell-dev/ui/icons";
+import { AddLine, ArrowDownSLine, FileReduceLine, More2Fill } from "@larasell-dev/ui/icons";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import {
   type ChangeEventHandler,
   type Ref,
@@ -24,6 +27,7 @@ import {
   useState,
 } from "react";
 import { slugify } from "../utils/slugify";
+import { overlayExclusive } from "../utils/hotkeys";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
 import CategoryCheckboxTree from "./CategoryCheckboxTree";
@@ -203,10 +207,19 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
               <input type="hidden" name="images[]" value={image.id} />
               <img src={image.url} alt={`Image ${index + 1}`} className="size-full object-cover" />
               {index === 0 && (
-                <div className="absolute top-2 left-2">
+                // Flex, so the badge doesn't sit on a text line that adds space above it.
+                <div className="absolute top-2 left-2 flex">
                   <Badge>Thumbnail</Badge>
                 </div>
               )}
+              <div className="absolute top-2 right-2">
+                <ImageMenu
+                  label={`Actions for image ${index + 1}`}
+                  onRemove={() =>
+                    setImages((current) => current.filter(({ id }) => id !== image.id))
+                  }
+                />
+              </div>
             </li>
           ))}
           {uploading.map((file, index) => (
@@ -254,6 +267,32 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
         </Error>
       ))}
     </BaseField.Root>
+  );
+}
+
+/**
+ * An image's actions, always visible so they're found without hovering. Removing only takes the
+ * image out of the grid: saving unlinks it from the product, cancelling brings it back.
+ */
+function ImageMenu({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <Menu.Root>
+      <Menu.Trigger
+        render={
+          // A solid chip like the thumbnail badge, so it stands out on any image.
+          <IconButton variant="secondary" size="sm" aria-label={label}>
+            <Icon icon={More2Fill} />
+          </IconButton>
+        }
+      />
+      <Menu.Popup>
+        <HotkeysProvider scope="image-actions-menu" exclusive={overlayExclusive}>
+          <Menu.Item variant="destructive" icon={FileReduceLine} onClick={onRemove}>
+            Remove
+          </Menu.Item>
+        </HotkeysProvider>
+      </Menu.Popup>
+    </Menu.Root>
   );
 }
 
