@@ -164,7 +164,7 @@ it('sends the empty state to the table page', function () {
     $admin = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/shelf')
+        ->get(route('larasell.admin.shelf.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('TablePage')

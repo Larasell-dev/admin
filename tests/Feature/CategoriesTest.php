@@ -43,15 +43,15 @@ it('redirects the index to the top-most root category', function () {
     category('Shoes');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories')
-        ->assertRedirect("/admin/categories/{$clothing->id}");
+        ->get(route('larasell.admin.categories.index'))
+        ->assertRedirect(route('larasell.admin.categories.show', $clothing));
 });
 
 it('shows the index when the store has no categories', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories')
+        ->get(route('larasell.admin.categories.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Index', shouldExist: false)
@@ -68,7 +68,7 @@ it('shows every category of the store as a tree', function () {
     category('Boots', $shoes);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shoes->id}")
+        ->get(route('larasell.admin.categories.show', $shoes))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Show', shouldExist: false)
@@ -91,10 +91,10 @@ it('links every category in the tree to its page', function () {
     $shirts = category('Shirts', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shirts->id}")
+        ->get(route('larasell.admin.categories.show', $shirts))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('categories.0.url', url("/admin/categories/{$clothing->id}"))
-            ->where('categories.0.children.0.url', url("/admin/categories/{$shirts->id}")));
+            ->where('categories.0.url', route('larasell.admin.categories.show', $clothing))
+            ->where('categories.0.children.0.url', route('larasell.admin.categories.show', $shirts)));
 });
 
 it('shows a category, including a hidden one, next to the tree', function () {
@@ -104,7 +104,7 @@ it('shows a category, including a hidden one, next to the tree', function () {
     $linen = category('Linen', $clothing, Visibility::Hidden);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$linen->id}")
+        ->get(route('larasell.admin.categories.show', $linen))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Show', shouldExist: false)
@@ -118,7 +118,7 @@ it('shows the tree without a category, with a 404, for a category that does not 
     category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories/999')
+        ->get(route('larasell.admin.categories.show', 999))
         ->assertNotFound()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Show', shouldExist: false)
@@ -133,9 +133,9 @@ it('hides a category and goes back to the previous page', function () {
     $shirts = category('Shirts', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from("/admin/categories/{$clothing->id}")
-        ->post("/admin/categories/{$shirts->id}/hide")
-        ->assertRedirect("/admin/categories/{$clothing->id}");
+        ->from(route('larasell.admin.categories.show', $clothing))
+        ->post(route('larasell.admin.categories.hide', $shirts))
+        ->assertRedirect(route('larasell.admin.categories.show', $clothing));
 
     expect($shirts->fresh()->status)->toBe(Visibility::Hidden)
         ->and($clothing->fresh()->status)->toBe(Visibility::Visible);
@@ -146,9 +146,9 @@ it('makes a hidden category visible again', function () {
     $sale = category('Sale', status: Visibility::Hidden);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from("/admin/categories/{$sale->id}")
-        ->post("/admin/categories/{$sale->id}/unhide")
-        ->assertRedirect("/admin/categories/{$sale->id}");
+        ->from(route('larasell.admin.categories.show', $sale))
+        ->post(route('larasell.admin.categories.unhide', $sale))
+        ->assertRedirect(route('larasell.admin.categories.show', $sale));
 
     expect($sale->fresh()->status)->toBe(Visibility::Visible);
 });
@@ -158,17 +158,17 @@ it('gives every category in the tree its hide and unhide urls', function () {
     $clothing = category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$clothing->id}")
+        ->get(route('larasell.admin.categories.show', $clothing))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('categories.0.hideUrl', url("/admin/categories/{$clothing->id}/hide"))
-            ->where('categories.0.unhideUrl', url("/admin/categories/{$clothing->id}/unhide")));
+            ->where('categories.0.hideUrl', route('larasell.admin.categories.hide', $clothing))
+            ->where('categories.0.unhideUrl', route('larasell.admin.categories.unhide', $clothing)));
 });
 
 it('does not let guests change a category\'s visibility', function (string $action) {
     $clothing = category('Clothing');
 
-    $this->post("/admin/categories/{$clothing->id}/{$action}")
-        ->assertRedirect('/admin/login');
+    $this->post(route("larasell.admin.categories.{$action}", $clothing))
+        ->assertRedirect(route('larasell.admin.login'));
 
     expect($clothing->fresh()->status)->toBe(Visibility::Visible);
 })->with(['hide', 'unhide']);
@@ -178,9 +178,9 @@ it('links the category layout to the create page', function () {
     $clothing = category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$clothing->id}")
+        ->get(route('larasell.admin.categories.show', $clothing))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('createUrl', url('/admin/categories/create')));
+            ->where('createUrl', route('larasell.admin.categories.create')));
 });
 
 it('shows the create page next to the tree', function () {
@@ -188,26 +188,26 @@ it('shows the create page next to the tree', function () {
     category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories/create')
+        ->get(route('larasell.admin.categories.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Create', shouldExist: false)
             ->where('categories.0.name', 'Clothing')
-            ->where('createUrl', url('/admin/categories/create'))
-            ->where('storeUrl', url('/admin/categories'))
-            ->where('indexUrl', url('/admin/categories')));
+            ->where('createUrl', route('larasell.admin.categories.create'))
+            ->where('storeUrl', route('larasell.admin.categories.store'))
+            ->where('indexUrl', route('larasell.admin.categories.index')));
 });
 
 it('creates a root category and opens it', function (Visibility $status) {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Summer Sale', 'slug' => 'summer-sale', 'status' => $status->value]);
+        ->post(route('larasell.admin.categories.store'), ['name' => 'Summer Sale', 'slug' => 'summer-sale', 'status' => $status->value]);
 
     $category = Category::query()->sole();
 
     $response->assertSessionHasNoErrors()
-        ->assertRedirect("/admin/categories/{$category->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $category));
 
     expect($category->name->all())->toBe(['en' => 'Summer Sale'])
         ->and($category->slug->all())->toBe(['en' => 'summer-sale'])
@@ -224,7 +224,7 @@ it('shows the category\'s values to edit on its page', function () {
     $linen = category('Linen', $clothing, Visibility::Hidden);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$linen->id}")
+        ->get(route('larasell.admin.categories.show', $linen))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Show', shouldExist: false)
@@ -233,8 +233,8 @@ it('shows the category\'s values to edit on its page', function () {
             ->where('category.name', 'Linen')
             ->where('category.slug', 'linen')
             ->where('category.visible', false)
-            ->where('createUrl', url('/admin/categories/create'))
-            ->where('updateUrl', url("/admin/categories/{$linen->id}")));
+            ->where('createUrl', route('larasell.admin.categories.create'))
+            ->where('updateUrl', route('larasell.admin.categories.update', $linen)));
 });
 
 it('updates a category and stays on its page', function () {
@@ -243,9 +243,9 @@ it('updates a category and stays on its page', function () {
     $shirts = category('Shirts', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$shirts->id}", ['name' => 'Tops', 'slug' => 'tops', 'status' => 'hidden'])
+        ->put(route('larasell.admin.categories.update', $shirts), ['name' => 'Tops', 'slug' => 'tops', 'status' => 'hidden'])
         ->assertSessionHasNoErrors()
-        ->assertRedirect("/admin/categories/{$shirts->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $shirts));
 
     $shirts->refresh();
 
@@ -264,7 +264,7 @@ it('only changes the current locale\'s name and slug', function () {
     ]);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$shoes->id}", ['name' => 'Footwear', 'slug' => 'footwear', 'status' => 'visible'])
+        ->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Footwear', 'slug' => 'footwear', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     $shoes->refresh();
@@ -278,7 +278,7 @@ it('rejects an invalid category', function (array $input, string $error) {
     category('Shoes');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', [...['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'], ...$input])
+        ->post(route('larasell.admin.categories.store'), [...['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'], ...$input])
         ->assertSessionHasErrors($error);
 
     expect(Category::query()->count())->toBe(1);
@@ -299,7 +299,7 @@ it('lets a category keep its own slug', function () {
     $shoes = category('Shoes');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$shoes->id}", ['name' => 'All Shoes', 'slug' => 'shoes', 'status' => 'visible'])
+        ->put(route('larasell.admin.categories.update', $shoes), ['name' => 'All Shoes', 'slug' => 'shoes', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     expect($shoes->fresh()->name->get())->toBe('All Shoes');
@@ -311,7 +311,7 @@ it('does not let a category take the slug of another one', function () {
     $boots = category('Boots');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$boots->id}", ['name' => 'Boots', 'slug' => 'shoes', 'status' => 'visible'])
+        ->put(route('larasell.admin.categories.update', $boots), ['name' => 'Boots', 'slug' => 'shoes', 'status' => 'visible'])
         ->assertSessionHasErrors('slug');
 
     expect($boots->fresh()->slug->get())->toBe('boots');
@@ -320,9 +320,9 @@ it('does not let a category take the slug of another one', function () {
 it('does not let guests create or edit categories', function () {
     $shoes = category('Shoes');
 
-    $this->get('/admin/categories/create')->assertRedirect('/admin/login');
-    $this->post('/admin/categories', ['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'])->assertRedirect('/admin/login');
-    $this->put("/admin/categories/{$shoes->id}", ['name' => 'Boots', 'slug' => 'boots', 'status' => 'hidden'])->assertRedirect('/admin/login');
+    $this->get(route('larasell.admin.categories.create'))->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.categories.store'), ['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
+    $this->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'hidden'])->assertRedirect(route('larasell.admin.login'));
 
     expect(Category::query()->count())->toBe(1)
         ->and($shoes->fresh()->name->get())->toBe('Shoes');
@@ -336,7 +336,7 @@ it('lists the products of the category on its page', function () {
     product('Scarf', category('Accessories'));
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shoes->id}")
+        ->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('products.title', 'Products')
             ->where('products.columns', [
@@ -360,7 +360,7 @@ it('does not list products on the create page', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories/create')
+        ->get(route('larasell.admin.categories.create'))
         ->assertInertia(fn (AssertableInertia $page) => $page->missing('products'));
 });
 
@@ -373,12 +373,12 @@ it('removes a product from the category but keeps it in the store and its other 
     product('Sandals', $shoes);
 
     $url = $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shoes->id}")
+        ->get(route('larasell.admin.categories.show', $shoes))
         ->viewData('page')['props']['products']['rows'][0]['_actions'][1]['url'];
 
-    $this->from("/admin/categories/{$shoes->id}")
+    $this->from(route('larasell.admin.categories.show', $shoes))
         ->post($url)
-        ->assertRedirect("/admin/categories/{$shoes->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $shoes));
 
     expect($shoes->products()->pluck('name')->map->get()->all())->toBe(['Sandals'])
         ->and($sale->products()->pluck('larasell_products.id')->all())->toBe([$boots->id])
@@ -392,7 +392,7 @@ it('only removes products that are in the category', function () {
     $scarf = product('Scarf', category('Accessories'));
 
     $url = $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shoes->id}")
+        ->get(route('larasell.admin.categories.show', $shoes))
         ->viewData('page')['props']['products']['rows'][0]['_actions'][1]['url'];
 
     $this->post(str_replace("/{$boots->id}/", "/{$scarf->id}/", $url))->assertNotFound();
@@ -405,10 +405,10 @@ it('gives the category page the urls to find and add products', function () {
     $shoes = category('Shoes');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shoes->id}")
+        ->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('availableProductsUrl', url("/admin/categories/{$shoes->id}/available-products"))
-            ->where('addProductUrl', url("/admin/categories/{$shoes->id}/products")));
+            ->where('availableProductsUrl', route('larasell.admin.categories.available-products.index', $shoes))
+            ->where('addProductUrl', route('larasell.admin.categories.products.store', $shoes)));
 });
 
 it('finds the products by name that are not in the category yet', function () {
@@ -421,7 +421,7 @@ it('finds the products by name that are not in the category yet', function () {
     product('Scarf', $accessories);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->getJson("/admin/categories/{$shoes->id}/available-products?search=BOOTS")
+        ->getJson(route('larasell.admin.categories.available-products.index', [$shoes, 'search' => 'BOOTS']))
         ->assertOk()
         ->assertExactJson(['products' => [
             ['id' => $rainBoots->id, 'name' => 'Rain boots'],
@@ -435,7 +435,7 @@ it('suggests products without a search', function () {
     $scarf = product('Scarf', category('Accessories'));
 
     $this->actingAs($admin, 'larasell-admin')
-        ->getJson("/admin/categories/{$shoes->id}/available-products")
+        ->getJson(route('larasell.admin.categories.available-products.index', $shoes))
         ->assertExactJson(['products' => [['id' => $scarf->id, 'name' => 'Scarf']]]);
 });
 
@@ -446,10 +446,10 @@ it('adds a product to the category and goes back', function () {
     $boots = product('Boots', $sale);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from("/admin/categories/{$shoes->id}")
-        ->post("/admin/categories/{$shoes->id}/products", ['product_id' => $boots->id])
+        ->from(route('larasell.admin.categories.show', $shoes))
+        ->post(route('larasell.admin.categories.products.store', $shoes), ['product_id' => $boots->id])
         ->assertSessionHasNoErrors()
-        ->assertRedirect("/admin/categories/{$shoes->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $shoes));
 
     expect($shoes->products()->pluck('larasell_products.id')->all())->toBe([$boots->id])
         ->and($sale->products()->pluck('larasell_products.id')->all())->toBe([$boots->id]);
@@ -461,7 +461,7 @@ it('rejects adding a product that is missing or already in the category', functi
     $boots = product('Boots', $shoes);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post("/admin/categories/{$shoes->id}/products", ['product_id' => $productId($boots)])
+        ->post(route('larasell.admin.categories.products.store', $shoes), ['product_id' => $productId($boots)])
         ->assertSessionHasErrors('product_id');
 
     expect($shoes->products()->count())->toBe(1);
@@ -475,8 +475,8 @@ it('does not let guests find or add products', function () {
     $shoes = category('Shoes');
     $boots = product('Boots', category('Sale'));
 
-    $this->get("/admin/categories/{$shoes->id}/available-products")->assertRedirect('/admin/login');
-    $this->post("/admin/categories/{$shoes->id}/products", ['product_id' => $boots->id])->assertRedirect('/admin/login');
+    $this->get(route('larasell.admin.categories.available-products.index', $shoes))->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.categories.products.store', $shoes), ['product_id' => $boots->id])->assertRedirect(route('larasell.admin.login'));
 
     expect($shoes->products()->count())->toBe(0);
 });
@@ -486,9 +486,9 @@ it('gives every category in the tree its delete url', function () {
     $clothing = category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$clothing->id}")
+        ->get(route('larasell.admin.categories.show', $clothing))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('categories.0.deleteUrl', url("/admin/categories/{$clothing->id}")));
+            ->where('categories.0.deleteUrl', route('larasell.admin.categories.destroy', $clothing)));
 });
 
 it('deletes a category with all its descendants but keeps its parent, siblings and products', function () {
@@ -503,10 +503,10 @@ it('deletes a category with all its descendants but keeps its parent, siblings a
     $coat = product('Coat', $jackets);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from("/admin/categories/{$clothing->id}")
-        ->delete("/admin/categories/{$men->id}", ['confirmation' => 'Men'])
+        ->from(route('larasell.admin.categories.show', $clothing))
+        ->delete(route('larasell.admin.categories.destroy', $men), ['confirmation' => 'Men'])
         ->assertSessionHasNoErrors()
-        ->assertRedirect("/admin/categories/{$clothing->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $clothing));
 
     expect(Category::query()->orderBy('id')->pluck('id')->all())
         ->toBe(Category::query()->whereIn('slug->en', ['clothing', 'women', 'shoes'])->orderBy('id')->pluck('id')->all())
@@ -535,7 +535,7 @@ it('fires the model events for every deleted category, children before their par
     });
 
     $this->actingAs($admin, 'larasell-admin')
-        ->delete("/admin/categories/{$men->id}", ['confirmation' => 'Men'])
+        ->delete(route('larasell.admin.categories.destroy', $men), ['confirmation' => 'Men'])
         ->assertSessionHasNoErrors();
 
     $position = array_flip($deleted);
@@ -558,7 +558,7 @@ it('requires the category name to delete it', function (?string $typed) {
     category('Men', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->delete("/admin/categories/{$clothing->id}", array_filter(['confirmation' => $typed]))
+        ->delete(route('larasell.admin.categories.destroy', $clothing), array_filter(['confirmation' => $typed]))
         ->assertSessionHasErrors('confirmation');
 
     expect(Category::query()->count())->toBe(2);
@@ -574,16 +574,16 @@ it('goes to the categories index after deleting the category that was open', fun
     $men = category('Men', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from("/admin/categories/{$men->id}")
-        ->delete("/admin/categories/{$clothing->id}", ['confirmation' => 'Clothing'])
-        ->assertRedirect('/admin/categories');
+        ->from(route('larasell.admin.categories.show', $men))
+        ->delete(route('larasell.admin.categories.destroy', $clothing), ['confirmation' => 'Clothing'])
+        ->assertRedirect(route('larasell.admin.categories.index'));
 });
 
 it('does not let guests delete a category', function () {
     $clothing = category('Clothing');
 
-    $this->delete("/admin/categories/{$clothing->id}", ['confirmation' => 'Clothing'])
-        ->assertRedirect('/admin/login');
+    $this->delete(route('larasell.admin.categories.destroy', $clothing), ['confirmation' => 'Clothing'])
+        ->assertRedirect(route('larasell.admin.login'));
 
     expect(Category::query()->count())->toBe(1);
 });
@@ -594,10 +594,10 @@ it('gives every category in the tree a url to create a category inside it', func
     $men = category('Men', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$clothing->id}")
+        ->get(route('larasell.admin.categories.show', $clothing))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('categories.0.createChildUrl', url("/admin/categories/create?parent={$clothing->id}"))
-            ->where('categories.0.children.0.createChildUrl', url("/admin/categories/create?parent={$men->id}")));
+            ->where('categories.0.createChildUrl', route('larasell.admin.categories.create', ['parent' => $clothing]))
+            ->where('categories.0.children.0.createChildUrl', route('larasell.admin.categories.create', ['parent' => $men])));
 });
 
 it('shows the create page for a category inside another one', function () {
@@ -605,7 +605,7 @@ it('shows the create page for a category inside another one', function () {
     $clothing = category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/create?parent={$clothing->id}")
+        ->get(route('larasell.admin.categories.create', ['parent' => $clothing]))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Category/Create', shouldExist: false)
@@ -617,7 +617,7 @@ it('shows the create page without a parent for a root category', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories/create')
+        ->get(route('larasell.admin.categories.create'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('parent', null));
 });
 
@@ -625,7 +625,7 @@ it('returns 404 for the create page inside a category that does not exist', func
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/categories/create?parent=999')
+        ->get(route('larasell.admin.categories.create', ['parent' => 999]))
         ->assertNotFound();
 });
 
@@ -635,12 +635,12 @@ it('creates a category inside another one and opens it', function () {
     $men = category('Men', $clothing);
 
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $men->id]);
+        ->post(route('larasell.admin.categories.store'), ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $men->id]);
 
     $jackets = Category::query()->where('slug->en', 'jackets')->sole();
 
     $response->assertSessionHasNoErrors()
-        ->assertRedirect("/admin/categories/{$jackets->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $jackets));
 
     expect($jackets->parent_id)->toBe($men->id);
 });
@@ -649,7 +649,7 @@ it('rejects a parent that does not exist', function (mixed $parentId) {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/categories', ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $parentId])
+        ->post(route('larasell.admin.categories.store'), ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $parentId])
         ->assertSessionHasErrors('parent_id');
 
     expect(Category::query()->count())->toBe(0);
@@ -665,7 +665,7 @@ it('does not move a category to another parent when it is updated', function () 
     $men = category('Men', $clothing);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put("/admin/categories/{$men->id}", ['name' => 'Men', 'slug' => 'men', 'status' => 'visible', 'parent_id' => $shoes->id])
+        ->put(route('larasell.admin.categories.update', $men), ['name' => 'Men', 'slug' => 'men', 'status' => 'visible', 'parent_id' => $shoes->id])
         ->assertSessionHasNoErrors();
 
     expect($men->fresh()->parent_id)->toBe($clothing->id);
@@ -676,9 +676,9 @@ it('gives every category in the tree its move url', function () {
     $clothing = category('Clothing');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$clothing->id}")
+        ->get(route('larasell.admin.categories.show', $clothing))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('categories.0.moveUrl', url("/admin/categories/{$clothing->id}/move")));
+            ->where('categories.0.moveUrl', route('larasell.admin.categories.move', $clothing)));
 });
 
 it('moves a category with its children into another category', function () {
@@ -689,10 +689,10 @@ it('moves a category with its children into another category', function () {
     $sale = category('Sale');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from("/admin/categories/{$clothing->id}")
-        ->post("/admin/categories/{$men->id}/move", ['parent_id' => $sale->id])
+        ->from(route('larasell.admin.categories.show', $clothing))
+        ->post(route('larasell.admin.categories.move', $men), ['parent_id' => $sale->id])
         ->assertSessionHasNoErrors()
-        ->assertRedirect("/admin/categories/{$clothing->id}");
+        ->assertRedirect(route('larasell.admin.categories.show', $clothing));
 
     expect($men->fresh()->parent_id)->toBe($sale->id)
         ->and($shirts->fresh()->parent_id)->toBe($men->id);
@@ -703,7 +703,7 @@ it('moves a category to the root', function () {
     $men = category('Men', category('Clothing'));
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post("/admin/categories/{$men->id}/move", ['parent_id' => null])
+        ->post(route('larasell.admin.categories.move', $men), ['parent_id' => null])
         ->assertSessionHasNoErrors();
 
     expect($men->fresh()->parent_id)->toBeNull();
@@ -718,7 +718,7 @@ it('does not move a category into itself or a category below it', function (stri
     $target = ['itself' => $men, 'its child' => $jackets, 'its grandchild' => $rain][$into];
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post("/admin/categories/{$men->id}/move", ['parent_id' => $target->id])
+        ->post(route('larasell.admin.categories.move', $men), ['parent_id' => $target->id])
         ->assertSessionHasErrors('parent_id');
 
     expect($men->fresh()->parent_id)->toBe($clothing->id);
@@ -729,7 +729,7 @@ it('does not move a category into one that does not exist', function () {
     $men = category('Men', category('Clothing'));
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post("/admin/categories/{$men->id}/move", ['parent_id' => 999])
+        ->post(route('larasell.admin.categories.move', $men), ['parent_id' => 999])
         ->assertSessionHasErrors('parent_id');
 });
 
@@ -737,8 +737,8 @@ it('does not let guests move a category', function () {
     $clothing = category('Clothing');
     $sale = category('Sale');
 
-    $this->post("/admin/categories/{$clothing->id}/move", ['parent_id' => $sale->id])
-        ->assertRedirect('/admin/login');
+    $this->post(route('larasell.admin.categories.move', $clothing), ['parent_id' => $sale->id])
+        ->assertRedirect(route('larasell.admin.login'));
 
     expect($clothing->fresh()->parent_id)->toBeNull();
 });
@@ -746,11 +746,11 @@ it('does not let guests move a category', function () {
 it('links to creating a product from a category\'s page and the page for adding one', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $shoes = category('Shoes');
-    $link = fn (AssertableInertia $page) => $page->where('createProductUrl', url('/admin/products/create'));
+    $link = fn (AssertableInertia $page) => $page->where('createProductUrl', route('larasell.admin.products.create'));
 
     $this->actingAs($admin, 'larasell-admin');
-    $this->get("/admin/categories/{$shoes->id}")->assertInertia($link);
-    $this->get('/admin/categories/create')->assertInertia($link);
+    $this->get(route('larasell.admin.categories.show', $shoes))->assertInertia($link);
+    $this->get(route('larasell.admin.categories.create'))->assertInertia($link);
 });
 
 it('does not link to creating a product when the products are turned off', function () {
@@ -760,8 +760,8 @@ it('does not link to creating a product when the products are turned off', funct
     $noLink = fn (AssertableInertia $page) => $page->where('createProductUrl', null);
 
     $this->actingAs($admin, 'larasell-admin');
-    $this->get("/admin/categories/{$shoes->id}")->assertInertia($noLink);
-    $this->get('/admin/categories/create')->assertInertia($noLink);
+    $this->get(route('larasell.admin.categories.show', $shoes))->assertInertia($noLink);
+    $this->get(route('larasell.admin.categories.create'))->assertInertia($noLink);
 });
 
 it('stops linking to creating a product from a category\'s page once the store has products', function () {
@@ -771,6 +771,6 @@ it('stops linking to creating a product from a category\'s page once the store h
     product('Socks', category('Clothing'));
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get("/admin/categories/{$shoes->id}")
+        ->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('createProductUrl', null));
 });

@@ -146,7 +146,8 @@ describe('row actions', function () {
 
         withActions(fn () => [Action::make('View')->route('books.show')]);
 
-        expect(rowActions(1)[0]['url'])->toBe(url("/books/{$this->emma->id}"));
+        // Spelled out to check what route() produced.
+        expect(rowActions(1)[0]['url'])->toBe(url("/books/{$this->emma->id}")); // @phpstan-ignore larasell.preferRouteHelper
     });
 
     it('posts handler actions to the action endpoint for the row', function () {
@@ -383,9 +384,10 @@ describe('running an action', function () {
         withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
         signIn();
 
-        $this->from('/admin/books')
+        // Any page the table could be on; it has no route of its own here.
+        $this->from('/admin/books') // @phpstan-ignore larasell.preferRouteHelper
             ->post(actionUrl($this->emma, 'delete'))
-            ->assertRedirect('/admin/books');
+            ->assertRedirect('/admin/books'); // @phpstan-ignore larasell.preferRouteHelper
 
         expect(Book::pluck('title')->all())->toBe(['Dune']);
     });
@@ -500,7 +502,7 @@ describe('running an action', function () {
     it('requires a signed-in admin', function () {
         withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
 
-        $this->post(actionUrl($this->emma, 'delete'))->assertRedirect('/admin/login');
+        $this->post(actionUrl($this->emma, 'delete'))->assertRedirect(route('larasell.admin.login'));
 
         expect(Book::count())->toBe(2);
     });
@@ -564,7 +566,7 @@ describe('header actions', function () {
         Route::get('/books/{shelf}/new', fn () => '')->name('books.create');
 
         expect(headerActions(fn () => [TableAction::make('Add book')->route('books.create', ['shelf' => 'classics'])])[0]['url'])
-            ->toBe(url('/books/classics/new'));
+            ->toBe(url('/books/classics/new')); // @phpstan-ignore larasell.preferRouteHelper
     });
 
     it('shows an icon, given as an Icon case or a Remix icon name', function () {

@@ -30,7 +30,7 @@ it('lists customers with their order count, newest first', function () {
     }
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/customers')
+        ->get(route('larasell.admin.customers.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Customers', shouldExist: false)

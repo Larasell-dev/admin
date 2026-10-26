@@ -18,12 +18,12 @@ function profileAdmin(array $attributes = []): Admin
 }
 
 it('redirects guests away from the profile page', function () {
-    $this->get('/admin/profile')->assertRedirect('/admin/login');
+    $this->get(route('larasell.admin.profile'))->assertRedirect(route('larasell.admin.login'));
 });
 
 it('shows the profile page with the current admin details', function () {
     $this->actingAs(profileAdmin(), 'larasell-admin')
-        ->get('/admin/profile')
+        ->get(route('larasell.admin.profile'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Profile')
@@ -34,7 +34,7 @@ it('shows the profile page with the current admin details', function () {
 
 it('shares the signed-in admin and profile link with every admin page', function () {
     $this->actingAs(profileAdmin(), 'larasell-admin')
-        ->get('/admin')
+        ->get(route('larasell.admin.home'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->where('admin.name', 'Test Admin')
@@ -47,11 +47,11 @@ it('updates the admin name and email', function () {
     $admin = profileAdmin();
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', [
+        ->put(route('larasell.admin.profile.update'), [
             'name' => 'New Name',
             'email' => 'new@example.com',
         ])
-        ->assertRedirect('/admin/profile')
+        ->assertRedirect(route('larasell.admin.profile'))
         ->assertSessionHasNoErrors();
 
     expect($admin->fresh())
@@ -63,7 +63,7 @@ it('allows an admin to keep their own email', function () {
     $admin = profileAdmin();
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', [
+        ->put(route('larasell.admin.profile.update'), [
             'name' => 'New Name',
             'email' => 'admin@example.com',
         ])
@@ -77,9 +77,9 @@ it('validates the profile fields', function (array $payload, string $field) {
     $admin = profileAdmin();
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from('/admin/profile')
-        ->put('/admin/profile', $payload)
-        ->assertRedirect('/admin/profile')
+        ->from(route('larasell.admin.profile'))
+        ->put(route('larasell.admin.profile.update'), $payload)
+        ->assertRedirect(route('larasell.admin.profile'))
         ->assertSessionHasErrors($field);
 
     expect($admin->fresh())
@@ -97,14 +97,14 @@ it('only shows and updates the authenticated admin', function () {
     $admin = profileAdmin();
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/profile?id='.$other->id)
+        ->get(route('larasell.admin.profile', ['id' => $other->id]))
         ->assertInertia(fn (Assert $page) => $page
             ->where('admin.name', 'Test Admin')
             ->where('admin.email', 'admin@example.com')
         );
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', [
+        ->put(route('larasell.admin.profile.update'), [
             'id' => $other->id,
             'name' => 'New Name',
             'email' => 'new@example.com',
@@ -123,7 +123,7 @@ it('uploads an avatar without assigning it', function () {
     $admin = profileAdmin();
 
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
         ->assertCreated();
 
     $path = $response->json('path');
@@ -137,7 +137,7 @@ it('uses the public disk by default', function () {
     Storage::fake('public');
 
     $path = $this->actingAs(profileAdmin(), 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
         ->json('path');
 
     expect($path)->toBeString();
@@ -149,18 +149,18 @@ it('assigns an uploaded avatar when the profile is saved', function () {
     $admin = profileAdmin();
 
     $path = $this->actingAs($admin, 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
         ->json('path');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $path])
-        ->assertRedirect('/admin/profile')
+        ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $path])
+        ->assertRedirect(route('larasell.admin.profile'))
         ->assertSessionHasNoErrors();
 
     expect($admin->fresh()->avatar_path)->toBe($path);
 
     $this->actingAs($admin->fresh(), 'larasell-admin')
-        ->get('/admin/profile')
+        ->get(route('larasell.admin.profile'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('admin.avatarUrl', Storage::disk('public')->url($path))
         );
@@ -174,13 +174,13 @@ it('replaces the previous avatar and deletes the old file', function () {
     $admin->update(['avatar_path' => $old]);
 
     $new = $this->actingAs($admin, 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
         ->json('path');
 
     Storage::disk('public')->assertExists($old);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $new])
+        ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $new])
         ->assertSessionHasNoErrors();
 
     expect($admin->fresh()->avatar_path)->toBe($new);
@@ -193,18 +193,18 @@ it('deletes an unsaved upload when another one is uploaded', function () {
     $admin = profileAdmin();
 
     $first = $this->actingAs($admin, 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
         ->json('path');
     $second = $this->actingAs($admin, 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
         ->json('path');
 
     Storage::disk('public')->assertMissing($first);
     Storage::disk('public')->assertExists($second);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from('/admin/profile')
-        ->put('/admin/profile', ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $first])
+        ->from(route('larasell.admin.profile'))
+        ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $first])
         ->assertSessionHasErrors('avatar');
 });
 
@@ -215,8 +215,8 @@ it('only assigns avatars uploaded in the same session', function () {
     $admin = profileAdmin();
 
     $this->actingAs($admin, 'larasell-admin')
-        ->from('/admin/profile')
-        ->put('/admin/profile', ['name' => 'New Name', 'email' => 'admin@example.com', 'avatar' => 'avatars/other.png'])
+        ->from(route('larasell.admin.profile'))
+        ->put(route('larasell.admin.profile.update'), ['name' => 'New Name', 'email' => 'admin@example.com', 'avatar' => 'avatars/other.png'])
         ->assertSessionHasErrors('avatar');
 
     expect($admin->fresh())
@@ -231,7 +231,7 @@ it('keeps the avatar when the profile is saved without a new one', function () {
     Storage::disk('public')->put('avatars/current.png', 'current');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', ['name' => 'New Name', 'email' => 'admin@example.com'])
+        ->put(route('larasell.admin.profile.update'), ['name' => 'New Name', 'email' => 'admin@example.com'])
         ->assertSessionHasNoErrors();
 
     expect($admin->fresh()->avatar_path)->toBe('avatars/current.png');
@@ -244,7 +244,7 @@ it('removes the avatar', function () {
     Storage::disk('public')->put('avatars/current.png', 'current');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->put('/admin/profile', ['name' => 'Test Admin', 'email' => 'admin@example.com', 'remove_avatar' => '1'])
+        ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'remove_avatar' => '1'])
         ->assertSessionHasNoErrors();
 
     expect($admin->fresh()->avatar_path)->toBeNull();
@@ -252,15 +252,15 @@ it('removes the avatar', function () {
 });
 
 it('redirects guests away from the avatar upload', function () {
-    $this->post('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
-        ->assertRedirect('/admin/login');
+    $this->post(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)])
+        ->assertRedirect(route('larasell.admin.login'));
 });
 
 it('rejects invalid avatars', function (Closure $file) {
     Storage::fake('public');
 
     $this->actingAs(profileAdmin(), 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => $file()])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => $file()])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('avatar');
 
@@ -280,7 +280,7 @@ it('accepts avatars at the dimension limits', function (int $size) {
     Storage::fake('public');
 
     $this->actingAs(profileAdmin(), 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', $size, $size)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', $size, $size)])
         ->assertCreated();
 })->with([128, 2048]);
 
@@ -290,11 +290,11 @@ it('rate limits avatar uploads', function () {
 
     for ($i = 0; $i < 10; $i++) {
         $this->actingAs($admin, 'larasell-admin')
-            ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 128, 128)])
+            ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 128, 128)])
             ->assertCreated();
     }
 
     $this->actingAs($admin, 'larasell-admin')
-        ->postJson('/admin/profile/avatar', ['avatar' => UploadedFile::fake()->image('avatar.png', 128, 128)])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 128, 128)])
         ->assertTooManyRequests();
 });
