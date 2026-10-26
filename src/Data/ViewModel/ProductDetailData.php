@@ -23,10 +23,15 @@ class ProductDetailData extends Data
         public bool $allowBackorders,
         public ?int $minQuantity,
         public ?int $maxQuantity,
+        /** @var int[] */
+        public array $categoryIds,
     ) {}
 
     public static function fromModel(Product $product): self
     {
+        // Qualified, as the pivot table has an id too.
+        $categoryKey = $product->categories()->getRelated()->getQualifiedKeyName();
+
         return new self(
             id: $product->id,
             name: $product->name->get(),
@@ -40,6 +45,7 @@ class ProductDetailData extends Data
             allowBackorders: $product->allow_backorders,
             minQuantity: $product->min_quantity,
             maxQuantity: $product->max_quantity,
+            categoryIds: $product->categories()->orderBy($categoryKey)->pluck($categoryKey)->all(),
         );
     }
 }

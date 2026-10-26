@@ -13,6 +13,7 @@ use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Weight;
 
@@ -58,6 +59,9 @@ class ProductRequest extends FormRequest
             'allow_backorders' => ['sometimes', 'boolean'],
             'min_quantity' => ['nullable', 'integer', 'min:1'],
             'max_quantity' => ['nullable', 'integer', 'min:1', 'gte:min_quantity'],
+            // The form leaves it out when no category is selected.
+            'categories' => ['sometimes', 'array'],
+            'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
         ];
     }
 
@@ -127,6 +131,16 @@ class ProductRequest extends FormRequest
             'max_quantity' => $integer('max_quantity'),
             ...$this->has('allow_backorders') ? ['allow_backorders' => $this->boolean('allow_backorders')] : [],
         ];
+    }
+
+    /**
+     * The ids of the categories the product is in, none when the field is left out.
+     *
+     * @return array<int, int>
+     */
+    public function categoryIds(): array
+    {
+        return array_map(intval(...), $this->validated('categories', []));
     }
 
     /**

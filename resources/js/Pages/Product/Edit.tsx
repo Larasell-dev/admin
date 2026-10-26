@@ -8,7 +8,13 @@ import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.EditProductPageData;
 
-export default function Edit({ product, updateUrl, indexUrl }: Props) {
+export default function Edit({
+  product,
+  updateUrl,
+  indexUrl,
+  categories,
+  createCategoryUrl,
+}: Props) {
   const contentScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(contentScroll);
 
@@ -28,7 +34,11 @@ export default function Edit({ product, updateUrl, indexUrl }: Props) {
             // The saved values become the new baseline, so the form is no longer dirty.
             setDefaultsOnSuccess
           >
-            <ProductForm product={product} />
+            <ProductForm
+              product={product}
+              categories={categories}
+              createCategoryUrl={createCategoryUrl}
+            />
             <UnsavedChangesToast container={contentScroll} />
           </Form>
         </div>

@@ -8,8 +8,10 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Data\View\CreateProductPageData;
 use Larasell\Admin\Data\View\EditProductPageData;
+use Larasell\Admin\Data\ViewModel\CategoryData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
+use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
@@ -25,6 +27,8 @@ class ProductController
         return Inertia::render('Product/Create', new CreateProductPageData(
             storeUrl: route('larasell.admin.products.store'),
             indexUrl: route('larasell.admin.products.index'),
+            categories: $this->categories(),
+            createCategoryUrl: route('larasell.admin.categories.create'),
         ));
     }
 
@@ -46,6 +50,8 @@ class ProductController
             'price' => Price::of(0),
         ]);
 
+        $product->categories()->attach($request->categoryIds());
+
         return redirect()->route('larasell.admin.products.edit', $product);
     }
 
@@ -57,6 +63,8 @@ class ProductController
             product: ProductDetailData::fromModel($product),
             updateUrl: route('larasell.admin.products.update', $product),
             indexUrl: route('larasell.admin.products.index'),
+            categories: $this->categories(),
+            createCategoryUrl: route('larasell.admin.categories.create'),
         ));
     }
 
@@ -80,6 +88,19 @@ class ProductController
             ...$request->stock(),
         ]);
 
+        $product->categories()->sync($request->categoryIds());
+
         return redirect()->route('larasell.admin.products.edit', $product);
+    }
+
+    /**
+     * The store's categories to pick the product's from.
+     *
+     * @return array<int, CategoryData>
+     */
+    protected function categories(): array
+    {
+        // One query for the whole tree; the Category relations would query once per level.
+        return CategoryData::tree(Category::query()->orderBy('id')->get());
     }
 }
