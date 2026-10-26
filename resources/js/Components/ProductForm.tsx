@@ -16,6 +16,9 @@ import {
   Stack,
 } from "@larasell-dev/ui";
 import { AddLine, ArrowDownSLine, FileReduceLine, More2Fill } from "@larasell-dev/ui/icons";
+import { Accessibility, type defaultPreset } from "@dnd-kit/dom";
+import { type DragEndEvent, DragDropProvider } from "@dnd-kit/react";
+import { isSortable, useSortable } from "@dnd-kit/react/sortable";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import {
   type ChangeEventHandler,
@@ -26,6 +29,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { plugins, sensors } from "../utils/dragAndDrop";
 import { slugify } from "../utils/slugify";
 import { overlayExclusive } from "../utils/hotkeys";
 import { truncate } from "../utils/truncate";
@@ -137,14 +141,20 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
   );
 }
 
+// Without the plugin that makes each image a focusable button for keyboard dragging, which only
+// the pointer can do here, so the images stay the list's items.
+const imagePlugins = (defaults: typeof defaultPreset.plugins) =>
+  plugins(defaults).filter((plugin) => plugin !== Accessibility);
+
 /** The file types the server accepts. */
 const IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/avif";
 
 /**
  * The product's images in its order, then a square that opens the system's file picker. The
  * chosen images are uploaded right away, with a plain request since the unsaved changes toast
- * blocks Inertia visits, and join the grid. The form submits the grid's image ids in order, so
- * saving the product links them; until then, cancelling the changes drops them again.
+ * blocks Inertia visits, and join the grid. Dragging an image moves it to another's place. The
+ * form submits the grid's image ids in order, so saving the product links them; until then,
+ * cancelling the changes drops them again.
  */
 function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; uploadUrl: string }) {
   const [images, setImages] = useState(savedImages);
@@ -168,6 +178,16 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
     upload.clearErrors();
     setImages(savedImages);
   });
+
+  // The grid reorders while dragging; dropping keeps that order, cancelling puts it back.
+  const drop = ({ canceled, operation: { source } }: DragEndEvent) => {
+    if (canceled || !isSortable(source) || source.initialIndex === source.index) return;
+    setImages((current) => {
+      const next = [...current];
+      next.splice(source.index, 0, ...next.splice(source.initialIndex, 1));
+      return next;
+    });
+  };
 
   async function uploadFiles(input: HTMLInputElement) {
     const files = [...(input.files ?? [])];
@@ -199,29 +219,16 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
           aria-label="Images"
           className="grid auto-rows-fr grid-cols-1 gap-3 @xs:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4"
         >
-          {images.map((image, index) => (
-            <li
-              key={image.id}
-              className="border-border relative aspect-square overflow-hidden border bg-mauve-50 dark:bg-mauve-900"
-            >
-              <input type="hidden" name="images[]" value={image.id} />
-              <img src={image.url} alt={`Image ${index + 1}`} className="size-full object-cover" />
-              {index === 0 && (
-                // Flex, so the badge doesn't sit on a text line that adds space above it.
-                <div className="absolute top-2 left-2 flex">
-                  <Badge>Thumbnail</Badge>
-                </div>
-              )}
-              <div className="absolute top-2 right-2">
-                <ImageMenu
-                  label={`Actions for image ${index + 1}`}
-                  onRemove={() =>
-                    setImages((current) => current.filter(({ id }) => id !== image.id))
-                  }
-                />
-              </div>
-            </li>
-          ))}
+          <DragDropProvider sensors={sensors} plugins={imagePlugins} onDragEnd={drop}>
+            {images.map((image, index) => (
+              <ImageCard
+                key={image.id}
+                image={image}
+                index={index}
+                onRemove={() => setImages((current) => current.filter(({ id }) => id !== image.id))}
+              />
+            ))}
+          </DragDropProvider>
           {uploading.map((file, index) => (
             <li
               // The same file can be chosen twice, so its name isn't unique.
@@ -267,6 +274,52 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
         </Error>
       ))}
     </BaseField.Root>
+  );
+}
+
+/** An image in the grid, which drags from anywhere on it, its menu too once the pointer moves. */
+function ImageCard({
+  image,
+  index,
+  onRemove,
+}: {
+  image: Image;
+  index: number;
+  onRemove: () => void;
+}) {
+  // No transition, so the other images jump to their new places instead of sliding there.
+  const { ref, isDragging } = useSortable({ id: image.id, index, transition: null });
+
+  return (
+    <li
+      ref={ref}
+      data-dragging={isDragging || undefined}
+      className={cn(
+        "border-border relative aspect-square cursor-grab overflow-hidden border bg-mauve-50 select-none dark:bg-mauve-900",
+        "data-dragging:cursor-grabbing data-dragging:opacity-60",
+        // Otherwise iOS opens its share and save menu on the long press that starts a touch
+        // drag; it takes over the touch, and no image drags after that.
+        "[-webkit-touch-callout:none]",
+      )}
+    >
+      <input type="hidden" name="images[]" value={image.id} />
+      {/* A native image drag would take over the pointer before ours starts. */}
+      <img
+        src={image.url}
+        alt={`Image ${index + 1}`}
+        draggable={false}
+        className="size-full object-cover"
+      />
+      {index === 0 && (
+        // Flex, so the badge doesn't sit on a text line that adds space above it.
+        <div className="absolute top-2 left-2 flex">
+          <Badge>Thumbnail</Badge>
+        </div>
+      )}
+      <div className="absolute top-2 right-2">
+        <ImageMenu label={`Actions for image ${index + 1}`} onRemove={onRemove} />
+      </div>
+    </li>
   );
 }
 

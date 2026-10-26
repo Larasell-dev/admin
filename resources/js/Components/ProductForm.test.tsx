@@ -537,6 +537,39 @@ describe("images", () => {
     expect(gridImages()).toHaveLength(ids.length);
   });
 
+  // Moved, not swapped: the images between shift by one.
+  it.each([
+    ["the last image before the first", 3, 1, ["5", "7", "3"]],
+    ["the first image after the last", 1, 3, ["3", "5", "7"]],
+  ])("drags %s, to be saved in that order", async (_, from, to, order) => {
+    await renderForm({
+      ...boots,
+      images: [
+        { id: 7, url: swatch("red") },
+        { id: 3, url: swatch("blue") },
+        { id: 5, url: swatch("green") },
+      ],
+    });
+    const item = (n: number) =>
+      imageGrid()
+        .getByRole("listitem")
+        .nth(n - 1);
+
+    await userEvent.dragAndDrop(item(from), item(to));
+
+    await expect.poll(() => formData().getAll("images[]")).toEqual(order);
+    const colors = { "7": swatch("red"), "3": swatch("blue"), "5": swatch("green") };
+    expect(gridImages()).toEqual(order.map((id) => colors[id as keyof typeof colors]));
+    // The image now first becomes the thumbnail.
+    await expect.element(item(1)).toHaveTextContent("Thumbnail");
+    await expect.element(toast()).toBeVisible();
+
+    await toast().getByRole("button", { name: "Cancel" }).click();
+
+    await expect.element(toast()).not.toBeInTheDocument();
+    expect(formData().getAll("images[]")).toEqual(["7", "3", "5"]);
+  });
+
   it("drops the uploaded images when the changes are cancelled", async () => {
     fakeUploads(201, { images: [{ id: 8, url: swatch("green") }] });
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
