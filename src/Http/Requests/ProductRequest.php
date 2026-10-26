@@ -52,6 +52,12 @@ class ProductRequest extends FormRequest
             // Optional, but each identifies one product, so no other product may have it.
             'sku' => ['nullable', 'string', 'max:255', Rule::unique(Product::class)->ignore($this->route('product'))],
             'barcode' => ['nullable', 'string', new Barcode, Rule::unique(Product::class)->ignore($this->route('product'))],
+            // An empty stock isn't tracked. Backorders sell past 0, so the stock may be below it.
+            'stock' => ['nullable', 'integer'],
+            // Left out, a new product allows backorders and an existing one keeps its setting.
+            'allow_backorders' => ['sometimes', 'boolean'],
+            'min_quantity' => ['nullable', 'integer', 'min:1'],
+            'max_quantity' => ['nullable', 'integer', 'min:1', 'gte:min_quantity'],
         ];
     }
 
@@ -99,6 +105,27 @@ class ProductRequest extends FormRequest
             'dimensions.width' => 'width',
             'dimensions.height' => 'height',
             'dimensions.unit' => 'dimensions unit',
+            'allow_backorders' => 'backorders',
+            'min_quantity' => 'minimum quantity',
+            'max_quantity' => 'maximum quantity',
+        ];
+    }
+
+    /**
+     * The stock, whether it allows backorders, and the quantity limits, keyed as the product
+     * takes them. Empty numbers are null: an untracked stock, or no limit.
+     *
+     * @return array{stock: ?int, min_quantity: ?int, max_quantity: ?int, allow_backorders?: bool}
+     */
+    public function stock(): array
+    {
+        $integer = fn (string $key): ?int => $this->validated($key) === null ? null : (int) $this->validated($key);
+
+        return [
+            'stock' => $integer('stock'),
+            'min_quantity' => $integer('min_quantity'),
+            'max_quantity' => $integer('max_quantity'),
+            ...$this->has('allow_backorders') ? ['allow_backorders' => $this->boolean('allow_backorders')] : [],
         ];
     }
 

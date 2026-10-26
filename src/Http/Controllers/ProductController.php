@@ -42,6 +42,7 @@ class ProductController
             'dimensions' => $request->dimensions(),
             'sku' => $request->validated('sku'),
             'barcode' => $request->validated('barcode'),
+            ...$request->stock(),
             'price' => Price::of(0),
         ]);
 
@@ -66,7 +67,9 @@ class ProductController
     {
         $locale = App::currentLocale();
 
-        $product->update([
+        // The product checks each quantity limit against the other one it already has, so
+        // clearing both first lets a new range lie wholly above or below the old one.
+        $product->fill(['min_quantity' => null, 'max_quantity' => null])->update([
             'name' => $product->name->with($locale, $request->validated('name')),
             'slug' => $product->slug->with($locale, $request->validated('slug')),
             'status' => $request->validated('status'),
@@ -74,6 +77,7 @@ class ProductController
             'dimensions' => $request->dimensions(),
             'sku' => $request->validated('sku'),
             'barcode' => $request->validated('barcode'),
+            ...$request->stock(),
         ]);
 
         return redirect()->route('larasell.admin.products.edit', $product);
