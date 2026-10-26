@@ -372,7 +372,7 @@ describe("categories", () => {
     await page.getByRole("button", { name: "Actions for Shirts" }).click();
 
     await expect
-      .element(page.getByRole("menuitem", { name: "View category" }))
+      .element(page.getByRole("menuitem", { name: "View" }))
       .toHaveAttribute("href", "/admin/categories/2");
     // Opening the menu doesn't select the category.
     await expect.element(categoryItem("Shirts")).toHaveAttribute("aria-checked", "false");
