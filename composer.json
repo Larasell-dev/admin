@@ -25,6 +25,7 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "Larasell\\Admin\\Lint\\": "lint/",
       "Larasell\\Admin\\Tests\\": "tests",
       "Workbench\\App\\": "workbench/app/",
       "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -58,7 +59,10 @@
   "scripts": {
     "lint": "vendor/bin/pint",
     "lint:check": "vendor/bin/pint --test",
-    "phpstan": "phpstan analyse",
+    "phpstan": [
+      "phpstan analyse",
+      "phpstan analyse -c phpstan.tests.neon"
+    ],
     "test": "vendor/bin/pest",
     "types": [
       "testbench typescript:transform",
