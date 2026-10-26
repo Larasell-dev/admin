@@ -12,6 +12,7 @@ export default function Edit({
   indexUrl,
   categories,
   createCategoryUrl,
+  uploadImagesUrl,
 }: Props) {
   return (
     <>
@@ -29,6 +30,7 @@ export default function Edit({
             product={product}
             categories={categories}
             createCategoryUrl={createCategoryUrl}
+            uploadImagesUrl={uploadImagesUrl}
           />
           <UnsavedChangesToast />
         </Form>

@@ -29,6 +29,7 @@ class ProductController
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories(),
             createCategoryUrl: route('larasell.admin.categories.create'),
+            uploadImagesUrl: route('larasell.admin.products.images.store'),
         ));
     }
 
@@ -51,6 +52,7 @@ class ProductController
         ]);
 
         $product->categories()->attach($request->categoryIds());
+        $product->images()->attach($request->images());
 
         return redirect()->route('larasell.admin.products.edit', $product);
     }
@@ -65,6 +67,7 @@ class ProductController
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories(),
             createCategoryUrl: route('larasell.admin.categories.create'),
+            uploadImagesUrl: route('larasell.admin.products.images.store'),
         ));
     }
 
@@ -89,6 +92,8 @@ class ProductController
         ]);
 
         $product->categories()->sync($request->categoryIds());
+        // Also moves the images the product keeps to their new positions.
+        $product->images()->sync($request->images());
 
         return redirect()->route('larasell.admin.products.edit', $product);
     }

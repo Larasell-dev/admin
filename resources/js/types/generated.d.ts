@@ -34,6 +34,7 @@ declare namespace Larasell.Admin.Data.View {
     indexUrl: string;
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
     createCategoryUrl: string;
+    uploadImagesUrl: string;
   };
   export type CustomersPageData = {
     customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
@@ -49,6 +50,7 @@ declare namespace Larasell.Admin.Data.View {
     indexUrl: string;
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
     createCategoryUrl: string;
+    uploadImagesUrl: string;
   };
   export type HomePageData = {
     admin: Larasell.Admin.Data.ViewModel.AdminData;
@@ -131,6 +133,11 @@ declare namespace Larasell.Admin.Data.ViewModel {
     minQuantity: number | null;
     maxQuantity: number | null;
     categoryIds: Array<number>;
+    images: Array<Larasell.Admin.Data.ViewModel.ProductImageData>;
+  };
+  export type ProductImageData = {
+    id: number;
+    url: string;
   };
   export type WeightData = {
     amount: string;

@@ -9,6 +9,7 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\ProductController;
+use Larasell\Admin\Http\Controllers\ProductImageController;
 use Larasell\Admin\Tables\Product\Products;
 
 /**
@@ -35,6 +36,7 @@ class ProductServiceProvider extends ServiceProvider
             Route::post('products', [ProductController::class, 'store'])->name('products.store');
             Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+            Route::post('products/images', [ProductImageController::class, 'store'])->name('products.images.store');
         });
     }
 }
