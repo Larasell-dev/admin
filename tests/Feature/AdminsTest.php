@@ -15,7 +15,7 @@ use Larasell\Admin\Models\Admin;
 function adminRows(Admin $viewer): array
 {
     return test()->actingAs($viewer, 'larasell-admin')
-        ->get('/admin/settings/admins')
+        ->get(route('larasell.admin.settings.admins.index'))
         ->assertOk()
         ->inertiaProps('admins.rows');
 }
@@ -25,7 +25,7 @@ it('lists the admins by name and email in the settings', function () {
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
 
     $this->actingAs($alan, 'larasell-admin')
-        ->get('/admin/settings/admins')
+        ->get(route('larasell.admin.settings.admins.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Admin/Index')
@@ -66,9 +66,9 @@ it('deletes another admin and their avatar', function () {
 
     $delete = adminRows($alan)[0]['_actions'][0]['url'];
 
-    $this->from('/admin/settings/admins')
+    $this->from(route('larasell.admin.settings.admins.index'))
         ->post($delete, ['confirmation' => 'ada@example.com'])
-        ->assertRedirect('/admin/settings/admins');
+        ->assertRedirect(route('larasell.admin.settings.admins.index'));
 
     expect(Admin::query()->pluck('email')->all())->toBe(['alan@example.com']);
     $disk->assertMissing('avatars/ada.png');
@@ -102,7 +102,7 @@ it('opens the first settings page from Settings', function () {
     $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->get('/admin/settings')
+        ->get(route('larasell.admin.settings'))
         ->assertRedirect(route('larasell.admin.settings.admins.index'));
 });
 
@@ -110,7 +110,7 @@ it('opens the new admin page in the settings', function () {
     $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->get('/admin/settings/admins/create')
+        ->get(route('larasell.admin.settings.admins.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Admin/Create')
@@ -122,7 +122,7 @@ it('adds an admin and opens their page', function () {
     $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
     $response = $this->actingAs($ada, 'larasell-admin')
-        ->post('/admin/settings/admins', ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9']);
+        ->post(route('larasell.admin.settings.admins.store'), ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9']);
 
     $grace = Admin::query()->where('email', 'grace@example.com')->firstOrFail();
     $response->assertRedirect(route('larasell.admin.settings.admins.edit', $grace));
@@ -134,9 +134,9 @@ it('rejects a new admin with a taken email or a weak password', function () {
     $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->from('/admin/settings/admins/create')
-        ->post('/admin/settings/admins', ['name' => 'Ada Again', 'email' => 'ada@example.com', 'password' => 'password'])
-        ->assertRedirect('/admin/settings/admins/create')
+        ->from(route('larasell.admin.settings.admins.create'))
+        ->post(route('larasell.admin.settings.admins.store'), ['name' => 'Ada Again', 'email' => 'ada@example.com', 'password' => 'password'])
+        ->assertRedirect(route('larasell.admin.settings.admins.create'))
         ->assertSessionHasErrors(['email', 'password']);
 
     expect(Admin::query()->count())->toBe(1);
@@ -147,7 +147,7 @@ it('opens an admin to edit in the settings', function () {
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->get("/admin/settings/admins/{$alan->id}/edit")
+        ->get(route('larasell.admin.settings.admins.edit', $alan))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Admin/Edit')
@@ -163,7 +163,7 @@ it('updates an admin and keeps their password when none is given', function () {
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'Original-Pass-1']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->put("/admin/settings/admins/{$alan->id}", ['name' => 'Alan M. Turing', 'email' => 'turing@example.com', 'password' => ''])
+        ->put(route('larasell.admin.settings.admins.update', $alan), ['name' => 'Alan M. Turing', 'email' => 'turing@example.com', 'password' => ''])
         ->assertRedirect(route('larasell.admin.settings.admins.edit', $alan));
 
     $alan = $alan->fresh();
@@ -177,7 +177,7 @@ it('changes an admin\'s password when a new one is given', function () {
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->put("/admin/settings/admins/{$alan->id}", ['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'Brand-New-Pass-2'])
+        ->put(route('larasell.admin.settings.admins.update', $alan), ['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'Brand-New-Pass-2'])
         ->assertSessionHasNoErrors();
 
     expect(Hash::check('Brand-New-Pass-2', $alan->fresh()->password))->toBeTrue();
@@ -188,15 +188,15 @@ it('rejects an update with another admin\'s email or a weak password', function 
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
 
     $this->actingAs($ada, 'larasell-admin')
-        ->put("/admin/settings/admins/{$alan->id}", ['name' => 'Alan Turing', 'email' => 'ada@example.com', 'password' => 'short'])
+        ->put(route('larasell.admin.settings.admins.update', $alan), ['name' => 'Alan Turing', 'email' => 'ada@example.com', 'password' => 'short'])
         ->assertSessionHasErrors(['email', 'password']);
 
-    $this->put("/admin/settings/admins/{$alan->id}", ['name' => 'Alan Turing', 'email' => 'alan@example.com'])
+    $this->put(route('larasell.admin.settings.admins.update', $alan), ['name' => 'Alan Turing', 'email' => 'alan@example.com'])
         ->assertSessionHasNoErrors();
 });
 
 it('requires a signed-in admin', function (string $uri) {
     Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
-    $this->get($uri)->assertRedirect('/admin/login');
+    $this->get($uri)->assertRedirect(route('larasell.admin.login'));
 })->with(['/admin/settings', '/admin/settings/admins', '/admin/settings/admins/create', '/admin/settings/admins/1/edit']);

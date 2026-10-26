@@ -12,11 +12,11 @@ it('registers the admin routes under the configured prefix', function () {
 });
 
 it('shows the login page for guests', function () {
-    $this->get('/admin/login')->assertOk();
+    $this->get(route('larasell.admin.login'))->assertOk();
 });
 
 it('redirects guests to the admin login', function () {
-    $this->get('/admin')->assertRedirect('/admin/login');
+    $this->get(route('larasell.admin.home'))->assertRedirect(route('larasell.admin.login'));
 });
 
 it('redirects authenticated admins away from the login page', function () {
@@ -27,8 +27,8 @@ it('redirects authenticated admins away from the login page', function () {
     ]);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/login')
-        ->assertRedirect('/admin');
+        ->get(route('larasell.admin.login'))
+        ->assertRedirect(route('larasell.admin.home'));
 });
 
 it('allows authenticated admins to access the admin home', function () {
@@ -39,6 +39,6 @@ it('allows authenticated admins to access the admin home', function () {
     ]);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin')
+        ->get(route('larasell.admin.home'))
         ->assertOk();
 });

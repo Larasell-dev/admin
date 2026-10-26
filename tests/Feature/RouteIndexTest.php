@@ -37,7 +37,7 @@ it('renders the table page for an index route', function () {
     expect(route('larasell.admin.shop.library.index', absolute: false))->toBe('/admin/shop/library');
 
     $this->actingAs($admin, 'larasell-admin')
-        ->get('/admin/shop/library')
+        ->get(route('larasell.admin.shop.library.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('TablePage')
@@ -47,5 +47,5 @@ it('renders the table page for an index route', function () {
 });
 
 it('requires a signed-in admin', function () {
-    $this->get('/admin/shop/library')->assertRedirect('/admin/login');
+    $this->get(route('larasell.admin.shop.library.index'))->assertRedirect(route('larasell.admin.login'));
 });

@@ -45,7 +45,7 @@ function signedInAdmin(): void
 }
 
 it('titles the login page', function () {
-    expect(pageTitle($this->get('/admin/login')))->toBe('Sign in - Admin');
+    expect(pageTitle($this->get(route('larasell.admin.login'))))->toBe('Sign in - Admin');
 });
 
 it('titles the signed-in pages', function (string $uri, string $title) {
@@ -66,7 +66,7 @@ it('titles the signed-in pages', function (string $uri, string $title) {
 it('titles an admin\'s page with their name', function () {
     signedInAdmin();
 
-    expect(pageTitle($this->get('/admin/settings/admins/1/edit')))->toBe('Ada Lovelace - Admin');
+    expect(pageTitle($this->get(route('larasell.admin.settings.admins.edit', 1))))->toBe('Ada Lovelace - Admin');
 });
 
 it('titles category pages with the category name', function (string $uri, string $title) {
@@ -103,6 +103,6 @@ it('titles app routes with their own title, their table, or Admin', function (st
 it('shares the title with Inertia visits', function () {
     signedInAdmin();
 
-    $this->get('/admin/customers', ['X-Inertia' => 'true'])
+    $this->get(route('larasell.admin.customers.index'), ['X-Inertia' => 'true'])
         ->assertJsonPath('props.head', ['<title data-inertia="title">Customers - Admin</title>']);
 });

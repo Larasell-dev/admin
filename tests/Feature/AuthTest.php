@@ -12,10 +12,10 @@ it('logs an admin in with valid credentials', function () {
         'password' => 'password',
     ]);
 
-    $this->post('/admin/login', [
+    $this->post(route('larasell.admin.login.store'), [
         'email' => 'admin@example.com',
         'password' => 'password',
-    ])->assertRedirect('/admin');
+    ])->assertRedirect(route('larasell.admin.home'));
 
     expect(auth('larasell-admin')->check())->toBeTrue();
 });
@@ -27,17 +27,17 @@ it('fails to log an admin in with invalid credentials', function () {
         'password' => 'password',
     ]);
 
-    $this->from('/admin/login')
-        ->post('/admin/login', [
+    $this->from(route('larasell.admin.login'))
+        ->post(route('larasell.admin.login.store'), [
             'email' => 'admin@example.com',
             'password' => 'wrong-password',
         ])
-        ->assertRedirect('/admin/login')
+        ->assertRedirect(route('larasell.admin.login'))
         ->assertSessionHasErrors('email');
 
     expect(auth('larasell-admin')->check())->toBeFalse();
 
-    $this->get('/admin/login')->assertInertia(fn (Assert $page) => $page
+    $this->get(route('larasell.admin.login'))->assertInertia(fn (Assert $page) => $page
         ->component('Login')
         ->where('errors.email', __('auth.failed'))
     );
@@ -51,8 +51,8 @@ it('logs an admin out', function () {
     ]);
 
     $this->actingAs($admin, 'larasell-admin')
-        ->post('/admin/logout')
-        ->assertRedirect('/admin/login');
+        ->post(route('larasell.admin.logout'))
+        ->assertRedirect(route('larasell.admin.login'));
 
     expect(auth('larasell-admin')->check())->toBeFalse();
 });
