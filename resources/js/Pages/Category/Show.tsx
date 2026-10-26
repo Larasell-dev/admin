@@ -11,6 +11,7 @@ import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
 import { useRef } from "react";
 
 import CategoryForm from "../../Components/CategoryForm";
+import ModuleHeader from "../../Components/ModuleHeader";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/CategoryLayout";
@@ -27,12 +28,10 @@ export default function Show(props: Props) {
 
   return (
     <>
-      <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border px-6">
-        <h2 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">
-          {props.category?.name ?? "Category not found"}
-        </h2>
-        {props.categories.length > 0 && <CategoryTreeTrigger />}
-      </header>
+      <ModuleHeader
+        title={props.category?.name ?? "Category not found"}
+        suffix={props.categories.length > 0 && <CategoryTreeTrigger />}
+      />
       {props.category === null ? (
         <CategoryNotFound {...props} />
       ) : (
