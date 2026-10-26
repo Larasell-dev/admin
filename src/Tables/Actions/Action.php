@@ -20,6 +20,8 @@ class Action
 
     protected bool|Closure $disabled = false;
 
+    protected bool|Closure $hidden = false;
+
     protected ?Icon $icon = null;
 
     /** @var array<int, string> The configuration methods called so far, which may each be called only once. */
@@ -104,6 +106,18 @@ class Action
     }
 
     /**
+     * Hide the action, for every row or for the rows where the closure returns true.
+     * Hidden actions are left out of the row and cannot be run on it.
+     */
+    public function hidden(bool|Closure $condition = true): static
+    {
+        $this->configureOnce('hidden()');
+        $this->hidden = $condition;
+
+        return $this;
+    }
+
+    /**
      * Show an icon before the label: an Icon case or its Remix icon name, e.g. "delete-bin".
      */
     public function icon(Icon|string $icon): static
@@ -140,6 +154,11 @@ class Action
     public function isDisabledFor(Model $record): bool
     {
         return $this->disabled instanceof Closure ? (bool) ($this->disabled)($record) : $this->disabled;
+    }
+
+    public function isHiddenFor(Model $record): bool
+    {
+        return $this->hidden instanceof Closure ? (bool) ($this->hidden)($record) : $this->hidden;
     }
 
     public function name(): string
