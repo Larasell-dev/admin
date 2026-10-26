@@ -14,7 +14,15 @@ import {
   Stack,
 } from "@larasell-dev/ui";
 import { AddLine, ArrowDownSLine } from "@larasell-dev/ui/icons";
-import { type ChangeEventHandler, type Ref, useEffect, useRef, useState } from "react";
+import {
+  type ChangeEventHandler,
+  type Ref,
+  type RefObject,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { slugify } from "../utils/slugify";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
@@ -150,16 +158,10 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
 
   // Cancelling the changes resets the form, which puts its fields back to their saved values but
   // can't remove the hidden inputs of images uploaded since. Going back to the saved images does.
-  useEffect(() => {
-    const form = grid.current?.closest("form");
-    if (!form) return;
-    const discard = () => {
-      upload.clearErrors();
-      setImages(savedImages);
-    };
-    form.addEventListener("reset", discard);
-    return () => form.removeEventListener("reset", discard);
-  }, [upload, savedImages]);
+  useFormReset(grid, () => {
+    upload.clearErrors();
+    setImages(savedImages);
+  });
 
   async function uploadFiles(input: HTMLInputElement) {
     const files = [...(input.files ?? [])];
@@ -243,6 +245,19 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
       ))}
     </BaseField.Root>
   );
+}
+
+/** Calls `onReset` whenever the form around `element` is reset, e.g. by cancelling its changes. */
+function useFormReset(element: RefObject<HTMLElement | null>, onReset: () => void) {
+  // Always the latest callback, without listening anew on every render.
+  const reset = useEffectEvent(onReset);
+
+  useEffect(() => {
+    const form = element.current?.closest("form");
+    if (!form) return;
+    form.addEventListener("reset", reset);
+    return () => form.removeEventListener("reset", reset);
+  }, [element]);
 }
 
 /** Both optional; the barcode is saved as its digits, without spaces or dashes. */
