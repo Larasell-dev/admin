@@ -1,7 +1,7 @@
 import "../../css/app.css";
-import { App, Form } from "@inertiajs/react";
+import { App, Form, http } from "@inertiajs/react";
 import type { ComponentProps } from "react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import ProductForm from "./ProductForm";
@@ -20,6 +20,7 @@ function renderForm(product?: Product, categories: Category[] = []) {
             product={product}
             categories={categories}
             createCategoryUrl="/admin/categories/create"
+            uploadImagesUrl="/admin/products/images"
           />
           <UnsavedChangesToast />
         </Form>
@@ -53,6 +54,7 @@ const boots = {
   minQuantity: null,
   maxQuantity: null,
   categoryIds: [],
+  images: [],
 };
 
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
@@ -376,5 +378,132 @@ describe("categories", () => {
       .toHaveAttribute("href", "/admin/categories/2");
     // Opening the menu doesn't select the category.
     await expect.element(categoryItem("Shirts")).toHaveAttribute("aria-checked", "false");
+  });
+});
+
+/** A solid square, so the images render without a server. */
+const swatch = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="${color}"/></svg>`)}`;
+
+const imageGrid = () => page.getByRole("list", { name: "Images" });
+const gridImages = () =>
+  imageGrid()
+    .getByRole("img")
+    .elements()
+    .map((image) => image.getAttribute("src"));
+const addImages = () => page.getByLabelText("Add images");
+const submittedImages = () =>
+  new FormData(page.getByTestId("form").element() as HTMLFormElement).getAll("images[]");
+const png = (name: string) => new File(["png"], name, { type: "image/png" });
+
+describe("images", () => {
+  const originalClient = http.getClient();
+  let uploads: { url: string; files: string[] }[];
+  let respond: (files: File[]) => { status: number; body: unknown };
+
+  beforeEach(() => {
+    uploads = [];
+    http.setClient({
+      async request(config) {
+        const files = [...(config.data as FormData).values()] as File[];
+        uploads.push({ url: config.url, files: files.map((file) => file.name) });
+        const { status, body } = respond(files);
+        return { status, data: JSON.stringify(body), headers: {} };
+      },
+    });
+  });
+
+  afterEach(() => http.setClient(originalClient));
+
+  it("shows a product's images in their order, the first one as its thumbnail", async () => {
+    await renderForm({
+      ...boots,
+      images: [
+        { id: 7, url: swatch("red") },
+        { id: 3, url: swatch("blue") },
+      ],
+    });
+
+    await expect.element(imageGrid()).toBeVisible();
+    expect(gridImages()).toEqual([swatch("red"), swatch("blue")]);
+    const [first, second] = imageGrid().getByRole("listitem").elements();
+    expect(first).toHaveTextContent("Thumbnail");
+    expect(second).not.toHaveTextContent("Thumbnail");
+  });
+
+  it("adds the chosen images after the product's, to be linked when it's saved", async () => {
+    respond = () => ({
+      status: 201,
+      body: {
+        images: [
+          { id: 8, url: swatch("green") },
+          { id: 9, url: swatch("yellow") },
+        ],
+      },
+    });
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    // A file input, so clicking the square opens the system's file picker.
+    await expect.element(addImages()).toHaveAttribute("type", "file");
+    await expect.element(addImages()).toHaveAttribute("multiple");
+    expect(submittedImages()).toEqual(["7"]);
+
+    await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
+
+    await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
+    expect(uploads).toEqual([{ url: "/admin/products/images", files: ["side.png", "back.png"] }]);
+    expect(submittedImages()).toEqual(["7", "8", "9"]);
+    await expect.element(toast()).toBeVisible();
+  });
+
+  it("drops the uploaded images when the changes are cancelled", async () => {
+    respond = () => ({ status: 201, body: { images: [{ id: 8, url: swatch("green") }] } });
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await userEvent.upload(addImages(), [png("side.png")]);
+    await expect.element(toast()).toBeVisible();
+
+    await toast().getByRole("button", { name: "Cancel" }).click();
+
+    await expect.element(toast()).not.toBeInTheDocument();
+    expect(gridImages()).toEqual([swatch("red")]);
+    expect(submittedImages()).toEqual(["7"]);
+  });
+
+  it("says why images were rejected and keeps the product's", async () => {
+    respond = () => ({
+      status: 422,
+      body: {
+        message: "Invalid",
+        errors: { "images.1": ["Each image must be a JPG, PNG, WebP or AVIF file."] },
+      },
+    });
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+
+    await userEvent.upload(addImages(), [png("side.png"), png("manual.pdf")]);
+
+    await expect
+      .element(page.getByText("Each image must be a JPG, PNG, WebP or AVIF file."))
+      .toBeVisible();
+    expect(gridImages()).toEqual([swatch("red")]);
+    expect(submittedImages()).toEqual(["7"]);
+  });
+
+  it("adds images to a new product, the first as its thumbnail", async () => {
+    respond = () => ({
+      status: 201,
+      body: {
+        images: [
+          { id: 8, url: swatch("green") },
+          { id: 9, url: swatch("yellow") },
+        ],
+      },
+    });
+    await renderForm();
+    await expect.element(addImages()).toBeVisible();
+    expect(submittedImages()).toEqual([]);
+
+    await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
+
+    await expect.poll(submittedImages).toEqual(["8", "9"]);
+    await expect.element(imageGrid().getByRole("listitem").first()).toHaveTextContent("Thumbnail");
   });
 });

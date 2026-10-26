@@ -1,6 +1,7 @@
 import { Field as BaseField } from "@base-ui/react/field";
-import { useFormContext } from "@inertiajs/react";
+import { useFormContext, useHttp } from "@inertiajs/react";
 import {
+  Badge,
   Checkbox,
   Error,
   Field,
@@ -8,10 +9,11 @@ import {
   Input,
   Section,
   SectionStack,
+  Spinner,
   Stack,
 } from "@larasell-dev/ui";
-import { ArrowDownSLine } from "@larasell-dev/ui/icons";
-import { type ChangeEventHandler, type Ref, useRef } from "react";
+import { AddLine, ArrowDownSLine } from "@larasell-dev/ui/icons";
+import { type ChangeEventHandler, type Ref, useEffect, useRef, useState } from "react";
 import { slugify } from "../utils/slugify";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
@@ -21,6 +23,7 @@ import VisibilityField from "./VisibilityField";
 
 type Product = Omit<Larasell.Admin.Data.ViewModel.ProductDetailData, "id">;
 type Category = Larasell.Admin.Data.ViewModel.CategoryData;
+type Image = Larasell.Admin.Data.ViewModel.ProductImageData;
 type Errors = Record<string, string | undefined>;
 
 /**
@@ -31,12 +34,15 @@ export default function ProductForm({
   product,
   categories,
   createCategoryUrl,
+  uploadImagesUrl,
 }: {
   product?: Product;
   /** The store's categories to pick the product's from. */
   categories: Category[];
   /** Where the store's first categories are created, offered while it has none. */
   createCategoryUrl: string;
+  /** Where images are uploaded before saving the product links them. */
+  uploadImagesUrl: string;
 }) {
   const errors: Errors = useFormContext()?.errors ?? {};
 
@@ -48,6 +54,10 @@ export default function ProductForm({
           description="How the product is named and found in the store."
         />
         <GeneralFields product={product} errors={errors} />
+      </Section.Root>
+      <Section.Root>
+        <Section.Header title="Images" description="The first image is the product's thumbnail." />
+        <ImageGrid images={product?.images ?? []} uploadUrl={uploadImagesUrl} />
       </Section.Root>
       <Section.Root>
         <Section.Header
@@ -111,6 +121,109 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
 
       <VisibilityField defaultVisible={product?.visible ?? true} error={errors.status} />
     </Stack>
+  );
+}
+
+/** The file types the server accepts. */
+const IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/avif";
+
+/**
+ * The product's images in its order, then a square that opens the system's file picker. The
+ * chosen images are uploaded right away, with a plain request since the unsaved changes toast
+ * blocks Inertia visits, and join the grid. The form submits the grid's image ids in order, so
+ * saving the product links them; until then, cancelling the changes drops them again.
+ */
+function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; uploadUrl: string }) {
+  const [images, setImages] = useState(savedImages);
+  const grid = useRef<HTMLUListElement>(null);
+  const upload = useHttp<{ images: File[] }, { images: Image[] }>({ images: [] });
+  // One message per kind of problem, however many images have it.
+  const errors = [...new Set(Object.values(upload.errors as Errors))];
+
+  // The form only notices hidden inputs change when told, e.g. to show the unsaved changes toast.
+  useEffect(() => {
+    grid.current?.dispatchEvent(new Event("input", { bubbles: true }));
+  }, [images]);
+
+  useEffect(() => {
+    const form = grid.current?.closest("form");
+    if (!form) return;
+    const discard = () => {
+      upload.clearErrors();
+      setImages(savedImages);
+    };
+    form.addEventListener("reset", discard);
+    return () => form.removeEventListener("reset", discard);
+  }, [upload, savedImages]);
+
+  async function uploadFiles(input: HTMLInputElement) {
+    const files = [...(input.files ?? [])];
+    // Lets the same files be chosen again.
+    input.value = "";
+    if (files.length === 0) return;
+
+    upload.clearErrors();
+    upload.transform(() => ({ images: files }));
+
+    try {
+      // Undefined when the images are invalid; the errors say why.
+      const response = await upload.post(uploadUrl);
+      if (response) setImages((current) => [...current, ...response.images]);
+    } catch {
+      upload.setError("images", "The images couldn't be uploaded. Try again.");
+    }
+  }
+
+  return (
+    <BaseField.Root invalid={errors.length > 0} className="flex flex-col gap-1.5">
+      {/* Fewer columns as the form narrows, so the images stay large enough to tell apart. */}
+      <div className="@container">
+        <ul
+          ref={grid}
+          aria-label="Images"
+          className="grid auto-rows-fr grid-cols-1 gap-3 @xs:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4"
+        >
+          {images.map((image, index) => (
+            <li
+              key={image.id}
+              className="border-border relative aspect-square overflow-hidden border bg-mauve-50 dark:bg-mauve-900"
+            >
+              <input type="hidden" name="images[]" value={image.id} />
+              <img src={image.url} alt={`Image ${index + 1}`} className="size-full object-cover" />
+              {index === 0 && (
+                <div className="absolute top-2 left-2">
+                  <Badge>Thumbnail</Badge>
+                </div>
+              )}
+            </li>
+          ))}
+          <li>
+            {/* A label, so clicking anywhere on the square opens the file picker. */}
+            <label className="flex aspect-square cursor-pointer items-center justify-center border border-dashed border-mauve-300 text-2xl text-mauve-600 hover:bg-mauve-50 has-focus-visible:focus-ring has-disabled:cursor-default dark:border-mauve-600 dark:text-mauve-300 dark:hover:bg-mauve-800">
+              <input
+                type="file"
+                multiple
+                accept={IMAGE_TYPES}
+                aria-label="Add images"
+                disabled={upload.processing}
+                className="sr-only"
+                onChange={(event) => uploadFiles(event.currentTarget)}
+              />
+              {upload.processing ? (
+                <Spinner aria-label="Uploading images" />
+              ) : (
+                <Icon icon={AddLine} />
+              )}
+            </label>
+          </li>
+        </ul>
+      </div>
+      {errors.map((error) => (
+        <Error key={error} match>
+          {error}
+        </Error>
+      ))}
+    </BaseField.Root>
   );
 }
 

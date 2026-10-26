@@ -15,6 +15,7 @@ use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Weight;
 
 class ProductRequest extends FormRequest
@@ -62,6 +63,9 @@ class ProductRequest extends FormRequest
             // The form leaves it out when no category is selected.
             'categories' => ['sometimes', 'array'],
             'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
+            // Uploaded images, in the product's order. The form leaves it out when there are none.
+            'images' => ['sometimes', 'array'],
+            'images.*' => ['integer', 'distinct', Rule::exists(ProductImage::class, 'id')],
         ];
     }
 
@@ -141,6 +145,19 @@ class ProductRequest extends FormRequest
     public function categoryIds(): array
     {
         return array_map(intval(...), $this->validated('categories', []));
+    }
+
+    /**
+     * The product's images keyed by id, each with its position, ready to sync. None when the
+     * field is left out.
+     *
+     * @return array<int, array{position: int}>
+     */
+    public function images(): array
+    {
+        $ids = array_map(intval(...), array_values($this->validated('images', [])));
+
+        return array_combine($ids, array_map(fn (int $position) => ['position' => $position], array_keys($ids)));
     }
 
     /**

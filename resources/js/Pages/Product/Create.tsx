@@ -6,13 +6,23 @@ import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CreateProductPageData;
 
-export default function Create({ storeUrl, indexUrl, categories, createCategoryUrl }: Props) {
+export default function Create({
+  storeUrl,
+  indexUrl,
+  categories,
+  createCategoryUrl,
+  uploadImagesUrl,
+}: Props) {
   return (
     <>
       <Page.Header title="New product" backLink={{ href: indexUrl, label: "Back to products" }} />
       <Page.Body>
         <Form action={storeUrl} method="post">
-          <ProductForm categories={categories} createCategoryUrl={createCategoryUrl} />
+          <ProductForm
+            categories={categories}
+            createCategoryUrl={createCategoryUrl}
+            uploadImagesUrl={uploadImagesUrl}
+          />
           <UnsavedChangesToast />
         </Form>
       </Page.Body>

@@ -15,5 +15,6 @@ class CreateProductPageData extends Data
         /** @var array<int, CategoryData> */
         public array $categories,
         public string $createCategoryUrl,
+        public string $uploadImagesUrl,
     ) {}
 }
