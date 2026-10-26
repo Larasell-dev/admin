@@ -1,6 +1,6 @@
 import { Combobox } from "@base-ui/react/combobox";
 import { Field } from "@base-ui/react/field";
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import {
   Button,
   EmptyState,
@@ -12,7 +12,7 @@ import {
   Pagination,
   Section,
 } from "@larasell-dev/ui";
-import { AddLine, More2Fill } from "@larasell-dev/ui/icons";
+import { AddLine, More2Fill, ShoppingBagLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { useEffect, useMemo, useState } from "react";
 import type { TableRowAction, TableResource } from "../types";
@@ -22,21 +22,29 @@ import { overlayExclusive } from "../utils/hotkeys";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 
-type Props =
-  /** The category doesn't exist yet, so it can't list or take products. */
-  | { mode: "create" }
+type Props = (
+  | /** The category doesn't exist yet, so it can't list or take products. */
+    { mode: "create" }
   | {
       mode: "edit";
       table: TableResource;
       availableProductsUrl: string;
       addProductUrl: string;
-    };
+    }
+) & {
+  /**
+   * Where a product is created, offered instead of adding one while the store has no products.
+   * Null when there are products to add, or while the products are turned off.
+   */
+  createProductUrl: string | null;
+};
 
 /**
  * The products section of a category: its header and a Section.Card with the products and a
  * menu of row actions. When editing, the empty state, or the header once there are products,
- * offers to add one, which shows a bar to pick products until closed. When creating, it only
- * explains that products show up once the category exists.
+ * offers to add one, which shows a bar to pick products until closed. When creating, it
+ * explains that products show up once the category exists. Either empty state links to
+ * creating a product instead, given `createProductUrl`, so it only ever offers one action.
  */
 export default function ProductsTable(props: Props) {
   const [adding, setAdding] = useState(false);
@@ -73,6 +81,7 @@ export default function ProductsTable(props: Props) {
   const table = props.mode === "edit" ? props.table : null;
   const rows = table?.rows ?? [];
   const canAdd = props.mode === "edit";
+  const createProductUrl = props.createProductUrl;
   const showsAddRow = props.mode === "edit" && adding;
   const hasActions = rows.some((row) => row._actions.length > 0);
   const startAdding = () => setAdding(true);
@@ -102,13 +111,24 @@ export default function ProductsTable(props: Props) {
       />
       {rows.length === 0 && !showsAddRow ? (
         <Section.Card>
-          <div className="flex justify-center px-(--inset) py-10">
+          <div className="flex justify-center px-(--inset) py-20">
             <EmptyState
+              icon={ShoppingBagLine}
               title={empty.title}
               description={empty.description ?? undefined}
               // Only given children when it has an action; even `false` renders an empty actions row.
-              {...(canAdd && {
-                children: (
+              {...((canAdd || createProductUrl) && {
+                children: createProductUrl ? (
+                  <Button
+                    nativeButton={false}
+                    // Base UI marks non-native buttons as buttons; this navigates, so it stays a link.
+                    role="link"
+                    render={<Link href={createProductUrl} prefetch="hover" />}
+                  >
+                    <Icon icon={AddLine} />
+                    Create product
+                  </Button>
+                ) : (
                   <Button type="button" onClick={startAdding}>
                     <Icon icon={AddLine} />
                     Add product

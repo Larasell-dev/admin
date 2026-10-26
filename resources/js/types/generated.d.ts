@@ -15,6 +15,7 @@ declare namespace Larasell.Admin.Data.View {
     products: import("./index").TableResource;
     availableProductsUrl: string;
     addProductUrl: string;
+    createProductUrl: string | null;
   };
   export type CreateAdminPageData = {
     storeUrl: string;
@@ -26,6 +27,7 @@ declare namespace Larasell.Admin.Data.View {
     storeUrl: string;
     indexUrl: string;
     parent: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
+    createProductUrl: string | null;
   };
   export type CreateProductPageData = {
     storeUrl: string;
