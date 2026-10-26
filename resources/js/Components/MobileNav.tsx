@@ -18,7 +18,7 @@ export default function MobileNav() {
 
   return (
     <Drawer.Root open={open} onOpenChange={setOpen} swipeDirection="left">
-      <header className="box-border h-14 border-b border-border bg-white dark:bg-mauve-950">
+      <header className="box-border h-(--mobile-nav-height) border-b border-border bg-white dark:bg-mauve-950">
         <div className="flex h-full items-center justify-between px-6">
           <Link
             href={home.url}

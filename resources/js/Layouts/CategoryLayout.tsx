@@ -93,16 +93,16 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
           like the panel beside the page does across visits. */}
       {/* Base UI's own invisible backdrop, which blocks the page, also starts below the
           mobile nav, so the nav stays usable while the dialog is open. */}
-      <Dialog.Portal keepMounted className="[&>[data-base-ui-inert]]:top-14!">
-        {/* Both start below the 3.5rem mobile nav, which stays visible above the dialog. */}
+      <Dialog.Portal keepMounted className="[&>[data-base-ui-inert]]:top-(--mobile-nav-height)!">
+        {/* Both start below the mobile nav, which stays visible above the dialog. */}
         {/* Gives way to the backdrop of a confirmation opened on top, such as deleting a
             category, which covers the page as well, so the page isn't dimmed twice. */}
-        <Dialog.Backdrop className="fixed inset-x-0 top-14 bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
+        <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
         <Dialog.Popup
           aria-label="Categories"
           className={cn(
             // Panel
-            "fixed top-14 bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none lg:hidden dark:bg-mauve-950",
+            "fixed top-(--mobile-nav-height) bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none lg:hidden dark:bg-mauve-950",
             // Slides in from the left
             "transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
           )}
