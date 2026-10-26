@@ -5,6 +5,9 @@ parameters:
     paths:
         - src
         - tests/Fixtures
+        - lint/PHPStan
+    excludePaths:
+        - lint/PHPStan/data
 
     level: 8
     databaseMigrationsPath:

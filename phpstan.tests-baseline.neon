@@ -1,0 +1,469 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/settings/admins/\{\$alan\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 4
+			path: tests/Feature/AdminsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/settings/admins/\{\$alan\-\>id\}/edit"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/AdminsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/AdminsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/settings''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/AdminsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/settings/admins''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 6
+			path: tests/Feature/AdminsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/settings/admins/create''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/AdminsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/AuthTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 6
+			path: tests/Feature/AuthTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/logout''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/AuthTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/create\?parent\=\{\$clothing\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/create\?parent\=\{\$men\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$boots\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$category\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$clothing\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 17
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$clothing\-\>id\}/hide"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$clothing\-\>id\}/move"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$clothing\-\>id\}/unhide"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$clothing\-\>id\}/\{\$action\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$jackets\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$linen\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$men\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 4
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$men\-\>id\}/move"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 4
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$sale\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$sale\-\>id\}/unhide"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$shirts\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 4
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$shirts\-\>id\}/hide"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$shoes\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 15
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$shoes\-\>id\}/available\-products"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$shoes\-\>id\}/available\-products\?search\=BOOTS"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/categories/\{\$shoes\-\>id\}/products"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 4
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/categories''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 10
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/categories/999''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/categories/create''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 9
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/categories/create\?parent\=999''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 8
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/products/create''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CategoriesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/customers''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/CustomersTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/__dev''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/__dev/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/__dev/login\?email\=second@example\.com&redirect\=/admin/profile''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/__dev/logout''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/profile''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/DevRoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/does\-not\-exist''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/NotFoundPageTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/settings/admins/999/edit''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/NotFoundPageTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/does\-not\-exist''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/NotFoundPageTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/customers''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/PageTitlesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/PageTitlesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/settings/admins/1/edit''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/PageTitlesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$boots\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 7
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$boots\-\>id\}/edit"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 6
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$poster\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$poster\-\>id\}/edit"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$product\-\>id\}/edit"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$socks\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/admin/products/\{\$socks\-\>id\}/edit"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/categories/create''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/products''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 32
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/products/999/edit''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/products/create''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 5
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/products/images''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProductsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProfileTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/ProfileTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/profile''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 19
+			path: tests/Feature/ProfileTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/profile/avatar''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 11
+			path: tests/Feature/ProfileTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/profile\?id\='' \. \$other\-\>id\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/ProfileTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/RouteIndexTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/shop/library''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/RouteIndexTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/RoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 3
+			path: tests/Feature/RoutesTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL "/books/\{\$this\-\>emma\-\>id\}"\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/TableActionsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/books''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 2
+			path: tests/Feature/TableActionsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/login''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/TableActionsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/books/classics/new''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/TableActionsTest.php
+
+		-
+			message: '#^Use route\(\) instead of the hard\-coded URL ''/admin/shelf''\.$#'
+			identifier: larasell.preferRouteHelper
+			count: 1
+			path: tests/Feature/TableEmptyStateTest.php

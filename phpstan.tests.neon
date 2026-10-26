@@ -1,0 +1,13 @@
+# Project rules for the Pest tests. These run without a level: tests aren't held to the
+# level 8 that phpstan.neon applies to src.
+includes:
+    - phpstan.tests-baseline.neon
+
+parameters:
+    customRulesetUsed: true
+    paths:
+        - tests/Feature
+        - tests/Unit
+
+rules:
+    - Larasell\Admin\Lint\PHPStan\PreferRouteHelperRule
