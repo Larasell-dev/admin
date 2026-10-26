@@ -144,6 +144,8 @@ const IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/avif";
  */
 function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; uploadUrl: string }) {
   const [images, setImages] = useState(savedImages);
+  // The files being uploaded, each shown as a loading card where its image will appear.
+  const [uploading, setUploading] = useState<File[]>([]);
   const grid = useRef<HTMLUListElement>(null);
   const upload = useHttp<{ images: File[] }, { images: Image[] }>({ images: [] });
   // One message per kind of problem, however many images have it.
@@ -171,6 +173,7 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
 
     upload.clearErrors();
     upload.transform(() => ({ images: files }));
+    setUploading(files);
 
     try {
       // Undefined when the images are invalid; the errors say why.
@@ -178,6 +181,8 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
       if (response) setImages((current) => [...current, ...response.images]);
     } catch {
       upload.setError("images", "The images couldn't be uploaded. Try again.");
+    } finally {
+      setUploading([]);
     }
   }
 
@@ -204,6 +209,15 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
               )}
             </li>
           ))}
+          {uploading.map((file, index) => (
+            <li
+              // The same file can be chosen twice, so its name isn't unique.
+              key={index}
+              className="border-border flex aspect-square items-center justify-center border bg-mauve-50 text-2xl text-mauve-600 dark:bg-mauve-900 dark:text-mauve-300"
+            >
+              <Spinner aria-label={`Uploading ${file.name}`} />
+            </li>
+          ))}
           <li>
             {/* A label, so clicking anywhere on the square opens the file picker. */}
             <label
@@ -213,9 +227,9 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
                 "relative flex aspect-square items-center justify-center text-2xl",
                 "border border-dashed border-mauve-300 dark:border-mauve-600",
                 "text-mauve-600 dark:text-mauve-300",
-                // Clickable while no upload is running
-                "cursor-pointer has-disabled:cursor-default",
-                "hover:bg-mauve-50 dark:hover:bg-mauve-800",
+                // Clickable while no upload is running, dimmed while one is
+                "cursor-pointer has-disabled:cursor-default has-disabled:opacity-50",
+                "not-has-disabled:hover:bg-mauve-50 dark:not-has-disabled:hover:bg-mauve-800",
                 // Focus is on the hidden file input inside
                 "has-focus-visible:focus-ring",
               )}
@@ -229,11 +243,7 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
                 className="sr-only"
                 onChange={(event) => uploadFiles(event.currentTarget)}
               />
-              {upload.processing ? (
-                <Spinner aria-label="Uploading images" />
-              ) : (
-                <Icon icon={AddLine} />
-              )}
+              <Icon icon={AddLine} />
             </label>
           </li>
         </ul>
