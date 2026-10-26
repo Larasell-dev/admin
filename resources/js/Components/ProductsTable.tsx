@@ -205,7 +205,9 @@ export default function ProductsTable(props: Props) {
                                   icon={
                                     action.icon ? navigationIcon(action.icon, false) : undefined
                                   }
-                                  onClick={() => choose(action)}
+                                  {...(action.method === "get" && !action.confirm
+                                    ? { render: <Link href={action.url} prefetch="hover" /> }
+                                    : { onClick: () => choose(action) })}
                                 >
                                   {action.label}
                                 </Menu.Item>
