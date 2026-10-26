@@ -278,7 +278,7 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
       <Menu.Popup>
         <HotkeysProvider scope="category-actions-menu" exclusive={overlayExclusive}>
           <Menu.Item icon={EyeLine} render={<Link href={category.url} prefetch="hover" />}>
-            View category
+            View
           </Menu.Item>
         </HotkeysProvider>
       </Menu.Popup>
