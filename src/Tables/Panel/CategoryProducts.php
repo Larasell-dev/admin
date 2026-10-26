@@ -47,6 +47,10 @@ class CategoryProducts extends Table
     public function actions(): array
     {
         return [
+            Action::make('View product')
+                ->route('larasell.admin.products.edit')
+                ->icon(Icon::Eye)
+                ->hidden(! config('larasell.admin.products.enabled')),
             Action::make('Remove', handle: fn (Product $product) => $this->category->products()->detach($product))
                 ->confirm(
                     title: 'Remove product',

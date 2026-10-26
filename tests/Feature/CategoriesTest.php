@@ -350,10 +350,10 @@ it('lists the products of the category on its page', function () {
             ->where('products.rows.1.id', $sandals->id)
             ->where('products.rows.1.name', 'Sandals')
             ->where('products.rows.1.status', 'Hidden')
-            ->where('products.rows.0._actions.0.label', 'Remove')
-            ->where('products.rows.0._actions.0.method', 'post')
-            ->where('products.rows.0._actions.0.destructive', true)
-            ->where('products.rows.0._actions.0.icon', 'FolderReduce'));
+            ->where('products.rows.0._actions.1.label', 'Remove')
+            ->where('products.rows.0._actions.1.method', 'post')
+            ->where('products.rows.0._actions.1.destructive', true)
+            ->where('products.rows.0._actions.1.icon', 'FolderReduce'));
 });
 
 it('does not list products on the create page', function () {
@@ -374,7 +374,7 @@ it('removes a product from the category but keeps it in the store and its other 
 
     $url = $this->actingAs($admin, 'larasell-admin')
         ->get("/admin/categories/{$shoes->id}")
-        ->viewData('page')['props']['products']['rows'][0]['_actions'][0]['url'];
+        ->viewData('page')['props']['products']['rows'][0]['_actions'][1]['url'];
 
     $this->from("/admin/categories/{$shoes->id}")
         ->post($url)
@@ -393,7 +393,7 @@ it('only removes products that are in the category', function () {
 
     $url = $this->actingAs($admin, 'larasell-admin')
         ->get("/admin/categories/{$shoes->id}")
-        ->viewData('page')['props']['products']['rows'][0]['_actions'][0]['url'];
+        ->viewData('page')['props']['products']['rows'][0]['_actions'][1]['url'];
 
     $this->post(str_replace("/{$boots->id}/", "/{$scarf->id}/", $url))->assertNotFound();
 
