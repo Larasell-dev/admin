@@ -392,9 +392,12 @@ const gridImages = () =>
     .elements()
     .map((image) => image.getAttribute("src"));
 const addImages = () => page.getByLabelText("Add images");
+/** The cards of images still uploading, named after their files. */
+const uploadingCards = () => imageGrid().getByRole("status");
 /**
  * Answers every image upload with the status and body instead of sending it to a server, and
- * returns the uploads it answered: where each went and the names of the files it sent.
+ * returns the uploads it answered: where each went and the names of the files it sent. A promised
+ * body holds the answer until it resolves.
  */
 function fakeUploads(status: number, body: unknown) {
   const uploads: { url: string; files: string[] }[] = [];
@@ -402,7 +405,7 @@ function fakeUploads(status: number, body: unknown) {
     async request({ url, data }) {
       const files = [...(data as FormData).values()] as File[];
       uploads.push({ url, files: files.map((file) => file.name) });
-      return { status, data: JSON.stringify(body), headers: {} };
+      return { status, data: JSON.stringify(await body), headers: {} };
     },
   });
   return uploads;
@@ -450,6 +453,37 @@ describe("images", () => {
     await expect.element(toast()).toBeVisible();
   });
 
+  it("shows a loading card per chosen image, and no more can be added until they're uploaded", async () => {
+    let respond!: (body: unknown) => void;
+    fakeUploads(201, new Promise((resolve) => (respond = resolve)));
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+
+    await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
+
+    // After the product's image, where the uploaded ones will appear.
+    await expect.poll(() => uploadingCards().elements()).toHaveLength(2);
+    const [, first, second, add] = imageGrid().getByRole("listitem").elements();
+    expect(first.querySelector("[role=status]")).toHaveAccessibleName("Uploading side.png");
+    expect(second.querySelector("[role=status]")).toHaveAccessibleName("Uploading back.png");
+    // The add square stays a plus, just disabled.
+    expect(add).toContainElement(addImages().element() as HTMLElement);
+    expect(add.querySelector("[role=status]")).toBeNull();
+    await expect.element(addImages()).toBeDisabled();
+    // Nothing to link until the upload answers.
+    expect(formData().getAll("images[]")).toEqual(["7"]);
+
+    respond({
+      images: [
+        { id: 8, url: swatch("green") },
+        { id: 9, url: swatch("yellow") },
+      ],
+    });
+
+    await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
+    expect(uploadingCards().elements()).toHaveLength(0);
+    await expect.element(addImages()).toBeEnabled();
+  });
+
   it("drops the uploaded images when the changes are cancelled", async () => {
     fakeUploads(201, { images: [{ id: 8, url: swatch("green") }] });
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
@@ -476,6 +510,7 @@ describe("images", () => {
       .element(page.getByText("Each image must be a JPG, PNG, WebP or AVIF file."))
       .toBeVisible();
     expect(gridImages()).toEqual([swatch("red")]);
+    expect(uploadingCards().elements()).toHaveLength(0);
     expect(formData().getAll("images[]")).toEqual(["7"]);
   });
 
