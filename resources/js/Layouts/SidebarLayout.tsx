@@ -14,7 +14,13 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       <div className="sticky top-0 hidden h-dvh lg:block">
         <Sidebar />
       </div>
-      <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
+      {/* Fills the viewport below the 3.5rem mobile nav, so pages stack a fixed header above
+          content that scrolls on its own. Pages taller than that, like the profile, scroll here. */}
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex h-[calc(100dvh-3.5rem)] min-w-0 flex-col overflow-y-auto focus:outline-none lg:h-dvh lg:flex-1"
+      >
         {children}
       </main>
       {/* Outside the page, so a toast can animate out after its page is gone. */}

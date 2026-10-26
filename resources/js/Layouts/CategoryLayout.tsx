@@ -32,8 +32,7 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
 
   return (
     <CategoryDeletion>
-      {/* Below lg the 3.5rem mobile nav sits above the layout, so it takes the rest of the viewport. */}
-      <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh">
+      <div className="flex min-h-0 flex-1">
         {/* Without categories there is no tree to show; the page offers to add the first one. */}
         {categories.length > 0 && (
           <TreePanel

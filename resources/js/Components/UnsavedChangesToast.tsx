@@ -1,9 +1,10 @@
 import { router, useFormContext } from "@inertiajs/react";
 import { Button } from "@larasell-dev/ui";
 import { AnimatePresence, MotionConfig, motion, useAnimate, useIsPresent } from "motion/react";
-import { type RefObject, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { use, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { assertDefined } from "ts-extras";
+import { PageBodyContext } from "./Page";
 
 type Position = { left: string; bottom: string };
 
@@ -38,15 +39,13 @@ const store = {
 
 /**
  * Saves or discards the surrounding Inertia `<Form>` once it has unsaved changes. It floats at
- * the bottom center of the viewport, or of `container` when given, outside the form's layout.
+ * the bottom center of the surrounding Page.Body, or of the viewport outside one, outside the
+ * form's layout.
  * While there are unsaved changes it blocks leaving the page and wobbles to point at itself.
  * An UnsavedChangesToastHost, which SidebarLayout renders, draws it.
  */
-export default function UnsavedChangesToast({
-  container,
-}: {
-  container?: RefObject<HTMLElement | null>;
-}) {
+export default function UnsavedChangesToast() {
+  const container = use(PageBodyContext);
   const form = useFormContext();
   assertDefined(form, "UnsavedChangesToast must be rendered inside an Inertia <Form>.");
 
