@@ -101,13 +101,13 @@ it('links each product to its edit page', function () {
 it('shows the page for adding a product', function () {
     signInAdmin();
 
-    $this->get('/admin/products/create')
+    $this->get(route('larasell.admin.products.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Create')
-            ->where('storeUrl', url('/admin/products'))
-            ->where('indexUrl', url('/admin/products'))
-            ->where('uploadImagesUrl', url('/admin/products/images')));
+            ->where('storeUrl', route('larasell.admin.products.store'))
+            ->where('indexUrl', route('larasell.admin.products.index'))
+            ->where('uploadImagesUrl', route('larasell.admin.products.images.store')));
 });
 
 it('creates a product and opens it', function (Visibility $status) {
@@ -135,7 +135,7 @@ it('shows the product\'s values to edit on its page', function () {
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Hidden]);
 
-    $this->get("/admin/products/{$boots->id}/edit")
+    $this->get(route('larasell.admin.products.edit', $boots))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Edit')
@@ -155,9 +155,9 @@ it('shows the product\'s values to edit on its page', function () {
                 'categoryIds' => [],
                 'images' => [],
             ])
-            ->where('updateUrl', url("/admin/products/{$boots->id}"))
-            ->where('indexUrl', url('/admin/products'))
-            ->where('uploadImagesUrl', url('/admin/products/images')));
+            ->where('updateUrl', route('larasell.admin.products.update', $boots))
+            ->where('indexUrl', route('larasell.admin.products.index'))
+            ->where('uploadImagesUrl', route('larasell.admin.products.images.store')));
 });
 
 it('shows the product\'s weight and dimensions in the units they were saved in', function () {
@@ -618,7 +618,7 @@ it('shows the product\'s images on its page in their order, whatever order they 
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
     $boots->images()->attach([$side->id => ['position' => 1], $front->id => ['position' => 0]]);
 
-    $this->get("/admin/products/{$boots->id}/edit")
+    $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.images', [
                 ['id' => $front->id, 'url' => $front->url()],
@@ -631,7 +631,7 @@ it('uploads several images at once, in the order chosen, without linking them to
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
-    $response = $this->postJson('/admin/products/images', [
+    $response = $this->postJson(route('larasell.admin.products.images.store'), [
         'images' => [
             UploadedFile::fake()->image('side.jpg'),
             UploadedFile::fake()->image('back.webp'),
@@ -643,7 +643,8 @@ it('uploads several images at once, in the order chosen, without linking them to
     // Each file is stored under a new name, but keeps its type.
     expect($images->map(fn (ProductImage $image) => pathinfo($image->file, PATHINFO_EXTENSION))->all())
         ->toBe(['jpg', 'webp'])
-        ->and(DB::table('larasell_product_product_image')->exists())->toBeFalse();
+        // Saving a product links them; uploading doesn't.
+        ->and(ProductImage::query()->has('products')->exists())->toBeFalse();
 
     $response->assertExactJson(['images' => $images->map(fn (ProductImage $image) => ['id' => $image->id, 'url' => $image->url()])->all()]);
     $images->each(fn (ProductImage $image) => Storage::disk('public')->assertExists($image->file));
@@ -661,14 +662,14 @@ it('links the submitted images to a product in their order, the first as its thu
     $valid = ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'];
 
     // Out of id order, and the existing image moves from first to second.
-    $this->put("/admin/products/{$boots->id}", [...$valid, 'images' => [(string) $back->id, (string) $front->id, (string) $side->id]])
+    $this->put(route('larasell.admin.products.update', $boots), [...$valid, 'images' => [(string) $back->id, (string) $front->id, (string) $side->id]])
         ->assertSessionHasNoErrors();
 
     expect($boots->images()->get()->modelKeys())->toBe([$back->id, $front->id, $side->id])
         ->and($boots->fresh()?->thumbnail?->id)->toBe($back->id);
 
     // The form leaves the field out when the product has no images.
-    $this->put("/admin/products/{$boots->id}", $valid)->assertSessionHasNoErrors();
+    $this->put(route('larasell.admin.products.update', $boots), $valid)->assertSessionHasNoErrors();
 
     expect($boots->images()->exists())->toBeFalse();
 });
@@ -681,7 +682,7 @@ it('links the submitted images to a new product in their order', function () {
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
     $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
 
-    $this->post('/admin/products', ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => [(string) $side->id, (string) $front->id]])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => [(string) $side->id, (string) $front->id]])
         ->assertSessionHasNoErrors();
 
     expect(Product::query()->sole()->images->modelKeys())->toBe([$side->id, $front->id]);
@@ -690,7 +691,7 @@ it('links the submitted images to a new product in their order', function () {
 it('rejects images that do not exist', function (mixed $images, string $error) {
     signInAdmin();
 
-    $this->post('/admin/products', ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => $images])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => $images])
         ->assertSessionHasErrors($error);
 
     expect(Product::query()->exists())->toBeFalse();
@@ -705,7 +706,7 @@ it('rejects uploads that are not images, and keeps every image of the request ou
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
-    $this->postJson('/admin/products/images', ['images' => $images])
+    $this->postJson(route('larasell.admin.products.images.store'), ['images' => $images])
         ->assertUnprocessable()
         ->assertJsonValidationErrors($error);
 
@@ -794,11 +795,11 @@ it('lets a product keep its own slug, but not take another one\'s', function () 
 it('does not let guests create or edit products', function () {
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
-    $this->get('/admin/products/create')->assertRedirect('/admin/login');
-    $this->post('/admin/products', ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect('/admin/login');
-    $this->get("/admin/products/{$boots->id}/edit")->assertRedirect('/admin/login');
-    $this->put("/admin/products/{$boots->id}", ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect('/admin/login');
-    $this->post('/admin/products/images', ['images' => [UploadedFile::fake()->image('front.png')]])->assertRedirect('/admin/login');
+    $this->get(route('larasell.admin.products.create'))->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
+    $this->get(route('larasell.admin.products.edit', $boots))->assertRedirect(route('larasell.admin.login'));
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.products.images.store'), ['images' => [UploadedFile::fake()->image('front.png')]])->assertRedirect(route('larasell.admin.login'));
 
     expect(Product::query()->sole()->name->get())->toBe('Boots')
         ->and(ProductImage::query()->count())->toBe(0);

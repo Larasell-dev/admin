@@ -1,5 +1,6 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import { useFormContext, useHttp } from "@inertiajs/react";
+import { cn } from "cn";
 import {
   Badge,
   Checkbox,
@@ -140,11 +141,15 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
   // One message per kind of problem, however many images have it.
   const errors = [...new Set(Object.values(upload.errors as Errors))];
 
-  // The form only notices hidden inputs change when told, e.g. to show the unsaved changes toast.
+  // Inertia's <Form> only rechecks whether it's dirty on input, change and reset events, which
+  // inputs React adds or removes don't fire. Without this, uploading wouldn't show the unsaved
+  // changes toast.
   useEffect(() => {
     grid.current?.dispatchEvent(new Event("input", { bubbles: true }));
   }, [images]);
 
+  // Cancelling the changes resets the form, which puts its fields back to their saved values but
+  // can't remove the hidden inputs of images uploaded since. Going back to the saved images does.
   useEffect(() => {
     const form = grid.current?.closest("form");
     if (!form) return;
@@ -199,7 +204,19 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
           ))}
           <li>
             {/* A label, so clicking anywhere on the square opens the file picker. */}
-            <label className="flex aspect-square cursor-pointer items-center justify-center border border-dashed border-mauve-300 text-2xl text-mauve-600 hover:bg-mauve-50 has-focus-visible:focus-ring has-disabled:cursor-default dark:border-mauve-600 dark:text-mauve-300 dark:hover:bg-mauve-800">
+            <label
+              className={cn(
+                // A square with the icon in its middle
+                "flex aspect-square items-center justify-center text-2xl",
+                "border border-dashed border-mauve-300 dark:border-mauve-600",
+                "text-mauve-600 dark:text-mauve-300",
+                // Clickable while no upload is running
+                "cursor-pointer has-disabled:cursor-default",
+                "hover:bg-mauve-50 dark:hover:bg-mauve-800",
+                // Focus is on the hidden file input inside
+                "has-focus-visible:focus-ring",
+              )}
+            >
               <input
                 type="file"
                 multiple
