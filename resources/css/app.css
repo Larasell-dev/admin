@@ -3,6 +3,8 @@
 
 @layer base {
   :root {
+    /* The height of the nav bar above the page below lg. Pages and overlays start below it. */
+    --mobile-nav-height: 3.5rem;
     color-scheme: light;
     background-color: var(--color-white);
   }

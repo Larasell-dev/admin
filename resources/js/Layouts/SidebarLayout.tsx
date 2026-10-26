@@ -14,12 +14,12 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       <div className="sticky top-0 hidden h-dvh lg:block">
         <Sidebar />
       </div>
-      {/* Fills the viewport below the 3.5rem mobile nav, so pages stack a fixed header above
+      {/* Fills the viewport below the mobile nav, so pages stack a fixed header above
           content that scrolls on its own. Pages taller than that, like the profile, scroll here. */}
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex h-[calc(100dvh-3.5rem)] min-w-0 flex-col overflow-y-auto focus:outline-none lg:h-dvh lg:flex-1"
+        className="flex h-[calc(100dvh-var(--mobile-nav-height))] min-w-0 flex-col overflow-y-auto focus:outline-none lg:h-dvh lg:flex-1"
       >
         {children}
       </main>
