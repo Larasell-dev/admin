@@ -462,7 +462,10 @@ abstract class Table implements JsonSerializable
                 }
             }
 
-            $row['_actions'] = array_map(fn (Action $action): array => $action->toRow($this, $record), $actions);
+            $row['_actions'] = array_values(array_map(
+                fn (Action $action): array => $action->toRow($this, $record),
+                array_filter($actions, fn (Action $action): bool => ! $action->isHiddenFor($record)),
+            ));
             $row['_link'] = method_exists($this, 'rowLink') ? $this->rowLink($record) : null;
             // An object, so a table without images still sends {} rather than [].
             $row['_images'] = (object) $images;

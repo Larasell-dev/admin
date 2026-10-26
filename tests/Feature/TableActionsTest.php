@@ -262,6 +262,27 @@ describe('row actions', function () {
             ->and(rowActions(1)[0]['disabled'])->toBeTrue();
     });
 
+    it('hides actions', function () {
+        withActions(fn () => [
+            Action::make('Archive', handle: fn (Book $book) => null)->hidden(),
+            Action::make('Publish', handle: fn (Book $book) => null)->hidden(false),
+            Action::make('View')->to('https://example.com')->hidden(true),
+        ]);
+
+        expect(rowActions())->toHaveCount(1)
+            ->and(rowActions()[0]['name'])->toBe('publish');
+    });
+
+    it('hides actions per record', function () {
+        withActions(fn () => [
+            Action::make('Archive', handle: fn (Book $book) => null)->hidden(fn (Book $book) => $book->title === 'Emma'),
+            Action::make('View')->to('https://example.com'),
+        ]);
+
+        expect(array_column(rowActions(0), 'name'))->toBe(['archive', 'view'])
+            ->and(array_column(rowActions(1), 'name'))->toBe(['view']);
+    });
+
     it('shows an icon given as an Icon case', function () {
         withActions(fn () => [
             Action::make('Delete', handle: fn (Book $book) => null)->icon(Icon::DeleteBin),
@@ -338,6 +359,7 @@ describe('row actions', function () {
         'confirm' => [fn (Action $action) => $action->confirm()->confirm(title: 'Sure?'), 'confirm()'],
         'destructive' => [fn (Action $action) => $action->destructive()->destructive(false), 'destructive()'],
         'disabled' => [fn (Action $action) => $action->disabled()->disabled(false), 'disabled()'],
+        'hidden' => [fn (Action $action) => $action->hidden()->hidden(false), 'hidden()'],
         'icon' => [fn (Action $action) => $action->icon(Icon::DeleteBin)->icon('delete-bin'), 'icon()'],
     ]);
 
@@ -348,6 +370,7 @@ describe('row actions', function () {
                 ->confirm()
                 ->destructive()
                 ->disabled(false)
+                ->hidden(false)
                 ->icon(Icon::DeleteBin),
         ]);
 
@@ -433,6 +456,19 @@ describe('running an action', function () {
         signIn();
 
         $this->post(actionUrl($this->emma, 'delete'))->assertForbidden();
+        $this->post(actionUrl($this->dune, 'delete'))->assertRedirect();
+
+        expect(Book::pluck('title')->all())->toBe(['Emma']);
+    });
+
+    it('refuses to run an action that is hidden for the record', function () {
+        withActions(fn () => [
+            Action::make('Delete', handle: fn (Book $book) => $book->delete())
+                ->hidden(fn (Book $book) => $book->title === 'Emma'),
+        ]);
+        signIn();
+
+        $this->post(actionUrl($this->emma, 'delete'))->assertNotFound();
         $this->post(actionUrl($this->dune, 'delete'))->assertRedirect();
 
         expect(Book::pluck('title')->all())->toBe(['Emma']);

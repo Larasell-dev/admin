@@ -22,7 +22,7 @@ class TableActionController
         abort_if($action === null || ! $action->runs(), 404);
 
         $model = $table->findRecord($record);
-        abort_if($model === null, 404);
+        abort_if($model === null || $action->isHiddenFor($model), 404);
         abort_if($action->isDisabledFor($model), 403);
 
         $expected = $action->confirmationTextFor($model);
