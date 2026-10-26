@@ -206,8 +206,9 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
             {/* A label, so clicking anywhere on the square opens the file picker. */}
             <label
               className={cn(
-                // A square with the icon in its middle
-                "flex aspect-square items-center justify-center text-2xl",
+                // A square with the icon in its middle. Relative keeps the hidden file input inside
+                // it; otherwise focusing the input scrolls the whole page to where it would be.
+                "relative flex aspect-square items-center justify-center text-2xl",
                 "border border-dashed border-mauve-300 dark:border-mauve-600",
                 "text-mauve-600 dark:text-mauve-300",
                 // Clickable while no upload is running
