@@ -1,7 +1,7 @@
 import { Link } from "@inertiajs/react";
 import { Button, Icon } from "@larasell-dev/ui";
 import { AddLine } from "@larasell-dev/ui/icons";
-import ModuleHeader from "../../Components/ModuleHeader";
+import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
@@ -9,10 +9,10 @@ type Props = Larasell.Admin.Data.View.AdminsPageData;
 
 export default function Index({ admins, createUrl }: Props) {
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] flex-col lg:h-dvh">
-      <ModuleHeader
+    <>
+      <Page.Header
         title={admins.title}
-        suffix={
+        actions={
           <Button
             size="sm"
             nativeButton={false}
@@ -26,7 +26,7 @@ export default function Index({ admins, createUrl }: Props) {
         }
       />
       <ResourceTable resource={admins} />
-    </div>
+    </>
   );
 }
 

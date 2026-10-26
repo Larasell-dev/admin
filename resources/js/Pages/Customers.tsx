@@ -3,7 +3,7 @@ import type { PaginationChange } from "@larasell-dev/ui";
 import { DataList, EmptyState, Pagination, Table } from "@larasell-dev/ui";
 import { GroupLine } from "@larasell-dev/ui/icons";
 import { useState } from "react";
-import ModuleHeader from "../Components/ModuleHeader";
+import { Page } from "../Components/Page";
 import SidebarLayout from "../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CustomersPageData;
@@ -30,8 +30,8 @@ export default function Customers({ customers }: Props) {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] flex-col lg:h-dvh">
-      <ModuleHeader title="Customers" />
+    <>
+      <Page.Header title="Customers" />
 
       {customers.total === 0 ? (
         <div className="flex flex-1 items-center justify-center px-6 py-12">
@@ -83,7 +83,7 @@ export default function Customers({ customers }: Props) {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
 

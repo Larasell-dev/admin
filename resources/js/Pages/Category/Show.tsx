@@ -1,17 +1,9 @@
 import { Form, Link } from "@inertiajs/react";
-import {
-  Button,
-  EmptyState,
-  Icon,
-  Section,
-  SectionStack,
-  useScrollMaskScrollbar,
-} from "@larasell-dev/ui";
+import { Button, EmptyState, Icon, Section, SectionStack } from "@larasell-dev/ui";
 import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
-import { useRef } from "react";
 
 import CategoryForm from "../../Components/CategoryForm";
-import ModuleHeader from "../../Components/ModuleHeader";
+import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/CategoryLayout";
@@ -23,52 +15,44 @@ type Props =
   | Larasell.Admin.Data.View.MissingCategoryPageData;
 
 export default function Show(props: Props) {
-  const contentScroll = useRef<HTMLDivElement>(null);
-  useScrollMaskScrollbar(contentScroll);
-
   return (
     <>
-      <ModuleHeader
+      <Page.Header
         title={props.category?.name ?? "Category not found"}
-        suffix={props.categories.length > 0 && <CategoryTreeTrigger />}
+        actions={props.categories.length > 0 && <CategoryTreeTrigger />}
       />
       {props.category === null ? (
         <CategoryNotFound {...props} />
       ) : (
-        <div
-          ref={contentScroll}
-          className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto px-6 py-6"
-        >
-          <div className="max-w-2xl">
-            <SectionStack>
-              <Form
-                // Inertia keeps this page mounted when moving between categories, and the tree's
-                // menu can hide or unhide this one; remounting resets the fields to the new values.
-                key={`${props.category.id}-${props.category.visible}`}
-                action={props.updateUrl}
-                method="put"
-                // The saved values become the new baseline, so the form is no longer dirty.
-                setDefaultsOnSuccess
-              >
-                <Section.Root>
-                  <Section.Header
-                    title="General"
-                    description="How the category is named and found in the store."
-                  />
-                  <CategoryForm category={props.category} />
-                </Section.Root>
-                <UnsavedChangesToast container={contentScroll} />
-              </Form>
-              <ProductsTable
-                mode="edit"
-                table={props.products}
-                availableProductsUrl={props.availableProductsUrl}
-                addProductUrl={props.addProductUrl}
-                createProductUrl={props.createProductUrl}
-              />
-            </SectionStack>
-          </div>
-        </div>
+        <Page.Body>
+          <SectionStack>
+            <Form
+              // Inertia keeps this page mounted when moving between categories, and the tree's
+              // menu can hide or unhide this one; remounting resets the fields to the new values.
+              key={`${props.category.id}-${props.category.visible}`}
+              action={props.updateUrl}
+              method="put"
+              // The saved values become the new baseline, so the form is no longer dirty.
+              setDefaultsOnSuccess
+            >
+              <Section.Root>
+                <Section.Header
+                  title="General"
+                  description="How the category is named and found in the store."
+                />
+                <CategoryForm category={props.category} />
+              </Section.Root>
+              <UnsavedChangesToast />
+            </Form>
+            <ProductsTable
+              mode="edit"
+              table={props.products}
+              availableProductsUrl={props.availableProductsUrl}
+              addProductUrl={props.addProductUrl}
+              createProductUrl={props.createProductUrl}
+            />
+          </SectionStack>
+        </Page.Body>
       )}
     </>
   );
