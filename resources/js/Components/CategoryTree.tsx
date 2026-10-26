@@ -10,12 +10,10 @@ import {
   FolderOpenLine,
   More2Fill,
 } from "@larasell-dev/ui/icons";
-import { defaultPreset, Feedback, PointerActivationConstraints } from "@dnd-kit/dom";
 import {
   type DragEndEvent,
   DragDropProvider,
   type DragOverEvent,
-  PointerSensor,
   useDraggable,
   useDroppable,
 } from "@dnd-kit/react";
@@ -31,6 +29,7 @@ import {
   useState,
 } from "react";
 import type { TableRowAction } from "../types";
+import { plugins, sensors } from "../utils/dragAndDrop";
 import { overlayExclusive } from "../utils/hotkeys";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 import Tree, { TreeItem } from "./Tree";
@@ -87,23 +86,6 @@ function withMoved(categories: Category[], id: number, parentId: number | null):
 
 // The root drop zone, below the categories' rows, which it loses to when they overlap.
 const ROOT = "root";
-
-// A mouse drags once it moved a little, so a click still follows the link. Touch waits
-// for a long press, so a swipe still scrolls.
-const sensors = [
-  PointerSensor.configure({
-    activationConstraints: (event) =>
-      event.pointerType === "mouse"
-        ? [new PointerActivationConstraints.Distance({ value: 5 })]
-        : [new PointerActivationConstraints.Delay({ value: 250, tolerance: 5 })],
-  }),
-];
-
-// A dropped row jumps straight to its new place instead of animating back to its old one.
-const plugins = (defaults: typeof defaultPreset.plugins) =>
-  defaults.map((plugin) =>
-    plugin === Feedback ? Feedback.configure({ dropAnimation: null }) : plugin,
-  );
 
 /**
  * The store's categories as a tree of links to their pages. It starts closed, except
