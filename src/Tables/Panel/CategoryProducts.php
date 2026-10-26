@@ -47,7 +47,7 @@ class CategoryProducts extends Table
     public function actions(): array
     {
         return [
-            Action::make('View product')
+            Action::make('View')
                 ->route('larasell.admin.products.edit')
                 ->icon(Icon::Eye)
                 ->hidden(! config('larasell.admin.products.enabled')),
