@@ -5,7 +5,10 @@ namespace Larasell\Admin\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
+use InvalidArgumentException;
+use Larasell\Admin\Rules\Barcode;
 use Larasell\Admin\Rules\Slug;
+use Larasell\Larasell\Barcode as LarasellBarcode;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
@@ -46,7 +49,27 @@ class ProductRequest extends FormRequest
             'dimensions.width' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.height'],
             'dimensions.height' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.width'],
             'dimensions.unit' => ['required_with:dimensions.length,dimensions.width,dimensions.height', Rule::enum(LengthUnit::class)],
+            // Optional, but each identifies one product, so no other product may have it.
+            'sku' => ['nullable', 'string', 'max:255', Rule::unique(Product::class)->ignore($this->route('product'))],
+            'barcode' => ['nullable', 'string', new Barcode, Rule::unique(Product::class)->ignore($this->route('product'))],
         ];
+    }
+
+    /**
+     * Reduces a valid barcode to its digits, so it's compared and saved the way the library
+     * writes it, whatever spaces or dashes it was entered with.
+     */
+    protected function prepareForValidation(): void
+    {
+        $barcode = $this->input('barcode');
+
+        try {
+            if (is_string($barcode) && $barcode !== '') {
+                $this->merge(['barcode' => LarasellBarcode::of($barcode)->value()]);
+            }
+        } catch (InvalidArgumentException) {
+            // Left as entered for the Barcode rule to explain.
+        }
     }
 
     /**

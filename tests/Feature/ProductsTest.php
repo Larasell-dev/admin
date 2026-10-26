@@ -135,7 +135,7 @@ it('shows the product\'s values to edit on its page', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Edit')
-            ->where('product', ['id' => $boots->id, 'name' => 'Boots', 'slug' => 'boots', 'visible' => false, 'weight' => null, 'dimensions' => null])
+            ->where('product', ['id' => $boots->id, 'name' => 'Boots', 'slug' => 'boots', 'visible' => false, 'weight' => null, 'dimensions' => null, 'sku' => null, 'barcode' => null])
             ->where('updateUrl', url("/admin/products/{$boots->id}"))
             ->where('indexUrl', url('/admin/products')));
 });
@@ -282,6 +282,93 @@ it('explains invalid weights and dimensions in words, not field paths', function
         'dimensions.height' => 'Enter a height too, or leave length, width and height empty.',
     ]);
 });
+
+it('shows the product\'s SKU and barcode on its page', function () {
+    signInAdmin();
+
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
+
+    $this->get("/admin/products/{$boots->id}/edit")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('product.sku', 'BOOT-42')
+            ->where('product.barcode', '4006381333931'));
+});
+
+it('saves the SKU as entered and the barcode as its digits', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', [
+        'name' => 'Boots',
+        'slug' => 'boots',
+        'status' => 'visible',
+        'sku' => 'Boot/42-black',
+        'barcode' => '400-6381 333931',
+    ])->assertSessionHasNoErrors();
+
+    $boots = Product::query()->sole();
+
+    expect($boots->sku)->toBe('Boot/42-black')
+        ->and($boots->barcode)->toBe('4006381333931');
+});
+
+it('saves no SKU or barcode when they are left empty', function () {
+    signInAdmin();
+
+    $this->post('/admin/products', ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'sku' => '', 'barcode' => ''])
+        ->assertSessionHasNoErrors();
+
+    $boots = Product::query()->sole();
+
+    expect($boots->sku)->toBeNull()
+        ->and($boots->barcode)->toBeNull();
+});
+
+it('changes and removes the SKU and barcode, and keeps them when they are unchanged', function () {
+    signInAdmin();
+
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
+    $update = fn (array $input) => $this->put("/admin/products/{$boots->id}", ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', ...$input]);
+
+    // Its own SKU and barcode aren't taken by another product.
+    $update(['sku' => 'BOOT-42', 'barcode' => '4006381333931'])->assertSessionHasNoErrors();
+    $update(['sku' => 'BOOT-43', 'barcode' => '012345678905'])->assertSessionHasNoErrors();
+    expect($boots->refresh()->sku)->toBe('BOOT-43')
+        ->and($boots->barcode)->toBe('012345678905');
+
+    $update(['sku' => '', 'barcode' => ''])->assertSessionHasNoErrors();
+    expect($boots->refresh()->sku)->toBeNull()
+        ->and($boots->barcode)->toBeNull();
+});
+
+it('rejects an invalid or taken SKU or barcode', function (array $input, string $error) {
+    signInAdmin();
+
+    Product::create(['slug' => 'shirt', 'name' => 'Shirt', 'price' => Price::of(1000), 'sku' => 'SHIRT-1', 'barcode' => '4006381333931']);
+
+    $this->post('/admin/products', ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', ...$input])
+        ->assertSessionHasErrors($error);
+
+    expect(Product::query()->count())->toBe(1);
+})->with([
+    'SKU of another product' => [['sku' => 'SHIRT-1'], 'sku'],
+    'SKU over 255 characters' => [['sku' => str_repeat('a', 256)], 'sku'],
+    'barcode of another product' => [['barcode' => '4006381333931'], 'barcode'],
+    'barcode of another product, written with dashes' => [['barcode' => '400-6381-333931'], 'barcode'],
+    'barcode with letters' => [['barcode' => '40063813339A1'], 'barcode'],
+    'barcode of the wrong length' => [['barcode' => '1234567890'], 'barcode'],
+    'barcode with a wrong check digit' => [['barcode' => '4006381333932'], 'barcode'],
+]);
+
+it('explains why a barcode is invalid', function (string $barcode, string $message) {
+    signInAdmin();
+
+    $this->post('/admin/products', ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'barcode' => $barcode])
+        ->assertSessionHasErrors(['barcode' => $message]);
+})->with([
+    'letters' => ['40063813339A1', 'A barcode must contain only digits.'],
+    'wrong length' => ['1234567890', 'A barcode must be an EAN-8, UPC-A, EAN-13, or GTIN-14.'],
+    'wrong check digit' => ['4006381333932', 'A barcode must have a valid check digit.'],
+]);
 
 it('returns 404 for editing a product that does not exist', function () {
     signInAdmin();

@@ -29,7 +29,15 @@ function renderForm(product?: Product) {
   );
 }
 
-const boots = { name: "Boots", slug: "boots", visible: true, weight: null, dimensions: null };
+const boots = {
+  name: "Boots",
+  slug: "boots",
+  visible: true,
+  weight: null,
+  dimensions: null,
+  sku: null,
+  barcode: null,
+};
 
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
 const slugInput = () => page.getByRole("textbox", { name: "Slug" });
@@ -123,5 +131,25 @@ describe("weight and dimensions", () => {
     const form = new FormData(page.getByTestId("form").element() as HTMLFormElement);
     expect(form.getAll("dimensions[unit]")).toEqual(["in"]);
     await expect.element(axis("Length")).toHaveValue("50");
+  });
+});
+
+const sku = () => page.getByRole("textbox", { name: "SKU" });
+const barcode = () => page.getByRole("textbox", { name: "Barcode" });
+
+describe("SKU and barcode", () => {
+  it("starts a new product without them", async () => {
+    await renderForm();
+
+    await expect.element(sku()).toHaveValue("");
+    await expect.element(barcode()).toHaveValue("");
+    expect(submitted()).toMatchObject({ sku: "", barcode: "" });
+  });
+
+  it("shows an existing product's SKU and barcode", async () => {
+    await renderForm({ ...boots, sku: "BOOT-42", barcode: "4006381333931" });
+
+    await expect.element(sku()).toHaveValue("BOOT-42");
+    await expect.element(barcode()).toHaveValue("4006381333931");
   });
 });

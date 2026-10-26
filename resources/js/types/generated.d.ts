@@ -118,6 +118,8 @@ declare namespace Larasell.Admin.Data.ViewModel {
     visible: boolean;
     weight: Larasell.Admin.Data.ViewModel.WeightData | null;
     dimensions: Larasell.Admin.Data.ViewModel.DimensionsData | null;
+    sku: string | null;
+    barcode: string | null;
   };
   export type WeightData = {
     amount: string;

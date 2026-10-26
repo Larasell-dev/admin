@@ -33,6 +33,13 @@ export default function ProductForm({ product }: { product?: Product }) {
         />
         <WeightAndDimensionsFields product={product} errors={errors} />
       </Section.Root>
+      <Section.Root>
+        <Section.Header
+          title="SKU and barcode"
+          description="Identify the product in your inventory and when it's scanned. Each belongs to one product only."
+        />
+        <IdentifierFields product={product} errors={errors} />
+      </Section.Root>
     </SectionStack>
   );
 }
@@ -63,6 +70,23 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
 
       <VisibilityField defaultVisible={product?.visible ?? true} error={errors.status} />
     </Stack>
+  );
+}
+
+/** Both optional; the barcode is saved as its digits, without spaces or dashes. */
+function IdentifierFields({ product, errors }: { product?: Product; errors: Errors }) {
+  return (
+    <div className="@container">
+      <div className="grid items-start gap-5 @md:grid-cols-2">
+        <Field label="SKU" name="sku" error={errors.sku}>
+          <Input defaultValue={product?.sku ?? ""} autoComplete="off" spellCheck={false} />
+        </Field>
+
+        <Field label="Barcode" name="barcode" error={errors.barcode}>
+          <Input defaultValue={product?.barcode ?? ""} autoComplete="off" spellCheck={false} />
+        </Field>
+      </div>
+    </div>
   );
 }
 
