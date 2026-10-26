@@ -71,7 +71,6 @@ class CategoryController
             products: CategoryProducts::make($category),
             availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
             addProductUrl: route('larasell.admin.categories.products.store', $category),
-            // Once the store has products, the page offers to add one of them instead.
             createProductUrl: Product::query()->exists() ? null : $this->createProductUrl(),
         ))->toResponse($request);
     }
@@ -154,11 +153,11 @@ class CategoryController
     }
 
     /**
-     * Where a product is created, or null while the products module and its routes are turned off.
+     * Where a product is created, or null while the products are turned off in the config.
      */
     protected function createProductUrl(): ?string
     {
-        return Route::has('larasell.admin.products.create') ? route('larasell.admin.products.create') : null;
+        return config('larasell.admin.products.enabled') ? route('larasell.admin.products.create') : null;
     }
 
     /**
