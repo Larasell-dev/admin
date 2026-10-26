@@ -164,6 +164,19 @@ describe.each([
     await expect.element(trigger).toHaveFocus();
   });
 
+  it("leaves out the actions menu on rows without actions", async () => {
+    const screen = await render(
+      <ResourceTable
+        resource={resource([row(1, "Dune", null, [archive]), row(2, "Emma", null)])}
+      />,
+    );
+
+    await expect.element(screen.getByRole("button", { name: "Actions for Dune" })).toBeVisible();
+    await expect
+      .element(screen.getByRole("button", { name: "Actions for Emma" }))
+      .not.toBeInTheDocument();
+  });
+
   it("opens a row's actions from the keyboard", async () => {
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", null, [archive])])} />,

@@ -103,28 +103,30 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
       value
     );
 
-  const actionsMenu = (row: TableRow) => (
-    <Table.Actions>
-      <Table.ActionsTrigger
-        aria-label={`Actions for ${primary ? cell(row, primary.name) : row.id}`}
-      />
-      <Table.ActionsPopup>
-        <HotkeysProvider scope="row-actions-menu" exclusive={overlayExclusive}>
-          {row._actions.map((action) => (
-            <Table.ActionsItem
-              key={action.name}
-              variant={action.destructive ? "destructive" : "default"}
-              disabled={action.disabled}
-              icon={action.icon ? navigationIcon(action.icon, false) : undefined}
-              onClick={() => choose(action)}
-            >
-              {action.label}
-            </Table.ActionsItem>
-          ))}
-        </HotkeysProvider>
-      </Table.ActionsPopup>
-    </Table.Actions>
-  );
+  // Rows whose actions are all hidden get no menu; the table keeps the column for the other rows.
+  const actionsMenu = (row: TableRow) =>
+    row._actions.length > 0 && (
+      <Table.Actions>
+        <Table.ActionsTrigger
+          aria-label={`Actions for ${primary ? cell(row, primary.name) : row.id}`}
+        />
+        <Table.ActionsPopup>
+          <HotkeysProvider scope="row-actions-menu" exclusive={overlayExclusive}>
+            {row._actions.map((action) => (
+              <Table.ActionsItem
+                key={action.name}
+                variant={action.destructive ? "destructive" : "default"}
+                disabled={action.disabled}
+                icon={action.icon ? navigationIcon(action.icon, false) : undefined}
+                onClick={() => choose(action)}
+              >
+                {action.label}
+              </Table.ActionsItem>
+            ))}
+          </HotkeysProvider>
+        </Table.ActionsPopup>
+      </Table.Actions>
+    );
 
   return (
     <>
@@ -139,7 +141,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
                       {linked(row, DataList.Link, value(row, primary))}
                     </DataList.Title>
                   )}
-                  {hasActions && actionsMenu(row)}
+                  {actionsMenu(row)}
                 </div>
                 {rest.map((column) => (
                   <DataList.Field key={column.name} label={column.label}>

@@ -180,41 +180,43 @@ export default function ProductsTable(props: Props) {
                     ))}
                     {hasActions && (
                       <td className="px-1.5 py-1.5 text-right">
-                        <Menu.Root>
-                          <Menu.Trigger
-                            render={
-                              <IconButton
-                                variant="tertiary"
-                                size="sm"
-                                aria-label={`Actions for ${String(row[table!.columns[0]?.name ?? "id"] as string | number | null)}`}
-                              >
-                                <Icon icon={More2Fill} />
-                              </IconButton>
-                            }
-                          />
-                          <Menu.Popup>
-                            <HotkeysProvider
-                              scope="product-actions-menu"
-                              exclusive={overlayExclusive}
-                            >
-                              {row._actions.map((action) => (
-                                <Menu.Item
-                                  key={action.name}
-                                  variant={action.destructive ? "destructive" : "default"}
-                                  disabled={action.disabled}
-                                  icon={
-                                    action.icon ? navigationIcon(action.icon, false) : undefined
-                                  }
-                                  {...(action.method === "get" && !action.confirm
-                                    ? { render: <Link href={action.url} prefetch="hover" /> }
-                                    : { onClick: () => choose(action) })}
+                        {row._actions.length > 0 && (
+                          <Menu.Root>
+                            <Menu.Trigger
+                              render={
+                                <IconButton
+                                  variant="tertiary"
+                                  size="sm"
+                                  aria-label={`Actions for ${String(row[table!.columns[0]?.name ?? "id"] as string | number | null)}`}
                                 >
-                                  {action.label}
-                                </Menu.Item>
-                              ))}
-                            </HotkeysProvider>
-                          </Menu.Popup>
-                        </Menu.Root>
+                                  <Icon icon={More2Fill} />
+                                </IconButton>
+                              }
+                            />
+                            <Menu.Popup>
+                              <HotkeysProvider
+                                scope="product-actions-menu"
+                                exclusive={overlayExclusive}
+                              >
+                                {row._actions.map((action) => (
+                                  <Menu.Item
+                                    key={action.name}
+                                    variant={action.destructive ? "destructive" : "default"}
+                                    disabled={action.disabled}
+                                    icon={
+                                      action.icon ? navigationIcon(action.icon, false) : undefined
+                                    }
+                                    {...(action.method === "get" && !action.confirm
+                                      ? { render: <Link href={action.url} prefetch="hover" /> }
+                                      : { onClick: () => choose(action) })}
+                                  >
+                                    {action.label}
+                                  </Menu.Item>
+                                ))}
+                              </HotkeysProvider>
+                            </Menu.Popup>
+                          </Menu.Root>
+                        )}
                       </td>
                     )}
                   </tr>
