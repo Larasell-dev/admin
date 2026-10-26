@@ -17,7 +17,7 @@ export default function Edit({ product, updateUrl, indexUrl }: Props) {
       <ModuleHeader title={product.name} backLink={{ href: indexUrl, label: "Back to products" }} />
       <div
         ref={contentScroll}
-        className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto px-6 py-6"
+        className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto px-6 pt-6 pb-28"
       >
         <div className="max-w-2xl">
           <Form
