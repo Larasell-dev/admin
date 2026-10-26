@@ -484,6 +484,59 @@ describe("images", () => {
     await expect.element(addImages()).toBeEnabled();
   });
 
+  it("removes an image from its menu, to be unlinked when saved, and puts it back on cancel", async () => {
+    await renderForm({
+      ...boots,
+      images: [
+        { id: 7, url: swatch("red") },
+        { id: 3, url: swatch("blue") },
+        { id: 5, url: swatch("green") },
+      ],
+    });
+
+    await page.getByRole("button", { name: "Actions for image 1" }).click();
+    await page.getByRole("menuitem", { name: "Remove" }).click();
+
+    // No confirmation: the unsaved changes toast is the way back.
+    await expect.poll(gridImages).toEqual([swatch("blue"), swatch("green")]);
+    expect(formData().getAll("images[]")).toEqual(["3", "5"]);
+    // The next image becomes the thumbnail.
+    await expect.element(imageGrid().getByRole("listitem").first()).toHaveTextContent("Thumbnail");
+    await expect.element(toast()).toBeVisible();
+
+    // The menus follow the images' new positions.
+    await page.getByRole("button", { name: "Actions for image 2" }).click();
+    await page.getByRole("menuitem", { name: "Remove" }).click();
+
+    await expect.poll(gridImages).toEqual([swatch("blue")]);
+    expect(formData().getAll("images[]")).toEqual(["3"]);
+
+    await toast().getByRole("button", { name: "Cancel" }).click();
+
+    await expect.element(toast()).not.toBeInTheDocument();
+    expect(gridImages()).toEqual([swatch("red"), swatch("blue"), swatch("green")]);
+    expect(formData().getAll("images[]")).toEqual(["7", "3", "5"]);
+  });
+
+  // Cancelling then leaves the remaining images' inputs as they were, which Inertia's reset alone
+  // doesn't count as a change.
+  it.each([
+    ["the last image", [7, 3, 5]],
+    ["the only image", [7]],
+  ])("puts %s back when the removal is cancelled", async (_, ids) => {
+    const colors = ["red", "blue", "green"];
+    await renderForm({ ...boots, images: ids.map((id, i) => ({ id, url: swatch(colors[i]) })) });
+    await page.getByRole("button", { name: `Actions for image ${ids.length}` }).click();
+    await page.getByRole("menuitem", { name: "Remove" }).click();
+    await expect.element(toast()).toBeVisible();
+
+    await toast().getByRole("button", { name: "Cancel" }).click();
+
+    await expect.element(toast()).not.toBeInTheDocument();
+    expect(formData().getAll("images[]")).toEqual(ids.map(String));
+    expect(gridImages()).toHaveLength(ids.length);
+  });
+
   it("drops the uploaded images when the changes are cancelled", async () => {
     fakeUploads(201, { images: [{ id: 8, url: swatch("green") }] });
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
