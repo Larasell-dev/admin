@@ -22,7 +22,10 @@ class TableActionController
         abort_if($action === null || ! $action->runs(), 404);
 
         $model = $table->findRecord($record);
-        abort_if($model === null || $action->isHiddenFor($model), 404);
+        abort_if($model === null, 404);
+        // A hidden action answers 404 like an unknown one, so the response doesn't reveal it exists
+        // for this record. Checked before disabled, whose 403 would.
+        abort_if($action->isHiddenFor($model), 404);
         abort_if($action->isDisabledFor($model), 403);
 
         $expected = $action->confirmationTextFor($model);

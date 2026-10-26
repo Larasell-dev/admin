@@ -474,6 +474,17 @@ describe('running an action', function () {
         expect(Book::pluck('title')->all())->toBe(['Emma']);
     });
 
+    it('answers 404, not 403, for an action that is both hidden and disabled', function () {
+        withActions(fn () => [
+            Action::make('Delete', handle: fn (Book $book) => $book->delete())->hidden()->disabled(),
+        ]);
+        signIn();
+
+        $this->post(actionUrl($this->emma, 'delete'))->assertNotFound();
+
+        expect(Book::count())->toBe(2);
+    });
+
     it('only runs on records matched by the query returned from model()', function () {
         withActions(fn () => [Action::make('Delete', handle: fn (Book $book) => $book->delete())]);
         signIn();

@@ -107,7 +107,10 @@ class Action
 
     /**
      * Hide the action, for every row or for the rows where the closure returns true.
-     * Hidden actions are left out of the row and cannot be run on it.
+     * Hidden actions are left out of the row, and a handler action cannot be run on it.
+     *
+     * This is not authorization for links: hiding a to() or route() action only removes
+     * it from the menu, its URL still answers. Guard that route itself.
      */
     public function hidden(bool|Closure $condition = true): static
     {

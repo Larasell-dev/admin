@@ -72,3 +72,35 @@ it("leaves out the link when the products are turned off", async () => {
   await expect.element(page.getByText("No products yet")).toBeVisible();
   await expect.element(createLink()).not.toBeInTheDocument();
 });
+
+it("leaves out the actions menu on rows without actions", async () => {
+  const remove = {
+    name: "remove",
+    label: "Remove",
+    method: "post",
+    url: "/admin/tables/category-products/1/actions/remove",
+    confirm: null,
+    destructive: true,
+    disabled: false,
+    icon: null,
+  } as const;
+  const row = (id: number, name: string, actions: (typeof remove)[]) => ({
+    id,
+    name,
+    _actions: actions,
+    _link: null,
+    _variants: {},
+  });
+  const table = {
+    ...emptyTable,
+    rows: [row(1, "Shoes", [remove]), row(2, "Socks", [])],
+    pagination: { page: 1, pageSize: 25, total: 2 },
+  };
+
+  await renderTable({ ...editProps, table, createProductUrl: null });
+
+  await expect.element(page.getByRole("button", { name: "Actions for Shoes" })).toBeVisible();
+  await expect
+    .element(page.getByRole("button", { name: "Actions for Socks" }))
+    .not.toBeInTheDocument();
+});
