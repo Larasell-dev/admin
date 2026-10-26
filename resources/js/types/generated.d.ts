@@ -30,6 +30,8 @@ declare namespace Larasell.Admin.Data.View {
   export type CreateProductPageData = {
     storeUrl: string;
     indexUrl: string;
+    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    createCategoryUrl: string;
   };
   export type CustomersPageData = {
     customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
@@ -43,6 +45,8 @@ declare namespace Larasell.Admin.Data.View {
     product: Larasell.Admin.Data.ViewModel.ProductDetailData;
     updateUrl: string;
     indexUrl: string;
+    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    createCategoryUrl: string;
   };
   export type HomePageData = {
     admin: Larasell.Admin.Data.ViewModel.AdminData;
@@ -124,6 +128,7 @@ declare namespace Larasell.Admin.Data.ViewModel {
     allowBackorders: boolean;
     minQuantity: number | null;
     maxQuantity: number | null;
+    categoryIds: Array<number>;
   };
   export type WeightData = {
     amount: string;

@@ -15,17 +15,29 @@ import { type ChangeEventHandler, type Ref, useRef } from "react";
 import { slugify } from "../utils/slugify";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
+import CategoryCheckboxTree from "./CategoryCheckboxTree";
 import FormCheckbox from "./FormCheckbox";
 import VisibilityField from "./VisibilityField";
 
 type Product = Omit<Larasell.Admin.Data.ViewModel.ProductDetailData, "id">;
+type Category = Larasell.Admin.Data.ViewModel.CategoryData;
 type Errors = Record<string, string | undefined>;
 
 /**
  * The sections of a product's fields. It must sit inside an Inertia `<Form>`, which submits them
- * and provides their errors; without a product it starts empty and visible.
+ * and provides their errors; without a product it starts empty, visible and in no category.
  */
-export default function ProductForm({ product }: { product?: Product }) {
+export default function ProductForm({
+  product,
+  categories,
+  createCategoryUrl,
+}: {
+  product?: Product;
+  /** The store's categories to pick the product's from. */
+  categories: Category[];
+  /** Where the store's first categories are created, offered while it has none. */
+  createCategoryUrl: string;
+}) {
   const errors: Errors = useFormContext()?.errors ?? {};
 
   return (
@@ -36,6 +48,17 @@ export default function ProductForm({ product }: { product?: Product }) {
           description="How the product is named and found in the store."
         />
         <GeneralFields product={product} errors={errors} />
+      </Section.Root>
+      <Section.Root>
+        <Section.Header
+          title="Categories"
+          description="Where the product is listed in the store."
+        />
+        <CategoryCheckboxTree
+          categories={categories}
+          defaultSelectedIds={product?.categoryIds ?? []}
+          createUrl={createCategoryUrl}
+        />
       </Section.Root>
       <Section.Root>
         <Section.Header

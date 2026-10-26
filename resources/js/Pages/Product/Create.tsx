@@ -8,7 +8,7 @@ import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CreateProductPageData;
 
-export default function Create({ storeUrl, indexUrl }: Props) {
+export default function Create({ storeUrl, indexUrl, categories, createCategoryUrl }: Props) {
   const contentScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(contentScroll);
 
@@ -36,7 +36,7 @@ export default function Create({ storeUrl, indexUrl }: Props) {
       >
         <div className="max-w-2xl">
           <Form action={storeUrl} method="post">
-            <ProductForm />
+            <ProductForm categories={categories} createCategoryUrl={createCategoryUrl} />
             <UnsavedChangesToast container={contentScroll} />
           </Form>
         </div>

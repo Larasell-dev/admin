@@ -148,6 +148,7 @@ it('shows the product\'s values to edit on its page', function () {
                 'allowBackorders' => true,
                 'minQuantity' => null,
                 'maxQuantity' => null,
+                'categoryIds' => [],
             ])
             ->where('updateUrl', url("/admin/products/{$boots->id}"))
             ->where('indexUrl', url('/admin/products')));
@@ -503,6 +504,102 @@ it('rejects an invalid stock, backorders or quantity limit', function (array $in
     'maximum quantity of zero' => [['max_quantity' => '0'], 'max_quantity'],
     'minimum quantity with decimals' => [['min_quantity' => '2.5'], 'min_quantity'],
     'maximum below the minimum' => [['min_quantity' => '10', 'max_quantity' => '7'], 'max_quantity'],
+]);
+
+it('offers the store\'s categories as a tree when adding or editing a product', function () {
+    signInAdmin();
+
+    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
+    $shirts = Category::create(['name' => 'Shirts', 'slug' => 'shirts', 'parent_id' => $clothing->id]);
+    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+
+    $tree = fn (AssertableInertia $page) => $page
+        ->has('categories', 2)
+        ->where('categories.0.id', $clothing->id)
+        ->where('categories.0.name', 'Clothing')
+        ->where('categories.0.children.0.id', $shirts->id)
+        ->where('categories.0.children.0.name', 'Shirts')
+        ->where('categories.1.id', $shoes->id);
+
+    $this->get('/admin/products/create')->assertInertia($tree);
+    $this->get("/admin/products/{$boots->id}/edit")->assertInertia($tree);
+});
+
+it('links to creating a category from adding or editing a product', function () {
+    signInAdmin();
+
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $link = fn (AssertableInertia $page) => $page->where('createCategoryUrl', url('/admin/categories/create'));
+
+    $this->get('/admin/products/create')->assertInertia($link);
+    $this->get("/admin/products/{$boots->id}/edit")->assertInertia($link);
+});
+
+it('shows the categories a product is in on its page', function () {
+    signInAdmin();
+
+    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
+    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
+    Category::create(['name' => 'Socks', 'slug' => 'socks']);
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots->categories()->attach([$shoes->id, $clothing->id]);
+
+    $this->get("/admin/products/{$boots->id}/edit")
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('product.categoryIds', [$clothing->id, $shoes->id]));
+});
+
+it('adds a new product to the selected categories', function () {
+    signInAdmin();
+
+    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
+    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
+    Category::create(['name' => 'Socks', 'slug' => 'socks']);
+
+    $this->post('/admin/products', [
+        'name' => 'Boots',
+        'slug' => 'boots',
+        'status' => 'visible',
+        'categories' => [(string) $clothing->id, (string) $shoes->id],
+    ])->assertSessionHasNoErrors();
+
+    expect(Product::query()->sole()->categories->modelKeys())
+        ->toBe([$clothing->id, $shoes->id]);
+});
+
+it('moves a product into the selected categories, and out of all when none are selected', function () {
+    signInAdmin();
+
+    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
+    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots->categories()->attach($clothing);
+    $valid = ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'];
+
+    $this->put("/admin/products/{$boots->id}", [...$valid, 'categories' => [(string) $shoes->id]])
+        ->assertSessionHasNoErrors();
+
+    expect($boots->categories()->get()->modelKeys())->toBe([$shoes->id]);
+
+    // The form leaves the field out when no category is selected.
+    $this->put("/admin/products/{$boots->id}", $valid)->assertSessionHasNoErrors();
+
+    expect($boots->categories()->exists())->toBeFalse()
+        ->and(Category::query()->count())->toBe(2);
+});
+
+it('rejects categories that do not exist', function (mixed $categories, string $error) {
+    signInAdmin();
+
+    $this->post('/admin/products', ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'categories' => $categories])
+        ->assertSessionHasErrors($error);
+
+    expect(Product::query()->exists())->toBeFalse();
+})->with([
+    'not a list' => ['shoes', 'categories'],
+    'missing category' => [['999'], 'categories.0'],
+    'not an id' => [['shoes'], 'categories.0'],
 ]);
 
 it('returns 404 for editing a product that does not exist', function () {
