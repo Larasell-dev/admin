@@ -1,5 +1,5 @@
 import "../../css/app.css";
-import { App, Form, http } from "@inertiajs/react";
+import { App, Form, http, usePage } from "@inertiajs/react";
 import type { ComponentProps } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -10,35 +10,57 @@ import UnsavedChangesToast, { UnsavedChangesToastHost } from "./UnsavedChangesTo
 type Product = ComponentProps<typeof ProductForm>["product"];
 type Category = ComponentProps<typeof ProductForm>["categories"][number];
 
+type FormPageProps = { product?: Product; categories: Category[] };
+
+/**
+ * The page the tests render. It takes the product and categories from the page's props, since
+ * Inertia's router keeps resolving the component of the file's first test after a visit.
+ */
+function FormPage() {
+  const { product, categories } = usePage<FormPageProps>().props;
+
+  return (
+    <>
+      <Form action="/admin/products" method="post" data-testid="form">
+        <ProductForm
+          product={product}
+          categories={categories}
+          createCategoryUrl="/admin/categories/create"
+          uploadImagesUrl="/admin/products/images"
+        />
+        <UnsavedChangesToast />
+      </Form>
+      {/* SidebarLayout renders the host in the panel. */}
+      <UnsavedChangesToastHost />
+    </>
+  );
+}
+
+/** The current test's page, which saving the form answers with again. */
+let formPage: { component: string; url: string; version: null; props: FormPageProps };
+
 /** Renders the form for the product, or for a new one without it, with the store's categories. */
 function renderForm(product?: Product, categories: Category[] = []) {
-  function FormPage() {
-    return (
-      <>
-        <Form action="/admin/products" method="post" data-testid="form">
-          <ProductForm
-            product={product}
-            categories={categories}
-            createCategoryUrl="/admin/categories/create"
-            uploadImagesUrl="/admin/products/images"
-          />
-          <UnsavedChangesToast />
-        </Form>
-        {/* SidebarLayout renders the host in the panel. */}
-        <UnsavedChangesToastHost />
-      </>
-    );
-  }
-
-  const initialPage = { component: "FormPage", url: "/admin/products", version: null, props: {} };
+  formPage = {
+    component: "FormPage",
+    url: "/admin/products",
+    version: null,
+    props: { product, categories },
+  };
 
   return render(
     <App
-      initialPage={initialPage as never}
+      initialPage={formPage as never}
       initialComponent={FormPage}
       resolveComponent={() => FormPage}
     />,
   );
+}
+
+/** Answers saving the form with its page again, with the errors, as Laravel does when it's invalid. */
+function savedPage(errors: Record<string, string> = {}) {
+  const page = { ...formPage, props: { ...formPage.props, errors } };
+  return { status: 200, data: JSON.stringify(page), headers: { "x-inertia": "true" } };
 }
 
 const boots = {
@@ -394,23 +416,42 @@ const gridImages = () =>
 const addImages = () => page.getByLabelText("Add images");
 /** The cards of images still uploading, named after their files. */
 const uploadingCards = () => imageGrid().getByRole("status");
+type HttpResponse = { status: number; data: string; headers: Record<string, string> };
+
 /**
- * Answers every image upload with the status and body instead of sending it to a server, and
- * returns the uploads it answered: where each went and the names of the files it sent. A promised
- * body holds the answer until it resolves.
+ * Answers the image uploads in turn, each with the next status and body, instead of sending them to
+ * a server, and returns the uploads it answered: where each went, the names of the files it sent,
+ * and the signal that aborts it. A promised body holds the answer until it resolves; aborting the
+ * upload rejects it, like the browser does. Any other request, like saving the form, gets the page
+ * back.
  */
-function fakeUploads(status: number, body: unknown) {
-  const uploads: { url: string; files: string[] }[] = [];
+function fakeUploads(...answers: [status: number, body: unknown][]) {
+  const uploads: { url: string; files: string[]; signal?: AbortSignal }[] = [];
   vi.spyOn(http, "getClient").mockReturnValue({
-    async request({ url, data }) {
-      const files = [...(data as FormData).values()] as File[];
-      uploads.push({ url, files: files.map((file) => file.name) });
-      return { status, data: JSON.stringify(await body), headers: {} };
+    async request({ url, data, signal }): Promise<HttpResponse> {
+      if (url !== "/admin/products/images") return savedPage();
+      const fields = [...(data as FormData).entries()];
+      // One image per upload, as the server takes them.
+      expect(fields.map(([field]) => field)).toEqual(["image"]);
+      uploads.push({ url, files: fields.map(([, file]) => (file as File).name), signal });
+      const [status, body] = answers[uploads.length - 1];
+      const aborted = new Promise<never>((_, reject) =>
+        signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError"))),
+      );
+      return { status, data: JSON.stringify(await Promise.race([body, aborted])), headers: {} };
     },
   });
   return uploads;
 }
 
+/** A body that only arrives once it's given to `respond`. */
+function answerLater() {
+  let respond!: (body: unknown) => void;
+  const body = new Promise((resolve) => (respond = resolve));
+  return { body, respond };
+}
+
+const notAnImage = "The image must be a JPG, PNG, WebP or AVIF file.";
 const png = (name: string) => new File(["png"], name, { type: "image/png" });
 
 describe("images", () => {
@@ -433,12 +474,10 @@ describe("images", () => {
   });
 
   it("adds the chosen images after the product's, to be linked when it's saved", async () => {
-    const uploads = fakeUploads(201, {
-      images: [
-        { id: 8, url: swatch("green") },
-        { id: 9, url: swatch("yellow") },
-      ],
-    });
+    const uploads = fakeUploads(
+      [201, { image: { id: 8, url: swatch("green") } }],
+      [201, { image: { id: 9, url: swatch("yellow") } }],
+    );
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
     // A file input, so clicking the square opens the system's file picker.
     await expect.element(addImages()).toHaveAttribute("type", "file");
@@ -448,14 +487,19 @@ describe("images", () => {
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
     await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
-    expect(uploads).toEqual([{ url: "/admin/products/images", files: ["side.png", "back.png"] }]);
+    // One at a time, so a rejected image keeps none of the others out.
+    expect(uploads.map(({ url, files }) => ({ url, files }))).toEqual([
+      { url: "/admin/products/images", files: ["side.png"] },
+      { url: "/admin/products/images", files: ["back.png"] },
+    ]);
     expect(formData().getAll("images[]")).toEqual(["7", "8", "9"]);
     await expect.element(toast()).toBeVisible();
   });
 
   it("shows a loading card per chosen image, and no more can be added until they're uploaded", async () => {
-    let respond!: (body: unknown) => void;
-    fakeUploads(201, new Promise((resolve) => (respond = resolve)));
+    const side = answerLater();
+    const back = answerLater();
+    fakeUploads([201, side.body], [201, back.body]);
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
 
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
@@ -472,16 +516,69 @@ describe("images", () => {
     // Nothing to link until the upload answers.
     expect(formData().getAll("images[]")).toEqual(["7"]);
 
-    respond({
-      images: [
-        { id: 8, url: swatch("green") },
-        { id: 9, url: swatch("yellow") },
-      ],
-    });
+    side.respond({ image: { id: 8, url: swatch("green") } });
+
+    await expect.poll(gridImages).toEqual([swatch("red"), swatch("green")]);
+    expect(uploadingCards().elements()).toHaveLength(1);
+    await expect.element(addImages()).toBeDisabled();
+
+    back.respond({ image: { id: 9, url: swatch("yellow") } });
 
     await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
     expect(uploadingCards().elements()).toHaveLength(0);
     await expect.element(addImages()).toBeEnabled();
+  });
+
+  it("doesn't save while images upload, since they'd be left out", async () => {
+    const upload = answerLater();
+    fakeUploads([201, upload.body]);
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await nameInput().fill("Rain boots");
+    await expect.element(toast()).toBeVisible();
+
+    await userEvent.upload(addImages(), [png("side.png")]);
+
+    await expect.element(toast().getByRole("button", { name: "Save" })).toBeDisabled();
+
+    upload.respond({ image: { id: 8, url: swatch("green") } });
+
+    await expect.element(toast().getByRole("button", { name: "Save" })).toBeEnabled();
+  });
+
+  it("stops uploading when the changes are cancelled, and adds nothing once it would have answered", async () => {
+    const upload = answerLater();
+    const uploads = fakeUploads([201, upload.body]);
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await nameInput().fill("Rain boots");
+    await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
+    await expect.poll(() => uploadingCards().elements()).toHaveLength(2);
+
+    await toast().getByRole("button", { name: "Cancel" }).click();
+
+    await expect.element(toast()).not.toBeInTheDocument();
+    expect(uploadingCards().elements()).toHaveLength(0);
+    await expect.element(addImages()).toBeEnabled();
+    expect(uploads).toHaveLength(1);
+    expect(uploads[0].signal?.aborted).toBe(true);
+
+    upload.respond({ image: { id: 8, url: swatch("green") } });
+
+    // Nothing comes back, and the second image never starts.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(gridImages()).toEqual([swatch("red")]);
+    expect(uploads).toHaveLength(1);
+    await expect.element(toast()).not.toBeInTheDocument();
+  });
+
+  it("stops uploading when the form goes away", async () => {
+    const uploads = fakeUploads([201, answerLater().body]);
+    const screen = await renderForm();
+    await userEvent.upload(addImages(), [png("side.png")]);
+    await expect.poll(() => uploads).toHaveLength(1);
+
+    await screen.unmount();
+
+    expect(uploads[0].signal?.aborted).toBe(true);
   });
 
   it("removes an image from its menu, to be unlinked when saved, and puts it back on cancel", async () => {
@@ -571,7 +668,7 @@ describe("images", () => {
   });
 
   it("drops the uploaded images when the changes are cancelled", async () => {
-    fakeUploads(201, { images: [{ id: 8, url: swatch("green") }] });
+    fakeUploads([201, { image: { id: 8, url: swatch("green") } }]);
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
     await userEvent.upload(addImages(), [png("side.png")]);
     await expect.element(toast()).toBeVisible();
@@ -583,30 +680,80 @@ describe("images", () => {
     expect(formData().getAll("images[]")).toEqual(["7"]);
   });
 
-  it("says why images were rejected and keeps the product's", async () => {
-    fakeUploads(422, {
-      message: "Invalid",
-      errors: { "images.1": ["Each image must be a JPG, PNG, WebP or AVIF file."] },
-    });
+  it("uploads the other images when one is rejected, and says which and why", async () => {
+    fakeUploads(
+      [201, { image: { id: 8, url: swatch("green") } }],
+      [422, { message: "Invalid", errors: { image: [notAnImage] } }],
+      [201, { image: { id: 9, url: swatch("yellow") } }],
+    );
     await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
 
-    await userEvent.upload(addImages(), [png("side.png"), png("manual.pdf")]);
+    await userEvent.upload(addImages(), [png("side.png"), png("manual.pdf"), png("back.png")]);
+
+    await expect.element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`)).toBeVisible();
+    expect(gridImages()).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
+    expect(uploadingCards().elements()).toHaveLength(0);
+    expect(formData().getAll("images[]")).toEqual(["7", "8", "9"]);
+  });
+
+  it.each([
+    ["the server takes no files that large", 413, "It's larger than the server accepts."],
+    ["the server fails", 500, "Try again."],
+  ])("says so when %s", async (_, status, reason) => {
+    fakeUploads([status, { message: "Error" }]);
+    await renderForm();
+
+    await userEvent.upload(addImages(), [png("huge.png")]);
+
+    await expect.element(page.getByText(`Couldn't upload huge.png. ${reason}`)).toBeVisible();
+    expect(uploadingCards().elements()).toHaveLength(0);
+  });
+
+  it("forgets why images were rejected once the product is saved", async () => {
+    fakeUploads([422, { message: "Invalid", errors: { image: [notAnImage] } }]);
+    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await userEvent.upload(addImages(), [png("manual.pdf")]);
+    await expect.element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`)).toBeVisible();
+    await nameInput().fill("Rain boots");
+
+    await toast().getByRole("button", { name: "Save" }).click();
 
     await expect
-      .element(page.getByText("Each image must be a JPG, PNG, WebP or AVIF file."))
-      .toBeVisible();
-    expect(gridImages()).toEqual([swatch("red")]);
-    expect(uploadingCards().elements()).toHaveLength(0);
-    expect(formData().getAll("images[]")).toEqual(["7"]);
+      .element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`))
+      .not.toBeInTheDocument();
+  });
+
+  it("shows why the images couldn't be saved beside them, once per reason", async () => {
+    const invalid = "The selected image is invalid.";
+    vi.spyOn(http, "getClient").mockReturnValue({
+      request: async () =>
+        savedPage({ name: "The name is taken.", "images.0": invalid, "images.1": invalid }),
+    });
+    await renderForm({
+      ...boots,
+      images: [
+        { id: 7, url: swatch("red") },
+        { id: 3, url: swatch("blue") },
+      ],
+    });
+    await nameInput().fill("Rain boots");
+
+    await toast().getByRole("button", { name: "Save" }).click();
+
+    // Strict, so it also fails when the reason shows twice.
+    await expect.element(page.getByText(invalid)).toBeVisible();
+    expect(imageGrid().element().parentElement?.nextElementSibling).toHaveTextContent(invalid);
+
+    await toast().getByRole("button", { name: "Cancel" }).click();
+
+    await expect.element(page.getByText(invalid)).not.toBeInTheDocument();
   });
 
   it("adds images to a new product, the first as its thumbnail", async () => {
-    fakeUploads(201, {
-      images: [
-        { id: 8, url: swatch("green") },
-        { id: 9, url: swatch("yellow") },
-      ],
-    });
+    fakeUploads(
+      [201, { image: { id: 8, url: swatch("green") } }],
+      [201, { image: { id: 9, url: swatch("yellow") } }],
+    );
     await renderForm();
     await expect.element(addImages()).toBeVisible();
     expect(formData().getAll("images[]")).toEqual([]);

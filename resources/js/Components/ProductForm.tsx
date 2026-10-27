@@ -1,5 +1,5 @@
 import { Field as BaseField } from "@base-ui/react/field";
-import { useFormContext, useHttp } from "@inertiajs/react";
+import { router, useFormContext, useHttp } from "@inertiajs/react";
 import { cn } from "cn";
 import {
   Badge,
@@ -74,7 +74,7 @@ export default function ProductForm({
       </Section.Root>
       <Section.Root>
         <Section.Header title="Images" description="The first image is the product's thumbnail." />
-        <ImageGrid images={product?.images ?? []} uploadUrl={uploadImagesUrl} />
+        <ImageGrid images={product?.images ?? []} uploadUrl={uploadImagesUrl} saveErrors={errors} />
       </Section.Root>
       <Section.Root>
         <Section.Header
@@ -151,19 +151,32 @@ const IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/avif";
 
 /**
  * The product's images in its order, then a square that opens the system's file picker. The
- * chosen images are uploaded right away, with a plain request since the unsaved changes toast
- * blocks Inertia visits, and join the grid. Dragging an image moves it to another's place. The
- * form submits the grid's image ids in order, so saving the product links them; until then,
- * cancelling the changes drops them again.
+ * chosen images are uploaded right away, one at a time so a rejected one keeps none of the others
+ * out, with a plain request since the unsaved changes toast blocks Inertia visits, and join the
+ * grid. Dragging an image moves it to another's place. The form submits the grid's image ids in
+ * order, so saving the product links them; until then, cancelling the changes drops them again.
+ * Saving waits for the uploads; cancelling or leaving the page stops them.
  */
-function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; uploadUrl: string }) {
+function ImageGrid({
+  images: savedImages,
+  uploadUrl,
+  saveErrors,
+}: {
+  images: Image[];
+  uploadUrl: string;
+  /** The form's errors from saving, of which those for its images show here too. */
+  saveErrors: Errors;
+}) {
   const [images, setImages] = useState(savedImages);
-  // The files being uploaded, each shown as a loading card where its image will appear.
+  // The files still to upload, each shown as a loading card where its image will appear.
   const [uploading, setUploading] = useState<File[]>([]);
+  // Why chosen images weren't uploaded, one message per image.
+  const [errors, setErrors] = useState<string[]>([]);
   const grid = useRef<HTMLUListElement>(null);
-  const upload = useHttp<{ images: File[] }, { images: Image[] }>({ images: [] });
-  // One message per kind of problem, however many images have it.
-  const errors = [...new Set(Object.values(upload.errors as Errors))];
+  const upload = useHttp<{ image: File | null }, { image: Image }>({ image: null });
+  // The running uploads; replacing it stops them from adding anything more.
+  const run = useRef<object | null>(null);
+  const cancelUpload = upload.cancel;
 
   // Inertia's <Form> only rechecks whether it's dirty on input, change and reset events, which
   // inputs React adds or removes don't fire. Without this, uploading wouldn't show the unsaved
@@ -172,10 +185,26 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
     grid.current?.dispatchEvent(new Event("input", { bubbles: true }));
   }, [images]);
 
+  // Once the product is saved, the rejected images no longer matter.
+  useEffect(() => router.on("success", () => setErrors([])), []);
+
+  // Stops the uploads when the form goes away, e.g. when leaving the page.
+  useEffect(
+    () => () => {
+      run.current = null;
+      cancelUpload();
+    },
+    [cancelUpload],
+  );
+
   // Cancelling the changes resets the form, which puts its fields back to their saved values but
-  // can't remove the hidden inputs of images uploaded since. Going back to the saved images does.
+  // can't remove the hidden inputs of images uploaded since. Going back to the saved images does,
+  // after stopping the uploads that would add more.
   useFormReset(grid, () => {
-    upload.clearErrors();
+    run.current = null;
+    cancelUpload();
+    setUploading([]);
+    setErrors([]);
     setImages(savedImages);
   });
 
@@ -195,28 +224,57 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
     input.value = "";
     if (files.length === 0) return;
 
-    upload.clearErrors();
-    upload.transform(() => ({ images: files }));
+    const current = {};
+    run.current = current;
+    setErrors([]);
     setUploading(files);
 
-    try {
-      // Undefined when the images are invalid; the errors say why.
-      const response = await upload.post(uploadUrl);
-      if (response) setImages((current) => [...current, ...response.images]);
-    } catch {
-      upload.setError("images", "The images couldn't be uploaded. Try again.");
-    } finally {
-      setUploading([]);
+    for (const file of files) {
+      let reason = "Try again.";
+      let response: { image: Image } | undefined;
+      upload.transform(() => ({ image: file }));
+      try {
+        // Undefined when the image is invalid; onError says why.
+        response = await upload.post(uploadUrl, {
+          onError: (fieldErrors) => (reason = Object.values(fieldErrors)[0] ?? reason),
+          onHttpException: ({ status }) => {
+            if (status === 413) reason = "It's larger than the server accepts.";
+          },
+        });
+      } catch {
+        // The reason stays "Try again.", unless the uploads were stopped.
+      }
+      if (run.current !== current) return;
+
+      const uploaded = response?.image;
+      if (uploaded) setImages((images) => [...images, uploaded]);
+      else setErrors((errors) => [...errors, `Couldn't upload ${file.name}. ${reason}`]);
+      setUploading((files) => files.slice(1));
     }
   }
 
+  // Why saving refused the images, e.g. one deleted since it was uploaded. Once per reason, however
+  // many images have it.
+  const invalidImages = [
+    ...new Set(
+      Object.entries(saveErrors)
+        .filter(([key]) => key === "images" || key.startsWith("images."))
+        .map(([, error]) => error)
+        .filter((error) => error !== undefined),
+    ),
+  ];
+
   return (
-    <BaseField.Root invalid={errors.length > 0} className="flex flex-col gap-1.5">
+    <BaseField.Root
+      invalid={invalidImages.length + errors.length > 0}
+      className="flex flex-col gap-1.5"
+    >
       {/* Fewer columns as the form narrows, so the images stay large enough to tell apart. */}
       <div className="@container">
         <ul
           ref={grid}
           aria-label="Images"
+          aria-busy={uploading.length > 0}
           className="grid auto-rows-fr grid-cols-1 gap-3 @xs:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4"
         >
           <DragDropProvider sensors={sensors} plugins={imagePlugins} onDragEnd={drop}>
@@ -259,7 +317,7 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
                 multiple
                 accept={IMAGE_TYPES}
                 aria-label="Add images"
-                disabled={upload.processing}
+                disabled={uploading.length > 0}
                 className="sr-only"
                 onChange={(event) => uploadFiles(event.currentTarget)}
               />
@@ -268,8 +326,9 @@ function ImageGrid({ images: savedImages, uploadUrl }: { images: Image[]; upload
           </li>
         </ul>
       </div>
-      {errors.map((error) => (
-        <Error key={error} match>
+      {[...invalidImages, ...errors].map((error, index) => (
+        // The same file can be chosen twice, so its message isn't unique.
+        <Error key={index} match>
           {error}
         </Error>
       ))}
