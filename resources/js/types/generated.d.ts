@@ -53,7 +53,10 @@ declare namespace Larasell.Admin.Data.View {
     uploadImagesUrl: string;
   };
   export type HomePageData = {
-    admin: Larasell.Admin.Data.ViewModel.AdminData;
+    createProductUrl: string | null;
+    createCategoryUrl: string;
+    inviteAdminUrl: string;
+    helpEmail: string;
   };
   export type LoginPageData = {
     loginUrl: string;

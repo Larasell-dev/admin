@@ -2,19 +2,20 @@
 
 namespace Larasell\Admin\Http\Controllers;
 
-use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Data\View\HomePageData;
-use Larasell\Admin\Data\ViewModel\AdminData;
-use Larasell\Admin\Models\Admin;
 
 class HomeController
 {
-    public function __invoke(#[CurrentUser('larasell-admin')] Admin $admin): Response
+    public function __invoke(): Response
     {
         return Inertia::render('Home', new HomePageData(
-            admin: AdminData::fromModel($admin),
+            createProductUrl: Route::has('larasell.admin.products.create') ? route('larasell.admin.products.create') : null,
+            createCategoryUrl: route('larasell.admin.categories.create'),
+            inviteAdminUrl: route('larasell.admin.settings.admins.create'),
+            helpEmail: 'nils@larasell.dev',
         ));
     }
 }
