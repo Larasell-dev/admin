@@ -1,5 +1,6 @@
 import "../../css/app.css";
 import { App, Form, http, router, usePage } from "@inertiajs/react";
+import { ToastProvider } from "@larasell-dev/ui";
 import type { ComponentProps } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -52,11 +53,13 @@ async function renderForm(product?: Product, categories: Category[] = [], url = 
   };
 
   const screen = await render(
-    <App
-      initialPage={formPage as never}
-      initialComponent={FormPage}
-      resolveComponent={() => FormPage}
-    />,
+    <ToastProvider>
+      <App
+        initialPage={formPage as never}
+        initialComponent={FormPage}
+        resolveComponent={() => FormPage}
+      />
+    </ToastProvider>,
   );
   // The router only takes the initial page of the file's first test. Without this, visits that
   // stay in the browser, like opening the image lightbox, would bring back that test's page.
@@ -811,6 +814,14 @@ describe("images", () => {
       await expect.element(imageGrid()).toBeVisible();
       await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
       await expect.poll(query).toEqual(remaining);
+    });
+
+    it("says why a stale link didn't open the image", async () => {
+      await renderForm({ ...boots, images: [image(7, "red")] }, [], lightboxUrl(99));
+
+      await expect
+        .element(page.getByText("Couldn't find that image on this product"))
+        .toBeVisible();
     });
 
     // Going back to an entry remounts the page, which would drop the form's changes.

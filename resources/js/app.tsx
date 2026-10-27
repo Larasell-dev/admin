@@ -6,6 +6,7 @@ import * as React from "react";
 import * as JsxDevRuntime from "react/jsx-dev-runtime";
 import * as JsxRuntime from "react/jsx-runtime";
 import { createRoot } from "react-dom/client";
+import { ToastProvider } from "@larasell-dev/ui";
 import ResourceTable from "./Components/ResourceTable";
 import SidebarLayout from "./Layouts/SidebarLayout";
 import { AppHotkeysProvider } from "./utils/hotkeys";
@@ -81,7 +82,9 @@ window.LarasellAdmin = {
       setup({ el, App, props }) {
         createRoot(el).render(
           <AppHotkeysProvider>
-            <App {...props} />
+            <ToastProvider>
+              <App {...props} />
+            </ToastProvider>
           </AppHotkeysProvider>,
         );
       },

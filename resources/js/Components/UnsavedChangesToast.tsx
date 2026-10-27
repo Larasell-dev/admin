@@ -1,5 +1,5 @@
 import { router, useFormContext } from "@inertiajs/react";
-import { Button } from "@larasell-dev/ui";
+import { Button, useToastPosition } from "@larasell-dev/ui";
 import { AnimatePresence, MotionConfig, motion, useAnimate, useIsPresent } from "motion/react";
 import { use, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
@@ -165,6 +165,17 @@ export default function UnsavedChangesToast() {
 /** Draws the UnsavedChangesToast of the current page. Render it once in a persistent layout. */
 export function UnsavedChangesToastHost() {
   const toast = useSyncExternalStore(store.subscribe, () => store.state);
+  const [height, setHeight] = useState(0);
+
+  // Other toasts sit where this one does, or just above it while it shows, so they move up as it
+  // appears and back down once it's gone. Outside a form, both center in the viewport.
+  const position = toast?.position ?? { left: "50%", bottom: "0px" };
+  useToastPosition({
+    left: position.left,
+    bottom: toast?.dirty
+      ? `calc(${position.bottom} + 1.5rem + ${height}px + 0.5rem)`
+      : `calc(${position.bottom} + 1.5rem)`,
+  });
 
   // AnimatePresence keeps the last rendered toast while it animates out, even once its form is gone.
   return createPortal(
@@ -172,6 +183,11 @@ export function UnsavedChangesToastHost() {
       <AnimatePresence>
         {toast?.dirty && (
           <motion.div
+            ref={(element: HTMLDivElement) => {
+              const observer = new ResizeObserver(() => setHeight(element.offsetHeight));
+              observer.observe(element);
+              return () => observer.disconnect();
+            }}
             role="region"
             aria-label="Unsaved changes"
             style={{
@@ -219,10 +235,11 @@ function ToastContent({ toast }: { toast: ToastState }) {
 
   return (
     // The wobble moves this inner box, since the outer one's x centers the toast.
+    // As wide as the other toasts, so their borders line up.
     <div
       ref={scope}
       inert={!present}
-      className="flex items-center gap-6 border border-border bg-white bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-lg dark:bg-mauve-900"
+      className="flex w-(--toast-width) max-w-[calc(100vw-2rem)] items-center justify-between gap-6 border border-border bg-white bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-lg dark:bg-mauve-900"
     >
       <p className="type-body-md whitespace-nowrap text-mauve-950 dark:text-mauve-50">
         Unsaved changes
