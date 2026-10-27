@@ -189,7 +189,7 @@ function ImageGrid({
   const dropMissingImage = useEffectEvent(() => {
     lightbox.close();
     // By id, so strict mode's second run doesn't show it twice.
-    toast.add({ id: "missing-lightbox-image", title: "Couldn't find that image on this product" });
+    toast.add({ id: "missing-lightbox-image", title: "Image not found" });
   });
   const missingImage = lightbox.imageId !== null && openImage === undefined;
   useEffect(() => {
