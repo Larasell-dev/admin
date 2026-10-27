@@ -44,6 +44,11 @@ class CategoryProducts extends Table
         ];
     }
 
+    public function rowLink(Product $product): ?string
+    {
+        return config('larasell.admin.products.enabled') ? route('larasell.admin.products.edit', $product) : null;
+    }
+
     public function actions(): array
     {
         return [

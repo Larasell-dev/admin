@@ -104,3 +104,40 @@ it("leaves out the actions menu on rows without actions", async () => {
     .element(page.getByRole("button", { name: "Actions for Socks" }))
     .not.toBeInTheDocument();
 });
+
+it("links each row with a link through its name, keeping its actions menu clickable", async () => {
+  const view = {
+    name: "view",
+    label: "View",
+    method: "get",
+    url: "/admin/products/1/edit",
+    confirm: null,
+    destructive: false,
+    disabled: false,
+    icon: null,
+  } as const;
+  const row = (id: number, name: string, link: string | null) => ({
+    id,
+    name,
+    _actions: [view],
+    _link: link,
+    _variants: {},
+  });
+  const table = {
+    ...emptyTable,
+    rows: [row(1, "Shoes", "/admin/products/1/edit"), row(2, "Socks", null)],
+    pagination: { page: 1, pageSize: 25, total: 2 },
+  };
+
+  await renderTable({ ...editProps, table, createProductUrl: null });
+
+  await expect
+    .element(page.getByRole("link", { name: "Shoes" }))
+    .toHaveAttribute("href", "/admin/products/1/edit");
+  await expect.element(page.getByRole("link", { name: "Socks" })).not.toBeInTheDocument();
+
+  // The link stretches over the row, so the menu's trigger must sit above it.
+  await page.getByRole("button", { name: "Actions for Shoes" }).click();
+  await expect.element(page.getByRole("menuitem", { name: "View" })).toBeVisible();
+  expect(window.location.pathname).not.toBe("/admin/products/1/edit");
+});
