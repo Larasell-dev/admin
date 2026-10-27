@@ -1,3 +1,4 @@
+import { Button as BaseButton } from "@base-ui/react/button";
 import { Field as BaseField } from "@base-ui/react/field";
 import { router, useFormContext, useHttp, usePage } from "@inertiajs/react";
 import { cn } from "cn";
@@ -34,8 +35,10 @@ import { slugify } from "../utils/slugify";
 import { overlayExclusive } from "../utils/hotkeys";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
+import { useMergedRef } from "../utils/useMergedRef";
 import CategoryCheckboxTree from "./CategoryCheckboxTree";
 import FormCheckbox from "./FormCheckbox";
+import { useFrozen } from "./Freeze";
 import ProductImageLightbox from "./ProductImageLightbox";
 import VisibilityField from "./VisibilityField";
 
@@ -175,6 +178,16 @@ function ImageGrid({
   // Why chosen images weren't uploaded, one message per image.
   const [errors, setErrors] = useState<string[]>([]);
   const lightbox = useLightboxUrl();
+  const openImage = images.find(({ id }) => id === lightbox.imageId);
+  // The last image opened, kept while the lightbox closes so it fades out with it. Mounted from
+  // then on, so the lightbox keeps its background for the next image.
+  const lightboxImage = useFrozen(openImage, openImage === undefined);
+  // A URL naming an image the product doesn't have, e.g. a stale link, stops naming it.
+  const closeLightbox = useEffectEvent(lightbox.close);
+  const missingImage = lightbox.imageId !== null && openImage === undefined;
+  useEffect(() => {
+    if (missingImage) closeLightbox();
+  }, [missingImage]);
   const grid = useRef<HTMLUListElement>(null);
   const upload = useHttp<{ image: File | null }, { image: Image }>({ image: null });
   // The running uploads; replacing it stops them from adding anything more.
@@ -332,15 +345,18 @@ function ImageGrid({
           </li>
         </ul>
       </div>
-      <ProductImageLightbox
-        image={images.find(({ id }) => id === lightbox.imageId) ?? null}
-        onClose={lightbox.close}
-        onAltChange={(alt) =>
-          setImages((current) =>
-            current.map((image) => (image.id === lightbox.imageId ? { ...image, alt } : image)),
-          )
-        }
-      />
+      {lightboxImage && (
+        <ProductImageLightbox
+          open={openImage !== undefined}
+          image={lightboxImage}
+          onClose={lightbox.close}
+          onAltChange={(alt) =>
+            setImages((current) =>
+              current.map((image) => (image.id === lightboxImage.id ? { ...image, alt } : image)),
+            )
+          }
+        />
+      )}
       {[...invalidImages, ...errors].map((error, index) => (
         // The same file can be chosen twice, so its message isn't unique.
         <Error key={index} match>
@@ -371,11 +387,8 @@ function ImageCard({
 
   return (
     <li
-      ref={(element) => {
-        ref(element);
-        // The whole card is its handle, since dragging never starts from a button otherwise.
-        handleRef(element);
-      }}
+      // The whole card is its handle, since dragging never starts from a button otherwise.
+      ref={useMergedRef(ref, handleRef)}
       data-dragging={isDragging || undefined}
       className={cn(
         "border-border relative aspect-square cursor-grab overflow-hidden border bg-mauve-50 select-none dark:bg-mauve-900",
@@ -389,8 +402,7 @@ function ImageCard({
     >
       <input type="hidden" name="images[]" value={image.id} />
       <input type="hidden" name={`image_alts[${image.id}]`} value={image.alt ?? ""} />
-      <button
-        type="button"
+      <BaseButton
         aria-label={`Open image ${index + 1}`}
         onClick={onOpen}
         className="size-full cursor-[inherit] outline-none"
@@ -402,7 +414,7 @@ function ImageCard({
           draggable={false}
           className="size-full object-cover"
         />
-      </button>
+      </BaseButton>
       {index === 0 && (
         // Flex, so the badge doesn't sit on a text line that adds space above it.
         <div className="absolute top-2 left-2 flex">
