@@ -105,6 +105,23 @@ it("lets its save button submit the form", async () => {
   expect(wasCancelled(() => save.click())).toBe(false);
 });
 
+it("doesn't save while anything in the form is busy, like an upload", async () => {
+  await renderPage();
+  await name().fill("Boots");
+  const save = toast().getByRole("button", { name: "Save" });
+  await expect.element(save).toBeEnabled();
+  const upload = document.createElement("div");
+  upload.setAttribute("aria-busy", "true");
+
+  name().element().after(upload);
+
+  await expect.element(save).toBeDisabled();
+
+  upload.setAttribute("aria-busy", "false");
+
+  await expect.element(save).toBeEnabled();
+});
+
 it("asks before leaving the site only while the form has unsaved changes", async () => {
   await renderPage();
   const unload = () => {

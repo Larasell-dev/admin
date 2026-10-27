@@ -13,6 +13,8 @@ type ToastState = {
   owner: object;
   dirty: boolean;
   processing: boolean;
+  /** Whether something in the form, like an upload, is marked aria-busy and holds off saving. */
+  busy: boolean;
   position: Position;
   save: () => void;
   cancel: () => void;
@@ -76,6 +78,22 @@ export default function UnsavedChangesToast() {
     };
   }, [form.isDirty]);
 
+  // Fields mark themselves aria-busy while they work, like uploading files that saving would leave
+  // out; Save waits for them.
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const element = anchor.current?.closest("form");
+    if (!element) return;
+
+    const update = () => setBusy(element.querySelector('[aria-busy="true"]') !== null);
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(element, { subtree: true, childList: true, attributeFilter: ["aria-busy"] });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Without a container it centers in the viewport.
   const [position, setPosition] = useState<Position>({ left: "50%", bottom: "0px" });
 
@@ -108,6 +126,7 @@ export default function UnsavedChangesToast() {
       owner,
       dirty: form.isDirty,
       processing: form.processing,
+      busy,
       position,
       save() {
         saving.current = true;
@@ -212,7 +231,11 @@ function ToastContent({ toast }: { toast: ToastState }) {
         <Button type="button" variant="tertiary" disabled={toast.processing} onClick={toast.cancel}>
           Cancel
         </Button>
-        <Button type="button" loading={toast.processing} onClick={toast.save}>
+        <Button
+          type="button"
+          {...(toast.processing ? { loading: true } : { disabled: toast.busy })}
+          onClick={toast.save}
+        >
           Save
         </Button>
       </div>
