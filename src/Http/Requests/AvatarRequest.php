@@ -22,4 +22,15 @@ class AvatarRequest extends FormRequest
             ],
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            // Mostly files over PHP's upload_max_filesize, which it drops before the max rule runs.
+            'avatar.uploaded' => 'The picture may be larger than the server accepts.',
+        ];
+    }
 }

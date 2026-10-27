@@ -2,7 +2,7 @@ import { Avatar } from "@base-ui/react/avatar";
 import { Field as BaseField } from "@base-ui/react/field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
-import { Form, useFormContext, useHttp, usePage } from "@inertiajs/react";
+import { Form, router, useFormContext, useHttp, usePage } from "@inertiajs/react";
 import {
   Button,
   Container,
@@ -95,32 +95,54 @@ function AvatarInput({ error }: { error?: string }) {
 
   const avatarError = upload.errors.avatar ?? error;
   const avatarPath = useRef<HTMLInputElement>(null);
+  const cancelUpload = upload.cancel;
+  const clearUploadErrors = upload.clearErrors;
 
   useEffect(() => {
     avatarPath.current?.dispatchEvent(new Event("input", { bubbles: true }));
   }, [change]);
 
+  // Once the profile is saved, a rejected picture no longer matters.
+  useEffect(() => router.on("success", () => clearUploadErrors()), [clearUploadErrors]);
+
+  // Cancelling the changes also stops an upload, so its picture doesn't come back afterwards.
   useEffect(() => {
     const form = avatarPath.current?.form;
     if (!form) return;
     const discard = () => {
-      upload.clearErrors();
+      cancelUpload();
+      clearUploadErrors();
       setChange({ type: "unchanged" });
     };
     form.addEventListener("reset", discard);
     return () => form.removeEventListener("reset", discard);
-  }, [upload]);
+  }, [cancelUpload, clearUploadErrors]);
+
+  // Stops the upload when the page goes away.
+  useEffect(() => () => cancelUpload(), [cancelUpload]);
 
   // The file is stored right away; saving the form is what assigns it to the profile.
   async function selectFile(file: File | undefined) {
     assertDefined(file, "A file must be selected to upload an avatar.");
 
+    const failed = (status?: number) =>
+      upload.setError(
+        "avatar",
+        status === 413
+          ? "The picture is larger than the server accepts."
+          : "The picture couldn't be uploaded. Try again.",
+      );
     upload.transform(() => ({ avatar: file }));
 
     try {
-      setChange({ type: "uploaded", ...(await upload.post(avatarUploadUrl)) });
+      // Undefined when the picture is invalid; upload.errors says why.
+      const uploaded = await upload.post(avatarUploadUrl, {
+        onHttpException: ({ status }) => failed(status),
+        onNetworkError: () => failed(),
+      });
+      if (uploaded) setChange({ type: "uploaded", ...uploaded });
     } catch {
-      // Validation errors are shown from upload.errors.
+      // Said why above, unless the upload was cancelled, which needs no reason.
     } finally {
       if (fileInput.current) fileInput.current.value = "";
     }
@@ -141,7 +163,7 @@ function AvatarInput({ error }: { error?: string }) {
       />
       <input type="hidden" name="remove_avatar" value={change.type === "removed" ? "1" : "0"} />
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4" aria-busy={upload.processing}>
         <Avatar.Root className="inline-flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 type-body-md text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
           {currentUrl && (
             <Avatar.Image src={currentUrl} alt="" className="size-full object-cover" />
