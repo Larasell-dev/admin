@@ -356,6 +356,30 @@ it('lists the products of the category on its page', function () {
             ->where('products.rows.0._actions.1.icon', 'FolderReduce'));
 });
 
+it('links each product on the category\'s page to its edit page', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    $boots = product('Boots', $shoes);
+    $sandals = product('Sandals', $shoes);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.categories.show', $shoes))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('products.rows.0._link', route('larasell.admin.products.edit', $boots))
+            ->where('products.rows.1._link', route('larasell.admin.products.edit', $sandals)));
+});
+
+it('does not link the products on the category\'s page when the products are turned off', function () {
+    $this->bootingWith(fn () => config(['larasell.admin.products.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $shoes = category('Shoes');
+    product('Boots', $shoes);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.categories.show', $shoes))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('products.rows.0._link', null));
+});
+
 it('does not list products on the create page', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 

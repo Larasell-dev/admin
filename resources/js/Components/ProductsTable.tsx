@@ -11,6 +11,7 @@ import {
   Menu,
   Pagination,
   Section,
+  Table,
 } from "@larasell-dev/ui";
 import { AddLine, More2Fill, ShoppingBagLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
@@ -19,6 +20,7 @@ import type { TableRowAction, TableResource } from "../types";
 import { abortPrevious } from "../utils/abortPrevious";
 import { debounce } from "../utils/debounce";
 import { overlayExclusive } from "../utils/hotkeys";
+import { isSameSite } from "../utils/isSameSite";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
 
@@ -164,17 +166,36 @@ export default function ProductsTable(props: Props) {
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.id} className="border-b border-border last:border-b-0">
-                    {table!.columns.map((column) => (
+                  <tr
+                    key={row.id}
+                    // `relative` contains the row link, which stretches over the whole row.
+                    className={`relative border-b border-border last:border-b-0 ${row._link ? "hover:bg-mauve-50 has-[a:focus-visible]:bg-mauve-50 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-primary-500 dark:hover:bg-mauve-800/50 dark:has-[a:focus-visible]:bg-mauve-800/50" : ""}`}
+                  >
+                    {table!.columns.map((column, index) => (
                       <td
                         key={column.name}
                         className="px-(--inset) py-1.5 type-body-md text-mauve-950 dark:text-mauve-50"
                       >
-                        {row[column.name] as string | null}
+                        {index === 0 && row._link ? (
+                          <Table.Link
+                            render={
+                              isSameSite(row._link) ? (
+                                <Link href={row._link} prefetch="hover" />
+                              ) : (
+                                <a href={row._link} />
+                              )
+                            }
+                          >
+                            {row[column.name] as string | null}
+                          </Table.Link>
+                        ) : (
+                          (row[column.name] as string | null)
+                        )}
                       </td>
                     ))}
                     {hasActions && (
-                      <td className="px-1.5 py-1.5 text-right">
+                      // Above the row link, so the menu opens instead of following it.
+                      <td className="relative z-10 px-1.5 py-1.5 text-right">
                         {row._actions.length > 0 && (
                           <Menu.Root>
                             <Menu.Trigger
