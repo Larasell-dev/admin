@@ -66,6 +66,9 @@ class ProductRequest extends FormRequest
             // Uploaded images, in the product's order. The form leaves it out when there are none.
             'images' => ['sometimes', 'array'],
             'images.*' => ['integer', 'distinct', Rule::exists(ProductImage::class, 'id')],
+            // Each image's alt text keyed by its id. Empty removes it.
+            'image_alts' => ['sometimes', 'array'],
+            'image_alts.*' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -118,6 +121,7 @@ class ProductRequest extends FormRequest
             'max_quantity' => 'maximum quantity',
             // Shown beside the images, which have no key the admin would know.
             'images.*' => 'image',
+            'image_alts.*' => 'alt text',
         ];
     }
 
@@ -160,6 +164,17 @@ class ProductRequest extends FormRequest
         $ids = array_map(intval(...), array_values($this->validated('images', [])));
 
         return array_combine($ids, array_map(fn (int $position) => ['position' => $position], array_keys($ids)));
+    }
+
+    /**
+     * The alt text of the product's images keyed by id, null where it was emptied. Those of images
+     * the product doesn't have are left out, so the form can only describe its own.
+     *
+     * @return array<int, ?string>
+     */
+    public function imageAlts(): array
+    {
+        return array_intersect_key($this->validated('image_alts', []), $this->images());
     }
 
     /**

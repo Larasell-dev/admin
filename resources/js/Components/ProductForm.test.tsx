@@ -1,5 +1,5 @@
 import "../../css/app.css";
-import { App, Form, http, usePage } from "@inertiajs/react";
+import { App, Form, http, router, usePage } from "@inertiajs/react";
 import type { ComponentProps } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -39,22 +39,29 @@ function FormPage() {
 /** The current test's page, which saving the form answers with again. */
 let formPage: { component: string; url: string; version: null; props: FormPageProps };
 
-/** Renders the form for the product, or for a new one without it, with the store's categories. */
-function renderForm(product?: Product, categories: Category[] = []) {
+/**
+ * Renders the form for the product, or for a new one without it, with the store's categories, on
+ * the page at the URL.
+ */
+async function renderForm(product?: Product, categories: Category[] = [], url = "/admin/products") {
   formPage = {
     component: "FormPage",
-    url: "/admin/products",
+    url,
     version: null,
     props: { product, categories },
   };
 
-  return render(
+  const screen = await render(
     <App
       initialPage={formPage as never}
       initialComponent={FormPage}
       resolveComponent={() => FormPage}
     />,
   );
+  // The router only takes the initial page of the file's first test. Without this, visits that
+  // stay in the browser, like opening the image lightbox, would bring back that test's page.
+  router.replace({ ...formPage, preserveState: true, preserveScroll: true });
+  return screen;
 }
 
 /** Answers saving the form with its page again, with the errors, as Laravel does when it's invalid. */
@@ -407,6 +414,14 @@ describe("categories", () => {
 const swatch = (color: string) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="${color}"/></svg>`)}`;
 
+/** An image of the product, as the server sends it, in a solid color and named after it. */
+const image = (id: number, color: string, alt: string | null = null) => ({
+  id,
+  url: swatch(color),
+  filename: `${color}.png`,
+  alt,
+});
+
 const imageGrid = () => page.getByRole("list", { name: "Images" });
 const gridImages = () =>
   imageGrid()
@@ -460,10 +475,7 @@ describe("images", () => {
   it("shows a product's images in their order, the first one as its thumbnail", async () => {
     await renderForm({
       ...boots,
-      images: [
-        { id: 7, url: swatch("red") },
-        { id: 3, url: swatch("blue") },
-      ],
+      images: [image(7, "red"), image(3, "blue")],
     });
 
     await expect.element(imageGrid()).toBeVisible();
@@ -475,10 +487,10 @@ describe("images", () => {
 
   it("adds the chosen images after the product's, to be linked when it's saved", async () => {
     const uploads = fakeUploads(
-      [201, { image: { id: 8, url: swatch("green") } }],
-      [201, { image: { id: 9, url: swatch("yellow") } }],
+      [201, { image: image(8, "green") }],
+      [201, { image: image(9, "yellow") }],
     );
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await renderForm({ ...boots, images: [image(7, "red")] });
     // A file input, so clicking the square opens the system's file picker.
     await expect.element(addImages()).toHaveAttribute("type", "file");
     await expect.element(addImages()).toHaveAttribute("multiple");
@@ -500,7 +512,7 @@ describe("images", () => {
     const side = answerLater();
     const back = answerLater();
     fakeUploads([201, side.body], [201, back.body]);
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await renderForm({ ...boots, images: [image(7, "red")] });
 
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
@@ -516,13 +528,13 @@ describe("images", () => {
     // Nothing to link until the upload answers.
     expect(formData().getAll("images[]")).toEqual(["7"]);
 
-    side.respond({ image: { id: 8, url: swatch("green") } });
+    side.respond({ image: image(8, "green") });
 
     await expect.poll(gridImages).toEqual([swatch("red"), swatch("green")]);
     expect(uploadingCards().elements()).toHaveLength(1);
     await expect.element(addImages()).toBeDisabled();
 
-    back.respond({ image: { id: 9, url: swatch("yellow") } });
+    back.respond({ image: image(9, "yellow") });
 
     await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
     expect(uploadingCards().elements()).toHaveLength(0);
@@ -532,7 +544,7 @@ describe("images", () => {
   it("doesn't save while images upload, since they'd be left out", async () => {
     const upload = answerLater();
     fakeUploads([201, upload.body]);
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await renderForm({ ...boots, images: [image(7, "red")] });
     await nameInput().fill("Rain boots");
     await expect.element(toast()).toBeVisible();
 
@@ -540,7 +552,7 @@ describe("images", () => {
 
     await expect.element(toast().getByRole("button", { name: "Save" })).toBeDisabled();
 
-    upload.respond({ image: { id: 8, url: swatch("green") } });
+    upload.respond({ image: image(8, "green") });
 
     await expect.element(toast().getByRole("button", { name: "Save" })).toBeEnabled();
   });
@@ -548,7 +560,7 @@ describe("images", () => {
   it("stops uploading when the changes are cancelled, and adds nothing once it would have answered", async () => {
     const upload = answerLater();
     const uploads = fakeUploads([201, upload.body]);
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await renderForm({ ...boots, images: [image(7, "red")] });
     await nameInput().fill("Rain boots");
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
     await expect.poll(() => uploadingCards().elements()).toHaveLength(2);
@@ -561,7 +573,7 @@ describe("images", () => {
     expect(uploads).toHaveLength(1);
     expect(uploads[0].signal?.aborted).toBe(true);
 
-    upload.respond({ image: { id: 8, url: swatch("green") } });
+    upload.respond({ image: image(8, "green") });
 
     // Nothing comes back, and the second image never starts.
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -584,11 +596,7 @@ describe("images", () => {
   it("removes an image from its menu, to be unlinked when saved, and puts it back on cancel", async () => {
     await renderForm({
       ...boots,
-      images: [
-        { id: 7, url: swatch("red") },
-        { id: 3, url: swatch("blue") },
-        { id: 5, url: swatch("green") },
-      ],
+      images: [image(7, "red"), image(3, "blue"), image(5, "green")],
     });
 
     await page.getByRole("button", { name: "Actions for image 1" }).click();
@@ -622,7 +630,7 @@ describe("images", () => {
     ["the only image", [7]],
   ])("puts %s back when the removal is cancelled", async (_, ids) => {
     const colors = ["red", "blue", "green"];
-    await renderForm({ ...boots, images: ids.map((id, i) => ({ id, url: swatch(colors[i]) })) });
+    await renderForm({ ...boots, images: ids.map((id, i) => image(id, colors[i])) });
     await page.getByRole("button", { name: `Actions for image ${ids.length}` }).click();
     await page.getByRole("menuitem", { name: "Remove" }).click();
     await expect.element(toast()).toBeVisible();
@@ -641,11 +649,7 @@ describe("images", () => {
   ])("drags %s, to be saved in that order", async (_, from, to, order) => {
     await renderForm({
       ...boots,
-      images: [
-        { id: 7, url: swatch("red") },
-        { id: 3, url: swatch("blue") },
-        { id: 5, url: swatch("green") },
-      ],
+      images: [image(7, "red"), image(3, "blue"), image(5, "green")],
     });
     const item = (n: number) =>
       imageGrid()
@@ -655,6 +659,8 @@ describe("images", () => {
     await userEvent.dragAndDrop(item(from), item(to));
 
     await expect.poll(() => formData().getAll("images[]")).toEqual(order);
+    // Dropping isn't a click that opens the image.
+    await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
     const colors = { "7": swatch("red"), "3": swatch("blue"), "5": swatch("green") };
     expect(gridImages()).toEqual(order.map((id) => colors[id as keyof typeof colors]));
     // The image now first becomes the thumbnail.
@@ -668,8 +674,8 @@ describe("images", () => {
   });
 
   it("drops the uploaded images when the changes are cancelled", async () => {
-    fakeUploads([201, { image: { id: 8, url: swatch("green") } }]);
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    fakeUploads([201, { image: image(8, "green") }]);
+    await renderForm({ ...boots, images: [image(7, "red")] });
     await userEvent.upload(addImages(), [png("side.png")]);
     await expect.element(toast()).toBeVisible();
 
@@ -682,11 +688,11 @@ describe("images", () => {
 
   it("uploads the other images when one is rejected, and says which and why", async () => {
     fakeUploads(
-      [201, { image: { id: 8, url: swatch("green") } }],
+      [201, { image: image(8, "green") }],
       [422, { message: "Invalid", errors: { image: [notAnImage] } }],
-      [201, { image: { id: 9, url: swatch("yellow") } }],
+      [201, { image: image(9, "yellow") }],
     );
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await renderForm({ ...boots, images: [image(7, "red")] });
 
     await userEvent.upload(addImages(), [png("side.png"), png("manual.pdf"), png("back.png")]);
 
@@ -711,7 +717,7 @@ describe("images", () => {
 
   it("forgets why images were rejected once the product is saved", async () => {
     fakeUploads([422, { message: "Invalid", errors: { image: [notAnImage] } }]);
-    await renderForm({ ...boots, images: [{ id: 7, url: swatch("red") }] });
+    await renderForm({ ...boots, images: [image(7, "red")] });
     await userEvent.upload(addImages(), [png("manual.pdf")]);
     await expect.element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`)).toBeVisible();
     await nameInput().fill("Rain boots");
@@ -731,10 +737,7 @@ describe("images", () => {
     });
     await renderForm({
       ...boots,
-      images: [
-        { id: 7, url: swatch("red") },
-        { id: 3, url: swatch("blue") },
-      ],
+      images: [image(7, "red"), image(3, "blue")],
     });
     await nameInput().fill("Rain boots");
 
@@ -750,10 +753,7 @@ describe("images", () => {
   });
 
   it("adds images to a new product, the first as its thumbnail", async () => {
-    fakeUploads(
-      [201, { image: { id: 8, url: swatch("green") } }],
-      [201, { image: { id: 9, url: swatch("yellow") } }],
-    );
+    fakeUploads([201, { image: image(8, "green") }], [201, { image: image(9, "yellow") }]);
     await renderForm();
     await expect.element(addImages()).toBeVisible();
     expect(formData().getAll("images[]")).toEqual([]);
@@ -762,5 +762,118 @@ describe("images", () => {
 
     await expect.poll(() => formData().getAll("images[]")).toEqual(["8", "9"]);
     await expect.element(imageGrid().getByRole("listitem").first()).toHaveTextContent("Thumbnail");
+  });
+
+  describe("lightbox", () => {
+    const lightbox = (filename: string) => page.getByRole("dialog", { name: filename });
+    const altText = (filename: string) =>
+      lightbox(filename).getByRole("textbox", { name: "Alt text" });
+    const openImage = (n: number) => page.getByRole("button", { name: `Open image ${n}` });
+    const query = () => Object.fromEntries(new URL(window.location.href).searchParams);
+    const lightboxUrl = (id: number) =>
+      `/admin/products?dialog=product-image-lightbox&image-id=${id}`;
+
+    it("opens and closes with the URL, which names the image", async () => {
+      await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] });
+
+      await openImage(2).click();
+
+      await expect.element(lightbox("blue.png")).toBeVisible();
+      expect(query()).toEqual({ dialog: "product-image-lightbox", "image-id": "3" });
+
+      await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
+
+      await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+      expect(query()).toEqual({});
+    });
+
+    it("opens the image the URL names when the page loads", async () => {
+      await renderForm(
+        { ...boots, images: [image(7, "red"), image(3, "blue")] },
+        [],
+        lightboxUrl(3),
+      );
+
+      await expect.element(lightbox("blue.png")).toBeVisible();
+    });
+
+    it.each([
+      ["an image the product doesn't have", lightboxUrl(99)],
+      ["another dialog", "/admin/products?dialog=other&image-id=3"],
+    ])("stays closed when the URL names %s", async (_, url) => {
+      await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] }, [], url);
+
+      await expect.element(imageGrid()).toBeVisible();
+      await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    // Going back to an entry remounts the page, which would drop the form's changes.
+    it("adds no history entry to go back to", async () => {
+      await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] });
+      const entries = window.history.length;
+
+      await openImage(2).click();
+      await expect.element(lightbox("blue.png")).toBeVisible();
+      await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
+      await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+
+      expect(window.history.length).toBe(entries);
+    });
+
+    // The unsaved changes toast stops visits, which a server round trip would be.
+    it("opens and closes with unsaved changes, and keeps them", async () => {
+      await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] });
+      await userEvent.type(nameInput(), " for rain");
+      await expect.element(toast()).toBeVisible();
+
+      await openImage(2).click();
+      await userEvent.type(altText("blue.png"), "Side");
+      await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
+
+      await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+      expect(query()).toEqual({});
+      expect(submitted()).toMatchObject({ name: "Boots for rain", "image_alts[3]": "Side" });
+      await expect.element(toast()).toBeVisible();
+    });
+
+    it("opens the clicked image without unsaved changes", async () => {
+      await renderForm({
+        ...boots,
+        images: [image(7, "red", "Boots from the front"), image(3, "blue")],
+      });
+
+      await openImage(2).click();
+
+      await expect.element(lightbox("blue.png")).toBeVisible();
+      await expect.element(altText("blue.png")).toHaveValue("");
+      await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
+      await openImage(1).click();
+      await expect.element(altText("red.png")).toHaveValue("Boots from the front");
+      await expect.element(toast()).not.toBeInTheDocument();
+    });
+
+    it("submits the changed alt text with the image's id, and puts it back on cancel", async () => {
+      await renderForm({
+        ...boots,
+        images: [image(7, "red", "Boots from the front"), image(3, "blue")],
+      });
+      await openImage(2).click();
+
+      await userEvent.type(altText("blue.png"), "Boots from the side");
+      await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
+
+      await expect.element(toast()).toBeVisible();
+      expect(submitted()).toMatchObject({
+        "image_alts[7]": "Boots from the front",
+        "image_alts[3]": "Boots from the side",
+      });
+
+      await toast().getByRole("button", { name: "Cancel" }).click();
+
+      await expect.element(toast()).not.toBeInTheDocument();
+      expect(submitted()).toMatchObject({ "image_alts[3]": "" });
+      await openImage(2).click();
+      await expect.element(altText("blue.png")).toHaveValue("");
+    });
   });
 });

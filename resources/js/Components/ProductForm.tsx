@@ -1,5 +1,5 @@
 import { Field as BaseField } from "@base-ui/react/field";
-import { router, useFormContext, useHttp } from "@inertiajs/react";
+import { router, useFormContext, useHttp, usePage } from "@inertiajs/react";
 import { cn } from "cn";
 import {
   Badge,
@@ -36,6 +36,7 @@ import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
 import CategoryCheckboxTree from "./CategoryCheckboxTree";
 import FormCheckbox from "./FormCheckbox";
+import ProductImageLightbox from "./ProductImageLightbox";
 import VisibilityField from "./VisibilityField";
 
 type Product = Omit<Larasell.Admin.Data.ViewModel.ProductDetailData, "id">;
@@ -153,8 +154,9 @@ const IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/avif";
  * The product's images in its order, then a square that opens the system's file picker. The
  * chosen images are uploaded right away, one at a time so a rejected one keeps none of the others
  * out, with a plain request since the unsaved changes toast blocks Inertia visits, and join the
- * grid. Dragging an image moves it to another's place. The form submits the grid's image ids in
- * order, so saving the product links them; until then, cancelling the changes drops them again.
+ * grid. Dragging an image moves it to another's place; clicking it opens it in a lightbox, which
+ * edits its alt text. The form submits the grid's image ids in order and each one's alt text, so
+ * saving the product links and describes them; until then, cancelling the changes drops them again.
  * Saving waits for the uploads; cancelling or leaving the page stops them.
  */
 function ImageGrid({
@@ -172,6 +174,7 @@ function ImageGrid({
   const [uploading, setUploading] = useState<File[]>([]);
   // Why chosen images weren't uploaded, one message per image.
   const [errors, setErrors] = useState<string[]>([]);
+  const lightbox = useLightboxUrl();
   const grid = useRef<HTMLUListElement>(null);
   const upload = useHttp<{ image: File | null }, { image: Image }>({ image: null });
   // The running uploads; replacing it stops them from adding anything more.
@@ -258,7 +261,9 @@ function ImageGrid({
   const invalidImages = [
     ...new Set(
       Object.entries(saveErrors)
-        .filter(([key]) => key === "images" || key.startsWith("images."))
+        .filter(
+          ([key]) => key === "images" || key.startsWith("images.") || key.startsWith("image_alts."),
+        )
         .map(([, error]) => error)
         .filter((error) => error !== undefined),
     ),
@@ -283,6 +288,7 @@ function ImageGrid({
                 key={image.id}
                 image={image}
                 index={index}
+                onOpen={() => lightbox.open(image.id)}
                 onRemove={() => setImages((current) => current.filter(({ id }) => id !== image.id))}
               />
             ))}
@@ -326,6 +332,15 @@ function ImageGrid({
           </li>
         </ul>
       </div>
+      <ProductImageLightbox
+        image={images.find(({ id }) => id === lightbox.imageId) ?? null}
+        onClose={lightbox.close}
+        onAltChange={(alt) =>
+          setImages((current) =>
+            current.map((image) => (image.id === lightbox.imageId ? { ...image, alt } : image)),
+          )
+        }
+      />
       {[...invalidImages, ...errors].map((error, index) => (
         // The same file can be chosen twice, so its message isn't unique.
         <Error key={index} match>
@@ -336,39 +351,58 @@ function ImageGrid({
   );
 }
 
-/** An image in the grid, which drags from anywhere on it, its menu too once the pointer moves. */
+/**
+ * An image in the grid, which drags from anywhere on it, its menu too once the pointer moves.
+ * Clicking it without moving opens it.
+ */
 function ImageCard({
   image,
   index,
+  onOpen,
   onRemove,
 }: {
   image: Image;
   index: number;
+  onOpen: () => void;
   onRemove: () => void;
 }) {
   // No transition, so the other images jump to their new places instead of sliding there.
-  const { ref, isDragging } = useSortable({ id: image.id, index, transition: null });
+  const { ref, handleRef, isDragging } = useSortable({ id: image.id, index, transition: null });
 
   return (
     <li
-      ref={ref}
+      ref={(element) => {
+        ref(element);
+        // The whole card is its handle, since dragging never starts from a button otherwise.
+        handleRef(element);
+      }}
       data-dragging={isDragging || undefined}
       className={cn(
         "border-border relative aspect-square cursor-grab overflow-hidden border bg-mauve-50 select-none dark:bg-mauve-900",
         "data-dragging:cursor-grabbing data-dragging:opacity-60",
+        // On the card rather than its button, whose ring the card's overflow would clip.
+        "has-[>button:focus-visible]:focus-ring",
         // Otherwise iOS opens its share and save menu on the long press that starts a touch
         // drag; it takes over the touch, and no image drags after that.
         "[-webkit-touch-callout:none]",
       )}
     >
       <input type="hidden" name="images[]" value={image.id} />
-      {/* A native image drag would take over the pointer before ours starts. */}
-      <img
-        src={image.url}
-        alt={`Image ${index + 1}`}
-        draggable={false}
-        className="size-full object-cover"
-      />
+      <input type="hidden" name={`image_alts[${image.id}]`} value={image.alt ?? ""} />
+      <button
+        type="button"
+        aria-label={`Open image ${index + 1}`}
+        onClick={onOpen}
+        className="size-full cursor-[inherit] outline-none"
+      >
+        {/* A native image drag would take over the pointer before ours starts. */}
+        <img
+          src={image.url}
+          alt={`Image ${index + 1}`}
+          draggable={false}
+          className="size-full object-cover"
+        />
+      </button>
       {index === 0 && (
         // Flex, so the badge doesn't sit on a text line that adds space above it.
         <div className="absolute top-2 left-2 flex">
@@ -406,6 +440,49 @@ function ImageMenu({ label, onRemove }: { label: string; onRemove: () => void })
       </Menu.Popup>
     </Menu.Root>
   );
+}
+
+const LIGHTBOX = "product-image-lightbox";
+
+/**
+ * Which image the lightbox shows, by id so it stays the same image whatever its position. The URL
+ * holds it, as `?dialog=product-image-lightbox&image-id=7`, so a link opens it. Opening and closing
+ * only change the URL in the browser: a visit to the server would lose the form's changes, and the
+ * unsaved changes toast stops those anyway. They replace the page's history entry instead of adding
+ * one, since Inertia remounts the page when going back to an entry, which would drop the changes.
+ */
+function useLightboxUrl() {
+  const { url } = usePage();
+  const query = new URL(url, window.location.origin).searchParams;
+  const imageId = query.get("dialog") === LIGHTBOX ? Number(query.get("image-id")) : null;
+
+  const withQuery = (change: (query: URLSearchParams) => void) => {
+    const next = new URL(url, window.location.origin);
+    change(next.searchParams);
+    return {
+      url: next.pathname + next.search + next.hash,
+      preserveScroll: true,
+      preserveState: true,
+    };
+  };
+
+  return {
+    imageId,
+    open: (id: number) =>
+      router.replace(
+        withQuery((query) => {
+          query.set("dialog", LIGHTBOX);
+          query.set("image-id", String(id));
+        }),
+      ),
+    close: () =>
+      router.replace(
+        withQuery((query) => {
+          query.delete("dialog");
+          query.delete("image-id");
+        }),
+      ),
+  };
 }
 
 /** Calls `onReset` whenever the form around `element` is reset, e.g. by cancelling its changes. */

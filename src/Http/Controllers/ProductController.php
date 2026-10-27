@@ -13,6 +13,7 @@ use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
@@ -53,6 +54,7 @@ class ProductController
 
         $product->categories()->attach($request->categoryIds());
         $product->images()->attach($request->images());
+        $this->saveImageAlts($request);
 
         return redirect()->route('larasell.admin.products.edit', $product);
     }
@@ -94,8 +96,19 @@ class ProductController
         $product->categories()->sync($request->categoryIds());
         // Also moves the images the product keeps to their new positions.
         $product->images()->sync($request->images());
+        $this->saveImageAlts($request);
 
         return redirect()->route('larasell.admin.products.edit', $product);
+    }
+
+    /**
+     * Saves the alt text the form gives the product's images.
+     */
+    protected function saveImageAlts(ProductRequest $request): void
+    {
+        foreach ($request->imageAlts() as $id => $alt) {
+            ProductImage::query()->whereKey($id)->update(['alt' => $alt]);
+        }
     }
 
     /**
