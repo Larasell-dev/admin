@@ -138,6 +138,8 @@ declare namespace Larasell.Admin.Data.ViewModel {
   export type ProductImageData = {
     id: number;
     url: string;
+    filename: string;
+    alt: string | null;
   };
   export type WeightData = {
     amount: string;

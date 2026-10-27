@@ -615,14 +615,15 @@ it('shows the product\'s images on its page in their order, whatever order they 
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
     $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
-    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
+    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png'), 'alt' => 'Boots from the front']);
     $boots->images()->attach([$side->id => ['position' => 1], $front->id => ['position' => 0]]);
 
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.images', [
-                ['id' => $front->id, 'url' => $front->url()],
-                ['id' => $side->id, 'url' => $side->url()],
+                // Named after the stored file, which is what opening it shows.
+                ['id' => $front->id, 'url' => $front->url(), 'filename' => basename($front->file), 'alt' => 'Boots from the front'],
+                ['id' => $side->id, 'url' => $side->url(), 'filename' => basename($side->file), 'alt' => null],
             ]));
 });
 
@@ -642,7 +643,7 @@ it('uploads an image without linking it to a product', function () {
         // Saving a product links it; uploading doesn't.
         ->and($image->products()->exists())->toBeFalse();
 
-    $response->assertExactJson(['image' => ['id' => $image->id, 'url' => $image->url()]]);
+    $response->assertExactJson(['image' => ['id' => $image->id, 'url' => $image->url(), 'filename' => basename($image->file), 'alt' => null]]);
     Storage::disk('public')->assertExists($image->file);
 });
 
@@ -685,6 +686,63 @@ it('links the submitted images to a new product in their order', function () {
         ->assertSessionHasNoErrors();
 
     expect(Product::query()->sole()->images->modelKeys())->toBe([$side->id, $front->id]);
+});
+
+it('saves the alt text of the product\'s images', function () {
+    Storage::fake('public');
+    config(['larasell.images.disk' => 'public']);
+    signInAdmin();
+
+    [$front, $side, $other] = collect(['front.png', 'side.png', 'other.png'])
+        ->map(fn (string $name) => ProductImage::create(['file' => UploadedFile::fake()->image($name), 'alt' => "Old {$name}"]));
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+
+    $this->put(route('larasell.admin.products.update', $boots), [
+        'name' => 'Boots',
+        'slug' => 'boots',
+        'status' => 'visible',
+        'images' => [(string) $front->id, (string) $side->id],
+        // An emptied alt text is removed; one for an image the product doesn't have is ignored.
+        'image_alts' => [$front->id => 'Boots from the front', $side->id => '', $other->id => 'Hijacked'],
+    ])->assertSessionHasNoErrors();
+
+    expect($front->fresh()?->alt)->toBe('Boots from the front')
+        ->and($side->fresh()?->alt)->toBeNull()
+        ->and($other->fresh()?->alt)->toBe('Old other.png');
+});
+
+it('saves the alt text of a new product\'s images', function () {
+    Storage::fake('public');
+    config(['larasell.images.disk' => 'public']);
+    signInAdmin();
+
+    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
+
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Boots',
+        'slug' => 'boots',
+        'status' => 'visible',
+        'images' => [(string) $front->id],
+        'image_alts' => [$front->id => 'Boots from the front'],
+    ])->assertSessionHasNoErrors();
+
+    expect($front->fresh()?->alt)->toBe('Boots from the front');
+});
+
+it('rejects alt text longer than the column holds', function () {
+    Storage::fake('public');
+    config(['larasell.images.disk' => 'public']);
+    signInAdmin();
+
+    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
+
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Boots',
+        'slug' => 'boots',
+        'status' => 'visible',
+        'images' => [(string) $front->id],
+        'image_alts' => [$front->id => str_repeat('a', 256)],
+    ])->assertSessionHasErrors(["image_alts.{$front->id}" => 'The alt text field must not be greater than 255 characters.']);
 });
 
 // The form shows these beside the images, so they name an image rather than its key.
