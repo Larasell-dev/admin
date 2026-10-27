@@ -819,9 +819,7 @@ describe("images", () => {
     it("says why a stale link didn't open the image", async () => {
       await renderForm({ ...boots, images: [image(7, "red")] }, [], lightboxUrl(99));
 
-      await expect
-        .element(page.getByText("Couldn't find that image on this product"))
-        .toBeVisible();
+      await expect.element(page.getByText("Image not found")).toBeVisible();
     });
 
     // Going back to an entry remounts the page, which would drop the form's changes.
