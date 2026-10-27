@@ -15,6 +15,7 @@ import {
   SectionStack,
   Spinner,
   Stack,
+  useToast,
 } from "@larasell-dev/ui";
 import { AddLine, ArrowDownSLine, FileReduceLine, More2Fill } from "@larasell-dev/ui/icons";
 import { Accessibility, type defaultPreset } from "@dnd-kit/dom";
@@ -182,11 +183,17 @@ function ImageGrid({
   // The last image opened, kept while the lightbox closes so it fades out with it. Mounted from
   // then on, so the lightbox keeps its background for the next image.
   const lightboxImage = useFrozen(openImage, openImage === undefined);
-  // A URL naming an image the product doesn't have, e.g. a stale link, stops naming it.
-  const closeLightbox = useEffectEvent(lightbox.close);
+  // A URL naming an image the product doesn't have, e.g. a stale link, stops naming it, and a
+  // toast says why the image didn't open.
+  const toast = useToast();
+  const dropMissingImage = useEffectEvent(() => {
+    lightbox.close();
+    // By id, so strict mode's second run doesn't show it twice.
+    toast.add({ id: "missing-lightbox-image", title: "Couldn't find that image on this product" });
+  });
   const missingImage = lightbox.imageId !== null && openImage === undefined;
   useEffect(() => {
-    if (missingImage) closeLightbox();
+    if (missingImage) dropMissingImage();
   }, [missingImage]);
   const grid = useRef<HTMLUListElement>(null);
   const upload = useHttp<{ image: File | null }, { image: Image }>({ image: null });
