@@ -626,28 +626,24 @@ it('shows the product\'s images on its page in their order, whatever order they 
             ]));
 });
 
-it('uploads several images at once, in the order chosen, without linking them to a product', function () {
+it('uploads an image without linking it to a product', function () {
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
     $response = $this->postJson(route('larasell.admin.products.images.store'), [
-        'images' => [
-            UploadedFile::fake()->image('side.jpg'),
-            UploadedFile::fake()->image('back.webp'),
-        ],
+        'image' => UploadedFile::fake()->image('back.webp'),
     ])->assertCreated();
 
-    $images = ProductImage::query()->orderBy('id')->get();
+    $image = ProductImage::query()->sole();
 
-    // Each file is stored under a new name, but keeps its type.
-    expect($images->map(fn (ProductImage $image) => pathinfo($image->file, PATHINFO_EXTENSION))->all())
-        ->toBe(['jpg', 'webp'])
-        // Saving a product links them; uploading doesn't.
-        ->and(ProductImage::query()->has('products')->exists())->toBeFalse();
+    // The file is stored under a new name, but keeps its type.
+    expect(pathinfo($image->file, PATHINFO_EXTENSION))->toBe('webp')
+        // Saving a product links it; uploading doesn't.
+        ->and($image->products()->exists())->toBeFalse();
 
-    $response->assertExactJson(['images' => $images->map(fn (ProductImage $image) => ['id' => $image->id, 'url' => $image->url()])->all()]);
-    $images->each(fn (ProductImage $image) => Storage::disk('public')->assertExists($image->file));
+    $response->assertExactJson(['image' => ['id' => $image->id, 'url' => $image->url()]]);
+    Storage::disk('public')->assertExists($image->file);
 });
 
 it('links the submitted images to a product in their order, the first as its thumbnail', function () {
@@ -691,36 +687,49 @@ it('links the submitted images to a new product in their order', function () {
     expect(Product::query()->sole()->images->modelKeys())->toBe([$side->id, $front->id]);
 });
 
-it('rejects images that do not exist', function (mixed $images, string $error) {
+// The form shows these beside the images, so they name an image rather than its key.
+it('rejects images that do not exist', function (mixed $images, string $error, string $message) {
     signInAdmin();
 
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => $images])
-        ->assertSessionHasErrors($error);
+        ->assertSessionHasErrors([$error => $message]);
 
     expect(Product::query()->exists())->toBeFalse();
 })->with([
-    'not a list' => ['front', 'images'],
-    'missing image' => [['999'], 'images.0'],
-    'not an id' => [['front'], 'images.0'],
+    'not a list' => ['front', 'images', 'The images field must be an array.'],
+    'missing image' => [['999'], 'images.0', 'The selected image is invalid.'],
+    'not an id' => [['front'], 'images.0', 'The image field must be an integer.'],
 ]);
 
-it('rejects uploads that are not images, and keeps every image of the request out', function (array $images, string $error) {
+it('rejects uploads that are not one image', function (Closure $image) {
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
-    $this->postJson(route('larasell.admin.products.images.store'), ['images' => $images])
+    $this->postJson(route('larasell.admin.products.images.store'), ['image' => $image()])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors($error);
+        ->assertJsonValidationErrors('image');
 
     expect(ProductImage::query()->count())->toBe(0)
         ->and(Storage::disk('public')->allFiles())->toBe([]);
 })->with([
-    'none' => fn () => [[], 'images'],
-    'a document' => fn () => [[UploadedFile::fake()->image('front.png'), UploadedFile::fake()->create('manual.pdf', 10, 'application/pdf')], 'images.1'],
-    'an SVG' => fn () => [[UploadedFile::fake()->create('logo.svg', 1, 'image/svg+xml')], 'images.0'],
-    'too large' => fn () => [[UploadedFile::fake()->image('huge.png')->size(10 * 1024 + 1)], 'images.0'],
+    'none' => fn () => null,
+    // One at a time, so a failure can't leave some of a request's images stored.
+    'several' => fn () => [UploadedFile::fake()->image('front.png'), UploadedFile::fake()->image('back.png')],
+    'a document' => fn () => UploadedFile::fake()->create('manual.pdf', 10, 'application/pdf'),
+    'an SVG' => fn () => UploadedFile::fake()->create('logo.svg', 1, 'image/svg+xml'),
+    'too large' => fn () => UploadedFile::fake()->image('huge.png')->size(10 * 1024 + 1),
 ]);
+
+// PHP drops files over its upload_max_filesize, which defaults to 2 MB, before the size rule runs.
+it('explains images that PHP could not receive', function () {
+    signInAdmin();
+    $file = new UploadedFile(UploadedFile::fake()->image('huge.png')->getPathname(), 'huge.png', 'image/png', UPLOAD_ERR_INI_SIZE, true);
+
+    $this->postJson(route('larasell.admin.products.images.store'), ['image' => $file])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['image' => 'The image may be larger than the server accepts.']);
+});
 
 it('returns 404 for editing a product that does not exist', function () {
     signInAdmin();
@@ -802,7 +811,7 @@ it('does not let guests create or edit products', function () {
     $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
     $this->get(route('larasell.admin.products.edit', $boots))->assertRedirect(route('larasell.admin.login'));
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
-    $this->post(route('larasell.admin.products.images.store'), ['images' => [UploadedFile::fake()->image('front.png')]])->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.products.images.store'), ['image' => UploadedFile::fake()->image('front.png')])->assertRedirect(route('larasell.admin.login'));
 
     expect(Product::query()->sole()->name->get())->toBe('Boots')
         ->and(ProductImage::query()->count())->toBe(0);

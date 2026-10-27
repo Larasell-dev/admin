@@ -116,6 +116,8 @@ class ProductRequest extends FormRequest
             'allow_backorders' => 'backorders',
             'min_quantity' => 'minimum quantity',
             'max_quantity' => 'maximum quantity',
+            // Shown beside the images, which have no key the admin would know.
+            'images.*' => 'image',
         ];
     }
 
