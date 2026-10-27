@@ -276,6 +276,16 @@ it('rejects invalid avatars', function (Closure $file) {
     'file too big' => [fn () => UploadedFile::fake()->image('avatar.png', 256, 256)->size(2049)],
 ]);
 
+// PHP drops files over its upload_max_filesize before the size rule runs.
+it('explains avatars that PHP could not receive', function () {
+    $file = new UploadedFile(UploadedFile::fake()->image('avatar.png', 256, 256)->getPathname(), 'avatar.png', 'image/png', UPLOAD_ERR_INI_SIZE, true);
+
+    $this->actingAs(profileAdmin(), 'larasell-admin')
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => $file])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['avatar' => 'The picture may be larger than the server accepts.']);
+});
+
 it('accepts avatars at the dimension limits', function (int $size) {
     Storage::fake('public');
 
