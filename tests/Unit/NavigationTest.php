@@ -157,8 +157,8 @@ it('positions NavItem cases in steps of 1000 in declaration order', function () 
 it('lists NavItem labels keyed by route', function () {
     expect(NavItem::all())->toBe([
         'larasell.admin.home' => 'Home',
-        'larasell.admin.categories.index' => 'Categories',
         'larasell.admin.products.index' => 'Products',
+        'larasell.admin.categories.index' => 'Categories',
         'larasell.admin.customers.index' => 'Customers',
         'larasell.admin.settings' => 'Settings',
     ]);
@@ -173,8 +173,8 @@ it('places built-in navigation items at their NavItem position', function () {
     expect(array_column(Navigation::resolve()->tree(), 'id'))->toBe([
         'larasell.admin.home',
         'larasell.admin.notes',
-        'larasell.admin.categories.index',
         'larasell.admin.products.index',
+        'larasell.admin.categories.index',
         'larasell.admin.customers.index',
         'larasell.admin.settings',
     ]);

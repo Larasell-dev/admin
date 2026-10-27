@@ -9,8 +9,8 @@ enum NavItem: string
     use HasLabel;
 
     case Home = 'larasell.admin.home';
-    case Categories = 'larasell.admin.categories.index';
     case Products = 'larasell.admin.products.index';
+    case Categories = 'larasell.admin.categories.index';
     case Customers = 'larasell.admin.customers.index';
     case Settings = 'larasell.admin.settings';
 
@@ -18,8 +18,8 @@ enum NavItem: string
     {
         return match ($this) {
             self::Home => 'Home',
-            self::Categories => 'Categories',
             self::Products => 'Products',
+            self::Categories => 'Categories',
             self::Customers => 'Customers',
             self::Settings => 'Settings',
         };
@@ -32,8 +32,8 @@ enum NavItem: string
     {
         return match ($this) {
             self::Home => 1000,
-            self::Categories => 2000,
-            self::Products => 3000,
+            self::Products => 2000,
+            self::Categories => 3000,
             self::Customers => 4000,
             self::Settings => 5000,
         };

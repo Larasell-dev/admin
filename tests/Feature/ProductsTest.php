@@ -866,12 +866,12 @@ it('redirects guests away from the products', function () {
     $this->get(route('larasell.admin.products.index'))->assertRedirect(route('larasell.admin.login'));
 });
 
-it('shows Products in the navigation between Categories and Customers', function () {
+it('shows Products in the navigation between Home and Categories', function () {
     signInAdmin();
 
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Categories', 'Products', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Customers', 'Settings']));
 });
 
 it('turns the products off when disabled in the config', function () {
