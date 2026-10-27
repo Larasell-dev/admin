@@ -798,13 +798,19 @@ describe("images", () => {
     });
 
     it.each([
-      ["an image the product doesn't have", lightboxUrl(99)],
-      ["another dialog", "/admin/products?dialog=other&image-id=3"],
-    ])("stays closed when the URL names %s", async (_, url) => {
+      // A stale link, e.g. to an image removed since. The URL stops naming it.
+      ["an image the product doesn't have", lightboxUrl(99), {}],
+      [
+        "another dialog",
+        "/admin/products?dialog=other&image-id=3",
+        { dialog: "other", "image-id": "3" },
+      ],
+    ])("stays closed when the URL names %s", async (_, url, remaining) => {
       await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] }, [], url);
 
       await expect.element(imageGrid()).toBeVisible();
       await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+      await expect.poll(query).toEqual(remaining);
     });
 
     // Going back to an entry remounts the page, which would drop the form's changes.
