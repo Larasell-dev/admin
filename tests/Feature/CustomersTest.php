@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
 use Larasell\Larasell\Models\Customer;
@@ -145,4 +146,25 @@ it('shows a missing customer as not found', function () {
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.edit', 999))
         ->assertNotFound();
+});
+
+it('turns the customers off when disabled in the config', function () {
+    $this->bootingWith(fn () => config(['larasell.admin.customers.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
+    $this->actingAs($admin, 'larasell-admin');
+
+    expect(Route::has('larasell.admin.customers.index'))->toBeFalse();
+
+    // The routes aren't registered, so there are no route names to use.
+    $this->get('/admin/customers')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get('/admin/customers/create')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->post('/admin/customers', ['first_name' => 'Grace', 'last_name' => 'Hopper'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get("/admin/customers/{$ada->id}/edit")->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->put("/admin/customers/{$ada->id}", ['first_name' => 'Ada', 'last_name' => 'King'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get(route('larasell.admin.home'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Settings']));
+
+    expect(Customer::query()->pluck('last_name')->all())->toBe(['Lovelace']);
 });

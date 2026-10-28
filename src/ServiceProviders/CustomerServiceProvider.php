@@ -13,12 +13,21 @@ use Larasell\Admin\Tables\Customers\Customers;
 
 /**
  * The customers module: its table page, its navigation item, and the pages to add and edit a
- * customer.
+ * customer. Setting larasell.admin.customers.enabled to false leaves all of them out.
  */
 class CustomerServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/customers.php', 'larasell.admin.customers');
+    }
+
     public function boot(): void
     {
+        if (! config('larasell.admin.customers.enabled')) {
+            return;
+        }
+
         Navigation::index(NavItem::Customers->label(), 'customers', Customers::class, icon: Icon::Group)->position(NavItem::Customers->position());
 
         AdminPanel::resolve()->routes(function (): void {
