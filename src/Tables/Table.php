@@ -50,6 +50,7 @@ abstract class Table implements JsonSerializable
         'larasell:' => 'Larasell\\Admin\\Tables\\Panel\\',
         'larasell-product:' => 'Larasell\\Admin\\Tables\\Product\\',
         'larasell-customers:' => 'Larasell\\Admin\\Tables\\Customers\\',
+        'larasell-orders:' => 'Larasell\\Admin\\Tables\\Orders\\',
     ];
 
     public static function make(mixed ...$arguments): static
