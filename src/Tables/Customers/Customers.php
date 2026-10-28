@@ -4,7 +4,9 @@ namespace Larasell\Admin\Tables\Customers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Larasell\Admin\Actions\DeleteCustomer;
 use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Actions\TableAction;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
@@ -38,6 +40,16 @@ class Customers extends Table
     {
         return [
             TableAction::make('Add customer')->route('larasell.admin.customers.create')->icon(Icon::Add),
+        ];
+    }
+
+    public function actions(): array
+    {
+        return [
+            Action::make('Delete', handle: fn (Customer $customer) => app(DeleteCustomer::class)->handle($customer))
+                ->confirm(message: 'Their orders are kept, with the name and email they were placed with. This can\'t be undone.')
+                ->icon(Icon::DeleteBin)
+                ->destructive(),
         ];
     }
 
