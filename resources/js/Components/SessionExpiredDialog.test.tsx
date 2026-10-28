@@ -82,7 +82,13 @@ it("asks for the password once the session expired and signs back in on the same
 
   await dialog().getByLabelText("Password").fill("secret");
   await dialog().getByRole("button", { name: "Continue" }).click();
+  // Animates out rather than vanishing with the form.
+  await expect.element(dialog()).toHaveAttribute("data-ending-style");
   await expect.element(dialog()).not.toBeInTheDocument();
+
+  // The next time it asks, the password is empty again.
+  expireSession();
+  await expect.element(dialog().getByLabelText("Password")).toHaveValue("");
 
   expect(requests.map(({ data }) => JSON.parse(data as string))).toEqual([
     { email: "ada@example.com", password: "wrong" },

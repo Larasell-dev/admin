@@ -28,10 +28,17 @@ export default function SessionExpiredDialog() {
   const { admin, loginUrl } = usePage<Page>().props;
   assertPresent(admin, "The session expired dialog needs a signed-in admin.");
   const cookies = useCookies();
-  const [expired, setExpired] = useState(false);
+  // Kept after closing, so the popup can animate out instead of unmounting with its content.
+  // The key changes each time the session expires, so the form starts empty again.
+  const [session, setSession] = useState<{ expired: boolean; key: number } | null>(null);
+  const expired = session?.expired ?? false;
+  const expire = () =>
+    setSession((current) =>
+      current?.expired ? current : { expired: true, key: (current?.key ?? 0) + 1 },
+    );
 
   const check = () => {
-    if (!sessionAlive(cookies)) setExpired(true);
+    if (!sessionAlive(cookies)) expire();
   };
   useInterval(check, checkInterval);
   // Timers are throttled in background tabs, so check right away when the admin comes back.
@@ -49,7 +56,7 @@ export default function SessionExpiredDialog() {
         return;
       }
       event.preventDefault();
-      setExpired(true);
+      expire();
     });
   }, [cookies, loginUrl]);
 
@@ -61,11 +68,12 @@ export default function SessionExpiredDialog() {
         exclusive={overlayExclusive}
         enabled={expired}
       >
-        {expired && (
+        {session && (
           <SignInAgain
+            key={session.key}
             email={admin.email}
             loginUrl={loginUrl}
-            onSignedIn={() => setExpired(false)}
+            onSignedIn={() => setSession({ ...session, expired: false })}
           />
         )}
       </HotkeysProvider>
