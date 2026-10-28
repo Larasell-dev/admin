@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Http\Requests;
+namespace Larasell\Admin\Http\Requests\Customers;
 
 use Illuminate\Foundation\Http\FormRequest;
 

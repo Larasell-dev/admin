@@ -1,8 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Data\View;
+namespace Larasell\Admin\Data\View\Customers;
 
-use Larasell\Admin\Data\ViewModel\CustomerDetailData;
+use Larasell\Admin\Data\ViewModel\Customers\CustomerDetailData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 

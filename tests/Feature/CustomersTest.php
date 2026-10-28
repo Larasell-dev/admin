@@ -33,13 +33,19 @@ it('lists customers with their order count, newest first', function () {
         ->get(route('larasell.admin.customers.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Customer/Index')
-            ->where('customers.total', 2)
-            ->where('customers.data.0.name', 'Alan Turing')
-            ->where('customers.data.0.ordersCount', 0)
-            ->where('customers.data.1.name', 'Ada Lovelace')
-            ->where('customers.data.1.ordersCount', 2)
-            ->where('customers.data.1.createdAt', '2 days ago'));
+            ->component('TablePage')
+            ->where('table.title', 'Customers')
+            ->where('table.columns', [
+                ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
+                ['name' => 'orders_count', 'label' => 'Orders', 'type' => 'text'],
+                ['name' => 'created_at', 'label' => 'Created', 'type' => 'text'],
+            ])
+            ->where('table.pagination.total', 2)
+            ->where('table.rows.0.name', 'Alan Turing')
+            ->where('table.rows.0.orders_count', '0')
+            ->where('table.rows.1.name', 'Ada Lovelace')
+            ->where('table.rows.1.orders_count', '2')
+            ->where('table.rows.1.created_at', '2 days ago'));
 });
 
 it('links each customer to their edit page and offers to add one', function () {
@@ -49,8 +55,21 @@ it('links each customer to their edit page and offers to add one', function () {
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('createUrl', route('larasell.admin.customers.create'))
-            ->where('customers.data.0.editUrl', route('larasell.admin.customers.edit', $ada)));
+            ->where('table.headerActions.0.label', 'Add customer')
+            ->where('table.headerActions.0.url', route('larasell.admin.customers.create'))
+            ->where('table.rows.0._link', route('larasell.admin.customers.edit', $ada)));
+});
+
+it('offers to add the first customer when there are none', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.customers.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.pagination.total', 0)
+            ->where('table.emptyState.title', 'No customers yet')
+            ->where('table.emptyState.icon', 'Group')
+            ->where('table.emptyState.actions.0.url', route('larasell.admin.customers.create')));
 });
 
 it('opens the new customer page', function () {

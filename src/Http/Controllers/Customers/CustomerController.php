@@ -1,39 +1,19 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers;
+namespace Larasell\Admin\Http\Controllers\Customers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Data\View\CreateCustomerPageData;
-use Larasell\Admin\Data\View\CustomersPageData;
-use Larasell\Admin\Data\View\EditCustomerPageData;
-use Larasell\Admin\Data\ViewModel\CustomerData;
-use Larasell\Admin\Data\ViewModel\CustomerDetailData;
-use Larasell\Admin\Data\ViewModel\PaginatedCustomersData;
-use Larasell\Admin\Http\Requests\CustomerRequest;
+use Larasell\Admin\Data\View\Customers\CreateCustomerPageData;
+use Larasell\Admin\Data\View\Customers\EditCustomerPageData;
+use Larasell\Admin\Data\ViewModel\Customers\CustomerDetailData;
+use Larasell\Admin\Http\Requests\Customers\CustomerRequest;
 use Larasell\Larasell\Models\Customer;
 use Laravel\Head\Facades\Head;
 
 class CustomerController
 {
-    public function index(Request $request): Response
-    {
-        $perPage = in_array($request->integer('per_page'), [25, 50, 100], true) ? $request->integer('per_page') : 25;
-
-        $customers = Customer::query()
-            ->withCount('orders')
-            ->latest()
-            ->paginate($perPage)
-            ->through(fn (Customer $customer): CustomerData => CustomerData::fromModel($customer));
-
-        return Inertia::render('Customer/Index', new CustomersPageData(
-            createUrl: route('larasell.admin.customers.create'),
-            customers: PaginatedCustomersData::fromPaginator($customers),
-        ));
-    }
-
     public function create(): Response
     {
         return Inertia::render('Customer/Create', new CreateCustomerPageData(
