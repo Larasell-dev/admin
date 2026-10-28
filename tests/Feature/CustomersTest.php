@@ -231,7 +231,7 @@ it('turns the customers off when disabled in the config', function () {
     $this->put("/admin/customers/{$ada->id}", ['first_name' => 'Ada', 'last_name' => 'King'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Settings']));
 
     expect(Customer::query()->pluck('last_name')->all())->toBe(['Lovelace']);
 });

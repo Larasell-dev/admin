@@ -151,7 +151,7 @@ it('has a registered navigation item for every NavItem case', function () {
 
 it('positions NavItem cases in steps of 1000 in declaration order', function () {
     expect(array_map(fn (NavItem $case): int => $case->position(), NavItem::cases()))
-        ->toBe([1000, 2000, 3000, 4000, 5000]);
+        ->toBe([1000, 2000, 3000, 4000, 5000, 6000]);
 });
 
 it('lists NavItem labels keyed by route', function () {
@@ -159,6 +159,7 @@ it('lists NavItem labels keyed by route', function () {
         'larasell.admin.home' => 'Home',
         'larasell.admin.products.index' => 'Products',
         'larasell.admin.categories.index' => 'Categories',
+        'larasell.admin.orders.index' => 'Orders',
         'larasell.admin.customers.index' => 'Customers',
         'larasell.admin.settings' => 'Settings',
     ]);
@@ -175,6 +176,7 @@ it('places built-in navigation items at their NavItem position', function () {
         'larasell.admin.notes',
         'larasell.admin.products.index',
         'larasell.admin.categories.index',
+        'larasell.admin.orders.index',
         'larasell.admin.customers.index',
         'larasell.admin.settings',
     ]);
