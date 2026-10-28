@@ -11,6 +11,7 @@ use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Translatable;
 
 class ReadingListTable extends Table
@@ -58,6 +59,7 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'new category' => ['/admin/categories/create', 'New category - Admin'],
     'products' => ['/admin/products', 'Products - Admin'],
     'customers' => ['/admin/customers', 'Customers - Admin'],
+    'new customer' => ['/admin/customers/create', 'New customer - Admin'],
     'profile' => ['/admin/profile', 'Profile - Admin'],
     'admins' => ['/admin/settings/admins', 'Admins - Admin'],
     'new admin' => ['/admin/settings/admins/create', 'New admin - Admin'],
@@ -67,6 +69,14 @@ it('titles an admin\'s page with their name', function () {
     signedInAdmin();
 
     expect(pageTitle($this->get(route('larasell.admin.settings.admins.edit', 1))))->toBe('Ada Lovelace - Admin');
+});
+
+it('titles a customer\'s page with their name', function () {
+    signedInAdmin();
+
+    $customer = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
+
+    expect(pageTitle($this->get(route('larasell.admin.customers.edit', $customer))))->toBe('Ada Lovelace - Admin');
 });
 
 it('titles category pages with the category name', function (string $uri, string $title) {
