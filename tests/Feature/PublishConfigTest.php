@@ -11,7 +11,7 @@ afterEach(function () {
 it('publishes the config files to config/larasell/admin', function () {
     $this->artisan('vendor:publish', ['--tag' => 'larasell-admin-config'])->assertSuccessful();
 
-    foreach (['panel.php', 'products.php'] as $file) {
+    foreach (['panel.php', 'products.php', 'customers.php'] as $file) {
         expect(config_path("larasell/admin/{$file}"))->toBeFile()
             ->and(File::get(config_path("larasell/admin/{$file}")))
             ->toBe(File::get(__DIR__."/../../config/larasell/admin/{$file}"));
