@@ -20,6 +20,28 @@ it('logs an admin in with valid credentials', function () {
     expect(auth('larasell-admin')->check())->toBeTrue();
 });
 
+it('signs an admin back in without a redirect for the session expired dialog', function () {
+    Admin::create([
+        'name' => 'Test Admin',
+        'email' => 'admin@example.com',
+        'password' => 'password',
+    ]);
+
+    $this->postJson(route('larasell.admin.login.store'), [
+        'email' => 'admin@example.com',
+        'password' => 'wrong-password',
+    ])->assertUnprocessable()->assertJsonValidationErrors('email');
+
+    expect(auth('larasell-admin')->check())->toBeFalse();
+
+    $this->postJson(route('larasell.admin.login.store'), [
+        'email' => 'admin@example.com',
+        'password' => 'password',
+    ])->assertNoContent();
+
+    expect(auth('larasell-admin')->check())->toBeTrue();
+});
+
 it('fails to log an admin in with invalid credentials', function () {
     Admin::create([
         'name' => 'Test Admin',

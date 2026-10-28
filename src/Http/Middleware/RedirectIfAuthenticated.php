@@ -12,7 +12,10 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::guard('larasell-admin')->check()) {
-            return redirect()->route('larasell.admin.home');
+            // The session expired dialog, after the admin signed back in from another tab.
+            return $request->expectsJson()
+                ? response()->noContent()
+                : redirect()->route('larasell.admin.home');
         }
 
         return $next($request);
