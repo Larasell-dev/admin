@@ -4,7 +4,7 @@ namespace Larasell\Admin\Tables\Customers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Larasell\Admin\Actions\DeleteCustomer;
+use Larasell\Admin\Actions\Customers\DeleteCustomer;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Actions\TableAction;
