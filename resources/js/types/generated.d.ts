@@ -29,6 +29,10 @@ declare namespace Larasell.Admin.Data.View {
     parent: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
     createProductUrl: string | null;
   };
+  export type CreateCustomerPageData = {
+    storeUrl: string;
+    indexUrl: string;
+  };
   export type CreateProductPageData = {
     storeUrl: string;
     indexUrl: string;
@@ -37,10 +41,16 @@ declare namespace Larasell.Admin.Data.View {
     uploadImagesUrl: string;
   };
   export type CustomersPageData = {
+    createUrl: string;
     customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
   };
   export type EditAdminPageData = {
     editedAdmin: Larasell.Admin.Data.ViewModel.AdminData;
+    updateUrl: string;
+    indexUrl: string;
+  };
+  export type EditCustomerPageData = {
+    customer: Larasell.Admin.Data.ViewModel.CustomerDetailData;
     updateUrl: string;
     indexUrl: string;
   };
@@ -102,6 +112,12 @@ declare namespace Larasell.Admin.Data.ViewModel {
     name: string;
     ordersCount: number;
     createdAt: string | null;
+    editUrl: string;
+  };
+  export type CustomerDetailData = {
+    name: string;
+    firstName: string;
+    lastName: string;
   };
   export type DimensionsData = {
     length: string;

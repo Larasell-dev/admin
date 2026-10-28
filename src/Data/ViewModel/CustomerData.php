@@ -14,6 +14,7 @@ class CustomerData extends Data
         public string $name,
         public int $ordersCount,
         public ?string $createdAt,
+        public string $editUrl,
     ) {}
 
     public static function fromModel(Customer $customer): self
@@ -23,6 +24,7 @@ class CustomerData extends Data
             name: $customer->fullName(),
             ordersCount: $customer->orders_count,
             createdAt: $customer->getAttribute('created_at')?->diffForHumans(),
+            editUrl: route('larasell.admin.customers.edit', $customer),
         );
     }
 }

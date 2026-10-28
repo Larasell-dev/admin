@@ -44,6 +44,10 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
     Route::post('categories/{category}/move', MoveCategoryController::class)->name('categories.move');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->withHead(title: 'Customers');
+    Route::post('customers', [CustomerController::class, 'store'])->name('customers.store');
+    Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->withHead(title: 'New customer');
+    Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+    Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('settings', SettingsController::class)->name('settings');

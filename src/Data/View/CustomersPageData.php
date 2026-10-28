@@ -10,6 +10,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 class CustomersPageData extends Data
 {
     public function __construct(
+        public string $createUrl,
         public PaginatedCustomersData $customers,
     ) {}
 }
