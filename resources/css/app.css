@@ -17,11 +17,17 @@
   /* Each Base UI portal is one layer, so a dialog or menu opened later covers earlier ones,
      backdrop included: its backdrop (z-40) and popup (z-50) only rank within the portal.
      A portal opened from inside another one is nested in it, after its popup, so the same
-     z-index puts it on top. */
+     z-index puts it on top.
+     Pinned to the top left: portals come after the full-height app, so a relative one would sit
+     at the bottom of the viewport. Popups are positioned within it, and while they first measure,
+     one opening near the bottom (like the rows per page select) lands below the viewport and
+     focusing it scrolls the page for a frame. */
   /* BEST-BEFORE 2027-02-23: Decide on whether we should define this in the ui package. Also
      think about tokens for z-index and enforce them via linting. */
   [data-base-ui-portal] {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     z-index: 50;
   }
 }
