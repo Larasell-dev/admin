@@ -1,7 +1,10 @@
 import { useFormContext } from "@inertiajs/react";
 import { Field, Input } from "@larasell-dev/ui";
 
-type Customer = Pick<Larasell.Admin.Data.ViewModel.Customers.CustomerDetailData, "firstName" | "lastName">;
+type Customer = Pick<
+  Larasell.Admin.Data.ViewModel.Customers.CustomerDetailData,
+  "firstName" | "lastName"
+>;
 
 /**
  * The fields of a customer. It must sit inside an Inertia `<Form>`, which submits them and
