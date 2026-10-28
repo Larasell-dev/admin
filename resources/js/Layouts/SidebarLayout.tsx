@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import MobileNav from "../Components/MobileNav";
+import SessionExpiredDialog from "../Components/SessionExpiredDialog";
 import Sidebar from "../Components/Sidebar";
 import { SkipLink } from "../Components/SkipLink";
 import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
@@ -25,6 +26,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       </main>
       {/* Outside the page, so a toast can animate out after its page is gone. */}
       <UnsavedChangesToastHost />
+      <SessionExpiredDialog />
     </div>
   );
 }

@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Data\View\LoginPageData;
 use Larasell\Admin\Http\Requests\LoginRequest;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class LoginController
 {
@@ -20,7 +21,7 @@ class LoginController
         ));
     }
 
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request): RedirectResponse|SymfonyResponse
     {
         if (! Auth::guard('larasell-admin')->attempt($request->safe()->only(['email', 'password']))) {
             throw ValidationException::withMessages([
@@ -29,6 +30,11 @@ class LoginController
         }
 
         $request->session()->regenerate();
+
+        // Signing back in from the session expired dialog, which stays on its page.
+        if ($request->expectsJson()) {
+            return response()->noContent();
+        }
 
         return redirect()->intended(route('larasell.admin.home'));
     }

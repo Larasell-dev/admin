@@ -5,6 +5,8 @@ export type SharedProps = {
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;
+  /** Signs in with a POST; the session expired dialog posts JSON to it. */
+  loginUrl: string;
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;
