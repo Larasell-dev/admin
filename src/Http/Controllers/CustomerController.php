@@ -22,7 +22,7 @@ class CustomerController
             ->paginate($perPage)
             ->through(fn (Customer $customer): CustomerData => CustomerData::fromModel($customer));
 
-        return Inertia::render('Customers', new CustomersPageData(
+        return Inertia::render('Customer/Index', new CustomersPageData(
             customers: PaginatedCustomersData::fromPaginator($customers),
         ));
     }
