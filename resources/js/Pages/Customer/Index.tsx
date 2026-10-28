@@ -3,12 +3,12 @@ import type { PaginationChange } from "@larasell-dev/ui";
 import { DataList, EmptyState, Pagination, Table } from "@larasell-dev/ui";
 import { GroupLine } from "@larasell-dev/ui/icons";
 import { useState } from "react";
-import { Page } from "../Components/Page";
-import SidebarLayout from "../Layouts/SidebarLayout";
+import { Page } from "../../Components/Page";
+import SidebarLayout from "../../Layouts/SidebarLayout";
 
 type Props = Larasell.Admin.Data.View.CustomersPageData;
 
-export default function Customers({ customers }: Props) {
+export default function Index({ customers }: Props) {
   const [isPaginating, setIsPaginating] = useState(false);
 
   const pagination = {
@@ -87,4 +87,4 @@ export default function Customers({ customers }: Props) {
   );
 }
 
-Customers.layout = [SidebarLayout];
+Index.layout = [SidebarLayout];

@@ -33,7 +33,7 @@ it('lists customers with their order count, newest first', function () {
         ->get(route('larasell.admin.customers.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Customers', shouldExist: false)
+            ->component('Customer/Index')
             ->where('customers.total', 2)
             ->where('customers.data.0.name', 'Alan Turing')
             ->where('customers.data.0.ordersCount', 0)
