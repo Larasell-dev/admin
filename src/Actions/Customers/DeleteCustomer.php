@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Actions;
+namespace Larasell\Admin\Actions\Customers;
 
 use Illuminate\Support\Facades\DB;
 use Larasell\Larasell\Models\Customer;

@@ -140,11 +140,37 @@ it('updates only the edited customer', function () {
         ->and($ada->refresh()->fullName())->toBe('Ada Lovelace');
 });
 
-it('deletes a customer, keeps their orders and the other customers', function () {
+it('offers to delete each customer', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
-    $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace', 'created_at' => now()->subDay()]);
+    Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.customers.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.rows.0._actions.0.label', 'Delete')
+            ->where('table.rows.0._actions.0.method', 'post')
+            ->where('table.rows.0._actions.0.destructive', true)
+            ->where('table.rows.0._actions.0.icon', 'DeleteBin')
+            ->where('table.rows.0._actions.0.confirm.title', 'Delete customer'));
+});
+
+it('deletes a customer and keeps the others', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace', 'created_at' => now()->subDay()]);
+    Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
+    $this->actingAs($admin, 'larasell-admin');
+
+    // The newest customer comes first, so this is Alan's delete action.
+    $delete = $this->get(route('larasell.admin.customers.index'))->inertiaProps('table.rows.0._actions.0.url');
+
+    $this->from(route('larasell.admin.customers.index'))->post($delete)->assertRedirect(route('larasell.admin.customers.index'));
+
+    expect(Customer::query()->pluck('last_name')->all())->toBe(['Lovelace']);
+});
+
+it('keeps the orders of a deleted customer, no longer linked to them', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
-    DB::table('larasell_customer_user')->insert([['customer_id' => $ada->id, 'user_id' => 7], ['customer_id' => $alan->id, 'user_id' => 8]]);
     DB::table('larasell_orders')->insert([
         'number' => '1',
         'customer_id' => $alan->id,
@@ -160,21 +186,25 @@ it('deletes a customer, keeps their orders and the other customers', function ()
     ]);
     $this->actingAs($admin, 'larasell-admin');
 
-    // The newest customer comes first, so this is Alan's delete action.
-    $this->get(route('larasell.admin.customers.index'))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('table.rows.0._actions.0.label', 'Delete')
-            ->where('table.rows.0._actions.0.method', 'post')
-            ->where('table.rows.0._actions.0.destructive', true)
-            ->where('table.rows.0._actions.0.confirm.title', 'Delete customer'));
     $delete = $this->get(route('larasell.admin.customers.index'))->inertiaProps('table.rows.0._actions.0.url');
+    $this->post($delete);
 
-    $this->from(route('larasell.admin.customers.index'))->post($delete)->assertRedirect(route('larasell.admin.customers.index'));
-
-    expect(Customer::query()->pluck('last_name')->all())->toBe(['Lovelace'])
-        ->and(DB::table('larasell_customer_user')->pluck('user_id')->all())->toBe([7])
-        ->and(DB::table('larasell_orders')->get(['customer_id', 'customer_name'])->map(fn ($order) => (array) $order)->all())
+    expect(DB::table('larasell_orders')->get(['customer_id', 'customer_name'])->map(fn ($order) => (array) $order)->all())
         ->toBe([['customer_id' => null, 'customer_name' => 'Alan Turing']]);
+});
+
+it('unlinks the user accounts of a deleted customer and keeps the others', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace', 'created_at' => now()->subDay()]);
+    $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
+    DB::table('larasell_customer_user')->insert([['customer_id' => $ada->id, 'user_id' => 7], ['customer_id' => $alan->id, 'user_id' => 8]]);
+    $this->actingAs($admin, 'larasell-admin');
+
+    // The newest customer comes first, so this is Alan's delete action.
+    $delete = $this->get(route('larasell.admin.customers.index'))->inertiaProps('table.rows.0._actions.0.url');
+    $this->post($delete);
+
+    expect(DB::table('larasell_customer_user')->pluck('user_id')->all())->toBe([7]);
 });
 
 it('shows a missing customer as not found', function () {
