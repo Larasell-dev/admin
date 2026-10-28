@@ -29,10 +29,6 @@ declare namespace Larasell.Admin.Data.View {
     parent: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
     createProductUrl: string | null;
   };
-  export type CreateCustomerPageData = {
-    storeUrl: string;
-    indexUrl: string;
-  };
   export type CreateProductPageData = {
     storeUrl: string;
     indexUrl: string;
@@ -40,17 +36,8 @@ declare namespace Larasell.Admin.Data.View {
     createCategoryUrl: string;
     uploadImagesUrl: string;
   };
-  export type CustomersPageData = {
-    createUrl: string;
-    customers: Larasell.Admin.Data.ViewModel.PaginatedCustomersData;
-  };
   export type EditAdminPageData = {
     editedAdmin: Larasell.Admin.Data.ViewModel.AdminData;
-    updateUrl: string;
-    indexUrl: string;
-  };
-  export type EditCustomerPageData = {
-    customer: Larasell.Admin.Data.ViewModel.CustomerDetailData;
     updateUrl: string;
     indexUrl: string;
   };
@@ -83,6 +70,17 @@ declare namespace Larasell.Admin.Data.View {
     avatarUploadUrl: string;
   };
 }
+declare namespace Larasell.Admin.Data.View.Customers {
+  export type CreateCustomerPageData = {
+    storeUrl: string;
+    indexUrl: string;
+  };
+  export type EditCustomerPageData = {
+    customer: Larasell.Admin.Data.ViewModel.Customers.CustomerDetailData;
+    updateUrl: string;
+    indexUrl: string;
+  };
+}
 declare namespace Larasell.Admin.Data.ViewModel {
   export type AdminData = {
     name: string;
@@ -107,18 +105,6 @@ declare namespace Larasell.Admin.Data.ViewModel {
     slug: string;
     visible: boolean;
   };
-  export type CustomerData = {
-    id: number;
-    name: string;
-    ordersCount: number;
-    createdAt: string | null;
-    editUrl: string;
-  };
-  export type CustomerDetailData = {
-    name: string;
-    firstName: string;
-    lastName: string;
-  };
   export type DimensionsData = {
     length: string;
     width: string;
@@ -131,12 +117,6 @@ declare namespace Larasell.Admin.Data.ViewModel {
     url: string;
     icon: string;
     children: Array<Larasell.Admin.Data.ViewModel.NavigationItemData>;
-  };
-  export type PaginatedCustomersData = {
-    data: Array<Larasell.Admin.Data.ViewModel.CustomerData>;
-    current_page: number;
-    per_page: number;
-    total: number;
   };
   export type ProductDetailData = {
     id: number;
@@ -163,5 +143,12 @@ declare namespace Larasell.Admin.Data.ViewModel {
   export type WeightData = {
     amount: string;
     unit: string;
+  };
+}
+declare namespace Larasell.Admin.Data.ViewModel.Customers {
+  export type CustomerDetailData = {
+    name: string;
+    firstName: string;
+    lastName: string;
   };
 }

@@ -16,6 +16,7 @@ use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
+use Larasell\Admin\ServiceProviders\CustomerServiceProvider;
 use Larasell\Admin\ServiceProviders\ProductServiceProvider;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
@@ -31,6 +32,7 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->app->register(HeadServiceProvider::class);
         $this->app->register(ProductServiceProvider::class);
+        $this->app->register(CustomerServiceProvider::class);
 
         $this->app->singleton(AdminPanel::class);
         $this->app->singleton(Navigation::class);

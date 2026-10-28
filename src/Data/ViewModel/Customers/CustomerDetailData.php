@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Data\ViewModel;
+namespace Larasell\Admin\Data\ViewModel\Customers;
 
 use Larasell\Larasell\Models\Customer;
 use Spatie\LaravelData\Data;
