@@ -12,6 +12,8 @@ use Larasell\Admin\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Customer;
+use Larasell\Larasell\Models\Order;
+use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 
 class ReadingListTable extends Table
@@ -77,6 +79,14 @@ it('titles a customer\'s page with their name', function () {
     $customer = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
 
     expect(pageTitle($this->get(route('larasell.admin.customers.edit', $customer))))->toBe('Ada Lovelace - Admin');
+});
+
+it('titles an order\'s page with its number', function () {
+    signedInAdmin();
+
+    $order = Order::create(['number' => '2026-000123', 'customer_email' => 'ada@example.com', 'customer_name' => 'Ada Lovelace', 'currency' => 'EUR', 'subtotal' => Price::of(0), 'total' => Price::of(0)]);
+
+    expect(pageTitle($this->get(route('larasell.admin.orders.show', $order))))->toBe('Order #2026-000123 - Admin');
 });
 
 it('titles category pages with the category name', function (string $uri, string $title) {
