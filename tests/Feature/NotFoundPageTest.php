@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
+use Symfony\Component\HttpFoundation\Response;
 
 it('shows the 404 page in the panel for unknown admin addresses and missing records', function (string $uri) {
     $this->actingAs(
@@ -30,6 +32,14 @@ it('shows guests the 404 page without the panel', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('GuestNotFound', shouldExist: false)
             ->where('admin', null));
+});
+
+it("keeps the app's own error response callback for other addresses", function () {
+    $this->bootingWith(fn () => app(ExceptionHandler::class)->respondUsing(
+        fn (Response $response) => $response->setContent('The app 404 page'),
+    ));
+
+    $this->get('/does-not-exist')->assertNotFound()->assertSee('The app 404 page'); // @phpstan-ignore larasell.preferRouteHelper
 });
 
 it('keeps plain 404s for other methods, JSON requests and other addresses', function () {
