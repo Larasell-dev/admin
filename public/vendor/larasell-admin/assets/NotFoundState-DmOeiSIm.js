@@ -1,0 +1,1 @@
+import{$T as e,Jn as t,Y9 as n,i as r}from"./dist-DfqE0HoB.js";var i=n(t(),1);function a(){return(0,i.jsx)(r,{icon:e,title:`Page not found`,description:`The page you're looking for doesn't exist. It may have been moved or deleted, or the link you followed is out of date.`})}export{a as t};

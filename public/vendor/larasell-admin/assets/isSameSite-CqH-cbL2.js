@@ -1,0 +1,1 @@
+function e(e){return new URL(e,window.location.href).origin===window.location.origin}export{e as t};
