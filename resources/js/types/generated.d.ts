@@ -81,6 +81,13 @@ declare namespace Larasell.Admin.Data.View.Customers {
     indexUrl: string;
   };
 }
+declare namespace Larasell.Admin.Data.View.Orders {
+  export type OrderPageData = {
+    order: Larasell.Admin.Data.ViewModel.Orders.OrderDetailData;
+    indexUrl: string;
+    customerUrl: string | null;
+  };
+}
 declare namespace Larasell.Admin.Data.ViewModel {
   export type AdminData = {
     name: string;
@@ -150,5 +157,55 @@ declare namespace Larasell.Admin.Data.ViewModel.Customers {
     name: string;
     firstName: string;
     lastName: string;
+  };
+}
+declare namespace Larasell.Admin.Data.ViewModel.Orders {
+  export type AddressData = {
+    name: string;
+    company: string | null;
+    street: Array<string>;
+    postcode: string;
+    city: string;
+    state: string | null;
+    country: string;
+  };
+  export type AmountData = {
+    label: string;
+    amount: string;
+  };
+  export type BadgeData = {
+    label: string;
+    variant: import("@larasell-dev/ui").BadgeVariant;
+  };
+  export type OrderDetailData = {
+    number: string;
+    status: Larasell.Admin.Data.ViewModel.Orders.BadgeData;
+    placedAt: string;
+    items: Array<Larasell.Admin.Data.ViewModel.Orders.OrderItemData>;
+    subtotal: string;
+    discount: string | null;
+    shipping: Larasell.Admin.Data.ViewModel.Orders.AmountData | null;
+    taxes: Array<Larasell.Admin.Data.ViewModel.Orders.AmountData>;
+    taxIncluded: boolean;
+    total: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string | null;
+    billingAddress: Larasell.Admin.Data.ViewModel.Orders.AddressData | null;
+    shippingAddress: Larasell.Admin.Data.ViewModel.Orders.AddressData | null;
+    payments: Array<Larasell.Admin.Data.ViewModel.Orders.PaymentData>;
+  };
+  export type OrderItemData = {
+    name: string;
+    variant: string | null;
+    quantity: number;
+    unitPrice: string;
+    total: string;
+  };
+  export type PaymentData = {
+    method: string;
+    status: Larasell.Admin.Data.ViewModel.Orders.BadgeData;
+    reference: string | null;
+    amount: string;
   };
 }

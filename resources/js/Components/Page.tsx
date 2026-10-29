@@ -40,8 +40,20 @@ function Header({ title, backLink, actions }: HeaderProps) {
 /** The scroll container of the Body around it, if any. UnsavedChangesToast centers in it. */
 export const PageBodyContext = createContext<RefObject<HTMLElement | null> | null>(null);
 
+/** How wide a Body's content gets: narrow for forms, wide for side-by-side columns. */
+const BODY_WIDTHS = {
+  narrow: "max-w-2xl",
+  wide: "max-w-5xl",
+};
+
 /** The page's content below its Header, scrolling on its own so the header stays put. */
-function Body({ children }: { children: ReactNode }) {
+function Body({
+  children,
+  width = "narrow",
+}: {
+  children: ReactNode;
+  width?: keyof typeof BODY_WIDTHS;
+}) {
   const scroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(scroll);
 
@@ -52,7 +64,7 @@ function Body({ children }: { children: ReactNode }) {
         ref={scroll}
         className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto px-6 pt-6 pb-28"
       >
-        <div className="max-w-2xl">{children}</div>
+        <div className={BODY_WIDTHS[width]}>{children}</div>
       </div>
     </PageBodyContext>
   );

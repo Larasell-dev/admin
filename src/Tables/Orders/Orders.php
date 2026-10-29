@@ -4,6 +4,7 @@ namespace Larasell\Admin\Tables\Orders;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Larasell\Admin\Data\ViewModel\Orders\BadgeData;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Tables\Columns\BadgeColumn;
@@ -29,22 +30,16 @@ class Orders extends Table
             TextColumn::make('number', 'Order'),
             TextColumn::make('customer_name', 'Customer'),
             BadgeColumn::make('status')
-                ->map(fn (OrderStatus $status): string => match ($status) {
-                    OrderStatus::PendingPayment => 'Pending payment',
-                    OrderStatus::Paid => 'Paid',
-                    OrderStatus::PaymentFailed => 'Payment failed',
-                    OrderStatus::Fulfilled => 'Fulfilled',
-                    OrderStatus::Cancelled => 'Cancelled',
-                })
-                ->variant([
-                    OrderStatus::PendingPayment->value => Variant::Warning,
-                    OrderStatus::Paid->value => Variant::Success,
-                    OrderStatus::PaymentFailed->value => Variant::Danger,
-                    OrderStatus::Fulfilled->value => Variant::Info,
-                ]),
+                ->map(fn (OrderStatus $status): string => BadgeData::fromOrderStatus($status)->label)
+                ->variant(fn (OrderStatus $status): Variant => BadgeData::fromOrderStatus($status)->variant),
             TextColumn::make('total')->map(fn (Price $total, Order $order): string => Price::format($total, $order->currency, app()->getLocale())),
             TextColumn::make('created_at', 'Date')->map(fn (?Carbon $createdAt): ?string => $createdAt?->diffForHumans()),
         ];
+    }
+
+    public function rowLink(Order $order): string
+    {
+        return route('larasell.admin.orders.show', $order);
     }
 
     public function emptyState(): array
