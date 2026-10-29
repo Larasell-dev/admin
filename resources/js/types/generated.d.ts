@@ -79,6 +79,7 @@ declare namespace Larasell.Admin.Data.View.Customers {
     customer: Larasell.Admin.Data.ViewModel.Customers.CustomerDetailData;
     updateUrl: string;
     indexUrl: string;
+    orders: import("./index").TableResource;
   };
 }
 declare namespace Larasell.Admin.Data.View.Orders {

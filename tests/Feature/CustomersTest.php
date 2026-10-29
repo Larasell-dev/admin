@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
+use Larasell\Larasell\Enums\Currency;
+use Larasell\Larasell\Enums\OrderStatus;
 use Larasell\Larasell\Models\Customer;
+use Larasell\Larasell\Models\Order;
+use Larasell\Larasell\Price;
 
 it('lists customers with their order count, newest first', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
@@ -234,4 +238,64 @@ it('turns the customers off when disabled in the config', function () {
             ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Settings']));
 
     expect(Customer::query()->pluck('last_name')->all())->toBe(['Lovelace']);
+});
+
+function customerOrder(string $number, ?Customer $customer, array $attributes = []): Order
+{
+    return Order::create([
+        'number' => $number,
+        'customer_id' => $customer?->id,
+        'customer_email' => 'ada@example.com',
+        'customer_name' => 'Ada Lovelace',
+        'currency' => Currency::EUR,
+        'subtotal' => Price::of(0),
+        'total' => Price::of(0),
+        ...$attributes,
+    ]);
+}
+
+it('lists the customer\'s own orders on their page, newest first', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
+    $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
+    $older = customerOrder('1001', $ada, ['status' => OrderStatus::Fulfilled, 'total' => Price::of(1250), 'created_at' => now()->subDays(2)]);
+    $newer = customerOrder('1003', $ada, ['status' => OrderStatus::Paid, 'currency' => Currency::USD, 'total' => Price::of(99)]);
+    customerOrder('1002', $alan);
+    customerOrder('1004', null);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.customers.edit', $ada))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('orders.title', 'Orders')
+            ->where('orders.columns', [
+                ['name' => 'number', 'label' => 'Order', 'type' => 'text'],
+                ['name' => 'status', 'label' => 'Status', 'type' => 'badge'],
+                ['name' => 'total', 'label' => 'Total', 'type' => 'text'],
+                ['name' => 'created_at', 'label' => 'Date', 'type' => 'text'],
+            ])
+            ->where('orders.pagination.total', 2)
+            ->where('orders.rows.0.number', '1003')
+            ->where('orders.rows.0.status', 'Paid')
+            ->where('orders.rows.0._variants.status', 'success')
+            ->where('orders.rows.0.total', '$0.99')
+            ->where('orders.rows.0._link', route('larasell.admin.orders.show', $newer))
+            ->where('orders.rows.1.number', '1001')
+            ->where('orders.rows.1.status', 'Fulfilled')
+            ->where('orders.rows.1.total', '€12.50')
+            ->where('orders.rows.1.created_at', '2 days ago')
+            ->where('orders.rows.1._link', route('larasell.admin.orders.show', $older)));
+});
+
+it('does not link the customer\'s orders while the orders are turned off', function () {
+    $this->bootingWith(fn () => config(['larasell.admin.orders.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
+    customerOrder('1001', $ada);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.customers.edit', $ada))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('orders.rows.0.number', '1001')
+            ->where('orders.rows.0._link', null));
 });
