@@ -1,5 +1,106 @@
 # Changelog
 
+## [0.5.0](https://github.com/Larasell-dev/admin/compare/v0.4.1...v0.5.0) (2026-10-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* let extensions register admin pages through @larasell-dev/admin ([#191](https://github.com/Larasell-dev/admin/issues/191))
+* add an orders index page
+* list products with Route::index and renumber the navigation
+* make the admin config publishable ([#151](https://github.com/Larasell-dev/admin/issues/151))
+
+### Features
+
+* add a read-only order page ([446ac8f](https://github.com/Larasell-dev/admin/commit/446ac8f8ee109faa6d77fc500feb06ee7f4f13e8))
+* add admins from the settings ([6fa3043](https://github.com/Larasell-dev/admin/commit/6fa304318ee8ba0f1a4534392df473161a837596))
+* add an orders index page ([e511842](https://github.com/Larasell-dev/admin/commit/e5118424141b540325530ad0d08e81684f4fb83a))
+* add and edit customers ([b4fb93a](https://github.com/Larasell-dev/admin/commit/b4fb93a2a195d25bda3d7c39cfa0d604ca703ae2))
+* add table actions to table headers and empty states ([#156](https://github.com/Larasell-dev/admin/issues/156)) ([18f8539](https://github.com/Larasell-dev/admin/commit/18f853910bfc3bb795f44e5b11483015381ae833))
+* ask for the password again once the session expires ([a412ac5](https://github.com/Larasell-dev/admin/commit/a412ac5ceae264cf7d9d2fe8da34445b63d75673))
+* create and edit products ([#157](https://github.com/Larasell-dev/admin/issues/157)) ([43772d6](https://github.com/Larasell-dev/admin/commit/43772d68355b8384a003b88eb2e290673ff2b9ad))
+* cycle the theme with a rebindable keyboard shortcut ([#145](https://github.com/Larasell-dev/admin/issues/145)) ([e377c01](https://github.com/Larasell-dev/admin/commit/e377c011bae1473a9ac01a8c5b19fcf0511b55a5))
+* delete admins from the admins table ([4814085](https://github.com/Larasell-dev/admin/commit/4814085b405ea9239420924937f2f3dace9d3a15))
+* delete customers from the customers table ([e8c45a9](https://github.com/Larasell-dev/admin/commit/e8c45a91be5eab522ef5d7a78bcc8c305ca2d3aa))
+* delete products from the products table ([1f1a318](https://github.com/Larasell-dev/admin/commit/1f1a318f61d091caa1db80f0a9e11faa2c223e9b))
+* edit a product's SKU and barcode ([#159](https://github.com/Larasell-dev/admin/issues/159)) ([59d738e](https://github.com/Larasell-dev/admin/commit/59d738e9f2c7576d686485836863f1f0000f6609))
+* edit a product's stock, backorders and quantity limits ([eb3c45e](https://github.com/Larasell-dev/admin/commit/eb3c45e06ba0dcdfe56e313986dafb8b619079cf))
+* edit a product's weight and dimensions ([d1004df](https://github.com/Larasell-dev/admin/commit/d1004df787e15519156c0b3a9e4b4f6e536f749e))
+* edit admins from the settings ([47206f6](https://github.com/Larasell-dev/admin/commit/47206f66b4e4a81f22b845ccb49672ec9ac4a5b1))
+* fill a new category's slug from its name ([#118](https://github.com/Larasell-dev/admin/issues/118)) ([e61875f](https://github.com/Larasell-dev/admin/commit/e61875f2fe8a2d62c58871e3892f13a74e07a87d))
+* freeze the navigation once the app has booted ([#134](https://github.com/Larasell-dev/admin/issues/134)) ([9c51714](https://github.com/Larasell-dev/admin/commit/9c517149036e577a3c2de0ea940b3c0fe754c856))
+* hide a row action, for every row or per record ([0f541cc](https://github.com/Larasell-dev/admin/commit/0f541cc55996f6f444429501737567aab5f4edb6))
+* hold off saving while a field in the form is busy ([dddf955](https://github.com/Larasell-dev/admin/commit/dddf95599d70e6224683bf1f515fce36c0ed2459))
+* let admins choose a light, dark, or system theme on the profile page ([87b016f](https://github.com/Larasell-dev/admin/commit/87b016f5dca87499fca86ae18fb7af0fba365fb6))
+* let apps turn the customers module off ([2190ec5](https://github.com/Larasell-dev/admin/commit/2190ec576236634401f27e537b13371d89c291b8))
+* let extensions register admin pages through @larasell-dev/admin ([#191](https://github.com/Larasell-dev/admin/issues/191)) ([f3ce5c7](https://github.com/Larasell-dev/admin/commit/f3ce5c7094bb823f0018cc71d0bd896de7c7dff1))
+* limit navigation items to 100 children per parent ([#132](https://github.com/Larasell-dev/admin/issues/132)) ([f7a4f57](https://github.com/Larasell-dev/admin/commit/f7a4f574d1b195bbc05e952dec9d85c29829c885))
+* link the dashboard to the first onboarding steps ([672ad5b](https://github.com/Larasell-dev/admin/commit/672ad5be76bf2071d5da11ea06fb14aa0a967f3c))
+* link the products on a category's page to their edit page ([768b640](https://github.com/Larasell-dev/admin/commit/768b640e2c6de30433174af9dcc6e6b1aa565a79))
+* link to creating a product from a category's empty products ([af39a9b](https://github.com/Larasell-dev/admin/commit/af39a9bffa2375acdc6e02d4a3bb844317b816ab))
+* list a customer's orders on their page ([003a162](https://github.com/Larasell-dev/admin/commit/003a1623013a0fa30f35f42a7026a92746261529))
+* list admins under a new Settings navigation item ([dc0fed7](https://github.com/Larasell-dev/admin/commit/dc0fed78a25bb9dfa43295a9d7699bff98398ef5))
+* list products on a new Products page ([5cbda18](https://github.com/Larasell-dev/admin/commit/5cbda184ab99423093064e8823ba44ca4bd19a65))
+* list products with Route::index and renumber the navigation ([ec98739](https://github.com/Larasell-dev/admin/commit/ec987395aae4d2545126e95666e7405f1f0820de))
+* make the admin config publishable ([#151](https://github.com/Larasell-dev/admin/issues/151)) ([41d12de](https://github.com/Larasell-dev/admin/commit/41d12de8aed742d98ec0dc46750bfd426f8f6cee))
+* open a product's images in a lightbox to edit their alt text ([85ca66e](https://github.com/Larasell-dev/admin/commit/85ca66eba325830b6f3f07e18ca4d2a6794813e3))
+* pick a product's categories from a checkbox tree ([b07a0b1](https://github.com/Larasell-dev/admin/commit/b07a0b17032db2f31ae6ecb28bfacb863b976ea8))
+* prefetch link actions in a category's products menu on hover ([a90804d](https://github.com/Larasell-dev/admin/commit/a90804d1b9aa74474ccd93286a291c84cda2c127))
+* put the profile fields in a General section ([2350974](https://github.com/Larasell-dev/admin/commit/2350974161a0f453c54da5703a2e1984450c3386))
+* register a table route and its navigation item with Navigation::index ([87367c9](https://github.com/Larasell-dev/admin/commit/87367c9ab22e2d7de9b54278be532223f604db67))
+* remove a product's images from a menu on each image ([70e9969](https://github.com/Larasell-dev/admin/commit/70e9969f7851e6861cae89c16661831981d21996))
+* render the admin 404 pages through Inertia's exception handling ([1ccf765](https://github.com/Larasell-dev/admin/commit/1ccf76550594822988a12fa8680620b0422006fd))
+* reorder a product's images by dragging them ([27fda6a](https://github.com/Larasell-dev/admin/commit/27fda6a71806a297a5331247f6a838ef5b8e42b2))
+* report navigation items with an unregistered route as a structured error ([#135](https://github.com/Larasell-dev/admin/issues/135)) ([7ed7c40](https://github.com/Larasell-dev/admin/commit/7ed7c40d2340a250699de242c6d4456337a67b28))
+* shorten the category products menu's view item to "View" ([b402a0a](https://github.com/Larasell-dev/admin/commit/b402a0a01b1e941c41171d706ecceef955e262f0))
+* shorten the category tree menu's view item to "View" ([96c6bb8](https://github.com/Larasell-dev/admin/commit/96c6bb811b77245a70f01bafc813ae3bb4c8c4c1))
+* show a 404 page inside the admin panel ([6cb9000](https://github.com/Larasell-dev/admin/commit/6cb900069bad559efbab51703cfd4d3632cce5da))
+* show a loading card per image while it uploads ([3291b48](https://github.com/Larasell-dev/admin/commit/3291b48d53b2faa7f34e127c2c3bd4b599baede2))
+* show a loading state on the dev login link ([#126](https://github.com/Larasell-dev/admin/issues/126)) ([1cda394](https://github.com/Larasell-dev/admin/commit/1cda394f9bd22fe430572cdf2d7601be5a291762))
+* show an icon or picture in table cells with image() ([#150](https://github.com/Larasell-dev/admin/issues/150)) ([b16c152](https://github.com/Larasell-dev/admin/commit/b16c152c4a9c2cabd961140b5a8952a6ddbcc8ec))
+* show Products above Categories in the navigation ([27270eb](https://github.com/Larasell-dev/admin/commit/27270ebb2142e0cecbc869f97fa78c944f803721))
+* show toasts and say why a stale image link didn't open ([ff15aea](https://github.com/Larasell-dev/admin/commit/ff15aea1824fe86b31cf2ab52ec11ea9d3c07463))
+* show values in a coloured badge with BadgeColumn ([#152](https://github.com/Larasell-dev/admin/issues/152)) ([96cfc25](https://github.com/Larasell-dev/admin/commit/96cfc255c8eef3da23cbb11316addf9b90cc8cc2))
+* support nested navigation items ([#128](https://github.com/Larasell-dev/admin/issues/128)) ([efb1f9e](https://github.com/Larasell-dev/admin/commit/efb1f9e6d9bcae0e31d1737a602bef200037e3f1))
+* upload a product's images and link them on save ([24f48f2](https://github.com/Larasell-dev/admin/commit/24f48f26f6feb1a8b387a3a4501bc1a9a4595da8))
+* use PasswordInput for the login password field ([#124](https://github.com/Larasell-dev/admin/issues/124)) ([455715d](https://github.com/Larasell-dev/admin/commit/455715d5b46699c6143fc5dd7c692a3a0bac97e5))
+* use the unsaved changes toast on the profile page ([#125](https://github.com/Larasell-dev/admin/issues/125)) ([c24acf7](https://github.com/Larasell-dev/admin/commit/c24acf73ff46aae78dba59ecc5135bf6cb6e5084))
+* view a product from a category's products menu ([ced44be](https://github.com/Larasell-dev/admin/commit/ced44bebfc98da13abd96b3e9012a136ab840146))
+
+
+### Bug Fixes
+
+* animate the session expired dialog out after signing back in ([ebc1bb4](https://github.com/Larasell-dev/admin/commit/ebc1bb48515e3b7994b4ea10000746cd8e0171f7))
+* break navigation position ties by id instead of label ([#130](https://github.com/Larasell-dev/admin/issues/130)) ([045b94a](https://github.com/Larasell-dev/admin/commit/045b94a0ea72d177ad85734800f9813d5433ed4f))
+* control the image lightbox with an open prop and drop stale image links ([6f35a71](https://github.com/Larasell-dev/admin/commit/6f35a7129a2794d3dc96631e29bd3f6437028085))
+* freeze the mobile nav while it closes ([6a81c0e](https://github.com/Larasell-dev/admin/commit/6a81c0e9e3feb91c69516a31b23e4ea418955719))
+* keep the add images input inside its square ([870e464](https://github.com/Larasell-dev/admin/commit/870e4640094877b7441bb4dafff9b3eaec4dcedc))
+* keep the confirmation dialog's content unchanged while it closes ([#123](https://github.com/Larasell-dev/admin/issues/123)) ([0d6d1a0](https://github.com/Larasell-dev/admin/commit/0d6d1a0bf4c4af348873e130e0e08944d3f0c404))
+* keep the product form's last field clear of the unsaved changes toast ([8a15c17](https://github.com/Larasell-dev/admin/commit/8a15c17a358badf7deeb0c3eed225c8192cf5ddc))
+* leave out the actions menu on rows whose actions are all hidden ([c0a5016](https://github.com/Larasell-dev/admin/commit/c0a5016aea26b4e4ab7513810e40c8896ee07f29))
+* let the category delete dialog animate out after deleting ([#122](https://github.com/Larasell-dev/admin/issues/122)) ([4dd69e5](https://github.com/Larasell-dev/admin/commit/4dd69e5abe392b5e429036654dd528c24a7d13e5))
+* only let siblings stop a navigation item from matching its pages ([#131](https://github.com/Larasell-dev/admin/issues/131)) ([60898db](https://github.com/Larasell-dev/admin/commit/60898db6ef8aff32a0720f872df6fe63c186bda0))
+* put dialogs opened later above earlier ones ([c6c87bc](https://github.com/Larasell-dev/admin/commit/c6c87bce924562d98bd5ad2c741edbe25c189652))
+* shorten the stale image link toast so it fits on one line ([520b3a4](https://github.com/Larasell-dev/admin/commit/520b3a4dd5bbc886aa46f443246c0f84e503a30f))
+* show a back link instead of the category tree trigger when there are no categories ([#121](https://github.com/Larasell-dev/admin/issues/121)) ([d7fd8b9](https://github.com/Larasell-dev/admin/commit/d7fd8b96a9bef51e9c19d9382b45d2ec5ffcbd12))
+* stack the add product search above its buttons on narrow screens ([#120](https://github.com/Larasell-dev/admin/issues/120)) ([891acd0](https://github.com/Larasell-dev/admin/commit/891acd09dd0f80b5030316a6af5800ef800875b8))
+* stop avatar uploads on cancel and explain why they fail ([fd66549](https://github.com/Larasell-dev/admin/commit/fd66549a9a8f637db55b8e33e6efa6eff4dfde20))
+* stop the page jumping when the rows per page select opens ([675a52a](https://github.com/Larasell-dev/admin/commit/675a52afc407b938e9eac11ee247fcbeb01225b5))
+* upload product images one at a time and explain each failure ([13ee622](https://github.com/Larasell-dev/admin/commit/13ee622df48b06f1d63ade289dd8bdbf953caf1c))
+* visit the dev login with an Inertia link to avoid a full reload ([24d13ac](https://github.com/Larasell-dev/admin/commit/24d13ac30a945568e9b97cb56539abf9961a5437))
+
+
+### Miscellaneous Chores
+
+* add a phpstan rule that prefers route() over hard-coded URLs in tests ([41679fb](https://github.com/Larasell-dev/admin/commit/41679fb0e904b009f438f028ecc0f7d43163e5d1))
+* add an oxlint rule that asks for cn() in class lists ([258ceee](https://github.com/Larasell-dev/admin/commit/258ceee671c84bf87c815308b33c79cfe480280e))
+* add an oxlint rule that forbids positive margins ([#147](https://github.com/Larasell-dev/admin/issues/147)) ([7776bf5](https://github.com/Larasell-dev/admin/commit/7776bf50dcd9a64f765171270be08c7a0daa31c8))
+* enable oxlint plugins and type-aware linting ([#148](https://github.com/Larasell-dev/admin/issues/148)) ([95b8672](https://github.com/Larasell-dev/admin/commit/95b86723b8741ae6f523c07d5a2c64edde94a786))
+* report oxlint correctness rules as errors ([#149](https://github.com/Larasell-dev/admin/issues/149)) ([27d9ad5](https://github.com/Larasell-dev/admin/commit/27d9ad5eb06d48ddd896e66af34d51f461faa867))
+* store product images on the public disk in the workbench ([d6510c4](https://github.com/Larasell-dev/admin/commit/d6510c4f0c99ca7e49e533e85f95360751e985d4))
+* update @larasell-dev/ui to 0.1.19 ([#138](https://github.com/Larasell-dev/admin/issues/138)) ([f50b174](https://github.com/Larasell-dev/admin/commit/f50b174ddc1dc27346e963830018324577547c7c))
+* update @larasell-dev/ui to 0.1.25 ([f677aef](https://github.com/Larasell-dev/admin/commit/f677aefd3c3fe665db844f3e47ca4f39d5546232))
+
 ## [0.4.1](https://github.com/Larasell-dev/admin/compare/v0.4.0...v0.4.1) (2026-10-23)
 
 
