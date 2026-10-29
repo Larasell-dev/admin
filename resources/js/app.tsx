@@ -7,6 +7,7 @@ import * as JsxDevRuntime from "react/jsx-dev-runtime";
 import * as JsxRuntime from "react/jsx-runtime";
 import { createRoot } from "react-dom/client";
 import { ToastProvider } from "@larasell-dev/ui";
+import { Page } from "./Components/Page";
 import ResourceTable from "./Components/ResourceTable";
 import SidebarLayout from "./Layouts/SidebarLayout";
 import { AppHotkeysProvider } from "./utils/hotkeys";
@@ -29,6 +30,7 @@ declare global {
         SidebarLayout: typeof SidebarLayout;
       };
       Components: {
+        Page: typeof Page;
         ResourceTable: typeof ResourceTable;
       };
       pages: Record<string, RegisteredPage>;
@@ -50,6 +52,7 @@ window.LarasellAdmin = {
     SidebarLayout,
   },
   Components: {
+    Page,
     ResourceTable,
   },
   pages: registered,

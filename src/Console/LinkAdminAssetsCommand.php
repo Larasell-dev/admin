@@ -4,22 +4,45 @@ namespace Larasell\Admin\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Larasell\Admin\AdminPanel;
 
 class LinkAdminAssetsCommand extends Command
 {
     protected $signature = 'larasell:link';
 
-    protected $description = 'Link the admin panel JavaScript and CSS into the public directory';
+    protected $description = 'Link the admin panel JavaScript and CSS, and those of packages that extend it, into the public directory';
 
-    public function handle(): int
+    public function handle(AdminPanel $panel): int
     {
-        $source = dirname(__DIR__, 2).'/public/vendor/larasell-admin';
-        $target = public_path('vendor/larasell-admin');
+        if (! $this->link('larasell-admin', dirname(__DIR__, 2).'/public', 'Admin assets are not built. Run npm run build in the admin package.')) {
+            return self::FAILURE;
+        }
+
+        $this->components->info('Admin assets linked.');
+
+        foreach ($panel->packageScripts() as $name => $script) {
+            if (! $this->link($name, $script['publicPath'], "Assets of [{$name}] are not built. Run npm run build in its package.")) {
+                return self::FAILURE;
+            }
+
+            $this->components->info("Assets of [{$name}] linked.");
+        }
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Links $publicPath/vendor/$name, a package's build, to the app's public/vendor/$name.
+     */
+    private function link(string $name, string $publicPath, string $notBuilt): bool
+    {
+        $source = "{$publicPath}/vendor/{$name}";
+        $target = public_path("vendor/{$name}");
 
         if (! is_dir($source)) {
-            $this->components->error('Admin assets are not built. Run npm run build in the admin package.');
+            $this->components->error($notBuilt);
 
-            return self::FAILURE;
+            return false;
         }
 
         if (is_link($target)) {
@@ -31,13 +54,11 @@ class LinkAdminAssetsCommand extends Command
         File::ensureDirectoryExists(dirname($target));
 
         if (! symlink($source, $target)) {
-            $this->components->error('Unable to link admin assets.');
+            $this->components->error("Unable to link the assets of [{$name}].");
 
-            return self::FAILURE;
+            return false;
         }
 
-        $this->components->info('Admin assets linked.');
-
-        return self::SUCCESS;
+        return true;
     }
 }

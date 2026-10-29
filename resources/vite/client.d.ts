@@ -20,7 +20,7 @@ declare module "larasell-admin/layouts" {
 }
 
 declare module "larasell-admin/components" {
-  import type { ComponentType } from "react";
+  import type { ComponentType, ReactNode } from "react";
 
   export type TableColumn = { name: string; label: string; type: "text" };
 
@@ -64,4 +64,14 @@ declare module "larasell-admin/components" {
   };
 
   export const ResourceTable: ComponentType<{ resource: TableResource; "aria-label"?: string }>;
+
+  /** The building blocks of a page: a Header with its title, and the Body below it. */
+  export const Page: {
+    Header: ComponentType<{
+      title: string;
+      backLink?: { href: string; label: string; mobileOnly?: boolean };
+      actions?: ReactNode;
+    }>;
+    Body: ComponentType<{ children: ReactNode; width?: "narrow" | "wide" }>;
+  };
 }

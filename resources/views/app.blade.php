@@ -26,6 +26,11 @@
         {{ $panelVite->reactRefresh() }}
         {{ $panelVite('resources/js/app.tsx') }}
 
+        {{-- After the panel's script, which defines window.LarasellAdmin, and before boot(). --}}
+        @foreach (\Larasell\Admin\AdminPanel::resolve()->packageScripts() as $name => $packageScript)
+            {{ \Larasell\Admin\AdminPanel::resolve()->packageVite($name)($packageScript['entry']) }}
+        @endforeach
+
         @viteReactRefresh
         @if (\Larasell\Admin\AdminPanel::resolve()->scripts() !== [])
             @vite(\Larasell\Admin\AdminPanel::resolve()->scripts())

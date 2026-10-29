@@ -2,6 +2,7 @@ const ui = window.LarasellAdmin.UI;
 
 export const {
   AlertDialog,
+  Badge,
   Button,
   Container,
   DataList,
@@ -9,10 +10,13 @@ export const {
   Error,
   Field,
   Icon,
+  IconButton,
   Inline,
   Input,
+  Inset,
   Label,
   Pagination,
+  Section,
   Spacer,
   Spinner,
   Stack,
