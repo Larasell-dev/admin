@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/Larasell-dev/admin/compare/v0.5.0...v0.5.1) (2026-10-29)
+
+
+### Bug Fixes
+
+* keep the app's own error response callback alongside the admin 404 page ([#192](https://github.com/Larasell-dev/admin/issues/192)) ([10f4357](https://github.com/Larasell-dev/admin/commit/10f43571b14e3f37523dd2a032ca2e7ef6b7c305))
+
 ## [0.5.0](https://github.com/Larasell-dev/admin/compare/v0.4.1...v0.5.0) (2026-10-29)
 
 
