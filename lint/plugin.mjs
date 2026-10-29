@@ -131,7 +131,64 @@ const noMargin = {
   },
 };
 
+// Expressions a class list passes through on its way to a class attribute or helper call:
+// className={open ? `…` : "…"}, className={open && `…`}, (`…`) as string.
+const CLASS_VALUE_WRAPPERS = new Set([
+  "ConditionalExpression",
+  "LogicalExpression",
+  "ParenthesizedExpression",
+  "TSAsExpression",
+  "TSNonNullExpression",
+]);
+
+// Whether the node is a class list's value: a class attribute's, or a class helper's argument.
+function isClassValue(node) {
+  let current = node.parent;
+  while (current && CLASS_VALUE_WRAPPERS.has(current.type)) current = current.parent;
+  if (current?.type === "JSXExpressionContainer") current = current.parent;
+
+  if (current?.type === "JSXAttribute") {
+    return current.name.type === "JSXIdentifier" && isClassAttribute(current.name.name);
+  }
+  return (
+    current?.type === "CallExpression" &&
+    current.callee.type === "Identifier" &&
+    CLASS_HELPERS.has(current.callee.name)
+  );
+}
+
+const preferCn = {
+  meta: {
+    type: "suggestion",
+    docs: {
+      description: "Build conditional class lists with cn() instead of interpolating strings.",
+    },
+    messages: {
+      template:
+        'Don\'t interpolate class names in a template literal. Pass the parts to cn() instead, e.g. cn("flex", open && "gap-2").',
+      concatenation:
+        'Don\'t concatenate class names. Pass the parts to cn() instead, e.g. cn("flex", open && "gap-2").',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      TemplateLiteral(node) {
+        if (node.expressions.length > 0 && isClassValue(node)) {
+          context.report({ node, messageId: "template" });
+        }
+      },
+      BinaryExpression(node) {
+        // Only the outermost + of a chain like "a " + b + " c" reports.
+        if (node.operator === "+" && isClassValue(node)) {
+          context.report({ node, messageId: "concatenation" });
+        }
+      },
+    };
+  },
+};
+
 export default {
   meta: { name: "larasell" },
-  rules: { "no-margin": noMargin },
+  rules: { "no-margin": noMargin, "prefer-cn": preferCn },
 };

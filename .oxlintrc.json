@@ -9,7 +9,8 @@
     "correctness": "error"
   },
   "rules": {
-    "larasell/no-margin": "error"
+    "larasell/no-margin": "error",
+    "larasell/prefer-cn": "error"
   },
   "ignorePatterns": ["public/**", "vendor/**", "workbench/**"]
 }

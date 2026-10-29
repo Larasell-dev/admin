@@ -311,7 +311,10 @@ function CategoryRow({
         </span>
         <span
           // Zero width, so only the minimum, not the whole name, widens the row.
-          className={`w-0 min-w-32 flex-1 truncate ${category.visible ? "" : "text-mauve-500 dark:text-mauve-400"}`}
+          className={cn(
+            "w-0 min-w-32 flex-1 truncate",
+            !category.visible && "text-mauve-500 dark:text-mauve-400",
+          )}
         >
           {category.name}
         </span>
