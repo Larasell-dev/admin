@@ -5,6 +5,7 @@ namespace Larasell\Admin;
 use Closure;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Route;
+use InvalidArgumentException;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 
@@ -25,6 +26,13 @@ class AdminPanel
      * @var list<string>
      */
     protected array $pagePaths = [];
+
+    /**
+     * The prebuilt admin assets of extensions, by the name their build is linked under.
+     *
+     * @var array<string, array{publicPath: string, entries: list<string>}>
+     */
+    protected array $extensions = [];
 
     public static function resolve(): self
     {
@@ -51,6 +59,38 @@ class AdminPanel
     public function scripts(): array
     {
         return $this->scripts;
+    }
+
+    /**
+     * Loads an extension's prebuilt scripts and stylesheets on every admin page. Its Vite build,
+     * made with the larasell() plugin under the same $name, sits in $publicPath/vendor/{$name}
+     * next to the dev server's hot file; larasell:link links it into the app's public/vendor.
+     *
+     * @param  list<string>  $entries
+     */
+    public function vite(string $name, string $publicPath, array $entries): void
+    {
+        $this->extensions[$name] = ['publicPath' => rtrim($publicPath, '/'), 'entries' => $entries];
+    }
+
+    /**
+     * @return array<string, array{publicPath: string, entries: list<string>}>
+     */
+    public function extensions(): array
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * The Vite instance for an extension's assets, reading its own build and hot file.
+     */
+    public function extensionVite(string $name): Vite
+    {
+        $extension = $this->extensions[$name] ?? throw new InvalidArgumentException("No extension assets are registered as [{$name}].");
+
+        return (clone app(Vite::class))
+            ->useBuildDirectory("vendor/{$name}")
+            ->useHotFile("{$extension['publicPath']}/hot");
     }
 
     public function pagePath(string $path): void

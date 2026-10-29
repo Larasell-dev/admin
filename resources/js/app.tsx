@@ -1,71 +1,37 @@
 import "../css/app.css";
 import { createInertiaApp, type ResolvedComponent } from "@inertiajs/react";
-import * as Inertia from "@inertiajs/react";
-import * as UI from "@larasell-dev/ui";
-import * as React from "react";
-import * as JsxDevRuntime from "react/jsx-dev-runtime";
-import * as JsxRuntime from "react/jsx-runtime";
 import { createRoot } from "react-dom/client";
 import { ToastProvider } from "@larasell-dev/ui";
-import ResourceTable from "./Components/ResourceTable";
-import SidebarLayout from "./Layouts/SidebarLayout";
+import { extensions } from "./extensions";
+import { sharedModules } from "./sharedModules";
 import { AppHotkeysProvider } from "./utils/hotkeys";
 
 type PageModule = { default: ResolvedComponent };
-
-type RegisteredPage = PageModule | (() => Promise<PageModule>);
 
 const pages = import.meta.glob<PageModule>("./Pages/**/*.tsx");
 
 declare global {
   interface Window {
+    /** Internal: the admin Vite plugin's stand-in modules read the shared modules from here. */
     LarasellAdmin: {
-      React: typeof React;
-      JsxRuntime: typeof JsxRuntime;
-      JsxDevRuntime: typeof JsxDevRuntime;
-      Inertia: typeof Inertia;
-      UI: typeof UI;
-      Layouts: {
-        SidebarLayout: typeof SidebarLayout;
-      };
-      Components: {
-        ResourceTable: typeof ResourceTable;
-      };
-      pages: Record<string, RegisteredPage>;
-      registerPages: (pages: Record<string, RegisteredPage>) => void;
+      modules: typeof sharedModules;
       boot: () => void;
     };
   }
 }
 
-const registered: Record<string, RegisteredPage> = {};
-
 window.LarasellAdmin = {
-  React,
-  JsxRuntime,
-  JsxDevRuntime,
-  Inertia,
-  UI,
-  Layouts: {
-    SidebarLayout,
-  },
-  Components: {
-    ResourceTable,
-  },
-  pages: registered,
-  registerPages(next) {
-    Object.assign(registered, next);
-  },
+  modules: sharedModules,
   boot() {
+    extensions.boot();
+
     void createInertiaApp({
       serverHead: true,
       resolve: async (name) => {
-        const page = registered[name];
+        const page = await extensions.resolve(name);
 
         if (page) {
-          const module = typeof page === "function" ? await page() : page;
-
-          return module.default;
+          return page;
         }
 
         const loader = pages[`./Pages/${name}.tsx`];
