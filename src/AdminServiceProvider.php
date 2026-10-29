@@ -2,12 +2,16 @@
 
 namespace Larasell\Admin;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RouteDefinition;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
-use Inertia\Inertia;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
@@ -21,6 +25,8 @@ use Larasell\Admin\ServiceProviders\OrderServiceProvider;
 use Larasell\Admin\ServiceProviders\ProductServiceProvider;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -109,25 +115,33 @@ class AdminServiceProvider extends ServiceProvider
      * Admin pages that 404, such as unknown admin addresses (the fallback route) or editing an
      * admin that does not exist, show the panel's 404 page: inside the sidebar for signed-in
      * admins, on its own for guests. Other requests keep the application's 404.
+     *
+     * A renderable rather than Inertia::handleExceptionsUsing(), which takes the exception
+     * handler's only respondUsing() slot and so would replace the application's own callback.
      */
     private function renderNotFoundPage(): void
     {
-        Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
-            $request = $response->request;
-
-            if ($response->statusCode() !== 404
-                || ! $request->isMethod('GET')
-                || $request->expectsJson()
-                || ! $request->route()?->named('larasell.admin.*')) {
-                return null;
+        $this->callAfterResolving(ExceptionHandler::class, function (ExceptionHandler $handler): void {
+            if (! $handler instanceof Handler) {
+                return;
             }
 
-            Head::title('Page not found');
+            $handler->renderable(function (HttpExceptionInterface $exception, Request $request) {
+                if ($exception->getStatusCode() !== 404
+                    || ! $request->isMethod('GET')
+                    || $request->expectsJson()
+                    || ! $request->route()?->named('larasell.admin.*')) {
+                    return null;
+                }
 
-            return $response
-                ->usingMiddleware(HandleAdminInertiaRequests::class)
-                ->render(Auth::guard('larasell-admin')->check() ? 'NotFound' : 'GuestNotFound')
-                ->withSharedData();
+                Head::title('Page not found');
+
+                return (new ExceptionResponse($exception, $request, new Response(status: 404), app(Router::class), app(Kernel::class)))
+                    ->usingMiddleware(HandleAdminInertiaRequests::class)
+                    ->render(Auth::guard('larasell-admin')->check() ? 'NotFound' : 'GuestNotFound')
+                    ->withSharedData()
+                    ->toResponse($request);
+            });
         });
     }
 
