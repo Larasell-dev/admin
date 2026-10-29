@@ -15,6 +15,7 @@ import {
 } from "@larasell-dev/ui";
 import { AddLine, More2Fill, ShoppingBagLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
+import { cn } from "cn";
 import { useEffect, useMemo, useState } from "react";
 import type { TableRowAction, TableResource } from "../types";
 import { abortPrevious } from "../utils/abortPrevious";
@@ -169,7 +170,11 @@ export default function ProductsTable(props: Props) {
                   <tr
                     key={row.id}
                     // `relative` contains the row link, which stretches over the whole row.
-                    className={`relative border-b border-border last:border-b-0 ${row._link ? "hover:bg-mauve-50 has-[a:focus-visible]:bg-mauve-50 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-primary-500 dark:hover:bg-mauve-800/50 dark:has-[a:focus-visible]:bg-mauve-800/50" : ""}`}
+                    className={cn(
+                      "relative border-b border-border last:border-b-0",
+                      row._link &&
+                        "hover:bg-mauve-50 has-[a:focus-visible]:bg-mauve-50 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-primary-500 dark:hover:bg-mauve-800/50 dark:has-[a:focus-visible]:bg-mauve-800/50",
+                    )}
                   >
                     {table!.columns.map((column, index) => (
                       <td

@@ -138,7 +138,7 @@ function TreePanel({
   return (
     <section
       aria-labelledby={headingId}
-      className={`min-h-0 w-full max-w-80 shrink-0 flex-col ${className}`}
+      className={cn("min-h-0 w-full max-w-80 shrink-0 flex-col", className)}
     >
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
         <h1 id={headingId} className="type-body-md text-mauve-950 dark:text-mauve-50">
