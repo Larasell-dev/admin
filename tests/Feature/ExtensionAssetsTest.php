@@ -41,6 +41,7 @@ it('loads extension assets after the panel\'s script and before the panel boots'
 });
 
 it('sets up React Refresh for an extension\'s dev server', function () {
+    file_put_contents($this->panelHot, 'http://localhost:5173');
     file_put_contents("{$this->extensionPublic}/hot", 'http://localhost:5199');
     $public = $this->extensionPublic;
     $this->bootingWith(fn () => AdminPanel::resolve()->vite('acme-wishlists', $public, ['resources/js/admin.ts']));
