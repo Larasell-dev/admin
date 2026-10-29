@@ -101,6 +101,157 @@
 * update @larasell-dev/ui to 0.1.19 ([#138](https://github.com/Larasell-dev/admin/issues/138)) ([f50b174](https://github.com/Larasell-dev/admin/commit/f50b174ddc1dc27346e963830018324577547c7c))
 * update @larasell-dev/ui to 0.1.25 ([f677aef](https://github.com/Larasell-dev/admin/commit/f677aefd3c3fe665db844f3e47ca4f39d5546232))
 
+### Upgrade guide
+
+#### Admin pages import `@larasell-dev/admin` and register with `Larasell.booting()`
+
+The `larasell-admin/register`, `larasell-admin/components` and `larasell-admin/layouts` modules
+are now one module, `@larasell-dev/admin`. Pages are registered in a `Larasell.booting()`
+callback and load when they're first opened instead of on every admin page. Every export of
+React, Inertia and `@larasell-dev/ui` is now available to admin pages, not only the hooks and
+components that were listed by hand.
+
+##### Who is affected
+
+Apps with their own admin pages in `resources/js/admin`, built with the `admin()` Vite plugin.
+Apps without that directory are not affected.
+
+##### How to upgrade
+
+Register pages with a loader in `resources/js/admin/app.tsx`:
+
+```tsx
+// Before
+import { page } from "larasell-admin/register";
+import Report from "./pages/Report";
+
+page.add("Report", Report);
+
+// After
+import { Larasell } from "@larasell-dev/admin";
+
+Larasell.booting(({ pages }) => {
+  pages.register("Report", () => import("./pages/Report"));
+});
+```
+
+Import components and layouts from `@larasell-dev/admin`:
+
+```tsx
+// Before
+import { ResourceTable } from "larasell-admin/components";
+import { SidebarLayout } from "larasell-admin/layouts";
+
+// After
+import { ResourceTable, SidebarLayout } from "@larasell-dev/admin";
+```
+
+The `TableResource` type and its parts now match what tables send: they include
+`headerActions`, `pagination`, badge columns and row links.
+
+#### The config now lives in `config/larasell/admin/panel.php` under `larasell.admin.panel`
+
+The admin config can now be published with `php artisan vendor:publish --tag=larasell-admin-config`.
+It is published into its own `config/larasell/admin` folder, so future config files can sit
+next to `panel.php` without crowding the app's `config` directory. Laravel names config keys
+after their folder, so the key changed from `larasell-admin` to `larasell.admin.panel`.
+
+##### Who is affected
+
+- Apps that read or set `larasell-admin.path`, `larasell-admin.disk`, or
+  `larasell-admin.tables.namespace`, for example with `config()`.
+- Apps with their own `config/larasell-admin.php`. The panel no longer reads that file, so its
+  values are silently ignored.
+
+Apps that only set `LARASELL_ADMIN_PATH` or `LARASELL_ADMIN_DISK` in `.env` are not affected.
+
+##### How to upgrade
+
+Rename the config keys:
+
+```php
+// Before
+config('larasell-admin.path');
+config('larasell-admin.disk');
+config(['larasell-admin.tables.namespace' => 'App\\Admin\\Tables']);
+
+// After
+config('larasell.admin.panel.path');
+config('larasell.admin.panel.disk');
+config(['larasell.admin.panel.tables.namespace' => 'App\\Admin\\Tables']);
+```
+
+If you have a `config/larasell-admin.php`, publish the new file, copy your values into it, and
+delete the old one:
+
+```sh
+php artisan vendor:publish --tag=larasell-admin-config
+# copy your values from config/larasell-admin.php into config/larasell/admin/panel.php
+rm config/larasell-admin.php
+```
+
+#### Customers and Settings moved down one navigation position
+
+The new Orders navigation item takes position 4000, between Categories and Customers. To keep the
+built-in items 1000 apart, Customers moved from 4000 to 5000 and Settings from 5000 to 6000.
+
+##### Who is affected
+
+Apps that add navigation items with a fixed `position()` above 3000. An item at 4500 used to sit
+between Customers and Settings; it now sits between Orders and Customers. Apps that place items
+with `before()` or `after()`, or with `NavItem::...->position()`, keep their order and are not
+affected.
+
+##### How to upgrade
+
+Add 1000 to positions above 3000 to keep an item where it was. Better, place it relative to a
+built-in item so it follows any future change:
+
+```php
+use Larasell\Admin\Enums\NavItem;
+use Larasell\Admin\Facades\Navigation;
+
+// Before: between Customers and Settings
+Navigation::add('Reports', 'reports.index', 'bar-chart')->position(4500);
+
+// After
+Navigation::add('Reports', 'reports.index', 'bar-chart')->position(5500);
+
+// Or
+Navigation::add('Reports', 'reports.index', 'bar-chart')->after(NavItem::Customers);
+```
+
+#### Customers and Settings moved down one navigation position
+
+The new Products navigation item takes position 3000, between Categories and Customers. To keep
+the built-in items 1000 apart, Customers moved from 3000 to 4000 and Settings from 4000 to 5000.
+
+##### Who is affected
+
+Apps that add navigation items with a fixed `position()` above 2000. An item at 3500 used to sit
+between Customers and Settings; it now sits between Products and Customers. Apps that place items
+with `before()` or `after()`, or with `NavItem::...->position()`, keep their order and are not
+affected.
+
+##### How to upgrade
+
+Add 1000 to positions above 2000 to keep an item where it was. Better, place it relative to a
+built-in item so it follows any future change:
+
+```php
+use Larasell\Admin\Enums\NavItem;
+use Larasell\Admin\Facades\Navigation;
+
+// Before: between Customers and Settings
+Navigation::add('Reports', 'reports.index', 'bar-chart')->position(3500);
+
+// After
+Navigation::add('Reports', 'reports.index', 'bar-chart')->position(4500);
+
+// Or
+Navigation::add('Reports', 'reports.index', 'bar-chart')->after(NavItem::Customers);
+```
+
 ## [0.4.1](https://github.com/Larasell-dev/admin/compare/v0.4.0...v0.4.1) (2026-10-23)
 
 
