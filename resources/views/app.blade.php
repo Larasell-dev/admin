@@ -27,8 +27,10 @@
         {{ $panelVite('resources/js/app.tsx') }}
 
         {{-- After the panel's script, which defines window.LarasellAdmin, and before boot(). --}}
-        @foreach (\Larasell\Admin\AdminPanel::resolve()->packageScripts() as $name => $packageScript)
-            {{ \Larasell\Admin\AdminPanel::resolve()->packageVite($name)($packageScript['entry']) }}
+        @foreach (\Larasell\Admin\AdminPanel::resolve()->extensions() as $name => $extension)
+            @php($extensionVite = \Larasell\Admin\AdminPanel::resolve()->extensionVite($name))
+            {{ $extensionVite->reactRefresh() }}
+            {{ $extensionVite($extension['entries']) }}
         @endforeach
 
         @viteReactRefresh

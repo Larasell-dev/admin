@@ -28,11 +28,11 @@ class AdminPanel
     protected array $pagePaths = [];
 
     /**
-     * Prebuilt scripts that packages ship, by the name their assets are linked under.
+     * The prebuilt admin assets of extensions, by the name their build is linked under.
      *
-     * @var array<string, array{publicPath: string, entry: string}>
+     * @var array<string, array{publicPath: string, entries: list<string>}>
      */
-    protected array $packageScripts = [];
+    protected array $extensions = [];
 
     public static function resolve(): self
     {
@@ -62,33 +62,35 @@ class AdminPanel
     }
 
     /**
-     * Loads a package's prebuilt script on every admin page, e.g. one that registers its pages.
-     * Like the panel's own assets, $publicPath holds the build in vendor/{$name} and the dev
-     * server's hot file; larasell:link links the build into the app's public/vendor/{$name}.
+     * Loads an extension's prebuilt scripts and stylesheets on every admin page. Its Vite build,
+     * made with the larasell() plugin under the same $name, sits in $publicPath/vendor/{$name}
+     * next to the dev server's hot file; larasell:link links it into the app's public/vendor.
+     *
+     * @param  list<string>  $entries
      */
-    public function packageScript(string $name, string $publicPath, string $entry): void
+    public function vite(string $name, string $publicPath, array $entries): void
     {
-        $this->packageScripts[$name] = ['publicPath' => rtrim($publicPath, '/'), 'entry' => $entry];
+        $this->extensions[$name] = ['publicPath' => rtrim($publicPath, '/'), 'entries' => $entries];
     }
 
     /**
-     * @return array<string, array{publicPath: string, entry: string}>
+     * @return array<string, array{publicPath: string, entries: list<string>}>
      */
-    public function packageScripts(): array
+    public function extensions(): array
     {
-        return $this->packageScripts;
+        return $this->extensions;
     }
 
     /**
-     * The Vite instance for a package's script, reading the package's own build and hot file.
+     * The Vite instance for an extension's assets, reading its own build and hot file.
      */
-    public function packageVite(string $name): Vite
+    public function extensionVite(string $name): Vite
     {
-        $script = $this->packageScripts[$name] ?? throw new InvalidArgumentException("No package script is registered as [{$name}].");
+        $extension = $this->extensions[$name] ?? throw new InvalidArgumentException("No extension assets are registered as [{$name}].");
 
         return (clone app(Vite::class))
             ->useBuildDirectory("vendor/{$name}")
-            ->useHotFile("{$script['publicPath']}/hot");
+            ->useHotFile("{$extension['publicPath']}/hot");
     }
 
     public function pagePath(string $path): void

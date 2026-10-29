@@ -19,50 +19,52 @@ it('registers scripts and page paths', function () {
         ->and($panel->pagePaths())->toBe(['/path/to/pages']);
 });
 
-it('registers package scripts by name', function () {
+it('registers extension assets by name', function () {
     $panel = new AdminPanel;
 
-    $panel->packageScript('acme-reviews', '/path/to/acme/public/', 'resources/js/admin/app.tsx');
+    $panel->vite('acme-wishlists', '/path/to/acme/public/', ['resources/js/admin.ts', 'resources/css/admin.css']);
 
-    expect($panel->packageScripts())->toBe([
-        'acme-reviews' => ['publicPath' => '/path/to/acme/public', 'entry' => 'resources/js/admin/app.tsx'],
+    expect($panel->extensions())->toBe([
+        'acme-wishlists' => ['publicPath' => '/path/to/acme/public', 'entries' => ['resources/js/admin.ts', 'resources/css/admin.css']],
     ]);
 });
 
-it('serves a package script from the package\'s own dev server', function () {
+it('serves extension assets from the extension\'s own dev server', function () {
     $this->withVite();
     $public = sys_get_temp_dir().'/'.uniqid('acme-public-');
     mkdir($public);
     file_put_contents("{$public}/hot", 'http://localhost:5199');
 
     $panel = new AdminPanel;
-    $panel->packageScript('acme-reviews', $public, 'resources/js/admin/app.tsx');
+    $panel->vite('acme-wishlists', $public, ['resources/js/admin.ts']);
 
-    expect((string) $panel->packageVite('acme-reviews')('resources/js/admin/app.tsx'))
-        ->toContain('src="http://localhost:5199/resources/js/admin/app.tsx"');
+    expect((string) $panel->extensionVite('acme-wishlists')('resources/js/admin.ts'))
+        ->toContain('src="http://localhost:5199/resources/js/admin.ts"');
 
     unlink("{$public}/hot");
     rmdir($public);
 });
 
-it('serves a package script from its build linked into vendor/{name}', function () {
+it('serves extension assets from their build linked into vendor/{name}', function () {
     $this->withVite();
-    $build = public_path('vendor/acme-reviews');
+    $build = public_path('vendor/acme-wishlists');
     mkdir($build, recursive: true);
     file_put_contents("{$build}/manifest.json", json_encode([
-        'resources/js/admin/app.tsx' => ['file' => 'assets/app-abc123.js', 'src' => 'resources/js/admin/app.tsx', 'isEntry' => true],
+        'resources/js/admin.ts' => ['file' => 'assets/admin-abc123.js', 'src' => 'resources/js/admin.ts', 'isEntry' => true],
+        'resources/css/admin.css' => ['file' => 'assets/admin-def456.css', 'src' => 'resources/css/admin.css', 'isEntry' => true],
     ]));
 
     $panel = new AdminPanel;
-    $panel->packageScript('acme-reviews', '/path/to/acme/public', 'resources/js/admin/app.tsx');
+    $panel->vite('acme-wishlists', '/path/to/acme/public', ['resources/js/admin.ts', 'resources/css/admin.css']);
 
-    expect((string) $panel->packageVite('acme-reviews')('resources/js/admin/app.tsx'))
-        ->toContain('/vendor/acme-reviews/assets/app-abc123.js');
+    expect((string) $panel->extensionVite('acme-wishlists')(['resources/js/admin.ts', 'resources/css/admin.css']))
+        ->toContain('/vendor/acme-wishlists/assets/admin-abc123.js')
+        ->toContain('/vendor/acme-wishlists/assets/admin-def456.css');
 
     unlink("{$build}/manifest.json");
     rmdir($build);
 });
 
-it('refuses to serve a package script that is not registered', function () {
-    (new AdminPanel)->packageVite('acme-reviews');
-})->throws(InvalidArgumentException::class, 'acme-reviews');
+it('refuses to serve assets of an extension that is not registered', function () {
+    (new AdminPanel)->extensionVite('acme-wishlists');
+})->throws(InvalidArgumentException::class, 'acme-wishlists');

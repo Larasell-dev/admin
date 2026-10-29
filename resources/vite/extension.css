@@ -1,0 +1,11 @@
+/*
+ * The base of an extension's admin stylesheet: @import "@larasell-dev/admin/extension.css".
+ *
+ * The panel's stylesheet already ships Tailwind's preflight and the UI kit's styles, so this only
+ * adds the theme and the utilities an extension's pages use. Those go in the components layer,
+ * below the panel's utilities: a class both stylesheets generate, like flex-col, would otherwise
+ * come later and beat the panel's responsive variants, like lg:flex-row.
+ */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(components);
+@import "@larasell-dev/ui/theme.css";

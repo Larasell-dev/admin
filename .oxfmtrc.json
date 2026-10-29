@@ -5,6 +5,7 @@
     ".release-please-manifest.json",
     "composer.lock",
     "package-lock.json",
-    "public/**"
+    "public/**",
+    "resources/vite/exports.json"
   ]
 }

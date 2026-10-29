@@ -20,6 +20,14 @@ export default defineConfig({
         },
       },
       {
+        // The admin Vite plugin runs in Node, where extensions build with it.
+        test: {
+          name: "vite",
+          include: ["resources/vite/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+      {
         // Oxlint's RuleTester runs the linter natively, so these tests run in Node.
         test: {
           name: "lint",

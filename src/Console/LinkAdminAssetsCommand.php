@@ -10,7 +10,7 @@ class LinkAdminAssetsCommand extends Command
 {
     protected $signature = 'larasell:link';
 
-    protected $description = 'Link the admin panel JavaScript and CSS, and those of packages that extend it, into the public directory';
+    protected $description = 'Link the admin panel JavaScript and CSS, and those of extensions, into the public directory';
 
     public function handle(AdminPanel $panel): int
     {
@@ -20,8 +20,8 @@ class LinkAdminAssetsCommand extends Command
 
         $this->components->info('Admin assets linked.');
 
-        foreach ($panel->packageScripts() as $name => $script) {
-            if (! $this->link($name, $script['publicPath'], "Assets of [{$name}] are not built. Run npm run build in its package.")) {
+        foreach ($panel->extensions() as $name => $extension) {
+            if (! $this->link($name, $extension['publicPath'], "Assets of [{$name}] are not built. Run npm run build in the extension.")) {
                 return self::FAILURE;
             }
 
@@ -32,7 +32,7 @@ class LinkAdminAssetsCommand extends Command
     }
 
     /**
-     * Links $publicPath/vendor/$name, a package's build, to the app's public/vendor/$name.
+     * Links $publicPath/vendor/$name, an extension's build, to the app's public/vendor/$name.
      */
     private function link(string $name, string $publicPath, string $notBuilt): bool
     {
