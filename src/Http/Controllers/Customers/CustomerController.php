@@ -9,6 +9,7 @@ use Larasell\Admin\Data\View\Customers\CreateCustomerPageData;
 use Larasell\Admin\Data\View\Customers\EditCustomerPageData;
 use Larasell\Admin\Data\ViewModel\Customers\CustomerDetailData;
 use Larasell\Admin\Http\Requests\Customers\CustomerRequest;
+use Larasell\Admin\Tables\Customers\CustomerOrders;
 use Larasell\Larasell\Models\Customer;
 use Laravel\Head\Facades\Head;
 
@@ -37,6 +38,7 @@ class CustomerController
             customer: CustomerDetailData::fromModel($customer),
             updateUrl: route('larasell.admin.customers.update', $customer),
             indexUrl: route('larasell.admin.customers.index'),
+            orders: CustomerOrders::make($customer),
         ));
     }
 
