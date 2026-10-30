@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/Larasell-dev/admin/compare/v0.5.1...v0.5.2) (2026-10-30)
+
+
+### Bug Fixes
+
+* register Navigation::index routes once when called from routes/admin.php ([#194](https://github.com/Larasell-dev/admin/issues/194)) ([89f5161](https://github.com/Larasell-dev/admin/commit/89f51616e09ff6d4837870de5adbf075228712a3))
+
 ## [0.5.1](https://github.com/Larasell-dev/admin/compare/v0.5.0...v0.5.1) (2026-10-29)
 
 
