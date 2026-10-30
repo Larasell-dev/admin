@@ -137,11 +137,11 @@ it("asks before leaving the site only while the form has unsaved changes", async
 });
 
 class Boundary extends Component<{ children: ReactNode }, { error: string | null }> {
-  state = { error: null };
+  override state = { error: null };
   static getDerivedStateFromError(error: Error) {
     return { error: error.message };
   }
-  render() {
+  override render() {
     return this.state.error ?? this.props.children;
   }
 }

@@ -126,7 +126,7 @@ describe.each([
     await screen.getByRole(role).getByText("Author 1").click({ force: true });
 
     expect(visit).toHaveBeenCalledOnce();
-    expect(visit.mock.calls[0][0]).toContain("/admin/books/1");
+    expect(visit.mock.calls[0]?.[0]).toContain("/admin/books/1");
   });
 
   it("follows links to other sites as plain anchors", async () => {
@@ -239,8 +239,8 @@ describe.each([
     await screen.getByRole("button", { name: "Next page" }).click();
 
     expect(get).toHaveBeenCalledOnce();
-    expect(get.mock.calls[0][0]).toBe(window.location.pathname);
-    expect(get.mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
-    expect(get.mock.calls[0][2]).toMatchObject({ preserveScroll: true });
+    expect(get.mock.calls[0]?.[0]).toBe(window.location.pathname);
+    expect(get.mock.calls[0]?.[1]).toEqual({ page: 3, per_page: 50 });
+    expect(get.mock.calls[0]?.[2]).toMatchObject({ preserveScroll: true });
   });
 });

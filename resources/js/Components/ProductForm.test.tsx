@@ -452,7 +452,7 @@ function fakeUploads(...answers: [status: number, body: unknown][]) {
       // One image per upload, as the server takes them.
       expect(fields.map(([field]) => field)).toEqual(["image"]);
       uploads.push({ url, files: fields.map(([, file]) => (file as File).name), signal });
-      const [status, body] = answers[uploads.length - 1];
+      const [status, body] = answers[uploads.length - 1]!;
       const aborted = new Promise<never>((_, reject) =>
         signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError"))),
       );
@@ -522,11 +522,11 @@ describe("images", () => {
     // After the product's image, where the uploaded ones will appear.
     await expect.poll(() => uploadingCards().elements()).toHaveLength(2);
     const [, first, second, add] = imageGrid().getByRole("listitem").elements();
-    expect(first.querySelector("[role=status]")).toHaveAccessibleName("Uploading side.png");
-    expect(second.querySelector("[role=status]")).toHaveAccessibleName("Uploading back.png");
+    expect(first?.querySelector("[role=status]")).toHaveAccessibleName("Uploading side.png");
+    expect(second?.querySelector("[role=status]")).toHaveAccessibleName("Uploading back.png");
     // The add square stays a plus, just disabled.
     expect(add).toContainElement(addImages().element() as HTMLElement);
-    expect(add.querySelector("[role=status]")).toBeNull();
+    expect(add?.querySelector("[role=status]")).toBeNull();
     await expect.element(addImages()).toBeDisabled();
     // Nothing to link until the upload answers.
     expect(formData().getAll("images[]")).toEqual(["7"]);
@@ -574,7 +574,7 @@ describe("images", () => {
     expect(uploadingCards().elements()).toHaveLength(0);
     await expect.element(addImages()).toBeEnabled();
     expect(uploads).toHaveLength(1);
-    expect(uploads[0].signal?.aborted).toBe(true);
+    expect(uploads[0]?.signal?.aborted).toBe(true);
 
     upload.respond({ image: image(8, "green") });
 
@@ -593,7 +593,7 @@ describe("images", () => {
 
     await screen.unmount();
 
-    expect(uploads[0].signal?.aborted).toBe(true);
+    expect(uploads[0]?.signal?.aborted).toBe(true);
   });
 
   it("removes an image from its menu, to be unlinked when saved, and puts it back on cancel", async () => {
@@ -633,7 +633,7 @@ describe("images", () => {
     ["the only image", [7]],
   ])("puts %s back when the removal is cancelled", async (_, ids) => {
     const colors = ["red", "blue", "green"];
-    await renderForm({ ...boots, images: ids.map((id, i) => image(id, colors[i])) });
+    await renderForm({ ...boots, images: ids.map((id, i) => image(id, colors[i]!)) });
     await page.getByRole("button", { name: `Actions for image ${ids.length}` }).click();
     await page.getByRole("menuitem", { name: "Remove" }).click();
     await expect.element(toast()).toBeVisible();
