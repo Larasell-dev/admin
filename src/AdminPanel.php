@@ -34,18 +34,38 @@ class AdminPanel
      */
     protected array $extensions = [];
 
+    /** Whether routes() is running its callback, so a nested call doesn't open the group again. */
+    private bool $registeringRoutes = false;
+
     public static function resolve(): self
     {
         return app(self::class);
     }
 
+    /**
+     * Registers admin routes in the admin route group. Inside that group already, e.g. when
+     * routes/admin.php calls Navigation::index(), it adds them as they are, so the prefixes
+     * don't apply twice.
+     */
     public function routes(Closure $routes): void
     {
-        Route::middleware(['web', HandleAdminInertiaRequests::class, Authenticate::class])
-            ->prefix(config('larasell.admin.panel.path'))
-            ->name('larasell.admin.')
-            ->withHead(title: self::TITLE)
-            ->group($routes);
+        if ($this->registeringRoutes) {
+            $routes();
+
+            return;
+        }
+
+        $this->registeringRoutes = true;
+
+        try {
+            Route::middleware(['web', HandleAdminInertiaRequests::class, Authenticate::class])
+                ->prefix(config('larasell.admin.panel.path'))
+                ->name('larasell.admin.')
+                ->withHead(title: self::TITLE)
+                ->group($routes);
+        } finally {
+            $this->registeringRoutes = false;
+        }
     }
 
     public function script(string $input): void
