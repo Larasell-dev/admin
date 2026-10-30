@@ -2,6 +2,7 @@ import "../css/app.css";
 import { createInertiaApp, type ResolvedComponent } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
 import { ToastProvider } from "@larasell-dev/ui";
+import { ThemeChangedToasts } from "./Components/ThemeChangedToast";
 import { extensions } from "./extensions";
 import { sharedModules } from "./sharedModules";
 import { AppHotkeysProvider } from "./utils/hotkeys";
@@ -50,6 +51,7 @@ window.LarasellAdmin = {
           <AppHotkeysProvider>
             <ToastProvider>
               <App {...props} />
+              <ThemeChangedToasts />
             </ToastProvider>
           </AppHotkeysProvider>,
         );
