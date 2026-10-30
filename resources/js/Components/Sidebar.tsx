@@ -208,12 +208,13 @@ function activeNavigationItem({ props, url }: { props: Page; url: string }): Nav
   let bestLength = -1;
 
   for (const siblings of groups) {
-    const paths = siblings.map((item) => pathOf(item.url));
+    const entries = siblings.map((item) => [item, pathOf(item.url)] as const);
 
-    for (const [index, item] of siblings.entries()) {
-      const itemPath = paths[index];
+    for (const [item, itemPath] of entries) {
       if (itemPath === path) return item;
-      if (!isUnder(path, itemPath) || paths.some((other) => isUnder(other, itemPath))) continue;
+      if (!isUnder(path, itemPath) || entries.some(([, other]) => isUnder(other, itemPath))) {
+        continue;
+      }
       if (itemPath.length > bestLength) {
         best = item;
         bestLength = itemPath.length;

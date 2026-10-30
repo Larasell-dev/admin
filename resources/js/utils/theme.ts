@@ -34,8 +34,13 @@ export function setTheme(theme: Theme) {
 
 /** Moves to the next theme in the order light, dark, system. */
 export function cycleTheme() {
-  const themes = Object.values(Theme);
-  setTheme(themes[(themes.indexOf(storedTheme()) + 1) % themes.length]);
+  const next: Record<Theme, Theme> = {
+    [Theme.Light]: Theme.Dark,
+    [Theme.Dark]: Theme.System,
+    [Theme.System]: Theme.Light,
+  };
+
+  setTheme(next[storedTheme()]);
 }
 
 /** The stored theme, updated whenever `setTheme` changes it. */
