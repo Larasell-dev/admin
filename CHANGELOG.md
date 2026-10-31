@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.4](https://github.com/Larasell-dev/admin/compare/v0.5.3...v0.5.4) (2026-10-31)
+
+
+### Bug Fixes
+
+* authenticate API tokens before route bindings and throttling ([deea5cf](https://github.com/Larasell-dev/admin/commit/deea5cf7c5e58c7d0daeecca9959a24f25990fbc))
+
 ## [0.5.3](https://github.com/Larasell-dev/admin/compare/v0.5.2...v0.5.3) (2026-10-31)
 
 
