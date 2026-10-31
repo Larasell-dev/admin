@@ -14,12 +14,24 @@ use Larasell\Admin\Http\Middleware\ApiTokens\AuthenticateApiToken;
 /**
  * The API tokens module: the settings pages to list, create and revoke tokens, their navigation
  * item under Settings, and the larasell.api middleware that extensions put their API behind.
+ * Setting larasell.admin.api_tokens.enabled to false leaves out the pages and navigation item,
+ * and the middleware then rejects every request.
  */
 class ApiTokenServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/api_tokens.php', 'larasell.admin.api_tokens');
+    }
+
     public function boot(): void
     {
+        // Even when disabled, so extension routes behind larasell.api answer 401 rather than fail.
         AuthenticateApiToken::register();
+
+        if (! config('larasell.admin.api_tokens.enabled')) {
+            return;
+        }
 
         // After Admins, which routes/web.php adds once every module has booted.
         Navigation::add('API tokens', 'larasell.admin.settings.api-tokens.index', Icon::Key)

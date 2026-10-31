@@ -352,6 +352,47 @@ it('only authenticates API tokens through the larasell.api middleware', function
     $this->getJson('api/guard-only', ['Authorization' => 'Bearer '.createApiToken()])->assertUnauthorized();
 });
 
+/**
+ * Reboots with the API tokens module turned off.
+ */
+function disableApiTokens(): void
+{
+    test()->bootingWith(fn () => config(['larasell.admin.api_tokens.enabled' => false]));
+}
+
+it('leaves out the API tokens settings pages when disabled', function () {
+    disableApiTokens();
+    $this->actingAs($this->ada, 'larasell-admin');
+
+    expect(Route::has('larasell.admin.settings.api-tokens.index'))->toBeFalse();
+
+    // The routes aren't registered, so there are no route names to use.
+    $this->get('/admin/settings/api-tokens')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get('/admin/settings/api-tokens/create')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->post('/admin/settings/api-tokens', ['name' => 'x', 'expires_in' => '3_months'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+
+    expect(ApiToken::query()->count())->toBe(0);
+});
+
+it('leaves out the API tokens navigation item when disabled', function () {
+    disableApiTokens();
+    $this->actingAs($this->ada, 'larasell-admin');
+
+    $this->get(route('larasell.admin.home'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Admins']));
+});
+
+it('rejects every token on larasell.api routes when disabled, rather than failing', function () {
+    disableApiTokens();
+    // What an extension's API does, registered again since rebooting dropped the routes.
+    Route::middleware(['api', 'larasell.api'])->get('api/whoami', fn () => 'reached');
+    // A token issued while the module was on.
+    ApiToken::query()->create(['name' => 'ERP sync', 'token_hash' => hash('sha256', 'larasell_issued-before'), 'expires_at' => now()->addMonth()]);
+
+    callApi('larasell_issued-before')->assertUnauthorized();
+});
+
 it('keeps API tokens out of reach for guests', function () {
     $this->get(route('larasell.admin.settings.api-tokens.index'))->assertRedirect(route('larasell.admin.login'));
     $this->post(route('larasell.admin.settings.api-tokens.store'), ['name' => 'x', 'expires_in' => '3_months'])->assertRedirect(route('larasell.admin.login'));
