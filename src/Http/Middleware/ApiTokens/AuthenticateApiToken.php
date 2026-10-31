@@ -32,7 +32,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AuthenticateApiToken implements AuthenticatesRequests
 {
-    private const string GUARD = 'larasell-api-token';
+    /**
+     * @internal
+     */
+    public const string GUARD = 'larasell-api-token';
 
     /**
      * Failed attempts one address may make per minute, so wrong tokens can't cost unlimited lookups.

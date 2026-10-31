@@ -7,14 +7,15 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Larasell\Admin\Audit\Actor;
 
 /**
  * A credential an admin issued for the API: what $request->user() returns on routes behind
  * the larasell.api middleware.
  *
- * Extensions may rely on getAuthIdentifier(), e.g. to rate limit per token, and on the name
- * and description. Everything else is internal and may change, including how the secret is
- * stored: today as a SHA-256 hash on this row.
+ * Extensions may rely on getAuthIdentifier(), e.g. to rate limit per token, on the name and
+ * description, and on it being an audit Actor. Everything else is internal and may change,
+ * including how the secret is stored: today as a SHA-256 hash on this row.
  *
  * @property int $id
  * @property string $name
@@ -25,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ?CarbonInterface $last_used_at
  * @property-read ?Admin $createdBy
  */
-class ApiToken extends Model implements AuthenticatableContract
+class ApiToken extends Model implements Actor, AuthenticatableContract
 {
     use Authenticatable;
 
@@ -75,5 +76,21 @@ class ApiToken extends Model implements AuthenticatableContract
     public function getRememberTokenName(): string
     {
         return '';
+    }
+
+    /**
+     * @public Part of Actor.
+     */
+    public function auditActorType(): string
+    {
+        return 'api_token';
+    }
+
+    /**
+     * @public Part of Actor.
+     */
+    public function auditActorId(): string
+    {
+        return (string) $this->getKey();
     }
 }

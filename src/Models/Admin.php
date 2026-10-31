@@ -4,8 +4,9 @@ namespace Larasell\Admin\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Audit\Actor;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements Actor
 {
     protected $table = 'larasell_admin_users';
 
@@ -35,5 +36,21 @@ class Admin extends Authenticatable
         }
 
         return Storage::disk(config('larasell.admin.panel.disk'))->url($this->avatar_path);
+    }
+
+    /**
+     * @public Part of Actor.
+     */
+    public function auditActorType(): string
+    {
+        return 'admin';
+    }
+
+    /**
+     * @public Part of Actor.
+     */
+    public function auditActorId(): string
+    {
+        return (string) $this->getKey();
     }
 }
