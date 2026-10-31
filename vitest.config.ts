@@ -27,14 +27,6 @@ export default defineConfig({
           environment: "node",
         },
       },
-      {
-        // Oxlint's RuleTester runs the linter natively, so these tests run in Node.
-        test: {
-          name: "lint",
-          include: ["lint/**/*.test.ts"],
-          environment: "node",
-        },
-      },
     ],
   },
 });
