@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4871b3a4f5b695e797bd52da9d9b56b",
+    "content-hash": "8ab28acf68f9c61cdd62b8d31aea8ffc",
     "packages": [
         {
             "name": "brick/math",
@@ -7532,6 +7532,56 @@
             "time": "2025-03-19T14:43:43+00:00"
         },
         {
+            "name": "larasell-dev/phpstan-rules",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Larasell-dev/phpstan-rules.git",
+                "reference": "7845452db99ef7407750e027d8947b60daa1a952"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Larasell-dev/phpstan-rules/zipball/7845452db99ef7407750e027d8947b60daa1a952",
+                "reference": "7845452db99ef7407750e027d8947b60daa1a952",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3",
+                "phpstan/phpstan": "^2.0",
+                "spaze/phpstan-disallowed-calls": "^4.15"
+            },
+            "require-dev": {
+                "illuminate/support": "^13.0",
+                "laravel/pint": "^1.32",
+                "pestphp/pest": "^4.7"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "rules.neon"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Haberkamp",
+                    "email": "nils@larasell.dev"
+                }
+            ],
+            "description": "PHPStan rules shared by the Larasell packages",
+            "support": {
+                "issues": "https://github.com/Larasell-dev/phpstan-rules/issues",
+                "source": "https://github.com/Larasell-dev/phpstan-rules/tree/v0.1.0"
+            },
+            "time": "2026-10-31T04:28:46+00:00",
+            "published-time": "2026-10-31T04:30:42+00:00"
+        },
+        {
             "name": "larastan/larastan",
             "version": "v3.13.0",
             "source": {
@@ -10803,6 +10853,74 @@
             "time": "2025-04-25T13:53:57+00:00"
         },
         {
+            "name": "spaze/phpstan-disallowed-calls",
+            "version": "v4.15.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spaze/phpstan-disallowed-calls.git",
+                "reference": "388075908225e22c46b9622177d1629203d41c1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/388075908225e22c46b9622177d1629203d41c1f",
+                "reference": "388075908225e22c46b9622177d1629203d41c1f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^1.12.6 || ^2.0"
+            },
+            "require-dev": {
+                "nette/neon": "^3.3.1",
+                "php-parallel-lint/php-console-highlighter": "^1.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^1.2 || ^2.0",
+                "phpunit/phpunit": "^9.6 || ^10.1 || ^11.0 || ^12.0 || ^13.0",
+                "shipmonk/dead-code-detector": "^1.1",
+                "spaze/coding-standard": "^1.8"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spaze\\PHPStan\\Rules\\Disallowed\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michal Špaček",
+                    "email": "mail@michalspacek.cz",
+                    "homepage": "https://www.michalspacek.cz"
+                }
+            ],
+            "description": "PHPStan rules to detect disallowed method & function calls, constant, namespace, attribute, property & superglobal usages, with powerful rules to re-allow a call or a usage in places where it should be allowed.",
+            "keywords": [
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/spaze/phpstan-disallowed-calls/issues",
+                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v4.15.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spaze",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-10-13T00:31:30+00:00",
+            "published-time": "2026-10-13T00:56:49+00:00"
+        },
+        {
             "name": "staabm/side-effects-detector",
             "version": "1.0.5",
             "source": {
@@ -11052,5 +11170,5 @@
     "platform-overrides": {
         "php": "8.3"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }
