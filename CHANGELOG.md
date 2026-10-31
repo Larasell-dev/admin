@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.6](https://github.com/Larasell-dev/admin/compare/v0.5.5...v0.5.6) (2026-10-31)
+
+
+### Bug Fixes
+
+* use the elevation tokens for menus, the toast and scrims ([495cb12](https://github.com/Larasell-dev/admin/commit/495cb124e5d4a32a2e75da846ab86f35f24dcfdd))
+
+
+### Miscellaneous Chores
+
+* check the code with larasell-dev/phpstan-rules ([287d311](https://github.com/Larasell-dev/admin/commit/287d3117616bd30ac60cc6b7150de7f01b8d8bf0))
+* enable the @larasell-dev/ui lint rules ([6dab5be](https://github.com/Larasell-dev/admin/commit/6dab5be18b089dc0710d8ed9789524978ef1c33b))
+
 ## [0.5.5](https://github.com/Larasell-dev/admin/compare/v0.5.4...v0.5.5) (2026-10-31)
 
 
