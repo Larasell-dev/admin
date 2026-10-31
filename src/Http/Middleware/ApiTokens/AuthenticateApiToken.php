@@ -4,6 +4,7 @@ namespace Larasell\Admin\Http\Middleware\ApiTokens;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
@@ -24,9 +25,12 @@ use Symfony\Component\HttpFoundation\Response;
  * It accepts no session, and only tokens issued in the admin panel, so tokens or sessions the
  * app has for its own users don't open these routes.
  *
+ * As AuthenticatesRequests, Laravel's middleware priority runs it before route model binding and
+ * throttling: requests without a token can't tell which records exist, and limiters see the token.
+ *
  * @internal Use the larasell.api alias; this class and its guard may change behind it.
  */
-class AuthenticateApiToken
+class AuthenticateApiToken implements AuthenticatesRequests
 {
     private const string GUARD = 'larasell-api-token';
 
