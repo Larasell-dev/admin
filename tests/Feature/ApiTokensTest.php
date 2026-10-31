@@ -293,6 +293,77 @@ it('revokes a token after its name is typed to confirm', function () {
     callApi($plainTextToken)->assertUnauthorized();
 });
 
+it('audits creating a token as the admin who did, without its secret', function () {
+    $plainTextToken = createApiToken();
+    $apiToken = ApiToken::query()->sole();
+
+    $record = DB::table('larasell_audit_log')->sole();
+
+    expect($record)->toMatchArray([
+        'event' => 'api_token.created',
+        'category' => 'security',
+        'actor_type' => 'admin',
+        'actor_id' => (string) $this->ada->id,
+        'subject_type' => 'api_token',
+        'subject_id' => (string) $apiToken->id,
+        'source' => 'web',
+    ])
+        ->and(json_decode($record->properties, true))->toBe([
+            'name' => 'ERP sync',
+            'description' => 'Pushes stock levels every night.',
+            'expires_at' => '2027-01-30T23:59:59Z',
+        ])
+        ->and(json_encode($record))->not->toContain($plainTextToken)->not->toContain($apiToken->token_hash);
+});
+
+it('audits revoking a token, keeping its name once the token is gone', function () {
+    createApiToken();
+    $apiToken = ApiToken::query()->sole();
+
+    $revoke = $this->actingAs($this->ada, 'larasell-admin')
+        ->get(route('larasell.admin.settings.api-tokens.index'))
+        ->inertiaProps('apiTokens.rows.0._actions.0');
+    $this->post($revoke['url'], ['confirmation' => 'ERP sync'])->assertRedirect();
+
+    $record = DB::table('larasell_audit_log')->where('event', 'api_token.revoked')->sole();
+
+    expect($record)->toMatchArray([
+        'category' => 'security',
+        'actor_type' => 'admin',
+        'actor_id' => (string) $this->ada->id,
+        'subject_type' => 'api_token',
+        'subject_id' => (string) $apiToken->id,
+    ])
+        ->and(json_decode($record->properties, true))->toBe([
+            'name' => 'ERP sync',
+            'expires_at' => '2027-01-30T23:59:59Z',
+        ]);
+});
+
+it('creates no token when its audit record can\'t be stored', function () {
+    Schema::drop('larasell_audit_log');
+
+    $this->actingAs($this->ada, 'larasell-admin')
+        ->post(route('larasell.admin.settings.api-tokens.store'), ['name' => 'ERP sync', 'expires_in' => '3_months'])
+        ->assertServerError();
+
+    expect(ApiToken::query()->count())->toBe(0);
+});
+
+it('keeps a token working when its revocation can\'t be audited', function () {
+    $plainTextToken = createApiToken();
+    $revoke = $this->actingAs($this->ada, 'larasell-admin')
+        ->get(route('larasell.admin.settings.api-tokens.index'))
+        ->inertiaProps('apiTokens.rows.0._actions.0');
+
+    Schema::drop('larasell_audit_log');
+    $this->post($revoke['url'], ['confirmation' => 'ERP sync'])->assertServerError();
+
+    $this->flushSession();
+    app('auth')->forgetGuards();
+    callApi($plainTextToken)->assertOk();
+});
+
 it('keeps tokens when the admin who created them is deleted', function () {
     $plainTextToken = createApiToken();
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
