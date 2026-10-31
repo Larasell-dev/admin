@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.5](https://github.com/Larasell-dev/admin/compare/v0.5.4...v0.5.5) (2026-10-31)
+
+
+### Bug Fixes
+
+* show the API tokens, orders and customers tables in apps with immutable dates ([1d8094f](https://github.com/Larasell-dev/admin/commit/1d8094f0e06b84e7e06312f76b99c83342cb5104))
+
+
+### Miscellaneous Chores
+
+* add an oxlint rule that keeps font sizes on the typescale ([9a711d0](https://github.com/Larasell-dev/admin/commit/9a711d03f1562015cba1be0271b3bb31fe188b81))
+
 ## [0.5.4](https://github.com/Larasell-dev/admin/compare/v0.5.3...v0.5.4) (2026-10-31)
 
 
