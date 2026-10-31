@@ -5,6 +5,7 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AdminController;
+use Larasell\Admin\Http\Controllers\ApiTokenController;
 use Larasell\Admin\Http\Controllers\AvatarController;
 use Larasell\Admin\Http\Controllers\CategoryController;
 use Larasell\Admin\Http\Controllers\CategoryProductController;
@@ -50,6 +51,9 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::get('settings/admins/create', [AdminController::class, 'create'])->name('settings.admins.create')->withHead(title: 'New admin');
     Route::get('settings/admins/{admin}/edit', [AdminController::class, 'edit'])->name('settings.admins.edit');
     Route::put('settings/admins/{admin}', [AdminController::class, 'update'])->name('settings.admins.update');
+    Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])->name('settings.api-tokens.index')->withHead(title: 'API tokens');
+    Route::post('settings/api-tokens', [ApiTokenController::class, 'store'])->name('settings.api-tokens.store');
+    Route::get('settings/api-tokens/create', [ApiTokenController::class, 'create'])->name('settings.api-tokens.create')->withHead(title: 'New API token');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::post('logout', LogoutController::class)->name('logout');
@@ -72,4 +76,5 @@ Navigation::add(NavItem::Settings->label(), NavItem::Settings->value, icon: Icon
     ->position(NavItem::Settings->position())
     ->children(function (NavigationGroup $settings): void {
         $settings->add('Admins', 'larasell.admin.settings.admins.index', Icon::Team);
+        $settings->add('API tokens', 'larasell.admin.settings.api-tokens.index', Icon::Key);
     });

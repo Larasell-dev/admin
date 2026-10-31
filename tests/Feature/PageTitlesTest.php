@@ -65,6 +65,8 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'profile' => ['/admin/profile', 'Profile - Admin'],
     'admins' => ['/admin/settings/admins', 'Admins - Admin'],
     'new admin' => ['/admin/settings/admins/create', 'New admin - Admin'],
+    'API tokens' => ['/admin/settings/api-tokens', 'API tokens - Admin'],
+    'new API token' => ['/admin/settings/api-tokens/create', 'New API token - Admin'],
 ]);
 
 it('titles an admin\'s page with their name', function () {

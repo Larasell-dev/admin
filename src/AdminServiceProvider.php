@@ -18,6 +18,7 @@ use Larasell\Admin\Console\ListAdminsCommand;
 use Larasell\Admin\Console\MakeTableCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
+use Larasell\Admin\Http\Middleware\AuthenticateApiToken;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\ServiceProviders\CustomerServiceProvider;
@@ -157,5 +158,8 @@ class AdminServiceProvider extends ServiceProvider
                 'model' => Admin::class,
             ],
         ]);
+
+        // Extensions put their API behind the larasell.api alias, so how tokens are checked can change behind it.
+        AuthenticateApiToken::register();
     }
 }
