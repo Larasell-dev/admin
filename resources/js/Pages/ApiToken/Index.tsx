@@ -82,7 +82,7 @@ function CreatedTokenDialog() {
                 </Button>
               </div>
               {/* Wraps rather than scrolls, so the whole token is visible to check a paste against. */}
-              <code className="block border border-border bg-white p-3 font-mono text-sm break-all text-mauve-950 select-all dark:bg-mauve-950 dark:text-mauve-50">
+              <code className="block border border-border bg-white p-3 type-mono-md break-all text-mauve-950 select-all dark:bg-mauve-950 dark:text-mauve-50">
                 {token.plainTextToken}
               </code>
             </div>
