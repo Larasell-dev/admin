@@ -97,7 +97,7 @@ function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { curre
         {/* Both start below the mobile nav, which stays visible above the dialog. */}
         {/* Gives way to the backdrop of a confirmation opened on top, such as deleting a
             category, which covers the page as well, so the page isn't dimmed twice. */}
-        <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
+        <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
         <Dialog.Popup
           aria-label="Categories"
           className={cn(
