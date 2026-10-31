@@ -31,8 +31,8 @@ export default function UserMenu() {
             {admin.email}
           </span>
         </span>
-        <span className="flex shrink-0 text-base text-mauve-500 dark:text-mauve-400">
-          <Icon icon={ExpandUpDownLine} />
+        <span className="flex shrink-0 text-mauve-500 dark:text-mauve-400">
+          <Icon icon={ExpandUpDownLine} size={4} />
         </span>
       </Menu.Trigger>
 
@@ -70,8 +70,8 @@ function UserMenuItem({
       {...props}
       className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-mauve-950 outline-none select-none hover:bg-mauve-50 data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-700 dark:data-highlighted:bg-mauve-800"
     >
-      <span className="flex text-base text-mauve-500 dark:text-mauve-400">
-        <Icon icon={icon} />
+      <span className="flex text-mauve-500 dark:text-mauve-400">
+        <Icon icon={icon} size={4} />
       </span>
       {children}
     </Menu.Item>

@@ -306,8 +306,8 @@ function CategoryRow({
           "dark:data-dnd-placeholder:bg-mauve-900! dark:data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,var(--color-mauve-800)_0_1px,transparent_1px_6px)]",
         )}
       >
-        <span className="flex shrink-0 text-base text-mauve-500 dark:text-mauve-400">
-          <Icon icon={expanded ? FolderOpenLine : FolderLine} />
+        <span className="flex shrink-0 text-mauve-500 dark:text-mauve-400">
+          <Icon icon={expanded ? FolderOpenLine : FolderLine} size={4} />
         </span>
         <span
           // Zero width, so only the minimum, not the whole name, widens the row.

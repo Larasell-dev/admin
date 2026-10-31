@@ -215,8 +215,8 @@ function CategoryRow({
           data-testid="category-checkbox"
           DANGEROUS_className="pointer-events-none"
         />
-        <span className="flex shrink-0 text-base text-mauve-500 dark:text-mauve-400">
-          <Icon icon={expanded ? FolderOpenLine : FolderLine} />
+        <span className="flex shrink-0 text-mauve-500 dark:text-mauve-400">
+          <Icon icon={expanded ? FolderOpenLine : FolderLine} size={4} />
         </span>
         <span
           className={cn(
