@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Actions;
+namespace Larasell\Admin\Actions\ApiTokens;
 
 use Larasell\Admin\Models\ApiToken;
 

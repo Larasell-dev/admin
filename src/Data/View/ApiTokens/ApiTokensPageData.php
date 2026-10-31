@@ -1,8 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Data\View;
+namespace Larasell\Admin\Data\View\ApiTokens;
 
-use Larasell\Admin\Tables\Panel\ApiTokens;
+use Larasell\Admin\Tables\ApiTokens\ApiTokens;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;

@@ -1,18 +1,18 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers;
+namespace Larasell\Admin\Http\Controllers\ApiTokens;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Actions\CreateApiToken;
-use Larasell\Admin\Data\View\ApiTokensPageData;
-use Larasell\Admin\Data\View\CreateApiTokenPageData;
-use Larasell\Admin\Data\ViewModel\CreatedApiTokenData;
-use Larasell\Admin\Enums\ApiTokenExpiry;
+use Larasell\Admin\Actions\ApiTokens\CreateApiToken;
+use Larasell\Admin\Data\View\ApiTokens\ApiTokensPageData;
+use Larasell\Admin\Data\View\ApiTokens\CreateApiTokenPageData;
+use Larasell\Admin\Data\ViewModel\ApiTokens\CreatedApiTokenData;
+use Larasell\Admin\Enums\ApiTokens\ApiTokenExpiry;
 use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Tables\Panel\ApiTokens;
+use Larasell\Admin\Tables\ApiTokens\ApiTokens;
 
 /**
  * @internal The settings pages for API tokens.

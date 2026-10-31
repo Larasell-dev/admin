@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Enums;
+namespace Larasell\Admin\Enums\ApiTokens;
 
 use Illuminate\Support\Carbon;
 

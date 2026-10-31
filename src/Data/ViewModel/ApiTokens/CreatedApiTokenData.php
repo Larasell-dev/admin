@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Data\ViewModel;
+namespace Larasell\Admin\Data\ViewModel\ApiTokens;
 
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
