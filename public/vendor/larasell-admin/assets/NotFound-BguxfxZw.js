@@ -1,1 +1,0 @@
-import{Xn as e,Z9 as t}from"./dist-DnQicLxQ.js";import{t as n}from"./SidebarLayout-C_diN8vV.js";import{t as r}from"./NotFoundState-BzlgrcSW.js";var i=t(e(),1);function a(){return(0,i.jsx)(`div`,{className:`flex flex-1 items-center justify-center px-6 py-12`,children:(0,i.jsx)(r,{})})}a.layout=[n];export{a as default};
