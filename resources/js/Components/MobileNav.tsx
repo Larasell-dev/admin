@@ -38,7 +38,7 @@ export default function MobileNav() {
       </header>
 
       <Drawer.Portal>
-        <Drawer.Backdrop className="fixed inset-0 z-40 bg-[linear-gradient(rgb(0_0_0/10%),rgb(0_0_0/10%))] backdrop-blur-[2px] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+        <Drawer.Backdrop className="fixed inset-0 z-40 bg-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Drawer.Viewport className="fixed inset-0 z-50 pointer-events-none">
           {/* The sidebar extends a screen width to the left, so dragging the panel right keeps its background, border and highlight. */}
           <Drawer.Popup

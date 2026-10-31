@@ -44,7 +44,7 @@ export default function UserMenu() {
           alignOffset={12}
           className="z-50 w-58"
         >
-          <Menu.Popup className="origin-(--transform-origin) border border-border bg-white bg-clip-padding shadow-lg outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0 dark:bg-mauve-900">
+          <Menu.Popup className="origin-(--transform-origin) border border-border bg-elevated bg-clip-padding shadow-popover outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0">
             <HotkeysProvider scope="user-menu" exclusive={overlayExclusive}>
               <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
                 Profile

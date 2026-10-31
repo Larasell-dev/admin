@@ -239,7 +239,7 @@ function ToastContent({ toast }: { toast: ToastState }) {
     <div
       ref={scope}
       inert={!present}
-      className="flex w-(--toast-width) max-w-[calc(100vw-2rem)] items-center justify-between gap-6 border border-border bg-white bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-lg dark:bg-mauve-900"
+      className="flex w-(--toast-width) max-w-[calc(100vw-2rem)] items-center justify-between gap-6 border border-border bg-elevated bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-elevated"
     >
       <p className="type-body-md whitespace-nowrap text-mauve-950 dark:text-mauve-50">
         Unsaved changes
