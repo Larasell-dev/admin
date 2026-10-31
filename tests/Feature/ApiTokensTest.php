@@ -230,6 +230,29 @@ it('records the last use at most once a minute', function () {
     expect($lastUsedAt())->toBe('2026-11-02 08:01:01');
 });
 
+it('stops answering an address after 30 failed attempts in a minute', function () {
+    $plainTextToken = createApiToken();
+    $from = fn (string $ip, ?string $token) => test()->withServerVariables(['REMOTE_ADDR' => $ip])->getJson(
+        'api/whoami',
+        $token === null ? [] : ['Authorization' => 'Bearer '.$token],
+    );
+
+    foreach (range(1, 30) as $attempt) {
+        $from('203.0.113.7', 'larasell_wrong')->assertUnauthorized();
+    }
+
+    // Checked before the token is looked up, so even a valid token from there waits.
+    $from('203.0.113.7', 'larasell_wrong')->assertTooManyRequests()->assertHeader('Retry-After');
+    $from('203.0.113.7', $plainTextToken)->assertTooManyRequests();
+
+    // Other addresses, and successful requests before the limit, aren't counted.
+    $from('198.51.100.1', $plainTextToken)->assertOk();
+    $from('198.51.100.1', 'larasell_wrong')->assertUnauthorized();
+
+    $this->travel(61)->seconds();
+    $from('203.0.113.7', $plainTextToken)->assertOk();
+});
+
 it('rejects a new token without a name or with an unknown expiry', function (array $input, array $errors) {
     $this->actingAs($this->ada, 'larasell-admin')
         ->from(route('larasell.admin.settings.api-tokens.create'))

@@ -5,10 +5,12 @@ namespace Larasell\Admin\Http\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Larasell\Admin\Models\ApiToken;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,6 +29,11 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthenticateApiToken
 {
     private const string GUARD = 'larasell-api-token';
+
+    /**
+     * Failed attempts one address may make per minute, so wrong tokens can't cost unlimited lookups.
+     */
+    private const int FAILED_ATTEMPTS_PER_MINUTE_MAX = 30;
 
     /**
      * Registers the larasell.api alias, its guard, and the fallback 401.
@@ -53,7 +60,20 @@ class AuthenticateApiToken
 
     public function handle(Request $request, Closure $next): Response
     {
-        $apiToken = $this->resolve($request) ?? throw new AuthenticationException(guards: [self::GUARD]);
+        $failedAttempts = 'larasell-api:failed:'.$request->ip();
+
+        // Before the lookup, so a blocked address costs no query, even with a valid token.
+        if (RateLimiter::tooManyAttempts($failedAttempts, self::FAILED_ATTEMPTS_PER_MINUTE_MAX)) {
+            throw new ThrottleRequestsException(headers: ['Retry-After' => RateLimiter::availableIn($failedAttempts)]);
+        }
+
+        $apiToken = $this->resolve($request);
+
+        if ($apiToken === null) {
+            RateLimiter::hit($failedAttempts, 60);
+
+            throw new AuthenticationException(guards: [self::GUARD]);
+        }
 
         Auth::guard(self::GUARD)->setUser($apiToken);
         Auth::shouldUse(self::GUARD);
