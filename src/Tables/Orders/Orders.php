@@ -2,8 +2,8 @@
 
 namespace Larasell\Admin\Tables\Orders;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 use Larasell\Admin\Data\ViewModel\Orders\BadgeData;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
@@ -33,7 +33,7 @@ class Orders extends Table
                 ->map(fn (OrderStatus $status): string => BadgeData::fromOrderStatus($status)->label)
                 ->variant(fn (OrderStatus $status): Variant => BadgeData::fromOrderStatus($status)->variant),
             TextColumn::make('total')->map(fn (Price $total, Order $order): string => Price::format($total, $order->currency, app()->getLocale())),
-            TextColumn::make('created_at', 'Date')->map(fn (?Carbon $createdAt): ?string => $createdAt?->diffForHumans()),
+            TextColumn::make('created_at', 'Date')->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
         ];
     }
 

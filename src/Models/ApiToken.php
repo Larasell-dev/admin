@@ -2,11 +2,11 @@
 
 namespace Larasell\Admin\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
  * A credential an admin issued for the API: what $request->user() returns on routes behind
@@ -21,8 +21,8 @@ use Illuminate\Support\Carbon;
  * @property ?string $description
  * @property ?int $created_by
  * @property string $token_hash
- * @property Carbon $expires_at
- * @property ?Carbon $last_used_at
+ * @property CarbonInterface $expires_at
+ * @property ?CarbonInterface $last_used_at
  * @property-read ?Admin $createdBy
  */
 class ApiToken extends Model implements AuthenticatableContract

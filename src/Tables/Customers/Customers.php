@@ -2,8 +2,8 @@
 
 namespace Larasell\Admin\Tables\Customers;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 use Larasell\Admin\Actions\Customers\DeleteCustomer;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Tables\Actions\Action;
@@ -27,7 +27,7 @@ class Customers extends Table
         return [
             TextColumn::make('name')->map(fn (mixed $value, Customer $customer): string => $customer->fullName()),
             TextColumn::make('orders_count', 'Orders'),
-            TextColumn::make('created_at', 'Created')->map(fn (?Carbon $createdAt): ?string => $createdAt?->diffForHumans()),
+            TextColumn::make('created_at', 'Created')->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
         ];
     }
 
