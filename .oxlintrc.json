@@ -10,6 +10,7 @@
   },
   "rules": {
     "larasell/no-margin": "error",
+    "larasell/no-off-scale-font-size": "error",
     "larasell/prefer-cn": "error"
   },
   "ignorePatterns": ["public/**", "vendor/**", "workbench/**"]
