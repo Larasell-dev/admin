@@ -317,9 +317,9 @@ function ImageGrid({
             <li
               // The same file can be chosen twice, so its name isn't unique.
               key={index}
-              className="border-border flex aspect-square items-center justify-center border bg-mauve-50 text-2xl text-mauve-600 dark:bg-mauve-900 dark:text-mauve-300"
+              className="border-border flex aspect-square items-center justify-center border bg-mauve-50 text-mauve-600 dark:bg-mauve-900 dark:text-mauve-300"
             >
-              <Spinner aria-label={`Uploading ${file.name}`} />
+              <Spinner aria-label={`Uploading ${file.name}`} size={6} />
             </li>
           ))}
           <li>
@@ -328,7 +328,7 @@ function ImageGrid({
               className={cn(
                 // A square with the icon in its middle. Relative keeps the hidden file input inside
                 // it; otherwise focusing the input scrolls the whole page to where it would be.
-                "relative flex aspect-square items-center justify-center text-2xl",
+                "relative flex aspect-square items-center justify-center",
                 "border border-dashed border-mauve-300 dark:border-mauve-600",
                 "text-mauve-600 dark:text-mauve-300",
                 // Clickable while no upload is running, dimmed while one is
@@ -347,7 +347,7 @@ function ImageGrid({
                 className="sr-only"
                 onChange={(event) => uploadFiles(event.currentTarget)}
               />
-              <Icon icon={AddLine} />
+              <Icon icon={AddLine} size={6} />
             </label>
           </li>
         </ul>
