@@ -3,10 +3,6 @@ declare namespace Larasell.Admin.Data.View {
     createUrl: string;
     admins: import("./index").TableResource;
   };
-  export type ApiTokensPageData = {
-    createUrl: string;
-    apiTokens: import("./index").TableResource;
-  };
   export type CategoriesPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
     createUrl: string;
@@ -24,12 +20,6 @@ declare namespace Larasell.Admin.Data.View {
   export type CreateAdminPageData = {
     storeUrl: string;
     indexUrl: string;
-  };
-  export type CreateApiTokenPageData = {
-    storeUrl: string;
-    indexUrl: string;
-    expiryOptions: Array<{ value: string; label: string }>;
-    defaultExpiresIn: string;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
@@ -80,6 +70,18 @@ declare namespace Larasell.Admin.Data.View {
     avatarUploadUrl: string;
   };
 }
+declare namespace Larasell.Admin.Data.View.ApiTokens {
+  export type ApiTokensPageData = {
+    createUrl: string;
+    apiTokens: import("./index").TableResource;
+  };
+  export type CreateApiTokenPageData = {
+    storeUrl: string;
+    indexUrl: string;
+    expiryOptions: Array<{ value: string; label: string }>;
+    defaultExpiresIn: string;
+  };
+}
 declare namespace Larasell.Admin.Data.View.Customers {
   export type CreateCustomerPageData = {
     storeUrl: string;
@@ -123,10 +125,6 @@ declare namespace Larasell.Admin.Data.ViewModel {
     slug: string;
     visible: boolean;
   };
-  export type CreatedApiTokenData = {
-    name: string;
-    plainTextToken: string;
-  };
   export type DimensionsData = {
     length: string;
     width: string;
@@ -165,6 +163,12 @@ declare namespace Larasell.Admin.Data.ViewModel {
   export type WeightData = {
     amount: string;
     unit: string;
+  };
+}
+declare namespace Larasell.Admin.Data.ViewModel.ApiTokens {
+  export type CreatedApiTokenData = {
+    name: string;
+    plainTextToken: string;
   };
 }
 declare namespace Larasell.Admin.Data.ViewModel.Customers {

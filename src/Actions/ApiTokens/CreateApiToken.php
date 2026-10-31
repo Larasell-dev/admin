@@ -1,12 +1,12 @@
 <?php
 
-namespace Larasell\Admin\Actions;
+namespace Larasell\Admin\Actions\ApiTokens;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Larasell\Admin\Enums\ApiTokenExpiry;
+use Larasell\Admin\Enums\ApiTokens\ApiTokenExpiry;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Models\ApiToken;
 

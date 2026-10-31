@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Http\Middleware;
+namespace Larasell\Admin\Http\Middleware\ApiTokens;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;

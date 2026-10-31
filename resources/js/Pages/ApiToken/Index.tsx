@@ -7,7 +7,7 @@ import ResourceTable from "../../Components/ResourceTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 import { useFlash } from "../../utils/useFlash";
 
-type Props = Larasell.Admin.Data.View.ApiTokensPageData;
+type Props = Larasell.Admin.Data.View.ApiTokens.ApiTokensPageData;
 
 export default function Index({ apiTokens, createUrl }: Props) {
   const hasRows = apiTokens.pagination.total > 0;
@@ -48,7 +48,7 @@ export default function Index({ apiTokens, createUrl }: Props) {
 }
 
 function CreatedTokenDialog() {
-  const token = useFlash<Larasell.Admin.Data.ViewModel.CreatedApiTokenData>("apiToken");
+  const token = useFlash<Larasell.Admin.Data.ViewModel.ApiTokens.CreatedApiTokenData>("apiToken");
   const { open, dismiss } = useShowOnce(token?.plainTextToken);
   const { copied, copy } = useCopy();
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Larasell\Admin\Tables\Panel;
+namespace Larasell\Admin\Tables\ApiTokens;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Larasell\Admin\Actions\RevokeApiToken;
+use Larasell\Admin\Actions\ApiTokens\RevokeApiToken;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Models\ApiToken;
