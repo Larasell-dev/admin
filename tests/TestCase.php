@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Larasell\Admin\Tests;
 
+use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Date;
 use Inertia\ServiceProvider as InertiaServiceProvider;
 use Larasell\Admin\AdminServiceProvider;
 use Larasell\Larasell\LarasellServiceProvider;
@@ -66,6 +68,9 @@ abstract class TestCase extends OrchestraTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Apps may switch to immutable dates, so the panel can't rely on Illuminate\Support\Carbon.
+        Date::use(CarbonImmutable::class);
 
         $this->withoutVite();
         $this->artisan('migrate', ['--database' => 'testing'])->run();

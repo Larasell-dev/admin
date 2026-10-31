@@ -2,8 +2,8 @@
 
 namespace Larasell\Admin\Tables\ApiTokens;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 use Larasell\Admin\Actions\ApiTokens\RevokeApiToken;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
@@ -41,8 +41,8 @@ class ApiTokens extends Table
                 ->map(fn ($value, ApiToken $apiToken): string => $apiToken->isExpired() ? 'Expired' : 'Active')
                 ->variant(fn ($value, ApiToken $apiToken): Variant => $apiToken->isExpired() ? Variant::Danger : Variant::Success),
             // With the time and zone: a token ends at 23:59 in the app's time zone, which may not be the admin's.
-            TextColumn::make('expires_at', 'Expires ('.config('app.timezone').')')->map(fn (Carbon $expiresAt): string => $expiresAt->format('M j, Y H:i')),
-            TextColumn::make('last_used_at', 'Last used')->map(fn (?Carbon $lastUsedAt): string => $lastUsedAt?->diffForHumans() ?? 'Never'),
+            TextColumn::make('expires_at', 'Expires ('.config('app.timezone').')')->map(fn (CarbonInterface $expiresAt): string => $expiresAt->format('M j, Y H:i')),
+            TextColumn::make('last_used_at', 'Last used')->map(fn (?CarbonInterface $lastUsedAt): string => $lastUsedAt?->diffForHumans() ?? 'Never'),
         ];
     }
 
