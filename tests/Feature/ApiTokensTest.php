@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\TestResponse;
@@ -343,6 +345,28 @@ it('lets an extension render its own 401', function () {
     Route::middleware(['api', 'larasell.api'])->get('api/whoami', fn () => 'never');
 
     callApi(null)->assertUnauthorized()->assertExactJson(['errors' => [['status' => '401']]]);
+});
+
+it('authenticates before route model binding, so a request without a token can\'t tell which records exist', function () {
+    Route::middleware(['api', 'larasell.api'])->get('api/admins/{admin}', fn (Admin $admin) => $admin->name);
+
+    $this->getJson('api/admins/999')->assertUnauthorized();
+    $this->getJson('api/admins/'.$this->ada->id)->assertUnauthorized();
+});
+
+it('authenticates before rate limiting, so a limiter can count per token', function () {
+    $plainTextToken = createApiToken();
+    RateLimiter::for('per-token', function (Request $request) {
+        test()->limitedAs = $request->user();
+
+        return Limit::none();
+    });
+    Route::middleware(['api', 'larasell.api', 'throttle:per-token'])->get('api/limited', fn () => 'reached');
+
+    $this->getJson('api/limited', ['Authorization' => 'Bearer '.$plainTextToken])->assertOk();
+
+    expect($this->limitedAs)->toBeInstanceOf(ApiToken::class)
+        ->and($this->limitedAs->is(ApiToken::query()->sole()))->toBeTrue();
 });
 
 it('only authenticates API tokens through the larasell.api middleware', function () {
