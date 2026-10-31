@@ -1,5 +1,6 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    - vendor/larasell-dev/phpstan-rules/extension.neon
 
 parameters:
     paths:
