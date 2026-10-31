@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.3](https://github.com/Larasell-dev/admin/compare/v0.5.2...v0.5.3) (2026-10-31)
+
+
+### Features
+
+* add API tokens for extension APIs ([da61c78](https://github.com/Larasell-dev/admin/commit/da61c781ba8bf3b0579bf6ccb2838cb32d7f1b30))
+* let apps turn the API tokens module off ([7912788](https://github.com/Larasell-dev/admin/commit/791278865f575ccc84cbe363b90c7403804891e7))
+* limit failed API token attempts per address ([85c2ea5](https://github.com/Larasell-dev/admin/commit/85c2ea5a1a2ee1eea52f87f769d8b557ad116abb))
+* show a toast when the theme changes ([#198](https://github.com/Larasell-dev/admin/issues/198)) ([7308cf8](https://github.com/Larasell-dev/admin/commit/7308cf82dd94819a6f173dd9124bbc516d62e987))
+
 ## [0.5.2](https://github.com/Larasell-dev/admin/compare/v0.5.1...v0.5.2) (2026-10-30)
 
 
