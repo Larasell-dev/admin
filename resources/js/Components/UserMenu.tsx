@@ -17,17 +17,19 @@ export default function UserMenu() {
   return (
     <Menu.Root>
       <Menu.Trigger className="flex w-full border-t border-border cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-50 dark:hover:bg-mauve-900 dark:data-popup-open:bg-mauve-900">
-        <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 text-sm text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
+        <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 type-body-md text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
           {admin.avatarUrl && (
             <Avatar.Image src={admin.avatarUrl} alt="" className="size-full object-cover" />
           )}
           <Avatar.Fallback>{initials(admin.name)}</Avatar.Fallback>
         </Avatar.Root>
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-sm font-medium text-mauve-950 dark:text-mauve-50">
+          <span className="truncate type-body-md-strong text-mauve-950 dark:text-mauve-50">
             {admin.name}
           </span>
-          <span className="truncate text-xs text-mauve-500 dark:text-mauve-400">{admin.email}</span>
+          <span className="truncate type-body-sm text-mauve-500 dark:text-mauve-400">
+            {admin.email}
+          </span>
         </span>
         <span className="flex shrink-0 text-base text-mauve-500 dark:text-mauve-400">
           <Icon icon={ExpandUpDownLine} />
@@ -66,7 +68,7 @@ function UserMenuItem({
   return (
     <Menu.Item
       {...props}
-      className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 text-sm text-mauve-950 outline-none select-none hover:bg-mauve-50 data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-700 dark:data-highlighted:bg-mauve-800"
+      className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-mauve-950 outline-none select-none hover:bg-mauve-50 data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-700 dark:data-highlighted:bg-mauve-800"
     >
       <span className="flex text-base text-mauve-500 dark:text-mauve-400">
         <Icon icon={icon} />
