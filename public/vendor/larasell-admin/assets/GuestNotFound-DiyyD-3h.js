@@ -1,1 +1,0 @@
-import{Xn as e,Z9 as t}from"./dist-hHVZyVmN.js";import{t as n}from"./NotFoundState-3HF_r6_6.js";var r=t(e(),1);function i(){return(0,r.jsx)(`main`,{className:`flex min-h-dvh items-center justify-center bg-white px-6 py-12 dark:bg-mauve-950`,children:(0,r.jsx)(n,{})})}export{i as default};
