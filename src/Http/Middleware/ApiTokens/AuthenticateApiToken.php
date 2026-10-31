@@ -60,6 +60,11 @@ class AuthenticateApiToken
 
     public function handle(Request $request, Closure $next): Response
     {
+        // Turned off, no token gets through, not even one issued while the module was on.
+        if (! config('larasell.admin.api_tokens.enabled')) {
+            throw new AuthenticationException(guards: [self::GUARD]);
+        }
+
         $failedAttempts = 'larasell-api:failed:'.$request->ip();
 
         // Before the lookup, so a blocked address costs no query, even with a valid token.
