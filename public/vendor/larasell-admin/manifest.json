@@ -93,8 +93,8 @@
       "_dist-hnaINIWw.js"
     ]
   },
-  "_dist-BMhdBNvX.js": {
-    "file": "assets/dist-BMhdBNvX.js",
+  "_dist-DMcCBzdF.js": {
+    "file": "assets/dist-DMcCBzdF.js",
     "name": "dist",
     "imports": [
       "_dist-hnaINIWw.js",
@@ -188,7 +188,7 @@
     ]
   },
   "resources/js/Pages/Admin/Index.tsx": {
-    "file": "assets/Index-Dvn7IzqF.js",
+    "file": "assets/Index-BiuPS6cr.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Index.tsx",
     "isDynamicEntry": true,
@@ -211,9 +211,21 @@
     ]
   },
   "resources/js/Pages/ApiToken/Index.tsx": {
-    "file": "assets/Index-DLq-ZEl0.js",
+    "file": "assets/Index-BOguo292.js",
     "name": "Index",
     "src": "resources/js/Pages/ApiToken/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_dist-hnaINIWw.js",
+      "_dist-BFNxNBG3.js",
+      "_SidebarLayout-DXhdwQrn.js",
+      "resources/js/app.tsx"
+    ]
+  },
+  "resources/js/Pages/AuditLog/Index.tsx": {
+    "file": "assets/Index-Cyo0AOu4.js",
+    "name": "Index",
+    "src": "resources/js/Pages/AuditLog/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_dist-hnaINIWw.js",
@@ -273,7 +285,7 @@
     ]
   },
   "resources/js/Pages/Customer/Edit.tsx": {
-    "file": "assets/Edit-IzO8FcVH.js",
+    "file": "assets/Edit-bz2tzzSu.js",
     "name": "Edit",
     "src": "resources/js/Pages/Customer/Edit.tsx",
     "isDynamicEntry": true,
@@ -307,7 +319,7 @@
     ]
   },
   "resources/js/Pages/Login.test.tsx": {
-    "file": "assets/Login.test-CrklcjNt.js",
+    "file": "assets/Login.test-C3_9oHEJ.js",
     "name": "Login.test",
     "src": "resources/js/Pages/Login.test.tsx",
     "isDynamicEntry": true,
@@ -315,7 +327,7 @@
       "_dist-hnaINIWw.js",
       "_dist-BFNxNBG3.js",
       "resources/js/app.tsx",
-      "_dist-BMhdBNvX.js",
+      "_dist-DMcCBzdF.js",
       "resources/js/Pages/Login.tsx"
     ]
   },
@@ -376,7 +388,7 @@
     ]
   },
   "resources/js/Pages/Profile.test.tsx": {
-    "file": "assets/Profile.test-Csin-wON.js",
+    "file": "assets/Profile.test-Cx5RoTHR.js",
     "name": "Profile.test",
     "src": "resources/js/Pages/Profile.test.tsx",
     "isDynamicEntry": true,
@@ -385,7 +397,7 @@
       "_dist-BFNxNBG3.js",
       "_SidebarLayout-DXhdwQrn.js",
       "resources/js/app.tsx",
-      "_dist-BMhdBNvX.js",
+      "_dist-DMcCBzdF.js",
       "resources/js/Pages/Profile.tsx"
     ]
   },
@@ -401,19 +413,19 @@
     ]
   },
   "resources/js/Pages/TablePage.test.tsx": {
-    "file": "assets/TablePage.test-jBrRH7ua.js",
+    "file": "assets/TablePage.test-C8p6nS26.js",
     "name": "TablePage.test",
     "src": "resources/js/Pages/TablePage.test.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_dist-hnaINIWw.js",
       "resources/js/app.tsx",
-      "_dist-BMhdBNvX.js",
+      "_dist-DMcCBzdF.js",
       "resources/js/Pages/TablePage.tsx"
     ]
   },
   "resources/js/Pages/TablePage.tsx": {
-    "file": "assets/TablePage-B79EISBn.js",
+    "file": "assets/TablePage-CXsz0jc6.js",
     "name": "TablePage",
     "src": "resources/js/Pages/TablePage.tsx",
     "isDynamicEntry": true,
@@ -426,7 +438,7 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-CJ9VmJ3w.js",
+    "file": "assets/app-D57LJ6At.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -443,6 +455,7 @@
       "resources/js/Pages/Admin/Index.tsx",
       "resources/js/Pages/ApiToken/Create.tsx",
       "resources/js/Pages/ApiToken/Index.tsx",
+      "resources/js/Pages/AuditLog/Index.tsx",
       "resources/js/Pages/Category/Create.tsx",
       "resources/js/Pages/Category/Index.tsx",
       "resources/js/Pages/Category/Show.tsx",
@@ -462,7 +475,7 @@
       "resources/js/Pages/TablePage.tsx"
     ],
     "css": [
-      "assets/app-VlTzVq-Z.css"
+      "assets/app-Bkkph6Xz.css"
     ]
   }
 }
