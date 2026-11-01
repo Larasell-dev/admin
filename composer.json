@@ -13,7 +13,7 @@
     "php": "^8.3",
     "inertiajs/inertia-laravel": "^3.0",
     "larasell-dev/chronicle": "^0.2.7",
-    "larasell-dev/larasell": "^1.18",
+    "larasell-dev/larasell": "^1.20",
     "laravel/framework": "^13.23",
     "laravel/head": "^0.2",
     "laravel/pennant": "^1.26",
