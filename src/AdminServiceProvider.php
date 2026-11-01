@@ -17,6 +17,7 @@ use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
 use Larasell\Admin\Console\MakeAuditRecordCommand;
 use Larasell\Admin\Console\MakeTableCommand;
+use Larasell\Admin\Console\PruneAuditLogCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
@@ -82,6 +83,7 @@ class AdminServiceProvider extends ServiceProvider
                 ListAdminsCommand::class,
                 MakeAuditRecordCommand::class,
                 MakeTableCommand::class,
+                PruneAuditLogCommand::class,
                 RemoveAdminCommand::class,
             ]);
         }
