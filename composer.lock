@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afc462b1b26963be9156b9411d8c949e",
+    "content-hash": "90666cacdb9872ff9d6a021623aec0e7",
     "packages": [
         {
             "name": "brick/math",
@@ -1239,21 +1239,22 @@
         },
         {
             "name": "larasell-dev/larasell",
-            "version": "v1.19.1",
+            "version": "v1.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "19233c2cee4e2df207e68d9671a401125a7ada05"
+                "reference": "4990a1d8d21043734c2be8b3a93f3f35e46d6b16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/19233c2cee4e2df207e68d9671a401125a7ada05",
-                "reference": "19233c2cee4e2df207e68d9671a401125a7ada05",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/4990a1d8d21043734c2be8b3a93f3f35e46d6b16",
+                "reference": "4990a1d8d21043734c2be8b3a93f3f35e46d6b16",
                 "shasum": ""
             },
             "require": {
                 "ext-bcmath": "*",
                 "ext-intl": "*",
+                "larasell-dev/chronicle": "^0.2.7",
                 "laravel/framework": "^13.23",
                 "php": "^8.3"
             },
@@ -1303,7 +1304,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-10-13T19:15:52+00:00"
+            "time": "2026-11-01T20:11:20+00:00",
+            "published-time": "2026-11-01T20:11:37+00:00"
         },
         {
             "name": "laravel/framework",
