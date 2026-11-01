@@ -5,6 +5,7 @@ namespace Larasell\Admin\Console;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 use Larasell\Admin\Actions\CreateAdmin;
+use Larasell\Admin\Audit\SystemActor;
 
 class CreateAdminUserCommand extends Command
 {
@@ -19,7 +20,7 @@ class CreateAdminUserCommand extends Command
                 'name' => $this->option('name'),
                 'email' => $this->option('email'),
                 'password' => $this->option('password'),
-            ]);
+            ], new SystemActor('larasell:create-admin'));
         } catch (ValidationException $exception) {
             foreach ($exception->validator->errors()->all() as $error) {
                 $this->components->error($error);

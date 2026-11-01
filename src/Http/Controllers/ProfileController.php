@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Actions\UpdateAdmin;
 use Larasell\Admin\Data\View\ProfilePageData;
 use Larasell\Admin\Data\ViewModel\AdminData;
 use Larasell\Admin\Http\Requests\ProfileRequest;
@@ -23,7 +24,7 @@ class ProfileController
         ));
     }
 
-    public function update(ProfileRequest $request, #[CurrentUser('larasell-admin')] Admin $admin): RedirectResponse
+    public function update(ProfileRequest $request, UpdateAdmin $updateAdmin, #[CurrentUser('larasell-admin')] Admin $admin): RedirectResponse
     {
         $attributes = $request->safe()->only(['name', 'email']);
         $disk = Storage::disk(config('larasell.admin.panel.disk'));
@@ -36,7 +37,7 @@ class ProfileController
             $attributes['avatar_path'] = null;
         }
 
-        $admin->update($attributes);
+        $updateAdmin->handle($admin, $attributes, $admin);
 
         if ($previousAvatar !== null && $previousAvatar !== $admin->avatar_path) {
             $disk->delete($previousAvatar);
