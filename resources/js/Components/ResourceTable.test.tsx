@@ -230,17 +230,45 @@ describe.each([
   });
 
   it("requests the next page, keeping the page size and scroll position", async () => {
-    const screen = await render(
-      <ResourceTable
-        resource={resource([row(51, "Dune", null)], { page: 2, pageSize: 50, total: 120 })}
-      />,
-    );
+    await withQuery("", async () => {
+      const screen = await render(
+        <ResourceTable
+          resource={resource([row(51, "Dune", null)], { page: 2, pageSize: 50, total: 120 })}
+        />,
+      );
 
-    await screen.getByRole("button", { name: "Next page" }).click();
+      await screen.getByRole("button", { name: "Next page" }).click();
 
-    expect(get).toHaveBeenCalledOnce();
-    expect(get.mock.calls[0][0]).toBe(window.location.pathname);
-    expect(get.mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
-    expect(get.mock.calls[0][2]).toMatchObject({ preserveScroll: true });
+      expect(get).toHaveBeenCalledOnce();
+      expect(get.mock.calls[0][0]).toBe(window.location.pathname);
+      expect(get.mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
+      expect(get.mock.calls[0][2]).toMatchObject({ preserveScroll: true });
+    });
+  });
+
+  it("keeps the page's other query parameters, such as filters, when paging", async () => {
+    await withQuery("?event=api_token.created&page=2&per_page=50", async () => {
+      const screen = await render(
+        <ResourceTable
+          resource={resource([row(51, "Dune", null)], { page: 2, pageSize: 50, total: 120 })}
+        />,
+      );
+
+      await screen.getByRole("button", { name: "Next page" }).click();
+
+      expect(get.mock.calls[0][1]).toEqual({ event: "api_token.created", page: 3, per_page: 50 });
+    });
   });
 });
+
+/** Runs `test` on the current page with `search` as its query, then puts the address back. */
+async function withQuery(search: string, test: () => Promise<void>) {
+  const url = window.location.href;
+  window.history.replaceState(null, "", window.location.pathname + search);
+
+  try {
+    await test();
+  } finally {
+    window.history.replaceState(null, "", url);
+  }
+}

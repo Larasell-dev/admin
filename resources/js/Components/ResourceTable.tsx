@@ -58,7 +58,12 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
     onPaginationChange: ({ page, pageSize }: PaginationChange) =>
       router.get(
         window.location.pathname,
-        { page, per_page: pageSize },
+        // Keeps the page's other parameters, such as a page's filters.
+        {
+          ...Object.fromEntries(new URLSearchParams(window.location.search)),
+          page,
+          per_page: pageSize,
+        },
         {
           preserveScroll: true,
           onStart: () => setIsPaginating(true),

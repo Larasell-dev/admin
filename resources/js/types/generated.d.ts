@@ -82,6 +82,26 @@ declare namespace Larasell.Admin.Data.View.ApiTokens {
     defaultExpiresIn: string;
   };
 }
+declare namespace Larasell.Admin.Data.View.AuditLog {
+  export type AuditLogFiltersData = {
+    event: string | null;
+    actor_type: string | null;
+    actor_id: string | null;
+    subject_type: string | null;
+    subject_id: string | null;
+    from: string | null;
+    until: string | null;
+  };
+  export type AuditLogPageData = {
+    indexUrl: string;
+    auditLog: import("./index").TableResource;
+    filters: Larasell.Admin.Data.View.AuditLog.AuditLogFiltersData;
+    eventOptions: Array<any>;
+    actorTypeOptions: Array<any>;
+    subjectTypeOptions: Array<any>;
+    canSearch: boolean;
+  };
+}
 declare namespace Larasell.Admin.Data.View.Customers {
   export type CreateCustomerPageData = {
     storeUrl: string;
