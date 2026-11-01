@@ -475,7 +475,7 @@ it('leaves out the API tokens navigation item when disabled', function () {
 
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Admins']));
+            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Admins', 'Audit log']));
 });
 
 it('rejects every token on larasell.api routes when disabled, rather than failing', function () {
