@@ -9,6 +9,7 @@ use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Attributes\UseModel;
 use Larasell\Admin\Tables\Columns\TextColumn;
 use Larasell\Admin\Tables\Table;
+use LogicException;
 
 #[UseModel(Admin::class)]
 class Admins extends Table
@@ -29,14 +30,28 @@ class Admins extends Table
     public function actions(): array
     {
         return [
-            Action::make('Delete', handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin))
+            Action::make('Delete', handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin, $this->signedInAdmin()))
                 ->confirm(
                     message: 'They can no longer sign in to the admin panel. This can\'t be undone.',
                     confirmationText: fn (Admin $admin): string => $admin->email,
                 )
                 ->icon(Icon::DeleteBin)
                 ->destructive()
-                ->disabled(fn (Admin $admin): bool => $admin->is(auth('larasell-admin')->user())),
+                ->disabled(fn (Admin $admin): bool => $admin->is($this->signedInAdmin())),
         ];
+    }
+
+    /**
+     * The table only shows to signed-in admins.
+     */
+    private function signedInAdmin(): Admin
+    {
+        $admin = auth('larasell-admin')->user();
+
+        if (! $admin instanceof Admin) {
+            throw new LogicException('The admins table runs actions only for a signed-in admin.');
+        }
+
+        return $admin;
     }
 }

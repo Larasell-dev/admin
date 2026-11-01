@@ -4,6 +4,7 @@ namespace Larasell\Admin\Console;
 
 use Illuminate\Console\Command;
 use Larasell\Admin\Actions\DeleteAdmin;
+use Larasell\Admin\Audit\SystemActor;
 use Larasell\Admin\Exceptions\AdminRemovalFailed;
 use Larasell\Admin\Models\Admin;
 
@@ -43,7 +44,7 @@ class RemoveAdminCommand extends Command
         }
 
         try {
-            $deleteAdmin->handle($admin);
+            $deleteAdmin->handle($admin, new SystemActor('larasell:remove-admin'));
         } catch (AdminRemovalFailed $exception) {
             if ($exception->errorCode() !== 'larasell-admin.admin.last-admin') {
                 throw $exception;

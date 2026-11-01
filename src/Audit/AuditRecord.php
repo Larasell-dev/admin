@@ -47,6 +47,16 @@ abstract class AuditRecord
     }
 
     /**
+     * Whether the record describes a change it must commit or roll back with, so Auditor::record()
+     * refuses to store it outside a transaction. Records of actions that change nothing, such as a
+     * failed sign-in, return false.
+     */
+    public function requiresTransaction(): bool
+    {
+        return true;
+    }
+
+    /**
      * When the action happened, by default when it is recorded.
      */
     public function occurredAt(): CarbonInterface

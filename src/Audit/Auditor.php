@@ -14,7 +14,8 @@ use Larasell\Admin\Http\Middleware\ApiTokens\AuthenticateApiToken;
  * Writes audit records to the shop's database, the audit log's source of truth. Records can only
  * be added, never changed through the app.
  *
- * Record in the transaction of the change, so both commit or neither does:
+ * Record in the transaction of the change, so both commit or neither does. Records of actions
+ * that change nothing, such as a failed sign-in, opt out with requiresTransaction().
  *
  *     DB::transaction(function () use ($auditor) {
  *         // the change
@@ -52,7 +53,7 @@ class Auditor
     {
         $event = $record->event();
 
-        if (DB::transactionLevel() === 0) {
+        if ($record->requiresTransaction() && DB::transactionLevel() === 0) {
             throw AuditFailed::outsideTransaction($event);
         }
 

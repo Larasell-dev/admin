@@ -135,6 +135,40 @@ it('refuses to record outside a transaction, where the change could commit witho
     expect(DB::table('larasell_audit_log')->count())->toBe(0);
 });
 
+it('records outside a transaction when the record changes nothing it must commit with', function () {
+    $signInFailed = new class extends AuditRecord
+    {
+        public function event(): string
+        {
+            return 'admin.sign_in_failed';
+        }
+
+        public function category(): AuditCategory
+        {
+            return AuditCategory::Security;
+        }
+
+        public function subject(): ?Subject
+        {
+            return null;
+        }
+
+        public function properties(): array
+        {
+            return [];
+        }
+
+        public function requiresTransaction(): bool
+        {
+            return false;
+        }
+    };
+
+    app(Auditor::class)->record($signInFailed, new UnknownActor('No one was signed in.'));
+
+    expect(DB::table('larasell_audit_log')->sole()->event)->toBe('admin.sign_in_failed');
+});
+
 it('requires an explicit actor on the command line', function () {
     expect(fn () => audit(bookArchived()))->toThrow(AuditFailed::class);
 
