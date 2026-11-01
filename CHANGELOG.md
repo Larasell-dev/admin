@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/Larasell-dev/admin/compare/v0.5.6...v0.6.0) (2026-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* audit sign-ins and admin management ([#216](https://github.com/Larasell-dev/admin/issues/216))
+
+### Features
+
+* add a make:larasell-audit-record command ([9d8d7dd](https://github.com/Larasell-dev/admin/commit/9d8d7dd81ce27019dd523ecdafc666144fb6ff57))
+* audit sign-ins and admin management ([#216](https://github.com/Larasell-dev/admin/issues/216)) ([0bc1cfe](https://github.com/Larasell-dev/admin/commit/0bc1cfe738e369809ec48a9b2db691327b75905e))
+* hide the audit log filters behind a Pennant feature ([#218](https://github.com/Larasell-dev/admin/issues/218)) ([a3d52b5](https://github.com/Larasell-dev/admin/commit/a3d52b578a42c8b9e4da760a9b78d843dabcbcf9))
+* prune audit records after their retention period ([#217](https://github.com/Larasell-dev/admin/issues/217)) ([f255558](https://github.com/Larasell-dev/admin/commit/f2555581f9ce939e20d8e52d81d8989d1fad9aab))
+* show the audit log in the settings ([#215](https://github.com/Larasell-dev/admin/issues/215)) ([cf4c282](https://github.com/Larasell-dev/admin/commit/cf4c282e27fb812e7aa5ef86bd447c828a22a039))
+
 ## [0.5.6](https://github.com/Larasell-dev/admin/compare/v0.5.5...v0.5.6) (2026-10-31)
 
 
