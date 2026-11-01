@@ -14,6 +14,7 @@ use Larasell\Admin\Data\View\AuditLog\AuditLogFiltersData;
 use Larasell\Admin\Data\View\AuditLog\AuditLogPageData;
 use Larasell\Admin\Models\AuditLogEntry;
 use Larasell\Admin\Tables\AuditLog\AuditLog;
+use Larasell\Larasell\Facades\Entitlement;
 
 /**
  * @internal The audit log page in the settings.
@@ -38,6 +39,7 @@ class AuditLogController
 
         if ($filters !== []) {
             $gate->authorize('larasell.admin.search-audit-log');
+            abort_if(Entitlement::inactive('admin.audit-log-search'), 403, 'Filtering the audit log needs Larasell Pro.');
         }
 
         $page = max(1, $request->integer('page', 1));

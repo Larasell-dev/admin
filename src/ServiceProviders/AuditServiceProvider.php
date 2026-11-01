@@ -16,6 +16,8 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AuditLog\AuditLogController;
 use Larasell\Admin\Models\Admin;
+use Larasell\Larasell\Enums\Plan;
+use Larasell\Larasell\Facades\Entitlement;
 
 /**
  * The audit log: the Auditor that modules and extensions record their audit records with, and
@@ -25,6 +27,8 @@ use Larasell\Admin\Models\Admin;
  * up to larasell.admin.search-audit-log. Both let every admin by default. An app restricts them
  * by defining them again; its providers boot after this one, so its definition wins, e.g.
  * Gate::define('larasell.admin.search-audit-log', fn (Admin $admin) => $admin->isOwner()).
+ *
+ * Filtering also needs the admin.audit-log-search entitlement of the Pro plan, whatever the gate says.
  *
  * @internal Registered by AdminServiceProvider. The gates' names are public.
  */
@@ -45,6 +49,8 @@ class AuditServiceProvider extends ServiceProvider
         // JobExceptionOccurred.
         Event::listen(JobProcessing::class, fn () => $this->app->make(Auditor::class)->jobStarted());
         Event::listen([JobProcessed::class, JobExceptionOccurred::class], fn () => $this->app->make(Auditor::class)->jobEnded());
+
+        Entitlement::define('admin.audit-log-search', Plan::Pro);
 
         Gate::define('larasell.admin.view-audit-log', fn (Admin $admin): bool => true);
         Gate::define('larasell.admin.search-audit-log', fn (Admin $admin): bool => true);

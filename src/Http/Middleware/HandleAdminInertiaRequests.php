@@ -8,6 +8,7 @@ use Inertia\Middleware;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Navigation;
+use Larasell\Larasell\Facades\Entitlement;
 use Symfony\Component\HttpFoundation\Response;
 
 class HandleAdminInertiaRequests extends Middleware
@@ -45,6 +46,8 @@ class HandleAdminInertiaRequests extends Middleware
                     'avatarUrl' => $admin->avatarUrl(),
                 ] : null;
             },
+            // Which plan features the shop's license includes, so pages can show or lock them.
+            'entitlements' => fn (): array => Entitlement::all(),
             'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),
             'loginUrl' => fn (): string => route('larasell.admin.login.store'),

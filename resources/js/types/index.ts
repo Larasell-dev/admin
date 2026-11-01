@@ -5,6 +5,8 @@ export type SharedProps = {
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;
+  /** Each plan feature the core and the admin define, and whether the shop's license includes it. */
+  entitlements: Record<string, boolean>;
   /** Signs in with a POST; the session expired dialog posts JSON to it. */
   loginUrl: string;
 };

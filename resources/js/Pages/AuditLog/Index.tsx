@@ -1,10 +1,11 @@
 import { Link, router, usePage } from "@inertiajs/react";
-import { Button, EmptyState, Field, Input } from "@larasell-dev/ui";
-import { FileShieldLine } from "@larasell-dev/ui/icons";
+import { Badge, Button, EmptyState, Field, Icon, Input } from "@larasell-dev/ui";
+import { FileShieldLine, LockLine } from "@larasell-dev/ui/icons";
 import type { FormEvent, ReactNode } from "react";
 import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
+import type { Page as SharedPage } from "../../types";
 
 type Props = Larasell.Admin.Data.View.AuditLog.AuditLogPageData;
 type Filters = Larasell.Admin.Data.View.AuditLog.AuditLogFiltersData;
@@ -19,11 +20,13 @@ export default function Index({
   canSearch,
 }: Props) {
   const filtered = Object.values(filters).some((value) => value !== null);
+  const entitled = usePage<SharedPage>().props.entitlements["admin.audit-log-search"] === true;
 
   return (
     <>
       <Page.Header title={auditLog.title} />
-      {canSearch && (
+      {canSearch && !entitled && <ProNotice />}
+      {canSearch && entitled && (
         <FilterBar
           // A new form for new filters, e.g. after clearing them.
           key={JSON.stringify(filters)}
@@ -133,6 +136,16 @@ function FilterBar({
         )}
       </div>
     </form>
+  );
+}
+
+function ProNotice() {
+  return (
+    <div className="flex shrink-0 items-center gap-2 border-b border-border px-6 py-4 type-body-md text-mauve-600 dark:text-mauve-400">
+      <Icon icon={LockLine} size={4} />
+      <span>Filtering the audit log by event, actor, subject and date is part of</span>
+      <Badge>Pro</Badge>
+    </div>
   );
 }
 

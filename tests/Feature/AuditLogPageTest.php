@@ -15,6 +15,8 @@ use Larasell\Admin\Audit\SystemActor;
 use Larasell\Admin\Audit\UnknownActor;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Models\ApiToken;
+use Larasell\Larasell\Enums\Plan;
+use Larasell\Larasell\Facades\Entitlement;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
@@ -271,6 +273,20 @@ it('lets the larasell.admin.search-audit-log gate decide who may filter the log'
     auditLogPage()->where('canSearch', false);
 
     expect(DB::table('larasell_audit_log')->pluck('event')->all())->toBe(['audit_log.viewed']);
+});
+
+it('only lets a shop on the Pro plan filter the log', function () {
+    Entitlement::fake(Plan::Free);
+
+    $this->actingAs($this->ada, 'larasell-admin');
+    $this->get(route('larasell.admin.settings.audit-log.index', ['event' => 'api_token.created']))->assertForbidden();
+
+    auditLogPage()->where('entitlements', fn ($entitlements) => $entitlements['admin.audit-log-search'] === false);
+
+    Entitlement::fake(Plan::Pro);
+
+    $this->get(route('larasell.admin.settings.audit-log.index', ['event' => 'api_token.created']))->assertOk();
+    auditLogPage()->where('entitlements', fn ($entitlements) => $entitlements['admin.audit-log-search'] === true);
 });
 
 it('keeps the audit log out of reach for guests', function () {
