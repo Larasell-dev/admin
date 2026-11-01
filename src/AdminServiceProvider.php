@@ -29,6 +29,7 @@ use Larasell\Admin\ServiceProviders\OrderServiceProvider;
 use Larasell\Admin\ServiceProviders\ProductServiceProvider;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
+use Laravel\Pennant\PennantServiceProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -42,6 +43,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->registerRouteMacros();
 
         $this->app->register(HeadServiceProvider::class);
+        $this->app->register(PennantServiceProvider::class);
         $this->app->register(AuditServiceProvider::class);
         $this->app->register(ProductServiceProvider::class);
         $this->app->register(CustomerServiceProvider::class);
