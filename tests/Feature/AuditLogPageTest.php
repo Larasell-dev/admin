@@ -15,11 +15,15 @@ use Larasell\Admin\Audit\SystemActor;
 use Larasell\Admin\Audit\UnknownActor;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Models\ApiToken;
+use Laravel\Pennant\Feature;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
 
     $this->ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+
+    // Inactive by default; most tests here are about the filters.
+    Feature::for($this->ada)->activate('audit-log-filters');
 });
 
 /**
@@ -271,6 +275,26 @@ it('lets the larasell.admin.search-audit-log gate decide who may filter the log'
     auditLogPage()->where('canSearch', false);
 
     expect(DB::table('larasell_audit_log')->pluck('event')->all())->toBe(['audit_log.viewed']);
+});
+
+it('hides the filters and ignores them while the audit-log-filters feature is inactive', function () {
+    recordAt('2026-10-28 08:00:00', 'api_token.created', $this->ada);
+    recordAt('2026-10-28 09:00:00', 'api_token.revoked', $this->ada);
+    // A new admin, so the feature's default decides.
+    $this->ada = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+
+    // Even filters it would reject.
+    auditLogPage(['event' => 'api_token.created', 'from' => 'yesterday'])
+        ->where('canSearch', false)
+        ->where('filters', ['event' => null, 'actor_type' => null, 'actor_id' => null, 'subject_type' => null, 'subject_id' => null, 'from' => null, 'until' => null])
+        // Viewing the log is recorded before it lists the records.
+        ->where('auditLog.pagination.total', 3);
+
+    expect(DB::table('larasell_audit_log')->latest('id')->value('event'))->toBe('audit_log.viewed');
+
+    Feature::for($this->ada)->activate('audit-log-filters');
+
+    auditLogPage(['event' => 'api_token.created'])->where('canSearch', true)->where('auditLog.pagination.total', 1);
 });
 
 it('keeps the audit log out of reach for guests', function () {

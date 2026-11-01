@@ -14,6 +14,7 @@ use Larasell\Admin\Data\View\AuditLog\AuditLogFiltersData;
 use Larasell\Admin\Data\View\AuditLog\AuditLogPageData;
 use Larasell\Admin\Models\AuditLogEntry;
 use Larasell\Admin\Tables\AuditLog\AuditLog;
+use Laravel\Pennant\Feature;
 
 /**
  * @internal The audit log page in the settings.
@@ -25,8 +26,10 @@ class AuditLogController
         $gate = Gate::forUser($request->user('larasell-admin'));
         $gate->authorize('larasell.admin.view-audit-log');
 
+        $filtersEnabled = Feature::for($request->user('larasell-admin'))->active('audit-log-filters');
+
         /** @var array{event?: string, actor_type?: string, actor_id?: string, subject_type?: string, subject_id?: string, from?: string, until?: string} $filters */
-        $filters = array_filter($request->validate([
+        $filters = ! $filtersEnabled ? [] : array_filter($request->validate([
             'event' => ['nullable', 'string', 'max:255'],
             'actor_type' => ['nullable', 'string', 'max:255', 'required_with:actor_id'],
             'actor_id' => ['nullable', 'string', 'max:255'],
@@ -58,7 +61,7 @@ class AuditLogController
             eventOptions: $options('event'),
             actorTypeOptions: $options('actor_type'),
             subjectTypeOptions: $options('subject_type'),
-            canSearch: $gate->allows('larasell.admin.search-audit-log'),
+            canSearch: $filtersEnabled && $gate->allows('larasell.admin.search-audit-log'),
         ));
     }
 }

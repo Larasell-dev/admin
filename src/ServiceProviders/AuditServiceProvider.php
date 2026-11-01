@@ -16,6 +16,7 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AuditLog\AuditLogController;
 use Larasell\Admin\Models\Admin;
+use Laravel\Pennant\Feature;
 
 /**
  * The audit log: the Auditor that modules and extensions record their audit records with, and
@@ -26,7 +27,13 @@ use Larasell\Admin\Models\Admin;
  * by defining them again; its providers boot after this one, so its definition wins, e.g.
  * Gate::define('larasell.admin.search-audit-log', fn (Admin $admin) => $admin->isOwner()).
  *
- * @internal Registered by AdminServiceProvider. The gates' names are public.
+ * The filters are also behind the audit-log-filters Pennant feature, checked per admin and
+ * inactive by default. While it is inactive, the page shows no filters and ignores them in the
+ * address. Pennant stores the value it resolves for each admin, so turn the feature on with
+ * Feature::activateForEveryone('audit-log-filters') or Feature::for($admin)->activate(...);
+ * redefining it only changes it for admins who haven't opened the page yet.
+ *
+ * @internal Registered by AdminServiceProvider. The gates' and the feature's names are public.
  */
 class AuditServiceProvider extends ServiceProvider
 {
@@ -48,6 +55,8 @@ class AuditServiceProvider extends ServiceProvider
 
         Gate::define('larasell.admin.view-audit-log', fn (Admin $admin): bool => true);
         Gate::define('larasell.admin.search-audit-log', fn (Admin $admin): bool => true);
+
+        Feature::define('audit-log-filters', fn (Admin $admin): bool => false);
 
         // After API tokens, or Admins when that module is turned off.
         Navigation::add('Audit log', 'larasell.admin.settings.audit-log.index', Icon::FileShield)
