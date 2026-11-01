@@ -254,16 +254,16 @@ it('puts the audit log after Admins when API tokens are turned off', function ()
             ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Admins', 'Audit log']));
 });
 
-it('lets the viewAuditLog gate decide who may see the log', function () {
+it('lets the larasell.admin.view-audit-log gate decide who may see the log', function () {
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
-    Gate::define('viewAuditLog', fn (Admin $admin): bool => $admin->is($this->ada));
+    Gate::define('larasell.admin.view-audit-log', fn (Admin $admin): bool => $admin->is($this->ada));
 
     $this->actingAs($alan, 'larasell-admin')->get(route('larasell.admin.settings.audit-log.index'))->assertForbidden();
     $this->actingAs($this->ada, 'larasell-admin')->get(route('larasell.admin.settings.audit-log.index'))->assertOk();
 });
 
-it('lets the searchAuditLog gate decide who may filter the log', function () {
-    Gate::define('searchAuditLog', fn (): bool => false);
+it('lets the larasell.admin.search-audit-log gate decide who may filter the log', function () {
+    Gate::define('larasell.admin.search-audit-log', fn (): bool => false);
 
     $this->actingAs($this->ada, 'larasell-admin');
     $this->get(route('larasell.admin.settings.audit-log.index', ['event' => 'api_token.created']))->assertForbidden();

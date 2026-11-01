@@ -21,9 +21,10 @@ use Larasell\Admin\Models\Admin;
  * The audit log: the Auditor that modules and extensions record their audit records with, and
  * the settings page that lists them.
  *
- * Who may open the page is up to the viewAuditLog gate, and who may filter it up to the
- * searchAuditLog gate. Both let every admin by default; an app restricts them by defining its
- * own, e.g. Gate::define('searchAuditLog', fn (Admin $admin) => $admin->isOwner()).
+ * Who may open the page is up to the larasell.admin.view-audit-log gate, and who may filter it
+ * up to larasell.admin.search-audit-log. Both let every admin by default. An app restricts them
+ * by defining them again; its providers boot after this one, so its definition wins, e.g.
+ * Gate::define('larasell.admin.search-audit-log', fn (Admin $admin) => $admin->isOwner()).
  *
  * @internal Registered by AdminServiceProvider. The gates' names are public.
  */
@@ -43,12 +44,8 @@ class AuditServiceProvider extends ServiceProvider
         Event::listen(JobProcessing::class, fn () => $this->app->make(Auditor::class)->jobStarted());
         Event::listen([JobProcessed::class, JobExceptionOccurred::class], fn () => $this->app->make(Auditor::class)->jobEnded());
 
-        // Unless the app has its own, which also replaces these when it defines them later.
-        foreach (['viewAuditLog', 'searchAuditLog'] as $ability) {
-            if (! Gate::has($ability)) {
-                Gate::define($ability, fn (Admin $admin): bool => true);
-            }
-        }
+        Gate::define('larasell.admin.view-audit-log', fn (Admin $admin): bool => true);
+        Gate::define('larasell.admin.search-audit-log', fn (Admin $admin): bool => true);
 
         // After API tokens, or Admins when that module is turned off.
         Navigation::add('Audit log', 'larasell.admin.settings.audit-log.index', Icon::FileShield)

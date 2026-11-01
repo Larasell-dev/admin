@@ -23,7 +23,7 @@ class AuditLogController
     public function index(Request $request, Auditor $auditor): Response
     {
         $gate = Gate::forUser($request->user('larasell-admin'));
-        $gate->authorize('viewAuditLog');
+        $gate->authorize('larasell.admin.view-audit-log');
 
         /** @var array{event?: string, actor_type?: string, actor_id?: string, subject_type?: string, subject_id?: string, from?: string, until?: string} $filters */
         $filters = array_filter($request->validate([
@@ -37,7 +37,7 @@ class AuditLogController
         ]), fn (mixed $value): bool => $value !== null);
 
         if ($filters !== []) {
-            $gate->authorize('searchAuditLog');
+            $gate->authorize('larasell.admin.search-audit-log');
         }
 
         $page = max(1, $request->integer('page', 1));
@@ -58,7 +58,7 @@ class AuditLogController
             eventOptions: $options('event'),
             actorTypeOptions: $options('actor_type'),
             subjectTypeOptions: $options('subject_type'),
-            canSearch: $gate->allows('searchAuditLog'),
+            canSearch: $gate->allows('larasell.admin.search-audit-log'),
         ));
     }
 }
