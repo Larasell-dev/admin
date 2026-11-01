@@ -15,6 +15,7 @@ use Inertia\ExceptionResponse;
 use Larasell\Admin\Console\CreateAdminUserCommand;
 use Larasell\Admin\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Console\ListAdminsCommand;
+use Larasell\Admin\Console\MakeAuditRecordCommand;
 use Larasell\Admin\Console\MakeTableCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\Http\Controllers\TableController;
@@ -79,6 +80,7 @@ class AdminServiceProvider extends ServiceProvider
                 CreateAdminUserCommand::class,
                 LinkAdminAssetsCommand::class,
                 ListAdminsCommand::class,
+                MakeAuditRecordCommand::class,
                 MakeTableCommand::class,
                 RemoveAdminCommand::class,
             ]);
