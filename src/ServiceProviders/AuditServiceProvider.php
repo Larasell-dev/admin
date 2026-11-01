@@ -32,6 +32,8 @@ class AuditServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/audit.php', 'larasell.admin.audit');
+
         $this->app->singleton(Auditor::class);
     }
 
