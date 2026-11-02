@@ -47,6 +47,29 @@ it('redirects the index to the top-most root category', function () {
         ->assertRedirect(route('larasell.admin.categories.show', $clothing));
 });
 
+it('shows the categories in the order of their position', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $shoes = category('Shoes');
+    $shirts = category('Shirts', $clothing);
+    $trousers = category('Trousers', $clothing);
+    $shoes->update(['position' => 0]);
+    $clothing->update(['position' => 1]);
+    $shirts->update(['position' => 1]);
+    $trousers->update(['position' => 0]);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->get(route('larasell.admin.categories.index'))
+        ->assertRedirect(route('larasell.admin.categories.show', $shoes));
+
+    $this->get(route('larasell.admin.categories.show', $shoes))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('categories.0.name', 'Shoes')
+            ->where('categories.1.name', 'Clothing')
+            ->where('categories.1.children.0.name', 'Trousers')
+            ->where('categories.1.children.1.name', 'Shirts'));
+});
+
 it('shows the index when the store has no categories', function () {
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
@@ -731,6 +754,68 @@ it('moves a category to the root', function () {
         ->assertSessionHasNoErrors();
 
     expect($men->fresh()->parent_id)->toBeNull();
+});
+
+it('moves a category to a position among its new siblings', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $shirts = category('Shirts', $clothing);
+    $trousers = category('Trousers', $clothing);
+    $jackets = category('Jackets', $clothing);
+    $shoes = category('Shoes');
+    $sale = category('Sale');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post(route('larasell.admin.categories.move', $shoes), ['parent_id' => $clothing->id, 'position' => 1])
+        ->assertSessionHasNoErrors();
+
+    expect($clothing->children()->pluck('id')->all())->toBe([$shirts->id, $shoes->id, $trousers->id, $jackets->id])
+        ->and(Category::query()->whereNull('parent_id')->orderBy('position')->pluck('id')->all())->toBe([$clothing->id, $sale->id]);
+});
+
+it('reorders a category among its siblings', function (int $from, int $to, array $order) {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $children = collect(['Shirts', 'Trousers', 'Jackets', 'Hats'])->map(fn (string $name) => category($name, $clothing));
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post(route('larasell.admin.categories.move', $children[$from]), ['parent_id' => $clothing->id, 'position' => $to])
+        ->assertSessionHasNoErrors();
+
+    expect($clothing->children()->get()->map(fn (Category $category) => [$category->name->get(), $category->position])->all())
+        ->toBe(collect($order)->map(fn (string $name, int $position) => [$name, $position])->all());
+})->with([
+    'later' => [0, 2, ['Trousers', 'Jackets', 'Shirts', 'Hats']],
+    'earlier' => [3, 1, ['Shirts', 'Hats', 'Trousers', 'Jackets']],
+    'past the end' => [1, 99, ['Shirts', 'Jackets', 'Hats', 'Trousers']],
+]);
+
+it('moves a category last among its new siblings without a position', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $shirts = category('Shirts', $clothing);
+    $trousers = category('Trousers', $clothing);
+    $shoes = category('Shoes');
+    $clothing->update(['position' => 5]);
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post(route('larasell.admin.categories.move', $shirts), ['parent_id' => null])
+        ->assertSessionHasNoErrors();
+
+    expect(Category::query()->whereNull('parent_id')->orderBy('position')->pluck('id')->all())->toBe([$shoes->id, $clothing->id, $shirts->id])
+        ->and($trousers->fresh()->position)->toBe(1);
+});
+
+it('rejects a negative position', function () {
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $clothing = category('Clothing');
+    $shoes = category('Shoes');
+
+    $this->actingAs($admin, 'larasell-admin')
+        ->post(route('larasell.admin.categories.move', $shoes), ['parent_id' => null, 'position' => -1])
+        ->assertSessionHasErrors('position');
+
+    expect($shoes->fresh()->position)->toBe(1);
 });
 
 it('does not move a category into itself or a category below it', function (string $into) {

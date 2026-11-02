@@ -31,7 +31,7 @@ class CategoryController
      */
     public function index(): Response|RedirectResponse
     {
-        $first = Category::query()->whereNull('parent_id')->orderBy('id')->first();
+        $first = Category::query()->whereNull('parent_id')->orderBy('position')->orderBy('id')->first();
 
         if ($first !== null) {
             return redirect()->route('larasell.admin.categories.show', $first);
@@ -166,6 +166,6 @@ class CategoryController
     protected function tree(): array
     {
         // One query for the whole tree; the Category relations would query once per level.
-        return CategoryData::tree(Category::query()->orderBy('id')->get());
+        return CategoryData::tree(Category::query()->orderBy('position')->orderBy('id')->get());
     }
 }

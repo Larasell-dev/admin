@@ -119,6 +119,6 @@ class ProductController
     protected function categories(): array
     {
         // One query for the whole tree; the Category relations would query once per level.
-        return CategoryData::tree(Category::query()->orderBy('id')->get());
+        return CategoryData::tree(Category::query()->orderBy('position')->orderBy('id')->get());
     }
 }
