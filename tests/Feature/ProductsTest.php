@@ -149,7 +149,7 @@ it('shows the product\'s values to edit on its page', function () {
                 'sku' => null,
                 'barcode' => null,
                 'stock' => null,
-                'allowBackorders' => true,
+                'allowBackorders' => false,
                 'minQuantity' => null,
                 'maxQuantity' => null,
                 'categoryIds' => [],
