@@ -210,16 +210,16 @@ const minQuantity = () => page.getByRole("textbox", { name: "Minimum quantity" }
 const maxQuantity = () => page.getByRole("textbox", { name: "Maximum quantity" });
 
 describe("stock", () => {
-  it("starts a new product untracked, with backorders and no quantity limits", async () => {
+  it("starts a new product untracked, without backorders and with no quantity limits", async () => {
     await renderForm();
 
     await expect.element(stock()).toHaveValue("");
-    await expect.element(backorders()).toBeChecked();
+    await expect.element(backorders()).not.toBeChecked();
     await expect.element(minQuantity()).toHaveValue("");
     await expect.element(maxQuantity()).toHaveValue("");
     expect(submitted()).toMatchObject({
       stock: "",
-      allow_backorders: "1",
+      allow_backorders: "0",
       min_quantity: "",
       max_quantity: "",
     });
