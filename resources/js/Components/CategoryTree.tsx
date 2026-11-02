@@ -13,6 +13,7 @@ import {
 import {
   type DragEndEvent,
   DragDropProvider,
+  type DragMoveEvent,
   type DragOverEvent,
   useDraggable,
   useDroppable,
@@ -62,8 +63,16 @@ function parentIds(
   return into;
 }
 
-/** A copy of the tree with the category `id` moved to the end of `parentId`'s children, or of the roots. */
-function withMoved(categories: Category[], id: number, parentId: number | null): Category[] {
+/**
+ * A copy of the tree with the category `id` moved among `parentId`'s children, or the roots, to
+ * `index` counted without itself.
+ */
+function withMoved(
+  categories: Category[],
+  id: number,
+  parentId: number | null,
+  index: number,
+): Category[] {
   let moved: Category | undefined;
   const without = (nodes: Category[]): Category[] =>
     nodes.flatMap((category) => {
@@ -73,27 +82,37 @@ function withMoved(categories: Category[], id: number, parentId: number | null):
       }
       return [{ ...category, children: without(category.children) }];
     });
+  const insert = (nodes: Category[]) => [...nodes.slice(0, index), moved!, ...nodes.slice(index)];
   const into = (nodes: Category[]): Category[] =>
-    nodes.map((category) => ({
-      ...category,
-      children: [...into(category.children), ...(category.id === parentId ? [moved!] : [])],
-    }));
+    nodes.map((category) => {
+      const children = into(category.children);
+      return { ...category, children: category.id === parentId ? insert(children) : children };
+    });
 
   const rest = without(categories);
   if (moved === undefined) return categories;
-  return parentId === null ? [...rest, moved] : into(rest);
+  return parentId === null ? insert(rest) : into(rest);
 }
 
 // The root drop zone, below the categories' rows, which it loses to when they overlap.
 const ROOT = "root";
 
 /**
+ * Where a category dropped onto a row goes: before or after the row, inside it as its last
+ * child, or as its first child, which is what dropping after an open category with children means.
+ */
+type DropZone = "before" | "after" | "inside" | "first-child";
+type Placement = { id: number; zone: DropZone };
+
+/**
  * The store's categories as a tree of links to their pages. It starts closed, except
  * for the current category and the path to it. Clicking a category only follows its
  * link; its chevron opens and closes it. Hidden categories are greyed out.
  *
- * Dragging a category onto another moves it inside that one, and onto the space below
- * the tree moves it to the root. Hovering a closed category for a moment while dragging opens it.
+ * Dragging a category onto the top or bottom edge of another puts it before or after that
+ * one, which also orders the categories; onto the middle moves it inside that one, and onto
+ * the space below the tree moves it to the root. Hovering a closed category for a moment
+ * while dragging opens it.
  */
 export default function CategoryTree({
   categories,
@@ -121,51 +140,111 @@ export default function CategoryTree({
   }
   const parents = useMemo(() => parentIds(categories), [categories]);
   const expandTimer = useRef<number>(undefined);
+  // Where the dragged category would go, shown on the row it is over.
+  const [placement, setPlacement] = useState<Placement | null>(null);
 
-  // Not into its own parent, nor into itself or a category below it.
-  const canMove = (id: number, parentId: number | null) => {
-    if (parents.get(id) === parentId) return false;
-    for (let at = parentId; at !== null; at = parents.get(at) ?? null) {
-      if (at === id) return false;
+  /** Whether `at` is the category `id` or one below it. */
+  const isWithin = (at: number | null, id: number) => {
+    for (; at !== null; at = parents.get(at) ?? null) {
+      if (at === id) return true;
     }
-    return true;
+    return false;
   };
 
-  const move = (id: number, parentId: number | null) => {
+  // Not into its own parent, nor into itself or a category below it.
+  const canMoveInto = (id: number, parentId: number | null) =>
+    parents.get(id) !== parentId && !isWithin(parentId, id);
+
+  const siblingsOf = (parentId: number | null) =>
+    parentId === null ? categories : (find(categories, parentId)?.children ?? []);
+
+  /** Moves the category `id` among `parentId`'s children to `index`, counted without itself, or last. */
+  const move = (id: number, parentId: number | null, index?: number) => {
     const category = find(categories, id);
-    if (category === undefined || !canMove(id, parentId)) return;
+    if (category === undefined || isWithin(parentId, id)) return;
+    const siblings = siblingsOf(parentId);
+    const others = siblings.filter((sibling) => sibling.id !== id);
+    const position = Math.min(index ?? others.length, others.length);
+    if (siblings.findIndex((sibling) => sibling.id === id) === position) return;
     if (parentId !== null) setExpandedIds((current) => new Set(current).add(parentId));
     // Shows the move at once; Inertia rolls it back if the request fails.
     router.post(
       category.moveUrl,
-      { parent_id: parentId },
+      { parent_id: parentId, position },
       {
         preserveScroll: true,
         preserveState: true,
         optimistic: (props) => ({
-          categories: withMoved(props.categories as Category[], id, parentId),
+          categories: withMoved(props.categories as Category[], id, parentId, position),
         }),
       },
     );
   };
 
-  // Opens a closed category with children once it has been dragged over for a moment.
-  const openAfterHovering = (event: DragOverEvent) => {
+  /** Moves the category `id` to the placement it was dropped on. */
+  const place = (id: number, { id: rowId, zone }: Placement) => {
+    if (zone === "inside") return move(id, rowId);
+    if (zone === "first-child") return move(id, rowId, 0);
+    const parentId = parents.get(rowId) ?? null;
+    const others = siblingsOf(parentId).filter((sibling) => sibling.id !== id);
+    const index = others.findIndex((sibling) => sibling.id === rowId);
+    move(id, parentId, zone === "before" ? index : index + 1);
+  };
+
+  /**
+   * The zone of the row `rowId` the pointer is in: its top and bottom quarter put the dragged
+   * category before or after it, the middle inside it. Without the middle, as for the dragged
+   * category's own parent, the row splits in half.
+   */
+  const zoneAt = (id: number, rowId: number, element: Element, y: number): DropZone => {
+    const { top, height } = element.getBoundingClientRect();
+    const fraction = (y - top) / height;
+    const edge = canMoveInto(id, rowId) ? 0.25 : 0.5;
+    if (fraction < edge) return "before";
+    if (fraction <= 1 - edge) return "inside";
+    return expandedIds.has(rowId) && find(categories, rowId)?.children.length
+      ? "first-child"
+      : "after";
+  };
+
+  /** The row the dragged category is over and the zone of that row the pointer is in. */
+  const placementOf = ({
+    operation,
+  }: DragOverEvent | DragMoveEvent | DragEndEvent): Placement | null => {
+    const { source, target, position } = operation;
+    const rowId = target?.id;
+    if (source === null || typeof rowId !== "number" || !target?.element) return null;
+    return {
+      id: rowId,
+      zone: zoneAt(source.id as number, rowId, target.element, position.current.y),
+    };
+  };
+
+  // Follows the pointer over the rows, and opens a closed category with children once it has
+  // been dragged over its middle for a moment.
+  const track = (event: DragOverEvent | DragMoveEvent) => {
+    const next = placementOf(event);
+    if (next?.id === placement?.id && next?.zone === placement?.zone) return;
+    setPlacement(next);
+
     window.clearTimeout(expandTimer.current);
-    const id = event.operation.target?.id;
-    if (typeof id !== "number" || expandedIds.has(id)) return;
-    if (!find(categories, id)?.children.length) return;
+    if (next?.zone !== "inside" || expandedIds.has(next.id)) return;
+    if (!find(categories, next.id)?.children.length) return;
     expandTimer.current = window.setTimeout(
-      () => setExpandedIds((current) => new Set(current).add(id)),
+      () => setExpandedIds((current) => new Set(current).add(next.id)),
       200,
     );
   };
 
   const drop = (event: DragEndEvent) => {
     window.clearTimeout(expandTimer.current);
+    setPlacement(null);
     const { source, target } = event.operation;
     if (event.canceled || source === null || target === null) return;
-    move(source.id as number, target.id === ROOT ? null : (target.id as number));
+    if (target.id === ROOT) return move(source.id as number, null);
+    // From the drop itself, as the last pointer move may not have rendered its placement yet.
+    const dropped = placementOf(event);
+    if (dropped !== null) place(source.id as number, dropped);
   };
 
   return (
@@ -173,10 +252,11 @@ export default function CategoryTree({
       <DragDropProvider
         sensors={sensors}
         plugins={plugins}
-        onDragOver={openAfterHovering}
+        onDragOver={track}
+        onDragMove={track}
         onDragEnd={drop}
       >
-        <RootDropZone accepts={(id) => canMove(id, null)}>
+        <RootDropZone accepts={(id) => canMoveInto(id, null)}>
           <Tree
             aria-labelledby={labelledBy}
             items={categories}
@@ -186,13 +266,16 @@ export default function CategoryTree({
             toggleOnClick={false}
             // Not selectable: this only makes the current category the tree's tab stop.
             selectedId={currentId}
-            renderItem={(category, { expanded, tabbable }) => (
+            renderItem={(category, { level, expanded, tabbable }) => (
               <CategoryRow
                 category={category}
                 current={category.id === currentId}
+                level={level}
                 expanded={expanded}
                 tabbable={tabbable}
-                accepts={(id) => canMove(id, category.id)}
+                // Every category can go next to this one, unless it is this one or above it.
+                accepts={(id) => !isWithin(category.id, id)}
+                dropZone={placement?.id === category.id ? placement.zone : undefined}
                 onToggle={() =>
                   setExpandedIds((current) => {
                     const next = new Set(current);
@@ -248,21 +331,26 @@ function RootDropZone({
 /**
  * A category's row: its link is what drags, and the whole row is where others drop.
  * The chevron and the menu sit next to the link, not inside it, so clicking them never
- * follows the link or drags.
+ * follows the link or drags. Dropping inside the row outlines it; before or after it, or
+ * as its first child, draws a line where the category will go.
  */
 function CategoryRow({
   category,
   current,
+  level,
   expanded,
   tabbable,
   accepts,
+  dropZone,
   onToggle,
 }: {
   category: Category;
   current: boolean;
+  level: number;
   expanded: boolean | undefined;
   tabbable: boolean;
   accepts: (id: number) => boolean;
+  dropZone: DropZone | undefined;
   onToggle: () => void;
 }) {
   const { ref: dragRef, isDragging } = useDraggable({ id: category.id });
@@ -274,7 +362,7 @@ function CategoryRow({
   return (
     <div
       ref={dropRef}
-      data-drop-target={isDropTarget || undefined}
+      data-drop-target={(isDropTarget && dropZone === "inside") || undefined}
       // As wide as the panel, unless a deeply nested row needs more to keep its name's minimum
       // width; that row then pushes its controls out of line, and the panel scrolls sideways.
       className="group/row relative w-fit min-w-full data-drop-target:outline-1 data-drop-target:-outline-offset-1 data-drop-target:outline-primary-500"
@@ -319,7 +407,13 @@ function CategoryRow({
           {category.name}
         </span>
       </TreeItem>
-      <div className="pointer-events-none absolute top-0 right-0 flex items-center">
+      {/* Only the link moves with the pointer, so the controls would stay behind in the empty slot. */}
+      <div
+        className={cn(
+          "pointer-events-none absolute top-0 right-0 flex items-center",
+          isDragging && "invisible",
+        )}
+      >
         {expanded !== undefined && (
           <>
             <span className="type-body-md pointer-events-none pr-1 text-mauve-500 tabular-nums dark:text-mauve-400">
@@ -347,6 +441,19 @@ function CategoryRow({
         )}
         <CategoryMenu category={category} tabbable={tabbable} />
       </div>
+      {isDropTarget && dropZone !== undefined && dropZone !== "inside" && (
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute right-0 h-0.5 -translate-y-1/2 bg-primary-500",
+            dropZone === "before" ? "top-0" : "top-full",
+          )}
+          // Starts at the dragged category's new level, under the icon of its row.
+          style={{
+            left: `calc(1.5rem + ${level + (dropZone === "first-child" ? 1 : 0)} * 1.25rem)`,
+          }}
+        />
+      )}
     </div>
   );
 }

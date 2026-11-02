@@ -325,3 +325,81 @@ describe("path to the current category", () => {
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
   });
 });
+
+describe("dragging categories", () => {
+  // Moves the pointer in steps, as dnd-kit only follows a drag from one pointer move to the next.
+  // `y` is from the top of the row dropped onto: rows are 36px high, their top and bottom quarter
+  // put a category next to them, the middle inside.
+  async function drag(from: string, onto: string, y: number) {
+    const source = item(from).element().getBoundingClientRect();
+    const target = item(onto).element().getBoundingClientRect();
+    const pointer = (
+      type: string,
+      at: { x: number; y: number },
+      element: Element = document.body,
+    ) =>
+      element.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          pointerId: 1,
+          pointerType: "mouse",
+          isPrimary: true,
+          buttons: type === "pointerup" ? 0 : 1,
+          clientX: at.x,
+          clientY: at.y,
+        }),
+      );
+    const start = { x: source.left + 40, y: source.top + source.height / 2 };
+    const end = { x: target.left + 40, y: target.top + y };
+
+    pointer("pointerdown", start, item(from).element());
+    for (let step = 1; step <= 10; step++) {
+      pointer("pointermove", {
+        x: start.x + ((end.x - start.x) * step) / 10,
+        y: start.y + ((end.y - start.y) * step) / 10,
+      });
+      await new Promise(requestAnimationFrame);
+    }
+    pointer("pointerup", end);
+    await new Promise(requestAnimationFrame);
+  }
+
+  it("moves a category before or after another, counting its position without itself", async () => {
+    await renderTree();
+
+    await drag("Toys", "Clothing", 3);
+    expect(post).toHaveBeenLastCalledWith(
+      "/admin/categories/4/move",
+      { parent_id: null, position: 0 },
+      expect.anything(),
+    );
+
+    await drag("Clothing", "Sale", 33);
+    expect(post).toHaveBeenLastCalledWith(
+      "/admin/categories/1/move",
+      { parent_id: null, position: 1 },
+      expect.anything(),
+    );
+  });
+
+  it("moves a category inside another when dropped onto its middle", async () => {
+    await renderTree();
+
+    await drag("Toys", "Sale", 18);
+
+    expect(post).toHaveBeenCalledExactlyOnceWith(
+      "/admin/categories/4/move",
+      { parent_id: 3, position: 0 },
+      expect.anything(),
+    );
+  });
+
+  it("does not move a category dropped where it already is", async () => {
+    await renderTree();
+
+    await drag("Toys", "Sale", 33);
+
+    expect(post).not.toHaveBeenCalled();
+  });
+});

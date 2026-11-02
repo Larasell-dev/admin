@@ -13,6 +13,8 @@ class MoveCategoryController
 {
     /**
      * Moves the category, with everything below it, under another category or to the root.
+     * The position is where it goes among its new siblings, counted without itself; without
+     * one, or past the last sibling, it goes last.
      */
     public function __invoke(Request $request, Category $category): RedirectResponse
     {
@@ -27,9 +29,28 @@ class MoveCategoryController
                     }
                 },
             ],
+            'position' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        $category->update(['parent_id' => $validated['parent_id'] ?? null]);
+        $parentId = $validated['parent_id'] ?? null;
+
+        DB::transaction(function () use ($category, $parentId, $validated): void {
+            $siblings = Category::query()
+                ->where('parent_id', $parentId)
+                ->whereKeyNot($category->getKey())
+                ->orderBy('position')
+                ->orderBy('id')
+                ->get();
+
+            $siblings->splice(min($validated['position'] ?? $siblings->count(), $siblings->count()), 0, [$category]);
+            $category->parent_id = $parentId;
+
+            // Numbers the siblings again from 0, saving only those whose position changed.
+            foreach ($siblings->values() as $position => $sibling) {
+                $sibling->position = $position;
+                $sibling->save();
+            }
+        });
 
         return back();
     }
