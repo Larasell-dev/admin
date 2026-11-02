@@ -561,7 +561,7 @@ function StockFields({ product, errors }: { product?: Product; errors: Errors })
                 name="allow_backorders"
                 value="1"
                 uncheckedValue="0"
-                defaultChecked={product?.allowBackorders ?? true}
+                defaultChecked={product?.allowBackorders ?? false}
               />
               Allow backorders
             </Checkbox.Label>
