@@ -25,7 +25,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { overlayExclusive } from "../../utils/hotkeys";
 import Tree, { TreeItem } from "../Tree";
 
-type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryData;
+type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData;
 type CheckedState = boolean | "mixed";
 
 /** The ids of the categories without children at or below `category`. */
@@ -64,8 +64,8 @@ export default function CategoryCheckboxTree({
 }: {
   categories: Category[];
   defaultSelectedIds: number[];
-  /** Where categories are created, offered while the store has none. */
-  createUrl: string;
+  /** Where categories are created, offered while the store has none. Null while they're turned off. */
+  createUrl: string | null;
 }) {
   const all = useMemo(() => flatten(categories), [categories]);
   const [selected, setSelected] = useState(() => {
@@ -137,12 +137,16 @@ export default function CategoryCheckboxTree({
             icon={FoldersLine}
             title="No categories yet"
             description="Create categories to list the product in the store."
-          >
-            <Button render={<Link href={createUrl} prefetch="hover" />}>
-              <Icon icon={AddLine} />
-              Create categories
-            </Button>
-          </EmptyState>
+            // Only given children when it has an action; even `null` renders an empty actions row.
+            {...(createUrl && {
+              children: (
+                <Button render={<Link href={createUrl} prefetch="hover" />}>
+                  <Icon icon={AddLine} />
+                  Create categories
+                </Button>
+              ),
+            })}
+          />
         </div>
       ) : (
         // The rows run to the card's edges and pad their content by its --inset themselves.
@@ -254,14 +258,19 @@ function CategoryRow({
             </IconButton>
           </>
         )}
-        <CategoryMenu category={category} tabbable={tabbable} />
+        {category.url && (
+          <CategoryMenu url={category.url} name={category.name} tabbable={tabbable} />
+        )}
       </div>
     </div>
   );
 }
 
-/** A category's actions. Only the tree's tab stop row puts its button in the tab order. */
-function CategoryMenu({ category, tabbable }: { category: Category; tabbable: boolean }) {
+/**
+ * A category's actions, left out while the categories are turned off. Only the tree's tab stop
+ * row puts its button in the tab order.
+ */
+function CategoryMenu({ url, name, tabbable }: { url: string; name: string; tabbable: boolean }) {
   return (
     <Menu.Root>
       <Menu.Trigger
@@ -270,7 +279,7 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
           <IconButton
             variant="tertiary"
             size="sm"
-            aria-label={`Actions for ${category.name}`}
+            aria-label={`Actions for ${name}`}
             DANGEROUS_className="pointer-events-auto focus-visible:-outline-offset-2"
           >
             <Icon icon={More2Fill} />
@@ -279,7 +288,7 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
       />
       <Menu.Popup>
         <HotkeysProvider scope="category-actions-menu" exclusive={overlayExclusive}>
-          <Menu.Item icon={EyeLine} render={<Link href={category.url} prefetch="hover" />}>
+          <Menu.Item icon={EyeLine} render={<Link href={url} prefetch="hover" />}>
             View
           </Menu.Item>
         </HotkeysProvider>

@@ -27,12 +27,14 @@ export default function Home({
                 description="Add your first product with its name, images and price."
               />
             )}
-            <OnboardingLink
-              href={createCategoryUrl}
-              icon={FoldersLine}
-              title="Create category"
-              description="Group your products so customers can browse your store."
-            />
+            {createCategoryUrl && (
+              <OnboardingLink
+                href={createCategoryUrl}
+                icon={FoldersLine}
+                title="Create category"
+                description="Group your products so customers can browse your store."
+              />
+            )}
             <OnboardingLink
               href={inviteAdminUrl}
               icon={UserAddLine}

@@ -2,7 +2,7 @@
 
 namespace Larasell\Admin\Data\View;
 
-use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryOptionData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -14,9 +14,9 @@ class EditProductPageData extends Data
         public ProductDetailData $product,
         public string $updateUrl,
         public string $indexUrl,
-        /** @var array<int, CategoryData> */
+        /** @var array<int, CategoryOptionData> */
         public array $categories,
-        public string $createCategoryUrl,
+        public ?string $createCategoryUrl,
         public string $uploadImagesUrl,
     ) {}
 }

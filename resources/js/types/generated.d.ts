@@ -10,8 +10,8 @@ declare namespace Larasell.Admin.Data.View {
   export type CreateProductPageData = {
     storeUrl: string;
     indexUrl: string;
-    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
-    createCategoryUrl: string;
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
+    createCategoryUrl: string | null;
     uploadImagesUrl: string;
   };
   export type EditAdminPageData = {
@@ -23,13 +23,13 @@ declare namespace Larasell.Admin.Data.View {
     product: Larasell.Admin.Data.ViewModel.ProductDetailData;
     updateUrl: string;
     indexUrl: string;
-    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
-    createCategoryUrl: string;
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
+    createCategoryUrl: string | null;
     uploadImagesUrl: string;
   };
   export type HomePageData = {
     createProductUrl: string | null;
-    createCategoryUrl: string;
+    createCategoryUrl: string | null;
     inviteAdminUrl: string;
     helpEmail: string;
   };
@@ -193,6 +193,13 @@ declare namespace Larasell.Admin.Data.ViewModel.Categories {
     name: string;
     slug: string;
     visible: boolean;
+  };
+  export type CategoryOptionData = {
+    id: number;
+    name: string;
+    visible: boolean;
+    url: string | null;
+    children: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
   };
 }
 declare namespace Larasell.Admin.Data.ViewModel.Customers {

@@ -17,12 +17,23 @@ use Larasell\Admin\Http\Controllers\Categories\UnhideCategoryController;
 
 /**
  * The categories module: the category tree, its navigation item, and the pages to add, edit,
- * hide, move and delete a category and to add products to it.
+ * hide, move and delete a category and to add products to it. Setting
+ * larasell.admin.categories.enabled to false leaves all of them out; products can still be put
+ * into categories.
  */
 class CategoryServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/categories.php', 'larasell.admin.categories');
+    }
+
     public function boot(): void
     {
+        if (! config('larasell.admin.categories.enabled')) {
+            return;
+        }
+
         Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
 
         AdminPanel::resolve()->routes(function (): void {

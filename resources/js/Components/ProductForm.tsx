@@ -44,7 +44,7 @@ import ProductImageLightbox from "./ProductImageLightbox";
 import VisibilityField from "./VisibilityField";
 
 type Product = Omit<Larasell.Admin.Data.ViewModel.ProductDetailData, "id">;
-type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryData;
+type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData;
 type Image = Larasell.Admin.Data.ViewModel.ProductImageData;
 type Errors = Record<string, string | undefined>;
 
@@ -61,8 +61,9 @@ export default function ProductForm({
   product?: Product;
   /** The store's categories to pick the product's from. */
   categories: Category[];
-  /** Where the store's first categories are created, offered while it has none. */
-  createCategoryUrl: string;
+  /** Where the store's first categories are created, offered while it has none. Null while the
+   * categories are turned off. */
+  createCategoryUrl: string | null;
   /** Where images are uploaded before saving the product links them. */
   uploadImagesUrl: string;
 }) {

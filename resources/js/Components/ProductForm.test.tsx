@@ -11,14 +11,18 @@ import UnsavedChangesToast, { UnsavedChangesToastHost } from "./UnsavedChangesTo
 type Product = ComponentProps<typeof ProductForm>["product"];
 type Category = ComponentProps<typeof ProductForm>["categories"][number];
 
-type FormPageProps = { product?: Product; categories: Category[] };
+type FormPageProps = {
+  product?: Product;
+  categories: Category[];
+  createCategoryUrl: string | null;
+};
 
 /**
  * The page the tests render. It takes the product and categories from the page's props, since
  * Inertia's router keeps resolving the component of the file's first test after a visit.
  */
 function FormPage() {
-  const { product, categories } = usePage<FormPageProps>().props;
+  const { product, categories, createCategoryUrl } = usePage<FormPageProps>().props;
 
   return (
     <>
@@ -26,7 +30,7 @@ function FormPage() {
         <ProductForm
           product={product}
           categories={categories}
-          createCategoryUrl="/admin/categories/create"
+          createCategoryUrl={createCategoryUrl}
           uploadImagesUrl="/admin/products/images"
         />
         <UnsavedChangesToast />
@@ -42,14 +46,19 @@ let formPage: { component: string; url: string; version: null; props: FormPagePr
 
 /**
  * Renders the form for the product, or for a new one without it, with the store's categories, on
- * the page at the URL.
+ * the page at the URL. A null `createCategoryUrl` renders it as while the categories are turned off.
  */
-async function renderForm(product?: Product, categories: Category[] = [], url = "/admin/products") {
+async function renderForm(
+  product?: Product,
+  categories: Category[] = [],
+  url = "/admin/products",
+  createCategoryUrl: string | null = "/admin/categories/create",
+) {
   formPage = {
     component: "FormPage",
     url,
     version: null,
-    props: { product, categories },
+    props: { product, categories, createCategoryUrl },
   };
 
   const screen = await render(
@@ -252,11 +261,6 @@ const category = (id: number, name: string, children: Category[] = []): Category
   name,
   visible: true,
   url: `/admin/categories/${id}`,
-  hideUrl: "",
-  unhideUrl: "",
-  deleteUrl: "",
-  createChildUrl: "",
-  moveUrl: "",
   children,
 });
 
@@ -410,6 +414,29 @@ describe("categories", () => {
       .toHaveAttribute("href", "/admin/categories/2");
     // Opening the menu doesn't select the category.
     await expect.element(categoryItem("Shirts")).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("lists the categories without links while they're turned off", async () => {
+    const unlinked = (list: Category[]): Category[] =>
+      list.map((c) => ({ ...c, url: null, children: unlinked(c.children) }));
+    await renderForm(undefined, unlinked(categories), undefined, null);
+
+    await categoryItem("Shoes").click();
+
+    await expect.element(categoryItem("Shoes")).toHaveAttribute("aria-checked", "true");
+    expect(submittedCategories()).toEqual([6]);
+    await expect
+      .element(page.getByRole("button", { name: "Actions for Shoes" }))
+      .not.toBeInTheDocument();
+  });
+
+  it("doesn't offer to create categories while they're turned off", async () => {
+    await renderForm(undefined, [], undefined, null);
+
+    await expect.element(page.getByText("No categories yet")).toBeVisible();
+    await expect
+      .element(page.getByRole("link", { name: "Create categories" }))
+      .not.toBeInTheDocument();
   });
 });
 
