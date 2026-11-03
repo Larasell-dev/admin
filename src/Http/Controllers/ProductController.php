@@ -8,7 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Data\View\CreateProductPageData;
 use Larasell\Admin\Data\View\EditProductPageData;
-use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryOptionData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
 use Larasell\Larasell\Models\Category;
@@ -29,7 +29,7 @@ class ProductController
             storeUrl: route('larasell.admin.products.store'),
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories(),
-            createCategoryUrl: route('larasell.admin.categories.create'),
+            createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
         ));
     }
@@ -68,7 +68,7 @@ class ProductController
             updateUrl: route('larasell.admin.products.update', $product),
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories(),
-            createCategoryUrl: route('larasell.admin.categories.create'),
+            createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
         ));
     }
@@ -114,11 +114,11 @@ class ProductController
     /**
      * The store's categories to pick the product's from.
      *
-     * @return array<int, CategoryData>
+     * @return array<int, CategoryOptionData>
      */
     protected function categories(): array
     {
         // One query for the whole tree; the Category relations would query once per level.
-        return CategoryData::tree(Category::query()->orderBy('position')->orderBy('id')->get());
+        return CategoryOptionData::tree(Category::query()->orderBy('position')->orderBy('id')->get());
     }
 }

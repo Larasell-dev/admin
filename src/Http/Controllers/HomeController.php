@@ -13,7 +13,7 @@ class HomeController
     {
         return Inertia::render('Home', new HomePageData(
             createProductUrl: Route::has('larasell.admin.products.create') ? route('larasell.admin.products.create') : null,
-            createCategoryUrl: route('larasell.admin.categories.create'),
+            createCategoryUrl: Route::has('larasell.admin.categories.create') ? route('larasell.admin.categories.create') : null,
             inviteAdminUrl: route('larasell.admin.settings.admins.create'),
             helpEmail: 'nils@larasell.dev',
         ));

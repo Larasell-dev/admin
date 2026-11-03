@@ -10,7 +10,7 @@ class HomePageData extends Data
 {
     public function __construct(
         public ?string $createProductUrl,
-        public string $createCategoryUrl,
+        public ?string $createCategoryUrl,
         public string $inviteAdminUrl,
         public string $helpEmail,
     ) {}

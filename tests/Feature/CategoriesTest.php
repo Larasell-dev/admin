@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Models\Admin;
 use Larasell\Larasell\Enums\Visibility;
@@ -882,4 +883,26 @@ it('stops linking to creating a product from a category\'s page once the store h
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('createProductUrl', null));
+});
+
+it('turns the categories off when disabled in the config', function () {
+    $this->bootingWith(fn () => config(['larasell.admin.categories.enabled' => false]));
+    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
+    $this->actingAs($admin, 'larasell-admin');
+    $shoes = category('Shoes');
+
+    expect(Route::has('larasell.admin.categories.index'))->toBeFalse();
+
+    // The routes aren't registered, so there are no route names to use.
+    $this->get('/admin/categories')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get('/admin/categories/create')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->post('/admin/categories', ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get("/admin/categories/{$shoes->id}")->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->delete("/admin/categories/{$shoes->id}", ['confirmation' => 'Shoes'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get(route('larasell.admin.home'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('createCategoryUrl', null)
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Orders', 'Customers', 'Settings']));
+
+    expect(Category::query()->pluck('id')->all())->toBe([$shoes->id]);
 });

@@ -542,6 +542,32 @@ it('links to creating a category from adding or editing a product', function () 
     $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($link);
 });
 
+it('still puts products into categories while the categories are turned off', function () {
+    $this->bootingWith(fn () => config(['larasell.admin.categories.enabled' => false]));
+    signInAdmin();
+
+    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
+    $shirts = Category::create(['name' => 'Shirts', 'slug' => 'shirts', 'parent_id' => $clothing->id]);
+    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots->categories()->attach($shirts);
+
+    // There are no category pages to link to.
+    $form = fn (AssertableInertia $page) => $page
+        ->where('createCategoryUrl', null)
+        ->where('categories.0.id', $clothing->id)
+        ->where('categories.0.url', null)
+        ->where('categories.0.children.0.id', $shirts->id)
+        ->where('categories.0.children.0.url', null);
+
+    $this->get(route('larasell.admin.products.create'))->assertInertia($form);
+    $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($form);
+
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'categories' => [$clothing->id, $shirts->id]])
+        ->assertRedirect(route('larasell.admin.products.edit', $boots));
+
+    expect($boots->categories()->get()->modelKeys())->toEqualCanonicalizing([$clothing->id, $shirts->id]);
+});
+
 it('shows the categories a product is in on its page', function () {
     signInAdmin();
 
