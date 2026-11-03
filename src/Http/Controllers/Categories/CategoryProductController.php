@@ -1,9 +1,9 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers;
+namespace Larasell\Admin\Http\Controllers\Categories;
 
 use Illuminate\Http\RedirectResponse;
-use Larasell\Admin\Http\Requests\AddProductToCategoryRequest;
+use Larasell\Admin\Http\Requests\Categories\AddProductToCategoryRequest;
 use Larasell\Larasell\Models\Category;
 
 class CategoryProductController

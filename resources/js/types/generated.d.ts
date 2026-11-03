@@ -3,36 +3,14 @@ declare namespace Larasell.Admin.Data.View {
     createUrl: string;
     admins: import("./index").TableResource;
   };
-  export type CategoriesPageData = {
-    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
-    createUrl: string;
-  };
-  export type CategoryPageData = {
-    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
-    createUrl: string;
-    category: Larasell.Admin.Data.ViewModel.CategoryDetailData;
-    updateUrl: string;
-    products: import("./index").TableResource;
-    availableProductsUrl: string;
-    addProductUrl: string;
-    createProductUrl: string | null;
-  };
   export type CreateAdminPageData = {
     storeUrl: string;
     indexUrl: string;
   };
-  export type CreateCategoryPageData = {
-    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
-    createUrl: string;
-    storeUrl: string;
-    indexUrl: string;
-    parent: Larasell.Admin.Data.ViewModel.CategoryDetailData | null;
-    createProductUrl: string | null;
-  };
   export type CreateProductPageData = {
     storeUrl: string;
     indexUrl: string;
-    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
     createCategoryUrl: string;
     uploadImagesUrl: string;
   };
@@ -45,7 +23,7 @@ declare namespace Larasell.Admin.Data.View {
     product: Larasell.Admin.Data.ViewModel.ProductDetailData;
     updateUrl: string;
     indexUrl: string;
-    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
     createCategoryUrl: string;
     uploadImagesUrl: string;
   };
@@ -58,11 +36,6 @@ declare namespace Larasell.Admin.Data.View {
   export type LoginPageData = {
     loginUrl: string;
     devLoginUrl: string | null;
-  };
-  export type MissingCategoryPageData = {
-    categories: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
-    createUrl: string;
-    category: null;
   };
   export type ProfilePageData = {
     admin: Larasell.Admin.Data.ViewModel.AdminData;
@@ -102,6 +75,35 @@ declare namespace Larasell.Admin.Data.View.AuditLog {
     canSearch: boolean;
   };
 }
+declare namespace Larasell.Admin.Data.View.Categories {
+  export type CategoriesPageData = {
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
+    createUrl: string;
+  };
+  export type CategoryPageData = {
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
+    createUrl: string;
+    category: Larasell.Admin.Data.ViewModel.Categories.CategoryDetailData;
+    updateUrl: string;
+    products: import("./index").TableResource;
+    availableProductsUrl: string;
+    addProductUrl: string;
+    createProductUrl: string | null;
+  };
+  export type CreateCategoryPageData = {
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
+    createUrl: string;
+    storeUrl: string;
+    indexUrl: string;
+    parent: Larasell.Admin.Data.ViewModel.Categories.CategoryDetailData | null;
+    createProductUrl: string | null;
+  };
+  export type MissingCategoryPageData = {
+    categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
+    createUrl: string;
+    category: null;
+  };
+}
 declare namespace Larasell.Admin.Data.View.Customers {
   export type CreateCustomerPageData = {
     storeUrl: string;
@@ -126,24 +128,6 @@ declare namespace Larasell.Admin.Data.ViewModel {
     name: string;
     email: string;
     avatarUrl: string | null;
-  };
-  export type CategoryData = {
-    id: number;
-    name: string;
-    visible: boolean;
-    url: string;
-    hideUrl: string;
-    unhideUrl: string;
-    deleteUrl: string;
-    createChildUrl: string;
-    moveUrl: string;
-    children: Array<Larasell.Admin.Data.ViewModel.CategoryData>;
-  };
-  export type CategoryDetailData = {
-    id: number;
-    name: string;
-    slug: string;
-    visible: boolean;
   };
   export type DimensionsData = {
     length: string;
@@ -189,6 +173,26 @@ declare namespace Larasell.Admin.Data.ViewModel.ApiTokens {
   export type CreatedApiTokenData = {
     name: string;
     plainTextToken: string;
+  };
+}
+declare namespace Larasell.Admin.Data.ViewModel.Categories {
+  export type CategoryData = {
+    id: number;
+    name: string;
+    visible: boolean;
+    url: string;
+    hideUrl: string;
+    unhideUrl: string;
+    deleteUrl: string;
+    createChildUrl: string;
+    moveUrl: string;
+    children: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
+  };
+  export type CategoryDetailData = {
+    id: number;
+    name: string;
+    slug: string;
+    visible: boolean;
   };
 }
 declare namespace Larasell.Admin.Data.ViewModel.Customers {

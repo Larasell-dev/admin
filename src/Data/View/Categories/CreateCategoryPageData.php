@@ -1,9 +1,9 @@
 <?php
 
-namespace Larasell\Admin\Data\View;
+namespace Larasell\Admin\Data\View\Categories;
 
-use Larasell\Admin\Data\ViewModel\CategoryData;
-use Larasell\Admin\Data\ViewModel\CategoryDetailData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryDetailData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 

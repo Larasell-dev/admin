@@ -2,17 +2,17 @@ import { Form, Link } from "@inertiajs/react";
 import { Button, EmptyState, Icon, Section, SectionStack } from "@larasell-dev/ui";
 import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
 
-import CategoryForm from "../../Components/CategoryForm";
+import CategoryForm from "../../Components/Categories/CategoryForm";
 import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
-import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/CategoryLayout";
+import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Categories/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
 // The server sends a null category, and none of its urls, when the address names one that is gone.
 type Props =
-  | Larasell.Admin.Data.View.CategoryPageData
-  | Larasell.Admin.Data.View.MissingCategoryPageData;
+  | Larasell.Admin.Data.View.Categories.CategoryPageData
+  | Larasell.Admin.Data.View.Categories.MissingCategoryPageData;
 
 export default function Show(props: Props) {
   return (
@@ -61,7 +61,7 @@ export default function Show(props: Props) {
 function CategoryNotFound({
   categories,
   createUrl,
-}: Larasell.Admin.Data.View.MissingCategoryPageData) {
+}: Larasell.Admin.Data.View.Categories.MissingCategoryPageData) {
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-12">
       <EmptyState

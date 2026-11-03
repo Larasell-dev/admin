@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers;
+namespace Larasell\Admin\Http\Controllers\Categories;
 
 use Illuminate\Http\RedirectResponse;
 use Larasell\Larasell\Enums\Visibility;

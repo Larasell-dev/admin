@@ -5,15 +5,15 @@ import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { cn } from "cn";
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
-import CategoryTree, { CategoryDeletion } from "../Components/CategoryTree";
-import Freeze from "../Components/Freeze";
-import type { Page } from "../types";
-import { overlayExclusive } from "../utils/hotkeys";
+import CategoryTree, { CategoryDeletion } from "../../Components/Categories/CategoryTree";
+import Freeze from "../../Components/Freeze";
+import type { Page } from "../../types";
+import { overlayExclusive } from "../../utils/hotkeys";
 
 // Pages of a single category also pass that category; the index and create pages don't.
 type Props = Page<
-  Larasell.Admin.Data.View.CategoriesPageData &
-    Partial<Pick<Larasell.Admin.Data.View.CategoryPageData, "category">>
+  Larasell.Admin.Data.View.Categories.CategoriesPageData &
+    Partial<Pick<Larasell.Admin.Data.View.Categories.CategoryPageData, "category">>
 >;
 
 export default function CategoryLayout({ children }: { children: ReactNode }) {
@@ -76,7 +76,9 @@ export function CategoryTreeTrigger() {
   );
 }
 
-function TreeDialog(props: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number }) {
+function TreeDialog(
+  props: Larasell.Admin.Data.View.Categories.CategoriesPageData & { currentId?: number },
+) {
   const { url } = usePage();
   // Remembers the page it was opened on, so it closes once a link in the tree leads elsewhere
   // but stays open while hiding, moving or adding products keeps the admin on the same page.
@@ -128,7 +130,10 @@ function TreePanel({
   createUrl,
   currentId,
   className,
-}: Larasell.Admin.Data.View.CategoriesPageData & { currentId?: number; className: string }) {
+}: Larasell.Admin.Data.View.Categories.CategoriesPageData & {
+  currentId?: number;
+  className: string;
+}) {
   const treeScroll = useRef<HTMLDivElement>(null);
   useScrollMaskScrollbar(treeScroll);
   useScrollMaskReset(treeScroll);

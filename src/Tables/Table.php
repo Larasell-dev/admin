@@ -49,6 +49,7 @@ abstract class Table implements JsonSerializable
     private const array PANEL_NAMESPACES = [
         'larasell:' => 'Larasell\\Admin\\Tables\\Panel\\',
         'larasell-product:' => 'Larasell\\Admin\\Tables\\Product\\',
+        'larasell-categories:' => 'Larasell\\Admin\\Tables\\Categories\\',
         'larasell-customers:' => 'Larasell\\Admin\\Tables\\Customers\\',
         'larasell-orders:' => 'Larasell\\Admin\\Tables\\Orders\\',
         'larasell-api-tokens:' => 'Larasell\\Admin\\Tables\\ApiTokens\\',

@@ -1,10 +1,10 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers;
+namespace Larasell\Admin\Http\Controllers\Categories;
 
 use Illuminate\Http\RedirectResponse;
-use Larasell\Admin\Actions\MoveCategory;
-use Larasell\Admin\Http\Requests\MoveCategoryRequest;
+use Larasell\Admin\Actions\Categories\MoveCategory;
+use Larasell\Admin\Http\Requests\Categories\MoveCategoryRequest;
 use Larasell\Larasell\Models\Category;
 
 class MoveCategoryController

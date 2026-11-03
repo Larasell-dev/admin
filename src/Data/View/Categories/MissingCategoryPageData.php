@@ -1,8 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Data\View;
+namespace Larasell\Admin\Data\View\Categories;
 
-use Larasell\Admin\Data\ViewModel\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;

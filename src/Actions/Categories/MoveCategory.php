@@ -1,9 +1,9 @@
 <?php
 
-namespace Larasell\Admin\Actions;
+namespace Larasell\Admin\Actions\Categories;
 
 use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Payloads\MoveCategoryPayload;
+use Larasell\Admin\Payloads\Categories\MoveCategoryPayload;
 use Larasell\Larasell\Models\Category;
 
 class MoveCategory

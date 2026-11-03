@@ -1,11 +1,14 @@
 import { useFormContext } from "@inertiajs/react";
 import { Field, Input, Stack } from "@larasell-dev/ui";
-import { slugify } from "../utils/slugify";
-import { truncate } from "../utils/truncate";
-import { useCoupledField } from "../utils/useCoupledField";
-import VisibilityField from "./VisibilityField";
+import { slugify } from "../../utils/slugify";
+import { truncate } from "../../utils/truncate";
+import { useCoupledField } from "../../utils/useCoupledField";
+import VisibilityField from "../VisibilityField";
 
-type Category = Pick<Larasell.Admin.Data.ViewModel.CategoryDetailData, "name" | "slug" | "visible">;
+type Category = Pick<
+  Larasell.Admin.Data.ViewModel.Categories.CategoryDetailData,
+  "name" | "slug" | "visible"
+>;
 
 /**
  * The fields of a category. It must sit inside an Inertia `<Form>`, which submits them

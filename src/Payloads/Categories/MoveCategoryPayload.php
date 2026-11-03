@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Payloads;
+namespace Larasell\Admin\Payloads\Categories;
 
 /**
  * Where a category moves: under the parent, or to the root without one, at the position among

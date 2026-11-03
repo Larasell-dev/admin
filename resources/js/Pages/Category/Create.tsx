@@ -1,14 +1,14 @@
 import { Form } from "@inertiajs/react";
 import { Section, SectionStack } from "@larasell-dev/ui";
 
-import CategoryForm from "../../Components/CategoryForm";
+import CategoryForm from "../../Components/Categories/CategoryForm";
 import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
-import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/CategoryLayout";
+import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Categories/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.CreateCategoryPageData;
+type Props = Larasell.Admin.Data.View.Categories.CreateCategoryPageData;
 
 export default function Create({
   categories,
