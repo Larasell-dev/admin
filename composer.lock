@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc6021b2af3777dde6ec70b449041fe9",
+    "content-hash": "a86a05086219bd9096be9417969be875",
     "packages": [
         {
             "name": "brick/math",
@@ -1181,16 +1181,16 @@
         },
         {
             "name": "larasell-dev/chronicle",
-            "version": "v0.2.7",
+            "version": "v0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/chronicle.git",
-                "reference": "6a0b019fb75ccd7325cbe012814c7d9c966198f9"
+                "reference": "208a296f02503728d7340bd16f4fcc2f170d9939"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/chronicle/zipball/6a0b019fb75ccd7325cbe012814c7d9c966198f9",
-                "reference": "6a0b019fb75ccd7325cbe012814c7d9c966198f9",
+                "url": "https://api.github.com/repos/Larasell-dev/chronicle/zipball/208a296f02503728d7340bd16f4fcc2f170d9939",
+                "reference": "208a296f02503728d7340bd16f4fcc2f170d9939",
                 "shasum": ""
             },
             "require": {
@@ -1198,20 +1198,13 @@
                 "illuminate/log": "^12.0|^13.0",
                 "illuminate/routing": "^12.0|^13.0",
                 "illuminate/support": "^12.0|^13.0",
-                "php": "^8.3"
+                "php": "^8.4"
             },
             "require-dev": {
                 "laravel/pint": "^1.22",
-                "open-telemetry/api": "^1.10",
-                "open-telemetry/exporter-otlp": "^1.4",
-                "open-telemetry/sdk": "^1.15",
                 "orchestra/testbench": "^10.0|^11.0",
-                "pestphp/pest": "^5.0"
-            },
-            "suggest": {
-                "open-telemetry/api": "Required to use the posthog log driver (^1.10)",
-                "open-telemetry/exporter-otlp": "Required to use the posthog log driver (^1.4)",
-                "open-telemetry/sdk": "Required to use the posthog log driver (^1.15)"
+                "pestphp/pest": "^4.0|^5.0",
+                "phpstan/phpstan": "^2.1"
             },
             "type": "library",
             "extra": {
@@ -1233,30 +1226,31 @@
             "description": "Simple structured request logging for Laravel.",
             "support": {
                 "issues": "https://github.com/Larasell-dev/chronicle/issues",
-                "source": "https://github.com/Larasell-dev/chronicle/tree/v0.2.7"
+                "source": "https://github.com/Larasell-dev/chronicle/tree/v0.4.0"
             },
-            "time": "2026-10-12T15:51:43+00:00"
+            "time": "2026-11-03T19:48:37+00:00",
+            "published-time": "2026-11-03T19:48:51+00:00"
         },
         {
             "name": "larasell-dev/larasell",
-            "version": "v1.22.0",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "6ccd91ab17372df49dc42cdefd7779c0937df3fe"
+                "reference": "5a6cf82ebe586c18b7151c620bbe9eff50a57e7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/6ccd91ab17372df49dc42cdefd7779c0937df3fe",
-                "reference": "6ccd91ab17372df49dc42cdefd7779c0937df3fe",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/5a6cf82ebe586c18b7151c620bbe9eff50a57e7d",
+                "reference": "5a6cf82ebe586c18b7151c620bbe9eff50a57e7d",
                 "shasum": ""
             },
             "require": {
                 "ext-bcmath": "*",
                 "ext-intl": "*",
-                "larasell-dev/chronicle": "^0.2.7",
+                "larasell-dev/chronicle": "^0.4",
                 "laravel/framework": "^13.23",
-                "php": "^8.3"
+                "php": "^8.4"
             },
             "require-dev": {
                 "larastan/larastan": "^3.0",
@@ -1304,8 +1298,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-11-02T21:21:07+00:00",
-            "published-time": "2026-11-02T21:21:24+00:00"
+            "time": "2026-11-03T20:13:40+00:00",
+            "published-time": "2026-11-03T20:14:09+00:00"
         },
         {
             "name": "laravel/framework",
