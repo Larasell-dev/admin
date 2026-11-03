@@ -22,10 +22,10 @@ import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { MotionConfig, motion } from "motion/react";
 import { cn } from "cn";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { overlayExclusive } from "../utils/hotkeys";
-import Tree, { TreeItem } from "./Tree";
+import { overlayExclusive } from "../../utils/hotkeys";
+import Tree, { TreeItem } from "../Tree";
 
-type Category = Larasell.Admin.Data.ViewModel.CategoryData;
+type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryData;
 type CheckedState = boolean | "mixed";
 
 /** The ids of the categories without children at or below `category`. */

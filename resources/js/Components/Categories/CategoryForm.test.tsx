@@ -1,11 +1,11 @@
-import "../../css/app.css";
+import "../../../css/app.css";
 import { App, Form } from "@inertiajs/react";
 import type { ComponentProps } from "react";
 import { describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import CategoryForm from "./CategoryForm";
-import UnsavedChangesToast, { UnsavedChangesToastHost } from "./UnsavedChangesToast";
+import UnsavedChangesToast, { UnsavedChangesToastHost } from "../UnsavedChangesToast";
 
 type Category = ComponentProps<typeof CategoryForm>["category"];
 

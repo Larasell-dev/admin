@@ -2,7 +2,7 @@
 
 namespace Larasell\Admin\Data\View;
 
-use Larasell\Admin\Data\ViewModel\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 

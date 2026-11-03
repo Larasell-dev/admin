@@ -1,10 +1,10 @@
 import { Link } from "@inertiajs/react";
 import { Button, EmptyState, Icon } from "@larasell-dev/ui";
 import { AddLine, FoldersLine } from "@larasell-dev/ui/icons";
-import CategoryLayout from "../../Layouts/CategoryLayout";
+import CategoryLayout from "../../Layouts/Categories/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.CategoriesPageData;
+type Props = Larasell.Admin.Data.View.Categories.CategoriesPageData;
 
 /** Only shown when the store has no categories; otherwise the index redirects to the first one. */
 export default function Index({ createUrl }: Props) {

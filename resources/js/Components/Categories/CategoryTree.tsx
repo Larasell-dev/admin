@@ -29,14 +29,14 @@ import {
   useRef,
   useState,
 } from "react";
-import type { TableRowAction } from "../types";
-import { plugins, sensors } from "../utils/dragAndDrop";
-import { overlayExclusive } from "../utils/hotkeys";
-import ConfirmActionDialog from "./ConfirmActionDialog";
-import Tree, { TreeItem } from "./Tree";
+import type { TableRowAction } from "../../types";
+import { plugins, sensors } from "../../utils/dragAndDrop";
+import { overlayExclusive } from "../../utils/hotkeys";
+import ConfirmActionDialog from "../ConfirmActionDialog";
+import Tree, { TreeItem } from "../Tree";
 import { cn } from "cn";
 
-type Category = Larasell.Admin.Data.ViewModel.CategoryData;
+type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryData;
 
 /** The ids of the categories above the one with `id`, or [] when it is a root or missing. */
 function ancestorIds(categories: Category[], id: number): number[] {

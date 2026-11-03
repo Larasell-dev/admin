@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers;
+namespace Larasell\Admin\Http\Controllers\Categories;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Actions\DeleteCategory;
-use Larasell\Admin\Data\View\CategoriesPageData;
-use Larasell\Admin\Data\View\CategoryPageData;
-use Larasell\Admin\Data\View\CreateCategoryPageData;
-use Larasell\Admin\Data\View\MissingCategoryPageData;
-use Larasell\Admin\Data\ViewModel\CategoryData;
-use Larasell\Admin\Data\ViewModel\CategoryDetailData;
-use Larasell\Admin\Http\Requests\CategoryRequest;
-use Larasell\Admin\Tables\Panel\CategoryProducts;
+use Larasell\Admin\Actions\Categories\DeleteCategory;
+use Larasell\Admin\Data\View\Categories\CategoriesPageData;
+use Larasell\Admin\Data\View\Categories\CategoryPageData;
+use Larasell\Admin\Data\View\Categories\CreateCategoryPageData;
+use Larasell\Admin\Data\View\Categories\MissingCategoryPageData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryDetailData;
+use Larasell\Admin\Http\Requests\Categories\CategoryRequest;
+use Larasell\Admin\Tables\Categories\CategoryProducts;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Translatable;

@@ -1,12 +1,12 @@
 <?php
 
-namespace Larasell\Admin\Http\Requests;
+namespace Larasell\Admin\Http\Requests\Categories;
 
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Larasell\Admin\Payloads\MoveCategoryPayload;
+use Larasell\Admin\Payloads\Categories\MoveCategoryPayload;
 use Larasell\Larasell\Models\Category;
 
 class MoveCategoryRequest extends FormRequest

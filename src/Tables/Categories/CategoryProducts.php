@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Tables\Panel;
+namespace Larasell\Admin\Tables\Categories;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Larasell\Admin\Enums\Icon;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Data\ViewModel;
+namespace Larasell\Admin\Data\ViewModel\Categories;
 
 use Illuminate\Support\Collection;
 use Larasell\Larasell\Enums\Visibility;

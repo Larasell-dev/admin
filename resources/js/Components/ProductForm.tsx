@@ -37,14 +37,14 @@ import { overlayExclusive } from "../utils/hotkeys";
 import { truncate } from "../utils/truncate";
 import { useCoupledField } from "../utils/useCoupledField";
 import { useMergedRef } from "../utils/useMergedRef";
-import CategoryCheckboxTree from "./CategoryCheckboxTree";
+import CategoryCheckboxTree from "./Categories/CategoryCheckboxTree";
 import FormCheckbox from "./FormCheckbox";
 import { useFrozen } from "./Freeze";
 import ProductImageLightbox from "./ProductImageLightbox";
 import VisibilityField from "./VisibilityField";
 
 type Product = Omit<Larasell.Admin.Data.ViewModel.ProductDetailData, "id">;
-type Category = Larasell.Admin.Data.ViewModel.CategoryData;
+type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryData;
 type Image = Larasell.Admin.Data.ViewModel.ProductImageData;
 type Errors = Record<string, string | undefined>;
 

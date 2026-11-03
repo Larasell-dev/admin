@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Actions;
+namespace Larasell\Admin\Actions\Categories;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;

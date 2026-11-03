@@ -8,7 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Data\View\CreateProductPageData;
 use Larasell\Admin\Data\View\EditProductPageData;
-use Larasell\Admin\Data\ViewModel\CategoryData;
+use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
 use Larasell\Larasell\Models\Category;

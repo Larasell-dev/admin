@@ -6,20 +6,14 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AdminController;
 use Larasell\Admin\Http\Controllers\AvatarController;
-use Larasell\Admin\Http\Controllers\CategoryController;
-use Larasell\Admin\Http\Controllers\CategoryProductController;
 use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
 use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
-use Larasell\Admin\Http\Controllers\HideCategoryController;
 use Larasell\Admin\Http\Controllers\HomeController;
 use Larasell\Admin\Http\Controllers\LoginController;
 use Larasell\Admin\Http\Controllers\LogoutController;
-use Larasell\Admin\Http\Controllers\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\ProfileController;
-use Larasell\Admin\Http\Controllers\SearchProductsNotInCategoryController;
 use Larasell\Admin\Http\Controllers\SettingsController;
 use Larasell\Admin\Http\Controllers\TableActionController;
-use Larasell\Admin\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
 use Larasell\Admin\NavigationGroup;
@@ -31,17 +25,6 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home')->withHead(title: 'Dashboard');
-    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index')->withHead(title: 'Categories');
-    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create')->withHead(title: 'New category');
-    Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
-    Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-    Route::get('categories/{category}/available-products', SearchProductsNotInCategoryController::class)->name('categories.available-products.index');
-    Route::post('categories/{category}/products', [CategoryProductController::class, 'store'])->name('categories.products.store');
-    Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
-    Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
-    Route::post('categories/{category}/move', MoveCategoryController::class)->name('categories.move');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('settings', SettingsController::class)->name('settings');
@@ -67,7 +50,6 @@ if (app()->environment('local')) {
 }
 
 Navigation::add(NavItem::Home->label(), NavItem::Home->value, icon: Icon::Home)->position(NavItem::Home->position());
-Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
 Navigation::add(NavItem::Settings->label(), NavItem::Settings->value, icon: Icon::Settings)
     ->position(NavItem::Settings->position())
     ->children(function (NavigationGroup $settings): void {
