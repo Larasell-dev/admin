@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.6.0](https://github.com/Larasell-dev/admin/compare/v0.5.6...v0.6.0) (2026-11-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade Chronicle to 0.4
+* require PHP 8.4
+* audit sign-ins and admin management ([#216](https://github.com/Larasell-dev/admin/issues/216))
+
+### Features
+
+* add a make:larasell-audit-record command ([9d8d7dd](https://github.com/Larasell-dev/admin/commit/9d8d7dd81ce27019dd523ecdafc666144fb6ff57))
+* audit sign-ins and admin management ([#216](https://github.com/Larasell-dev/admin/issues/216)) ([0bc1cfe](https://github.com/Larasell-dev/admin/commit/0bc1cfe738e369809ec48a9b2db691327b75905e))
+* hide the audit log filters behind a Pennant feature ([#218](https://github.com/Larasell-dev/admin/issues/218)) ([a3d52b5](https://github.com/Larasell-dev/admin/commit/a3d52b578a42c8b9e4da760a9b78d843dabcbcf9))
+* let apps turn the categories module off ([0dd9ed0](https://github.com/Larasell-dev/admin/commit/0dd9ed0af676c675ca2afe2b64f4e00320470689))
+* prune audit records after their retention period ([#217](https://github.com/Larasell-dev/admin/issues/217)) ([f255558](https://github.com/Larasell-dev/admin/commit/f2555581f9ce939e20d8e52d81d8989d1fad9aab))
+* reorder categories by drag and drop ([2bbcea6](https://github.com/Larasell-dev/admin/commit/2bbcea63bd078ae26f76104c5ad1e1981a8cf918))
+* show the audit log in the settings ([#215](https://github.com/Larasell-dev/admin/issues/215)) ([cf4c282](https://github.com/Larasell-dev/admin/commit/cf4c282e27fb812e7aa5ef86bd447c828a22a039))
+* start new products without backorders ([14d43b1](https://github.com/Larasell-dev/admin/commit/14d43b1f350342de38f8bbee0868a5ce72cc6dff))
+* upgrade Chronicle to 0.4 ([0049d39](https://github.com/Larasell-dev/admin/commit/0049d393baf109ed3e59c2978a77c3ea005486a0))
+
+
+### Bug Fixes
+
+* keep menus from wrapping their text ([#222](https://github.com/Larasell-dev/admin/issues/222)) ([7919e05](https://github.com/Larasell-dev/admin/commit/7919e05014c17f96b7c4513a14b8adea60e288ad))
+
+
+### Build System
+
+* require PHP 8.4 ([7484983](https://github.com/Larasell-dev/admin/commit/7484983389a7dde8b15e0304cce9ccd84f5af017))
+
 ## [0.5.6](https://github.com/Larasell-dev/admin/compare/v0.5.5...v0.5.6) (2026-10-31)
 
 
