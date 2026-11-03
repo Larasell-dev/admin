@@ -31,6 +31,120 @@
 
 * require PHP 8.4 ([7484983](https://github.com/Larasell-dev/admin/commit/7484983389a7dde8b15e0304cce9ccd84f5af017))
 
+### Upgrade guide
+
+#### `CreateAdmin` and `DeleteAdmin` now require an actor
+
+Adding and deleting admins now writes an audit record in the same transaction as the change. The
+record says who made the change, so both actions now take that actor as a required argument.
+
+##### Who is affected
+
+Apps that call `Larasell\Admin\Actions\CreateAdmin::handle()` or
+`Larasell\Admin\Actions\DeleteAdmin::handle()` from their own code, such as a command, a job or an
+SSO sync. Adding and deleting admins in the admin panel, and the `larasell:create-admin` and
+`larasell:remove-admin` commands, are not affected: they pass their actor for you.
+
+##### How to upgrade
+
+Pass who made the change. In jobs and commands, use a `SystemActor` named for what the code does.
+In your own admin pages, pass the signed-in `Admin`.
+
+```php
+use Larasell\Admin\Audit\SystemActor;
+
+// Before
+app(CreateAdmin::class)->handle(['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => $password]);
+app(DeleteAdmin::class)->handle($admin);
+
+// After
+app(CreateAdmin::class)->handle(['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => $password], new SystemActor('sso-sync'));
+app(DeleteAdmin::class)->handle($admin, new SystemActor('sso-sync'));
+```
+
+If the actor truly can't be known, pass an `UnknownActor` with the reason, e.g.
+`new UnknownActor('Imported from the previous shop system.')`.
+
+Both actions now also throw `Larasell\Admin\Exceptions\AuditFailed` when the audit record can't be
+stored. No admin is then added or deleted, and a deleted admin keeps their avatar.
+
+#### The admin panel uses Chronicle 0.4
+
+The admin panel's structured exceptions now implement Chronicle 0.4's
+`Larasell\Chronicle\Exceptions\StructuredException` instead of `Larasell\Chronicle\StructuredError`.
+This covers `AuditFailed`, `AdminRemovalFailed`, `InvalidNavigationItem`, `InvalidTableAction`,
+`InvalidTableColumn` and `InvalidTableEmptyState`. Chronicle 0.4 bounds and redacts every event it
+logs and adds a fake for tests. The admin panel also requires Larasell 1.23, the first version on
+Chronicle 0.4.
+
+##### Who is affected
+
+- Apps that catch the admin panel's exceptions as `Larasell\Chronicle\StructuredError`.
+- Apps that use Chronicle themselves, e.g. its `LogRequests` middleware or structured exceptions.
+  Composer now installs Chronicle 0.4, so follow
+  [Chronicle's upgrade guide](https://github.com/Larasell-dev/chronicle/blob/main/CHANGELOG.md).
+
+Apps that catch these exceptions by name, or only read `errorCode()`, `errorWhy()`, `errorFix()`
+and `errorLink()`, are not affected.
+
+##### How to upgrade
+
+Update Larasell and the admin panel together:
+
+```bash
+composer update larasell-dev/larasell larasell-dev/admin --with-dependencies
+```
+
+Catch the new interface:
+
+```php
+// Before
+use Larasell\Chronicle\StructuredError;
+
+try {
+    // Code that builds an admin table, navigation or audit record
+} catch (StructuredError $exception) {
+    report($exception);
+}
+
+// After
+use Larasell\Chronicle\Exceptions\StructuredException;
+
+try {
+    // Code that builds an admin table, navigation or audit record
+} catch (StructuredException $exception) {
+    report($exception);
+}
+```
+
+#### The admin panel requires PHP 8.4
+
+The admin panel now needs PHP 8.4 or newer, like Larasell and Chronicle, which it is built on.
+Both require PHP 8.4 from their current versions, so the admin panel can't upgrade them while it
+still allows PHP 8.3.
+
+##### Who is affected
+
+Apps that run on PHP 8.3. Composer won't install this version of the admin panel there. Apps on
+PHP 8.4 or 8.5 are not affected.
+
+##### How to upgrade
+
+Upgrade PHP to 8.4 or newer on every server and in CI, then raise the PHP requirement in your
+app's `composer.json`:
+
+```json
+// Before
+"require": {
+    "php": "^8.3"
+}
+
+// After
+"require": {
+    "php": "^8.4"
+}
+```
+
 ## [0.5.6](https://github.com/Larasell-dev/admin/compare/v0.5.5...v0.5.6) (2026-10-31)
 
 
