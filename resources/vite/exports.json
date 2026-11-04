@@ -129,6 +129,7 @@
     "ResourceTable",
     "SidebarLayout",
     "defineCommand",
+    "matchRanges",
     "useCommand"
   ]
 }

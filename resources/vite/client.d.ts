@@ -82,6 +82,9 @@ declare module "@larasell-dev/admin" {
     ranges: ReadonlyArray<readonly [start: number, end: number]>;
   }>;
 
+  /** Where a search matched a text, for Highlight: its letters in order, case and gaps ignored. */
+  export function matchRanges(text: string, search: string): Array<[start: number, end: number]>;
+
   /** Offers a command in the command menu while the component is mounted. */
   export function useCommand(definition: CommandDefinition): void;
 
