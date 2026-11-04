@@ -9,6 +9,9 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\Customers\CustomerController;
+use Larasell\Admin\Http\Controllers\Search\SearchCustomersController;
+use Larasell\Admin\Search\CustomerSearch;
+use Larasell\Admin\Search\DatabaseCustomerSearch;
 use Larasell\Admin\Tables\Customers\Customers;
 
 /**
@@ -20,6 +23,8 @@ class CustomerServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/customers.php', 'larasell.admin.customers');
+
+        $this->app->bind(CustomerSearch::class, DatabaseCustomerSearch::class);
     }
 
     public function boot(): void
@@ -35,6 +40,7 @@ class CustomerServiceProvider extends ServiceProvider
             Route::post('customers', [CustomerController::class, 'store'])->name('customers.store');
             Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
             Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+            Route::get('search/customers', SearchCustomersController::class)->name('search.customers');
         });
     }
 }

@@ -274,3 +274,15 @@ declare namespace Larasell.Admin.Data.ViewModel.Orders {
     amount: string;
   };
 }
+declare namespace Larasell.Admin.Data.ViewModel.Search {
+  export type SearchMatchData = {
+    label: string;
+    value: string;
+  };
+  export type SearchResultData = {
+    id: number;
+    label: string;
+    url: string;
+    match: Larasell.Admin.Data.ViewModel.Search.SearchMatchData | null;
+  };
+}
