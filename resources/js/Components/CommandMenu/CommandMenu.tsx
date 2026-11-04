@@ -2,6 +2,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Icon } from "@larasell-dev/ui";
 import { ArrowLeftSLine, ArrowRightSLine, CheckLine, SearchLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider, useAppHotkeys, useHotkey } from "@tanstack/react-hotkeys";
+import { cn } from "cn";
 import { Command, defaultFilter } from "cmdk";
 import { Fragment, useEffect, useLayoutEffect, useState, useSyncExternalStore } from "react";
 import { overlayExclusive } from "../../utils/hotkeys";
@@ -142,10 +143,6 @@ export default function CommandMenu() {
                 }
               }}
             >
-              {/* Lined up with the items: the icon over theirs, the search over their labels. The
-                  input draws its text 1px lower than a span does, so the back chevron moves down 1px
-                  to stay centered on the capitals. The magnifier doesn't: its handle hangs below the
-                  lens, so centered on the row it already looks level with the text. */}
               <div className="flex items-center gap-3 border-b border-border px-4.5">
                 {nested ? (
                   <button
@@ -279,7 +276,12 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
       keywords={[...crumbs, item.label, ...(item.keywords ?? [])]}
       disabled={!!item.disabled}
       onSelect={() => (item.items ? actions.openView(path, item) : actions.run(item.run))}
-      className="flex min-h-9 cursor-default items-center gap-3 px-3 py-1.5 type-body-md text-mauve-950 select-none data-[disabled=true]:text-mauve-400 data-[selected=true]:bg-mauve-100 dark:text-mauve-50 dark:data-[disabled=true]:text-mauve-500 dark:data-[selected=true]:bg-mauve-800"
+      className={cn(
+        "flex min-h-9 cursor-default items-center gap-3 px-3 py-1.5 select-none",
+        "type-body-md text-mauve-950 dark:text-mauve-50",
+        "data-[disabled=true]:text-mauve-400 dark:data-[disabled=true]:text-mauve-500",
+        "data-[selected=true]:bg-mauve-100 dark:data-[selected=true]:bg-mauve-800",
+      )}
     >
       {/* An item without an icon keeps its place, so every label starts in the same column. */}
       <span aria-hidden className="flex size-4 shrink-0">
