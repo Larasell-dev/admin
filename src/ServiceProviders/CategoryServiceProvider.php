@@ -12,11 +12,12 @@ use Larasell\Admin\Http\Controllers\Categories\CategoryController;
 use Larasell\Admin\Http\Controllers\Categories\CategoryProductController;
 use Larasell\Admin\Http\Controllers\Categories\HideCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\MoveCategoryController;
+use Larasell\Admin\Http\Controllers\Categories\SearchCategoriesController;
 use Larasell\Admin\Http\Controllers\Categories\SearchProductsNotInCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\UnhideCategoryController;
-use Larasell\Admin\Http\Controllers\Search\SearchCategoriesController;
-use Larasell\Admin\Search\CategorySearch;
-use Larasell\Admin\Search\DatabaseCategorySearch;
+use Larasell\Admin\Search\Categories\CategorySearch;
+use Larasell\Admin\Search\Categories\DatabaseCategorySearch;
+use Larasell\Admin\Search\Searches;
 
 /**
  * The categories module: the category tree, its navigation item, and the pages to add, edit,
@@ -40,6 +41,8 @@ class CategoryServiceProvider extends ServiceProvider
         }
 
         Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
+
+        app(Searches::class)->add('categories', 'Search categories', Icon::Folders, 'Search by name', 'larasell.admin.search.categories');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('categories', [CategoryController::class, 'index'])->name('categories.index')->withHead(title: 'Categories');

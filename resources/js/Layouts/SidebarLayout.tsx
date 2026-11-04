@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import CommandMenu from "../Components/CommandMenu/CommandMenu";
+import { SearchCommands } from "../Components/CommandMenu/searchCommands";
 import MobileNav from "../Components/MobileNav";
 import SessionExpiredDialog from "../Components/SessionExpiredDialog";
 import Sidebar from "../Components/Sidebar";
@@ -30,6 +31,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       <SessionExpiredDialog />
       {/* Outside the page too, so it stays open while the page changes underneath. */}
       <CommandMenu />
+      <SearchCommands />
     </div>
   );
 }

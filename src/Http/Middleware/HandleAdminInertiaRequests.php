@@ -4,13 +4,14 @@ namespace Larasell\Admin\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Inertia\Middleware;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\Data\ViewModel\CommandMenuData;
 use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Navigation;
+use Larasell\Admin\Search\Searches;
 use Symfony\Component\HttpFoundation\Response;
 
 class HandleAdminInertiaRequests extends Middleware
@@ -52,12 +53,8 @@ class HandleAdminInertiaRequests extends Middleware
             'contentLocale' => fn (): ?ContentLocaleData => $request->user('larasell-admin') instanceof Admin
                 ? ContentLocaleData::of(app(ContentLocaleResolver::class)->resolve($request))
                 : null,
-            // The command menu's searches, of the modules that are turned on.
-            'searchUrls' => fn (): ?array => $request->user('larasell-admin') instanceof Admin
-                ? collect(['products', 'categories', 'orders', 'customers'])
-                    ->filter(fn (string $resource): bool => Route::has("larasell.admin.search.{$resource}"))
-                    ->mapWithKeys(fn (string $resource): array => [$resource => route("larasell.admin.search.{$resource}")])
-                    ->all()
+            'commandMenu' => fn (): ?CommandMenuData => $request->user('larasell-admin') instanceof Admin
+                ? new CommandMenuData(app(Searches::class)->all())
                 : null,
             'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),

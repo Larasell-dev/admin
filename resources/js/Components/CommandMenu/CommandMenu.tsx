@@ -3,6 +3,7 @@ import { Icon } from "@larasell-dev/ui";
 import { ArrowLeftSLine, ArrowRightSLine, CheckLine, SearchLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider, useAppHotkeys, useHotkey } from "@tanstack/react-hotkeys";
 import { cn } from "cn";
+import { objectKeys } from "ts-extras";
 import { Command, defaultFilter, useCommandState } from "cmdk";
 import {
   Fragment,
@@ -112,10 +113,7 @@ export default function CommandMenu() {
     },
     showView(next) {
       setShown((current) =>
-        current &&
-        (Object.keys(next) as Array<keyof Shown>).every((key) => current[key] === next[key])
-          ? current
-          : next,
+        current && objectKeys(next).every((key) => current[key] === next[key]) ? current : next,
       );
     },
     leaveView,

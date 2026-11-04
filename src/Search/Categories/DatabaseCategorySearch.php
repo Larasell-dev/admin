@@ -1,9 +1,10 @@
 <?php
 
-namespace Larasell\Admin\Search;
+namespace Larasell\Admin\Search\Categories;
 
 use Illuminate\Support\Collection;
 use Larasell\Admin\ContentLocale\AvailableLocales;
+use Larasell\Admin\Search\SearchQuery;
 use Larasell\Larasell\Models\Category;
 
 /**

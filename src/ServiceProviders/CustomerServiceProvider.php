@@ -9,9 +9,10 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\Customers\CustomerController;
-use Larasell\Admin\Http\Controllers\Search\SearchCustomersController;
-use Larasell\Admin\Search\CustomerSearch;
-use Larasell\Admin\Search\DatabaseCustomerSearch;
+use Larasell\Admin\Http\Controllers\Customers\SearchCustomersController;
+use Larasell\Admin\Search\Customers\CustomerSearch;
+use Larasell\Admin\Search\Customers\DatabaseCustomerSearch;
+use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Tables\Customers\Customers;
 
 /**
@@ -34,6 +35,8 @@ class CustomerServiceProvider extends ServiceProvider
         }
 
         Navigation::index(NavItem::Customers->label(), 'customers', Customers::class, icon: Icon::Group)->position(NavItem::Customers->position());
+
+        app(Searches::class)->add('customers', 'Search customers', Icon::Group, 'Search by name', 'larasell.admin.search.customers');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->withHead(title: 'New customer');

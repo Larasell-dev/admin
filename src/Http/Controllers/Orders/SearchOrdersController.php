@@ -1,13 +1,13 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers\Search;
+namespace Larasell\Admin\Http\Controllers\Orders;
 
 use Illuminate\Http\JsonResponse;
 use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Data\ViewModel\Search\SearchMatchData;
 use Larasell\Admin\Data\ViewModel\Search\SearchResultData;
 use Larasell\Admin\Http\Requests\SearchRequest;
-use Larasell\Admin\Search\OrderSearch;
+use Larasell\Admin\Search\Orders\OrderSearch;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Order;
 

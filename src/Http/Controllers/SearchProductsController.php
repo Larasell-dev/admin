@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Http\Controllers\Search;
+namespace Larasell\Admin\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -9,7 +9,7 @@ use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Data\ViewModel\Search\SearchMatchData;
 use Larasell\Admin\Data\ViewModel\Search\SearchResultData;
 use Larasell\Admin\Http\Requests\SearchRequest;
-use Larasell\Admin\Search\ProductSearch;
+use Larasell\Admin\Search\Products\ProductSearch;
 use Larasell\Admin\Search\SearchQuery;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Product;

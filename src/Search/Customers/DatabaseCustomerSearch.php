@@ -1,8 +1,9 @@
 <?php
 
-namespace Larasell\Admin\Search;
+namespace Larasell\Admin\Search\Customers;
 
 use Illuminate\Support\Collection;
+use Larasell\Admin\Search\SearchQuery;
 use Larasell\Larasell\Models\Customer;
 
 /**
