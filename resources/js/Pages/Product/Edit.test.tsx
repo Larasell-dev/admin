@@ -6,7 +6,7 @@ import { render } from "vitest-browser-react";
 import { UnsavedChangesToastHost } from "../../Components/UnsavedChangesToast";
 import Edit from "./Edit";
 
-type Props = Larasell.Admin.Data.View.EditProductPageData;
+type Props = Parameters<typeof Edit>[0];
 type ContentLocale = Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
 
 const english = { value: "en", label: "English" };

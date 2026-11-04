@@ -9,11 +9,14 @@ import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Categories/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
+import type { SharedProps } from "../../types";
 
 // The server sends a null category, and none of its urls, when the address names one that is gone.
-type Props =
+type Props = (
   | Larasell.Admin.Data.View.Categories.CategoryPageData
-  | Larasell.Admin.Data.View.Categories.MissingCategoryPageData;
+  | Larasell.Admin.Data.View.Categories.MissingCategoryPageData
+) &
+  Pick<SharedProps, "contentLocale">;
 
 export default function Show(props: Props) {
   return (
@@ -39,7 +42,7 @@ export default function Show(props: Props) {
             <Form
               // Inertia keeps this page mounted when moving between categories or languages, and the
               // tree's menu can hide or unhide this one; remounting resets the fields to the new values.
-              key={`${props.category.id}-${props.category.visible}-${props.contentLocale.current}`}
+              key={`${props.category.id}-${props.category.visible}-${props.contentLocale?.current}`}
               action={props.updateUrl}
               method="put"
               // The saved values become the new baseline, so the form is no longer dirty.

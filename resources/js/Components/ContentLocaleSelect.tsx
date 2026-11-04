@@ -9,10 +9,14 @@ type ContentLocale = Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleDa
  * in it. It is disabled while a form on the page has unsaved changes, which switching would drop,
  * wherever the select sits. Left out while there is only one language.
  */
-export default function ContentLocaleSelect({ contentLocale }: { contentLocale: ContentLocale }) {
+export default function ContentLocaleSelect({
+  contentLocale,
+}: {
+  contentLocale: ContentLocale | null;
+}) {
   const unsavedChanges = useUnsavedChanges();
 
-  if (contentLocale.options.length < 2) return null;
+  if (!contentLocale || contentLocale.options.length < 2) return null;
 
   return (
     <div className="w-40">

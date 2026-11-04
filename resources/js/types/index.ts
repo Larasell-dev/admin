@@ -5,6 +5,8 @@ export type SharedProps = {
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;
+  /** The language content is edited in, and the others to switch to. Null for guests. */
+  contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData | null;
   /** Signs in with a POST; the session expired dialog posts JSON to it. */
   loginUrl: string;
 };

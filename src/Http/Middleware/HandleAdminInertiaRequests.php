@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\Navigation;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,6 +47,10 @@ class HandleAdminInertiaRequests extends Middleware
                     'avatarUrl' => $admin->avatarUrl(),
                 ] : null;
             },
+            // On every page, so the command menu can switch it anywhere, e.g. on a table it names.
+            'contentLocale' => fn (): ?ContentLocaleData => $request->user('larasell-admin') instanceof Admin
+                ? ContentLocaleData::of(app(ContentLocaleResolver::class)->resolve($request))
+                : null,
             'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),
             'loginUrl' => fn (): string => route('larasell.admin.login.store'),

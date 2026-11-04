@@ -60,6 +60,31 @@ it('edits products in the default locale until the admin picks another, and offe
         ->assertInertia(fn (AssertableInertia $page) => $page->where('contentLocale.current', 'en'));
 });
 
+it('offers the content locale on every page, so it can be switched from anywhere', function () {
+    switchContentLocale('de');
+
+    foreach ([route('larasell.admin.home'), route('larasell.admin.orders.index'), route('larasell.admin.profile')] as $url) {
+        $this->get($url)
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('contentLocale', [
+                'current' => 'de',
+                'options' => [
+                    ['value' => 'en', 'label' => 'English'],
+                    ['value' => 'de', 'label' => 'German'],
+                ],
+                'switchUrl' => route('larasell.admin.content-locale.update'),
+            ]));
+    }
+});
+
+it('offers no content locale to guests', function () {
+    auth('larasell-admin')->logout();
+
+    $this->get(route('larasell.admin.login'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('contentLocale', null));
+});
+
 it('goes back to the page the locale was picked on', function () {
     $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
 
@@ -272,6 +297,10 @@ it('only edits products in the default locale without content translations, and 
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.name', 'Boots')
             ->where('contentLocale.current', 'en')
+            ->where('contentLocale.options', [['value' => 'en', 'label' => 'English']]));
+
+    $this->get(route('larasell.admin.home'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('contentLocale.options', [['value' => 'en', 'label' => 'English']]));
 
     $this->put(route('larasell.admin.content-locale.update'), ['locale' => 'de'])->assertSessionHasErrors('locale');

@@ -8,8 +8,10 @@ import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Categories/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
+import type { SharedProps } from "../../types";
 
-type Props = Larasell.Admin.Data.View.Categories.CreateCategoryPageData;
+type Props = Larasell.Admin.Data.View.Categories.CreateCategoryPageData &
+  Pick<SharedProps, "contentLocale">;
 
 export default function Create({
   categories,
@@ -40,7 +42,7 @@ export default function Create({
           <Form
             // Inertia keeps this page mounted when only the parent or the language changes;
             // remounting empties the fields.
-            key={`${parent?.id ?? "root"}-${contentLocale.current}`}
+            key={`${parent?.id ?? "root"}-${contentLocale?.current}`}
             action={storeUrl}
             method="post"
           >

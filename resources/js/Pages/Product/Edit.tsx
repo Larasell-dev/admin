@@ -4,8 +4,9 @@ import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/ProductForm";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
+import type { SharedProps } from "../../types";
 
-type Props = Larasell.Admin.Data.View.EditProductPageData;
+type Props = Larasell.Admin.Data.View.EditProductPageData & Pick<SharedProps, "contentLocale">;
 
 export default function Edit({
   product,
@@ -20,7 +21,7 @@ export default function Edit({
     <Form
       // Inertia keeps this page mounted when moving between products or languages; remounting
       // resets the fields to the new values.
-      key={`${updateUrl}-${contentLocale.current}`}
+      key={`${updateUrl}-${contentLocale?.current}`}
       action={updateUrl}
       method="put"
       // The saved values become the new baseline, so the form is no longer dirty.
