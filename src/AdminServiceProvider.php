@@ -25,6 +25,7 @@ use Larasell\Admin\ContentLocale\SessionContentLocaleResolver;
 use Larasell\Admin\ContentLocale\StoreLocales;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
+use Larasell\Admin\Http\Middleware\LogLicensingPlan;
 use Larasell\Admin\Models\Admin;
 use Larasell\Admin\ServiceProviders\ApiTokenServiceProvider;
 use Larasell\Admin\ServiceProviders\AuditServiceProvider;
@@ -74,7 +75,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'larasell-admin');
 
-        Route::middleware(['web', HandleAdminInertiaRequests::class])
+        Route::middleware(['web', LogLicensingPlan::class, HandleAdminInertiaRequests::class])
             ->prefix(config('larasell.admin.panel.path'))
             ->name('larasell.admin.')
             ->withHead(title: AdminPanel::TITLE)
