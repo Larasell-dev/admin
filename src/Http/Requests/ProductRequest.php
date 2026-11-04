@@ -3,9 +3,9 @@
 namespace Larasell\Admin\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
+use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Rules\Barcode;
 use Larasell\Admin\Rules\Slug;
 use Larasell\Larasell\Barcode as LarasellBarcode;
@@ -35,9 +35,10 @@ class ProductRequest extends FormRequest
                 'string',
                 'max:255',
                 new Slug,
-                // The storefront finds products by their slug in the current locale. Updating
-                // ignores the product's own slug; creating has no product, so ignores nothing.
-                Rule::unique(Product::class, 'slug->'.App::currentLocale())->ignore($this->route('product')),
+                // The storefront finds products by their slug in each locale, so it only needs to be
+                // unique in the content locale. Updating ignores the product's own slug; creating
+                // has no product, so ignores nothing.
+                Rule::unique(Product::class, 'slug->'.app(ContentLocaleResolver::class)->resolve($this)->value)->ignore($this->route('product')),
             ],
             'status' => ['required', Rule::enum(Visibility::class)],
             // Optional, since digital products have neither. The units always come with the

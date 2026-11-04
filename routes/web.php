@@ -6,6 +6,7 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\AdminController;
 use Larasell\Admin\Http\Controllers\AvatarController;
+use Larasell\Admin\Http\Controllers\ContentLocale\SwitchContentLocaleController;
 use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
 use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
 use Larasell\Admin\Http\Controllers\HomeController;
@@ -35,6 +36,7 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::put('settings/admins/{admin}', [AdminController::class, 'update'])->name('settings.admins.update');
     Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
+    Route::put('content-locale', SwitchContentLocaleController::class)->name('content-locale.update');
     Route::post('logout', LogoutController::class)->name('logout');
 });
 

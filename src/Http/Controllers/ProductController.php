@@ -3,12 +3,14 @@
 namespace Larasell\Admin\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\App;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Data\View\CreateProductPageData;
 use Larasell\Admin\Data\View\EditProductPageData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryOptionData;
+use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
 use Larasell\Larasell\Models\Category;
@@ -23,7 +25,7 @@ use Laravel\Head\Facades\Head;
  */
 class ProductController
 {
-    public function create(): Response
+    public function create(Request $request, ContentLocaleResolver $contentLocale): Response
     {
         return Inertia::render('Product/Create', new CreateProductPageData(
             storeUrl: route('larasell.admin.products.store'),
@@ -31,18 +33,21 @@ class ProductController
             categories: $this->categories(),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
+            contentLocale: ContentLocaleData::of($contentLocale->resolve($request)),
         ));
     }
 
     /**
-     * Creates a product with the name and slug in the current locale. The form has no price
+     * Creates a product with the name and slug in the content locale. The form has no price
      * yet, and every product needs one, so it starts at 0.
      */
-    public function store(ProductRequest $request): RedirectResponse
+    public function store(ProductRequest $request, ContentLocaleResolver $contentLocale): RedirectResponse
     {
+        $locale = $contentLocale->resolve($request)->value;
+
         $product = Product::create([
-            'name' => Translatable::fromString($request->validated('name')),
-            'slug' => Translatable::fromString($request->validated('slug')),
+            'name' => Translatable::fromString($request->validated('name'), $locale),
+            'slug' => Translatable::fromString($request->validated('slug'), $locale),
             'status' => $request->validated('status'),
             'weight' => $request->weight(),
             'dimensions' => $request->dimensions(),
@@ -59,26 +64,29 @@ class ProductController
         return redirect()->route('larasell.admin.products.edit', $product);
     }
 
-    public function edit(Product $product): Response
+    public function edit(Request $request, Product $product, ContentLocaleResolver $contentLocale): Response
     {
-        Head::title($product->name->get());
+        $locale = $contentLocale->resolve($request);
+
+        Head::title($product->name->get($locale->value));
 
         return Inertia::render('Product/Edit', new EditProductPageData(
-            product: ProductDetailData::fromModel($product),
+            product: ProductDetailData::fromModel($product, $locale),
             updateUrl: route('larasell.admin.products.update', $product),
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories(),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
+            contentLocale: ContentLocaleData::of($locale),
         ));
     }
 
     /**
-     * Changes the name and slug in the current locale and keeps their other translations.
+     * Changes the name and slug in the content locale and keeps their other translations.
      */
-    public function update(ProductRequest $request, Product $product): RedirectResponse
+    public function update(ProductRequest $request, Product $product, ContentLocaleResolver $contentLocale): RedirectResponse
     {
-        $locale = App::currentLocale();
+        $locale = $contentLocale->resolve($request)->value;
 
         // The product checks each quantity limit against the other one it already has, so
         // clearing both first lets a new range lie wholly above or below the old one.

@@ -119,8 +119,13 @@ export default function ProductForm({
 }
 
 function GeneralFields({ product, errors }: { product?: Product; errors: Errors }) {
-  // A new product's slug follows its name; an existing one keeps the slug its links use.
-  const slug = useCoupledField([slugify, truncate(255), slugify], { enabled: !product });
+  // A new product's slug follows its name, as does one in a language it has no slug in yet; an
+  // existing one keeps the slug its links use.
+  const slug = useCoupledField([slugify, truncate(255), slugify], {
+    enabled: !product || product.slug === null,
+  });
+  // Untranslated fields stay empty and show what the store shows instead.
+  const untranslated = product?.name === null;
 
   return (
     <Stack spacing={5}>
@@ -128,13 +133,19 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
           <Field label="Name" name="name" error={errors.name}>
-            <Input {...slug.source} defaultValue={product?.name} autoComplete="off" />
+            <Input
+              {...slug.source}
+              defaultValue={product?.name ?? undefined}
+              placeholder={untranslated ? product.fallbackName : undefined}
+              autoComplete="off"
+            />
           </Field>
 
           <Field label="Slug" name="slug" error={errors.slug}>
             <Input
               {...slug.target}
-              defaultValue={product?.slug}
+              defaultValue={product?.slug ?? undefined}
+              placeholder={product?.slug === null ? product.fallbackSlug : undefined}
               autoComplete="off"
               spellCheck={false}
             />

@@ -19,6 +19,10 @@ use Larasell\Admin\Console\MakeAuditRecordCommand;
 use Larasell\Admin\Console\MakeTableCommand;
 use Larasell\Admin\Console\PruneAuditLogCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
+use Larasell\Admin\ContentLocale\AvailableLocales;
+use Larasell\Admin\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\ContentLocale\SessionContentLocaleResolver;
+use Larasell\Admin\ContentLocale\StoreLocales;
 use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Models\Admin;
@@ -54,6 +58,11 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->app->singleton(AdminPanel::class);
         $this->app->singleton(Navigation::class);
+
+        // Which locales content is edited in, and how a request picks one. Apps rebind them, e.g.
+        // to take both from a sales channel.
+        $this->app->bind(AvailableLocales::class, StoreLocales::class);
+        $this->app->bind(ContentLocaleResolver::class, SessionContentLocaleResolver::class);
     }
 
     public function boot(): void
