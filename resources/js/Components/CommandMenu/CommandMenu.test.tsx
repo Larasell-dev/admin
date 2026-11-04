@@ -469,8 +469,10 @@ describe("views that search on their own", () => {
     await openMenu();
     await choose("Look up");
 
-    await expect.element(page.getByText("No results")).not.toBeInTheDocument();
+    // Nothing below the search until there is one.
+    await expect.element(page.getByRole("listbox")).not.toBeInTheDocument();
     await search().fill("a");
+    await expect.element(page.getByRole("listbox")).toBeInTheDocument();
     await expect.element(page.getByText("Searching…")).toBeVisible();
 
     loading = false;
