@@ -130,3 +130,8 @@ export const searchCommands: CommandDefinition[] = [
     placeholder: "Search by name",
   }),
 ];
+
+/** Not built yet: adds a command for each search the server shares. */
+export function SearchCommands() {
+  return null;
+}

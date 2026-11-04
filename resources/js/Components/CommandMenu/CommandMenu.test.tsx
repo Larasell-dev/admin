@@ -8,7 +8,7 @@ import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
-import { searchCommands } from "./searchCommands";
+import { SearchCommands } from "./searchCommands";
 import { themeCommand } from "./themeCommand";
 
 const cleanups: Array<() => void> = [];
@@ -484,12 +484,18 @@ describe("views that search on their own", () => {
 });
 
 describe("searching on the server", () => {
-  const searchUrls = {
-    products: "/admin/search/products",
-    categories: "/admin/search/categories",
-    orders: "/admin/search/orders",
-    customers: "/admin/search/customers",
-  };
+  const search_ = (id: string, label: string, icon: string) => ({
+    id,
+    label,
+    icon,
+    placeholder: `Search ${id}`,
+    url: `/admin/search/${id}`,
+  });
+  const searches = [
+    search_("products", "Search products", "ShoppingBag"),
+    search_("categories", "Search categories", "Folders"),
+    search_("gift-cards", "Search gift cards", "Gift"),
+  ];
 
   function respondWith(results: Larasell.Admin.Data.ViewModel.Search.SearchResultData[]) {
     return vi.spyOn(window, "fetch").mockImplementation(async () => Response.json({ results }));
@@ -506,8 +512,7 @@ describe("searching on the server", () => {
       { id: 2, label: "Boots", url: "/admin/products/2/edit", match: null },
     ]);
     const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
-    register(...searchCommands);
-    await renderMenu(undefined, { searchUrls });
+    await renderMenu(SearchCommands, { commandMenu: { searches } });
     await openMenu();
 
     // Searching the root doesn't search the server.
@@ -531,36 +536,24 @@ describe("searching on the server", () => {
     await expect.element(menu()).not.toBeInTheDocument();
   });
 
-  it("offers a search for each resource whose module is turned on", async () => {
-    register(...searchCommands);
-    await renderMenu(undefined, { searchUrls: { orders: searchUrls.orders } });
+  it("offers a command for each search the server shares, at its own url", async () => {
+    const fetch = respondWith([]);
+    await renderMenu(SearchCommands, { commandMenu: { searches } });
     await openMenu();
 
-    expect(options()).toEqual(["Search orders"]);
+    expect(options()).toEqual(["Search products", "Search categories", "Search gift cards"]);
+
+    await choose("Search gift cards");
+    await expect.element(search()).toHaveAttribute("placeholder", "Search gift-cards");
+    await search().fill("ada");
+
+    await expect.poll(() => fetch.mock.calls.at(-1)?.[0]).toBe("/admin/search/gift-cards?q=ada");
   });
 
-  it("searches orders, customers and categories at their own urls", async () => {
-    const fetch = respondWith([]);
-    register(...searchCommands);
-    await renderMenu(undefined, { searchUrls });
+  it("offers no searches to guests", async () => {
+    await renderMenu(SearchCommands, { commandMenu: null });
     await openMenu();
 
-    expect(options()).toEqual([
-      "Search products",
-      "Search categories",
-      "Search orders",
-      "Search customers",
-    ]);
-
-    for (const [name, url] of [
-      ["Search categories", searchUrls.categories],
-      ["Search orders", searchUrls.orders],
-      ["Search customers", searchUrls.customers],
-    ]) {
-      await choose(name);
-      await search().fill("ada");
-      await expect.poll(() => fetch.mock.calls.at(-1)?.[0]).toBe(`${url}?q=ada`);
-      await userEvent.keyboard("{Escape}{Escape}");
-    }
+    await expect.element(page.getByText("No results")).toBeVisible();
   });
 });
