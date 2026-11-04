@@ -3,16 +3,16 @@
 namespace Larasell\Admin\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Data\View\CreateProductPageData;
 use Larasell\Admin\Data\View\EditProductPageData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryOptionData;
 use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Models\ProductImage;
@@ -25,7 +25,7 @@ use Laravel\Head\Facades\Head;
  */
 class ProductController
 {
-    public function create(Request $request, ContentLocaleResolver $contentLocale): Response
+    public function create(#[CurrentContentLocale] Locale $locale): Response
     {
         return Inertia::render('Product/Create', new CreateProductPageData(
             storeUrl: route('larasell.admin.products.store'),
@@ -33,7 +33,7 @@ class ProductController
             categories: $this->categories(),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            contentLocale: ContentLocaleData::of($contentLocale->resolve($request)),
+            contentLocale: ContentLocaleData::of($locale),
         ));
     }
 
@@ -41,13 +41,11 @@ class ProductController
      * Creates a product with the name and slug in the content locale. The form has no price
      * yet, and every product needs one, so it starts at 0.
      */
-    public function store(ProductRequest $request, ContentLocaleResolver $contentLocale): RedirectResponse
+    public function store(ProductRequest $request, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
-        $locale = $contentLocale->resolve($request)->value;
-
         $product = Product::create([
-            'name' => Translatable::fromString($request->validated('name'), $locale),
-            'slug' => Translatable::fromString($request->validated('slug'), $locale),
+            'name' => Translatable::fromString($request->validated('name'), $locale->value),
+            'slug' => Translatable::fromString($request->validated('slug'), $locale->value),
             'status' => $request->validated('status'),
             'weight' => $request->weight(),
             'dimensions' => $request->dimensions(),
@@ -64,10 +62,8 @@ class ProductController
         return redirect()->route('larasell.admin.products.edit', $product);
     }
 
-    public function edit(Request $request, Product $product, ContentLocaleResolver $contentLocale): Response
+    public function edit(Product $product, #[CurrentContentLocale] Locale $locale): Response
     {
-        $locale = $contentLocale->resolve($request);
-
         Head::title($product->name->get($locale->value));
 
         return Inertia::render('Product/Edit', new EditProductPageData(
@@ -84,15 +80,13 @@ class ProductController
     /**
      * Changes the name and slug in the content locale and keeps their other translations.
      */
-    public function update(ProductRequest $request, Product $product, ContentLocaleResolver $contentLocale): RedirectResponse
+    public function update(ProductRequest $request, Product $product, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
-        $locale = $contentLocale->resolve($request)->value;
-
         // The product checks each quantity limit against the other one it already has, so
         // clearing both first lets a new range lie wholly above or below the old one.
         $product->fill(['min_quantity' => null, 'max_quantity' => null])->update([
-            'name' => $product->name->with($locale, $request->validated('name')),
-            'slug' => $product->slug->with($locale, $request->validated('slug')),
+            'name' => $product->name->with($locale->value, $request->validated('name')),
+            'slug' => $product->slug->with($locale->value, $request->validated('slug')),
             'status' => $request->validated('status'),
             'weight' => $request->weight(),
             'dimensions' => $request->dimensions(),
