@@ -91,6 +91,7 @@ declare namespace Larasell.Admin.Data.View.Categories {
     availableProductsUrl: string;
     addProductUrl: string;
     createProductUrl: string | null;
+    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
@@ -99,6 +100,7 @@ declare namespace Larasell.Admin.Data.View.Categories {
     indexUrl: string;
     parent: Larasell.Admin.Data.ViewModel.Categories.CategoryDetailData | null;
     createProductUrl: string | null;
+    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type MissingCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
@@ -194,8 +196,10 @@ declare namespace Larasell.Admin.Data.ViewModel.Categories {
   };
   export type CategoryDetailData = {
     id: number;
-    name: string;
-    slug: string;
+    name: string | null;
+    slug: string | null;
+    fallbackName: string;
+    fallbackSlug: string;
     visible: boolean;
   };
   export type CategoryOptionData = {

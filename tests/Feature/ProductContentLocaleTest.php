@@ -313,3 +313,32 @@ it('also limits the locales of an AvailableLocales an app binds to the default o
             ->where('contentLocale.current', 'fr')
             ->where('contentLocale.options', [['value' => 'fr', 'label' => 'French']]));
 });
+
+it('offers the categories by their name in the picked locale', function () {
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    Category::create(['name' => ['en' => 'Shoes', 'de' => 'Schuhe'], 'slug' => ['en' => 'shoes', 'de' => 'schuhe']]);
+    Category::create(['name' => ['en' => 'Bags'], 'slug' => ['en' => 'bags']]);
+
+    switchContentLocale('de');
+
+    $names = fn (AssertableInertia $page) => $page
+        ->where('categories.0.name', 'Schuhe')
+        // Untranslated, it shows what the store shows.
+        ->where('categories.1.name', 'Bags');
+
+    $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($names);
+    $this->get(route('larasell.admin.products.create'))->assertInertia($names);
+});
+
+it('lists the products by their name in the picked locale', function () {
+    translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    translatedProduct(['en' => 'Socks'], ['en' => 'socks']);
+
+    switchContentLocale('de');
+
+    $this->get(route('larasell.admin.products.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('table.rows.0.name', 'Stiefel')
+            // Untranslated, it shows what the store shows.
+            ->where('table.rows.1.name', 'Socks'));
+});

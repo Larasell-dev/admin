@@ -3,9 +3,10 @@
 namespace Larasell\Admin\Http\Requests\Categories;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
+use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Rules\Slug;
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 
@@ -14,7 +15,7 @@ class CategoryRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function rules(#[CurrentContentLocale] Locale $locale): array
     {
         $category = $this->route('category');
 
@@ -25,8 +26,9 @@ class CategoryRequest extends FormRequest
                 'string',
                 'max:255',
                 new Slug,
-                // The storefront finds categories by their slug in the current locale.
-                Rule::unique(Category::class, 'slug->'.App::currentLocale())
+                // The storefront finds categories by their slug in each locale, so it only needs to
+                // be unique in the content locale.
+                Rule::unique(Category::class, 'slug->'.$locale->value)
                     ->ignore($category instanceof Category ? $category->id : null),
             ],
             'status' => ['required', Rule::enum(Visibility::class)],

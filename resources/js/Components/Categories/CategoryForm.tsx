@@ -7,7 +7,7 @@ import VisibilityField from "../VisibilityField";
 
 type Category = Pick<
   Larasell.Admin.Data.ViewModel.Categories.CategoryDetailData,
-  "name" | "slug" | "visible"
+  "name" | "slug" | "fallbackName" | "fallbackSlug" | "visible"
 >;
 
 /**
@@ -16,7 +16,11 @@ type Category = Pick<
  */
 export default function CategoryForm({ category }: { category?: Category }) {
   const errors = useFormContext()?.errors ?? {};
-  const slug = useCoupledField([slugify, truncate(255), slugify], { enabled: !category });
+  // A new category's slug follows its name, as does one in a language it has no slug in yet; an
+  // existing one keeps the slug its links use.
+  const slug = useCoupledField([slugify, truncate(255), slugify], {
+    enabled: !category || category.slug === null,
+  });
 
   return (
     <Stack spacing={5}>
@@ -25,13 +29,20 @@ export default function CategoryForm({ category }: { category?: Category }) {
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
           <Field label="Name" name="name" error={errors.name}>
-            <Input {...slug.source} defaultValue={category?.name} autoComplete="off" />
+            {/* Untranslated fields stay empty and show what the store shows instead. */}
+            <Input
+              {...slug.source}
+              defaultValue={category?.name ?? undefined}
+              placeholder={category?.name === null ? category.fallbackName : undefined}
+              autoComplete="off"
+            />
           </Field>
 
           <Field label="Slug" name="slug" error={errors.slug}>
             <Input
               {...slug.target}
-              defaultValue={category?.slug}
+              defaultValue={category?.slug ?? undefined}
+              placeholder={category?.slug === null ? category.fallbackSlug : undefined}
               autoComplete="off"
               spellCheck={false}
             />

@@ -4,19 +4,21 @@ namespace Larasell\Admin\Http\Controllers\Categories;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Actions\Categories\DeleteCategory;
+use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Data\View\Categories\CategoriesPageData;
 use Larasell\Admin\Data\View\Categories\CategoryPageData;
 use Larasell\Admin\Data\View\Categories\CreateCategoryPageData;
 use Larasell\Admin\Data\View\Categories\MissingCategoryPageData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryDetailData;
+use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Http\Requests\Categories\CategoryRequest;
 use Larasell\Admin\Tables\Categories\CategoryProducts;
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Translatable;
@@ -29,7 +31,7 @@ class CategoryController
     /**
      * Opens the top-most root category. Only a store without categories sees the index itself.
      */
-    public function index(): Response|RedirectResponse
+    public function index(#[CurrentContentLocale] Locale $locale): Response|RedirectResponse
     {
         $first = Category::query()->whereNull('parent_id')->orderBy('position')->orderBy('id')->first();
 
@@ -38,7 +40,7 @@ class CategoryController
         }
 
         return Inertia::render('Category/Index', new CategoriesPageData(
-            categories: $this->tree(),
+            categories: $this->tree($locale),
             createUrl: route('larasell.admin.categories.create'),
         ));
     }
@@ -47,7 +49,7 @@ class CategoryController
      * Shows the category to edit. A category that no longer exists, such as one deleted in
      * another tab, keeps the tree and explains itself on the page instead of a bare 404 page.
      */
-    public function show(Request $request, string $category): SymfonyResponse
+    public function show(Request $request, string $category, #[CurrentContentLocale] Locale $locale): SymfonyResponse
     {
         $category = Category::query()->find($category);
 
@@ -56,57 +58,59 @@ class CategoryController
 
             // Inertia still renders a page that comes with an error status.
             return Inertia::render('Category/Show', new MissingCategoryPageData(
-                categories: $this->tree(),
+                categories: $this->tree($locale),
                 createUrl: route('larasell.admin.categories.create'),
             ))->toResponse($request)->setStatusCode(404);
         }
 
-        Head::title($category->name->get());
+        Head::title($category->name->get($locale->value));
 
         return Inertia::render('Category/Show', new CategoryPageData(
-            categories: $this->tree(),
+            categories: $this->tree($locale),
             createUrl: route('larasell.admin.categories.create'),
-            category: CategoryDetailData::fromModel($category),
+            category: CategoryDetailData::fromModel($category, $locale),
             updateUrl: route('larasell.admin.categories.update', $category),
             products: CategoryProducts::make($category),
             availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
             addProductUrl: route('larasell.admin.categories.products.store', $category),
             createProductUrl: Product::query()->exists() ? null : $this->createProductUrl(),
+            contentLocale: ContentLocaleData::of($locale),
         ))->toResponse($request);
     }
 
     /**
      * Creates a root category, or one inside the category given as ?parent=.
      */
-    public function create(Request $request): Response
+    public function create(Request $request, #[CurrentContentLocale] Locale $locale): Response
     {
         $parent = $request->filled('parent')
             ? Category::query()->findOrFail($request->integer('parent'))
             : null;
 
         if ($parent !== null) {
-            Head::title("New category in {$parent->name->get()}");
+            Head::title("New category in {$parent->name->get($locale->value)}");
         }
 
         return Inertia::render('Category/Create', new CreateCategoryPageData(
-            categories: $this->tree(),
+            categories: $this->tree($locale),
             createUrl: route('larasell.admin.categories.create'),
             storeUrl: route('larasell.admin.categories.store'),
             indexUrl: route('larasell.admin.categories.index'),
-            parent: $parent ? CategoryDetailData::fromModel($parent) : null,
+            parent: $parent ? CategoryDetailData::fromModel($parent, $locale) : null,
             createProductUrl: $this->createProductUrl(),
+            contentLocale: ContentLocaleData::of($locale),
         ));
     }
 
     /**
-     * Creates a category, inside its parent when given, with the name and slug in the current locale.
+     * Creates a category, inside its parent when given, with the name and slug in the content locale.
      */
-    public function store(CategoryRequest $request): RedirectResponse
+    public function store(CategoryRequest $request, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
         $category = Category::create([
             'parent_id' => $request->validated('parent_id'),
-            'name' => Translatable::fromString($request->validated('name')),
-            'slug' => Translatable::fromString($request->validated('slug')),
+            'name' => Translatable::fromString($request->validated('name'), $locale->value),
+            'slug' => Translatable::fromString($request->validated('slug'), $locale->value),
             'status' => $request->validated('status'),
         ]);
 
@@ -114,15 +118,13 @@ class CategoryController
     }
 
     /**
-     * Changes the name and slug in the current locale and keeps their other translations.
+     * Changes the name and slug in the content locale and keeps their other translations.
      */
-    public function update(CategoryRequest $request, Category $category): RedirectResponse
+    public function update(CategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
-        $locale = App::currentLocale();
-
         $category->update([
-            'name' => $category->name->with($locale, $request->validated('name')),
-            'slug' => $category->slug->with($locale, $request->validated('slug')),
+            'name' => $category->name->with($locale->value, $request->validated('name')),
+            'slug' => $category->slug->with($locale->value, $request->validated('slug')),
             'status' => $request->validated('status'),
         ]);
 
@@ -161,11 +163,13 @@ class CategoryController
     }
 
     /**
+     * The store's categories for the sidebar, named in the content locale.
+     *
      * @return array<int, CategoryData>
      */
-    protected function tree(): array
+    protected function tree(Locale $locale): array
     {
         // One query for the whole tree; the Category relations would query once per level.
-        return CategoryData::tree(Category::query()->orderBy('position')->orderBy('id')->get());
+        return CategoryData::tree(Category::query()->orderBy('position')->orderBy('id')->get(), $locale);
     }
 }
