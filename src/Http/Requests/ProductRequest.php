@@ -5,12 +5,13 @@ namespace Larasell\Admin\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
-use Larasell\Admin\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Rules\Barcode;
 use Larasell\Admin\Rules\Slug;
 use Larasell\Larasell\Barcode as LarasellBarcode;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
 use Larasell\Larasell\Models\Category;
@@ -26,7 +27,7 @@ class ProductRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function rules(#[CurrentContentLocale] Locale $locale): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
@@ -38,7 +39,7 @@ class ProductRequest extends FormRequest
                 // The storefront finds products by their slug in each locale, so it only needs to be
                 // unique in the content locale. Updating ignores the product's own slug; creating
                 // has no product, so ignores nothing.
-                Rule::unique(Product::class, 'slug->'.app(ContentLocaleResolver::class)->resolve($this)->value)->ignore($this->route('product')),
+                Rule::unique(Product::class, 'slug->'.$locale->value)->ignore($this->route('product')),
             ],
             'status' => ['required', Rule::enum(Visibility::class)],
             // Optional, since digital products have neither. The units always come with the
