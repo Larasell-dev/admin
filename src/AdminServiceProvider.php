@@ -21,6 +21,7 @@ use Larasell\Admin\Console\PruneAuditLogCommand;
 use Larasell\Admin\Console\RemoveAdminCommand;
 use Larasell\Admin\ContentLocale\AvailableLocales;
 use Larasell\Admin\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\ContentLocale\EntitledLocales;
 use Larasell\Admin\ContentLocale\SessionContentLocaleResolver;
 use Larasell\Admin\ContentLocale\StoreLocales;
 use Larasell\Admin\Http\Controllers\TableController;
@@ -34,6 +35,8 @@ use Larasell\Admin\ServiceProviders\CustomerServiceProvider;
 use Larasell\Admin\ServiceProviders\OrderServiceProvider;
 use Larasell\Admin\ServiceProviders\ProductServiceProvider;
 use Larasell\Chronicle\ChronicleServiceProvider;
+use Larasell\Larasell\Enums\Plan;
+use Larasell\Larasell\Facades\Entitlement;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
 use Laravel\Pennant\PennantServiceProvider;
@@ -66,11 +69,16 @@ class AdminServiceProvider extends ServiceProvider
         // to take both from a sales channel.
         $this->app->bind(AvailableLocales::class, StoreLocales::class);
         $this->app->bind(ContentLocaleResolver::class, SessionContentLocaleResolver::class);
+        // Extenders outlive rebinding, so apps' AvailableLocales are limited by the plan too.
+        $this->app->extend(AvailableLocales::class, fn (AvailableLocales $locales): AvailableLocales => new EntitledLocales($locales));
     }
 
     public function boot(): void
     {
         $this->configureAuth();
+
+        // Editing content in other locales than the default one.
+        Entitlement::define(EntitledLocales::ENTITLEMENT, Plan::Pro);
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'larasell-admin');

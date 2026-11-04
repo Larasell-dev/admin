@@ -6,6 +6,11 @@ locale: admins pick it with a select in the top right of the product pages, and 
 `larasell.locale.default`. This lets admins translate products without changing the panel's
 language.
 
+Picking another locale than the default needs a Pro plan: content translations are the
+`admin.content-translations` entitlement. On Free, which production shops without an active license
+get, the select is hidden and products are read and saved in `larasell.locale.default` only. Their
+other translations are kept.
+
 ## Who is affected
 
 - Apps whose `app.locale` differs from `larasell.locale.default`. Their admins used to see and
@@ -13,6 +18,8 @@ language.
 - Apps that edit translations by switching the app locale for admin requests, e.g. with a
   middleware that calls `App::setLocale()`. That no longer changes which translation the product
   pages edit.
+- Shops on the Free plan whose `app.locale` differs from `larasell.locale.default`. They used to
+  edit products in `app.locale` and can now only edit them in the default locale.
 
 Apps where `app.locale` and `larasell.locale.default` are the same, and that don't switch the locale
 for admin requests, are not affected.
