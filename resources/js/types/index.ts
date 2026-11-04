@@ -9,6 +9,8 @@ export type SharedProps = {
   contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData | null;
   /** Signs in with a POST; the session expired dialog posts JSON to it. */
   loginUrl: string;
+  /** The command menu's searches, of the modules that are turned on; null for guests. */
+  searchUrls: Partial<Record<"products" | "categories" | "orders" | "customers", string>> | null;
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;

@@ -38,26 +38,51 @@ export function Highlight({
 }
 
 /**
- * Where the search matched the text, for Highlight. Matches like the menu's filter: the search's
- * letters in order, ignoring case, with anything in between, so "oxfordshirt" marks both words
- * of "Oxford Shirt". Empty when the text doesn't match.
+ * Where the search matched the text, for Highlight. Ignores case and spaces, so "oxfordshirt"
+ * marks both words of "Oxford Shirt". Prefers the search's letters next to each other, like the
+ * server's searches match; otherwise marks them in order with anything in between, like the
+ * menu's filter. Empty when the text doesn't match.
  */
 export function matchRanges(text: string, search: string): Array<[start: number, end: number]> {
-  const haystack = text.toLowerCase();
+  const letters = search.toLowerCase().replace(/\s/g, "");
+  if (letters === "") return [];
+
+  // The text's letters without spaces, with where each one is in the text.
+  const lower = text.toLowerCase();
+  const positions: number[] = [];
+  let squeezed = "";
+  for (let index = 0; index < lower.length; index++) {
+    const letter = lower.charAt(index);
+    if (/\s/.test(letter)) continue;
+    positions.push(index);
+    squeezed += letter;
+  }
+
+  const at = squeezed.indexOf(letters);
+  const found =
+    at >= 0 ? positions.slice(at, at + letters.length) : inOrder(squeezed, letters, positions);
+
   const ranges: Array<[number, number]> = [];
-  let from = 0;
-
-  for (const letter of search.toLowerCase()) {
-    if (letter.trim() === "") continue;
-
-    const at = haystack.indexOf(letter, from);
-    if (at < 0) return [];
-
+  for (const index of found ?? []) {
     const last = ranges[ranges.length - 1];
-    if (last && last[1] === at) last[1] = at + 1;
-    else ranges.push([at, at + 1]);
-    from = at + 1;
+    if (last && last[1] === index) last[1] = index + 1;
+    else ranges.push([index, index + 1]);
   }
 
   return ranges;
+}
+
+/** Where each letter is found after the one before it, or null when one is missing. */
+function inOrder(squeezed: string, letters: string, positions: number[]): number[] | null {
+  const found: number[] = [];
+  let from = 0;
+
+  for (let index = 0; index < letters.length; index++) {
+    const at = squeezed.indexOf(letters.charAt(index), from);
+    if (at < 0) return null;
+    found.push(positions[at] ?? at);
+    from = at + 1;
+  }
+
+  return found;
 }

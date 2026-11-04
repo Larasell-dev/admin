@@ -16,6 +16,7 @@ import { overlayExclusive } from "../../utils/hotkeys";
 import {
   type CommandDefinition,
   type CommandFields,
+  type CommandHookState,
   type CommandItem,
   type CommandLabelState,
   commands,
@@ -37,12 +38,15 @@ const valueOf = (path: string[]) => path.join("\u001f");
 const filter = (_value: string, search: string, keywords?: string[]) =>
   defaultFilter(keywords?.join(" ") ?? "", search);
 
+/** What the menu shows of the open nested view besides its items. */
+type Shown = Pick<CommandFields, "placeholder" | "filterItems" | "loading"> & { label: string };
+
 type Actions = {
   view: View;
   openView: (path: string[], item: CommandFields) => void;
   run: (run: () => void) => void;
-  /** Called by the command whose nested view is open, with what the search shows. */
-  showView: (label: string, placeholder: string | undefined) => void;
+  /** Called by the command whose nested view is open, with the view's own fields. */
+  showView: (view: Shown) => void;
   /** Called by the command whose nested view is open once that view no longer exists. */
   leaveView: () => void;
 };
@@ -59,7 +63,9 @@ export default function CommandMenu() {
   const [views, setViews] = useState<View[]>([rootView]);
   const view = views[views.length - 1] ?? rootView;
   const nested = views.length > 1;
-  const [shown, setShown] = useState<{ label: string; placeholder?: string } | null>(null);
+  const [shown, setShown] = useState<Shown | null>(null);
+  // A view of items that are already the results of its search, e.g. from the server.
+  const searched = nested && shown?.filterItems === false;
 
   // From the views as they are when it applies: cmdk reports the highlight in the same update
   // that opens a nested view, which must not bring back the view it was opened from.
@@ -102,11 +108,12 @@ export default function CommandMenu() {
       setOpen(false);
       run();
     },
-    showView(label, placeholder) {
+    showView(next) {
       setShown((current) =>
-        current?.label === label && current.placeholder === placeholder
+        current &&
+        (Object.keys(next) as Array<keyof Shown>).every((key) => current[key] === next[key])
           ? current
-          : { label, placeholder },
+          : next,
       );
     },
     leaveView,
@@ -147,6 +154,7 @@ export default function CommandMenu() {
               key={views.length}
               label="Command menu"
               filter={filter}
+              shouldFilter={!searched}
               value={view.highlighted || undefined}
               onValueChange={(highlighted) => updateView({ highlighted })}
               onKeyDown={(event) => {
@@ -194,9 +202,12 @@ export default function CommandMenu() {
                 />
               </div>
               <Command.List className="max-h-80 scroll-py-1.5 overflow-y-auto p-1.5">
-                <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
-                  No results
-                </Command.Empty>
+                {/* A view that searches on its own has nothing to say before a search. */}
+                {!(searched && view.search === "") && (
+                  <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
+                    {nested && shown?.loading ? "Searching…" : "No results"}
+                  </Command.Empty>
+                )}
                 {definitions.map((definition) => (
                   // Keyed by kind too, so a command never switches between calling a hook and not.
                   <Entry
@@ -229,10 +240,10 @@ function HookEntry({
   actions,
 }: {
   id: string;
-  use: () => CommandFields | null;
+  use: (state: CommandHookState) => CommandFields | null;
   actions: Actions;
 }) {
-  const fields = use();
+  const fields = use({ search: actions.view.path[0] === id ? actions.view.search : null });
   const gone = fields === null && actions.view.path[0] === id;
 
   useEffect(() => {
@@ -273,7 +284,14 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
   const node = own ? find(command, view.path.slice(1)) : null;
 
   useLayoutEffect(() => {
-    if (node) actions.showView(textOf(node), node.placeholder);
+    if (node) {
+      actions.showView({
+        label: textOf(node),
+        placeholder: node.placeholder,
+        filterItems: node.filterItems,
+        loading: node.loading,
+      });
+    }
   });
   useEffect(() => {
     if (own && !node) actions.leaveView();
