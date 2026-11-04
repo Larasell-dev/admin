@@ -204,6 +204,29 @@ it("finds nested items from the root and runs them there", async () => {
   await expect.element(menu()).not.toBeInTheDocument();
 });
 
+it("leaves the items of a command searched only in its own view out of the root search", async () => {
+  register(switchTheme, {
+    id: "products",
+    label: "Search products",
+    searchItemsFromRoot: false,
+    items: [{ id: "boots", label: "Boots", run: () => run("boots") }],
+  });
+  await renderMenu();
+  await openMenu();
+
+  await search().fill("s");
+  expect(options()).not.toContain("Search productsBoots");
+  await expect.element(option("Search products")).toBeVisible();
+
+  await search().fill("boots");
+  await expect.element(page.getByText("No results")).toBeVisible();
+
+  await search().fill("");
+  await choose("Search products");
+  await search().fill("boots");
+  await expect.element(option("Boots")).toBeVisible();
+});
+
 it("shows why a command is disabled, and neither opens it nor finds its items", async () => {
   register(orders, { ...switchTheme, disabled: "Not right now" });
   await renderMenu();
