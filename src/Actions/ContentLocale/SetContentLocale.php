@@ -5,6 +5,7 @@ namespace Larasell\Admin\Actions\ContentLocale;
 use Illuminate\Http\Request;
 use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Payloads\ContentLocale\SetContentLocalePayload;
+use Larasell\Chronicle\Facades\Chronicle;
 
 class SetContentLocale
 {
@@ -18,6 +19,11 @@ class SetContentLocale
      */
     public function handle(SetContentLocalePayload $payload): void
     {
+        Chronicle::add('content_locale', [
+            'previous' => $this->resolver->resolve($this->request)->value,
+            'selected' => $payload->locale->value,
+        ]);
+
         $this->resolver->remember($this->request, $payload->locale);
     }
 }

@@ -8,6 +8,7 @@ use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\ContentLocale\AvailableLocales;
 use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Models\Admin;
+use Larasell\Chronicle\Facades\Chronicle;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
@@ -179,6 +180,19 @@ it('falls back to the default locale once the picked one is no longer supported'
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.name', 'Boots')
             ->where('contentLocale.current', 'en'));
+});
+
+it('logs which locale an admin picked and which one each request edits in', function () {
+    $chronicle = Chronicle::fake();
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+
+    switchContentLocale('de');
+
+    expect($chronicle->added())->toMatchArray(['content_locale.previous' => 'en', 'content_locale.selected' => 'de']);
+
+    $this->get(route('larasell.admin.products.edit', $boots))->assertOk();
+
+    expect($chronicle->added())->toMatchArray(['content_locale.current' => 'de']);
 });
 
 it('does not let guests pick a locale', function () {

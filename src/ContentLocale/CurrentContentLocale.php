@@ -5,6 +5,7 @@ namespace Larasell\Admin\ContentLocale;
 use Attribute;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Larasell\Chronicle\Facades\Chronicle;
 use Larasell\Larasell\Enums\Locale;
 
 /**
@@ -17,6 +18,11 @@ final class CurrentContentLocale implements ContextualAttribute
 {
     public static function resolve(self $attribute, Container $container): Locale
     {
-        return $container->make(ContentLocaleResolver::class)->resolve($container->make('request'));
+        $locale = $container->make(ContentLocaleResolver::class)->resolve($container->make('request'));
+
+        // Says which translation a request read or wrote, e.g. when a name changed in the wrong language.
+        Chronicle::add('content_locale.current', $locale->value);
+
+        return $locale;
     }
 }

@@ -32,6 +32,7 @@ use Larasell\Admin\ServiceProviders\CategoryServiceProvider;
 use Larasell\Admin\ServiceProviders\CustomerServiceProvider;
 use Larasell\Admin\ServiceProviders\OrderServiceProvider;
 use Larasell\Admin\ServiceProviders\ProductServiceProvider;
+use Larasell\Chronicle\ChronicleServiceProvider;
 use Laravel\Head\Facades\Head;
 use Laravel\Head\HeadServiceProvider;
 use Laravel\Pennant\PennantServiceProvider;
@@ -49,6 +50,7 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->app->register(HeadServiceProvider::class);
         $this->app->register(PennantServiceProvider::class);
+        $this->app->register(ChronicleServiceProvider::class);
         $this->app->register(AuditServiceProvider::class);
         $this->app->register(ProductServiceProvider::class);
         $this->app->register(CategoryServiceProvider::class);
