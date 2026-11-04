@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Data\ViewModel\Categories;
 
 use Illuminate\Support\Collection;
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 use Spatie\LaravelData\Data;
@@ -26,30 +27,30 @@ class CategoryOptionData extends Data
     ) {}
 
     /**
-     * Nests the categories under their parents, starting at the root categories.
+     * Nests the categories under their parents, starting at the root categories, named in the locale.
      *
      * @param  Collection<int, Category>  $categories
      * @return array<int, CategoryOptionData>
      */
-    public static function tree(Collection $categories): array
+    public static function tree(Collection $categories, Locale $locale): array
     {
-        return self::branch($categories->groupBy('parent_id'), null, (bool) config('larasell.admin.categories.enabled'));
+        return self::branch($categories->groupBy('parent_id'), null, (bool) config('larasell.admin.categories.enabled'), $locale);
     }
 
     /**
      * @param  Collection<array-key, Collection<int, Category>>  $byParent
      * @return array<int, CategoryOptionData>
      */
-    protected static function branch(Collection $byParent, ?int $parentId, bool $linked): array
+    protected static function branch(Collection $byParent, ?int $parentId, bool $linked, Locale $locale): array
     {
         // groupBy() keys categories without a parent by an empty string.
         return $byParent->get($parentId ?? '', collect())
             ->map(fn (Category $category): self => new self(
                 id: $category->id,
-                name: $category->name->get(),
+                name: $category->name->get($locale->value),
                 visible: $category->status === Visibility::Visible,
                 url: $linked ? route('larasell.admin.categories.show', $category) : null,
-                children: self::branch($byParent, $category->id, $linked),
+                children: self::branch($byParent, $category->id, $linked, $locale),
             ))
             ->values()
             ->all();

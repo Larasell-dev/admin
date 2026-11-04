@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Tables\Categories;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Tables\Actions\Action;
 use Larasell\Admin\Tables\Attributes\Remember;
@@ -37,8 +38,11 @@ class CategoryProducts extends Table
 
     public function columns(): array
     {
+        // Named in the content locale, like the category above them.
+        $locale = app(ContentLocaleResolver::class)->resolve(request())->value;
+
         return [
-            TextColumn::make('name')->map(fn (Translatable $name): string => $name->get()),
+            TextColumn::make('name')->map(fn (Translatable $name): string => $name->get($locale)),
             TextColumn::make('status', 'Visibility')
                 ->map(fn (Visibility $status): string => $status === Visibility::Visible ? 'Visible' : 'Hidden'),
         ];

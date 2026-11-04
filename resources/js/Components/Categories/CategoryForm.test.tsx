@@ -9,7 +9,13 @@ import UnsavedChangesToast, { UnsavedChangesToastHost } from "../UnsavedChangesT
 
 type Category = ComponentProps<typeof CategoryForm>["category"];
 
-const shoes = { name: "Shoes", slug: "shoes", visible: true };
+const shoes = {
+  name: "Shoes",
+  slug: "shoes",
+  fallbackName: "Shoes",
+  fallbackSlug: "shoes",
+  visible: true,
+};
 
 /** Renders the form for the category, or for a new one without it. */
 function renderPage(category?: Category) {
@@ -157,5 +163,26 @@ describe("slug", () => {
     await nameInput().fill("Boots");
     await expect.element(nameInput()).toHaveValue("Boots");
     await expect.element(slugInput()).toHaveValue("");
+  });
+});
+
+describe("translation", () => {
+  const untranslated = { ...shoes, name: null, slug: null };
+
+  it("leaves an untranslated name and slug empty and shows what the store shows instead", async () => {
+    await renderPage(untranslated);
+
+    await expect.element(nameInput()).toHaveValue("");
+    await expect.element(nameInput()).toHaveAttribute("placeholder", "Shoes");
+    await expect.element(slugInput()).toHaveValue("");
+    await expect.element(slugInput()).toHaveAttribute("placeholder", "shoes");
+  });
+
+  it("fills in an untranslated slug from the name", async () => {
+    await renderPage(untranslated);
+
+    await nameInput().fill("Schuhe");
+
+    await expect.element(slugInput()).toHaveValue("schuhe");
   });
 });

@@ -3,6 +3,7 @@ import { Button, EmptyState, Icon, Section, SectionStack } from "@larasell-dev/u
 import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
 
 import CategoryForm from "../../Components/Categories/CategoryForm";
+import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
@@ -18,8 +19,17 @@ export default function Show(props: Props) {
   return (
     <>
       <Page.Header
-        title={props.category?.name ?? "Category not found"}
-        actions={props.categories.length > 0 && <CategoryTreeTrigger />}
+        title={
+          props.category === null
+            ? "Category not found"
+            : (props.category.name ?? props.category.fallbackName)
+        }
+        actions={
+          <>
+            {props.category !== null && <ContentLocaleSelect contentLocale={props.contentLocale} />}
+            {props.categories.length > 0 && <CategoryTreeTrigger />}
+          </>
+        }
       />
       {props.category === null ? (
         <CategoryNotFound {...props} />
@@ -27,9 +37,9 @@ export default function Show(props: Props) {
         <Page.Body>
           <SectionStack>
             <Form
-              // Inertia keeps this page mounted when moving between categories, and the tree's
-              // menu can hide or unhide this one; remounting resets the fields to the new values.
-              key={`${props.category.id}-${props.category.visible}`}
+              // Inertia keeps this page mounted when moving between categories or languages, and the
+              // tree's menu can hide or unhide this one; remounting resets the fields to the new values.
+              key={`${props.category.id}-${props.category.visible}-${props.contentLocale.current}`}
               action={props.updateUrl}
               method="put"
               // The saved values become the new baseline, so the form is no longer dirty.

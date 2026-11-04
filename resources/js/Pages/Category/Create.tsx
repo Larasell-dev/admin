@@ -2,6 +2,7 @@ import { Form } from "@inertiajs/react";
 import { Section, SectionStack } from "@larasell-dev/ui";
 
 import CategoryForm from "../../Components/Categories/CategoryForm";
+import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
@@ -16,23 +17,30 @@ export default function Create({
   indexUrl,
   parent,
   createProductUrl,
+  contentLocale,
 }: Props) {
   return (
     <>
       <Page.Header
-        title={parent ? `New category in ${parent.name}` : "New category"}
+        title={parent ? `New category in ${parent.name ?? parent.fallbackName}` : "New category"}
         backLink={
           categories.length === 0
             ? { href: indexUrl, label: "Back to categories", mobileOnly: true }
             : undefined
         }
-        actions={categories.length > 0 && <CategoryTreeTrigger />}
+        actions={
+          <>
+            <ContentLocaleSelect contentLocale={contentLocale} />
+            {categories.length > 0 && <CategoryTreeTrigger />}
+          </>
+        }
       />
       <Page.Body>
         <SectionStack>
           <Form
-            // Inertia keeps this page mounted when only the parent changes; remounting empties the fields.
-            key={parent?.id ?? "root"}
+            // Inertia keeps this page mounted when only the parent or the language changes;
+            // remounting empties the fields.
+            key={`${parent?.id ?? "root"}-${contentLocale.current}`}
             action={storeUrl}
             method="post"
           >

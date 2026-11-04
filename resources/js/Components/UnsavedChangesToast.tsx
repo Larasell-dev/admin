@@ -162,6 +162,17 @@ export default function UnsavedChangesToast() {
   return <span ref={anchor} hidden />;
 }
 
+/**
+ * Whether a form on the page has unsaved changes or is saving them, for controls outside it, such as
+ * the content language select in the page's header.
+ */
+export function useUnsavedChanges(): boolean {
+  return useSyncExternalStore(
+    store.subscribe,
+    () => !!(store.state?.dirty || store.state?.processing),
+  );
+}
+
 /** Draws the UnsavedChangesToast of the current page. Render it once in a persistent layout. */
 export function UnsavedChangesToastHost() {
   const toast = useSyncExternalStore(store.subscribe, () => store.state);

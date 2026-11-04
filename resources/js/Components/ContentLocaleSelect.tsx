@@ -1,15 +1,16 @@
-import { router, useFormContext } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import { Input } from "@larasell-dev/ui";
+import { useUnsavedChanges } from "./UnsavedChangesToast";
 
 type ContentLocale = Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
 
 /**
  * Picks the language the page's content is edited in, not the panel's own, and reloads the page
- * in it. Inside an Inertia `<Form>` it is disabled while the form has unsaved changes, which
- * switching would drop. Left out while there is only one language.
+ * in it. It is disabled while a form on the page has unsaved changes, which switching would drop,
+ * wherever the select sits. Left out while there is only one language.
  */
 export default function ContentLocaleSelect({ contentLocale }: { contentLocale: ContentLocale }) {
-  const form = useFormContext();
+  const unsavedChanges = useUnsavedChanges();
 
   if (contentLocale.options.length < 2) return null;
 
@@ -18,7 +19,7 @@ export default function ContentLocaleSelect({ contentLocale }: { contentLocale: 
       <Input
         aria-label="Content language"
         defaultValue={contentLocale.current}
-        disabled={form?.isDirty || form?.processing}
+        disabled={unsavedChanges}
         render={
           // On the select, which types its own change events; Input types them for an input.
           <select

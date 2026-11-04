@@ -30,7 +30,7 @@ class ProductController
         return Inertia::render('Product/Create', new CreateProductPageData(
             storeUrl: route('larasell.admin.products.store'),
             indexUrl: route('larasell.admin.products.index'),
-            categories: $this->categories(),
+            categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
             contentLocale: ContentLocaleData::of($locale),
@@ -70,7 +70,7 @@ class ProductController
             product: ProductDetailData::fromModel($product, $locale),
             updateUrl: route('larasell.admin.products.update', $product),
             indexUrl: route('larasell.admin.products.index'),
-            categories: $this->categories(),
+            categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
             contentLocale: ContentLocaleData::of($locale),
@@ -114,13 +114,13 @@ class ProductController
     }
 
     /**
-     * The store's categories to pick the product's from.
+     * The store's categories to pick the product's from, named in the content locale.
      *
      * @return array<int, CategoryOptionData>
      */
-    protected function categories(): array
+    protected function categories(Locale $locale): array
     {
         // One query for the whole tree; the Category relations would query once per level.
-        return CategoryOptionData::tree(Category::query()->orderBy('position')->orderBy('id')->get());
+        return CategoryOptionData::tree(Category::query()->orderBy('position')->orderBy('id')->get(), $locale);
     }
 }

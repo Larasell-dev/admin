@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Tables\Product;
 
 use Larasell\Admin\Actions\Product\DeleteProduct;
+use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\Table\Variant;
 use Larasell\Admin\Tables\Actions\Action;
@@ -20,8 +21,11 @@ class Products extends Table
 {
     public function columns(): array
     {
+        // Named in the content locale picked on the product pages; this page has no select of its own.
+        $locale = app(ContentLocaleResolver::class)->resolve(request())->value;
+
         return [
-            TextColumn::make('name')->map(fn (Translatable $name): string => $name->get()),
+            TextColumn::make('name')->map(fn (Translatable $name): string => $name->get($locale)),
             // Null means the product's stock isn't tracked, unlike 0, which means it's sold out.
             TextColumn::make('stock')->map(fn (?int $stock): int|string => $stock ?? 'Not tracked'),
             BadgeColumn::make('status', 'Visibility')
