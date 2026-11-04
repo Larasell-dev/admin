@@ -18,6 +18,7 @@ it("lists every export that extensions can import from the panel", async () => {
 
 it("shares the panel's own extension API", () => {
   expect(Object.keys(sharedModules["@larasell-dev/admin"]).sort()).toEqual([
+    "Highlight",
     "Larasell",
     "Page",
     "ResourceTable",

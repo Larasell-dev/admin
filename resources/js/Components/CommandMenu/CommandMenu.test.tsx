@@ -7,6 +7,7 @@ import { AppHotkeysProvider } from "../../utils/hotkeys";
 import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
+import { Highlight } from "./Highlight";
 import { themeCommand } from "./themeCommand";
 
 const cleanups: Array<() => void> = [];
@@ -213,6 +214,83 @@ it("shows why a command is disabled, and neither opens it nor finds its items", 
 
   await search().fill("dark");
   await expect.element(page.getByText("No results")).toBeVisible();
+});
+
+describe("rendered labels", () => {
+  const boots = {
+    id: "boots",
+    label: ({ search, selected }: { search: string; selected: boolean }) => (
+      <>
+        <span>Boots</span>
+        <span>{`${selected ? "highlighted" : "not highlighted"} for "${search}"`}</span>
+      </>
+    ),
+    textValue: "Boots, SKU BT-100",
+    run: () => run("boots"),
+  };
+
+  it("renders the label with the search and whether it is highlighted, and finds and names it by its text value", async () => {
+    register(orders, boots);
+    await renderMenu();
+    await openMenu();
+
+    await expect.element(page.getByText('not highlighted for ""')).toBeVisible();
+    await expect.element(option(/^Boots, SKU BT-100$/)).toBeVisible();
+
+    await search().fill("BT-100");
+
+    await expect.element(page.getByText('highlighted for "BT-100"')).toBeVisible();
+    expect(options()).toHaveLength(1);
+    await userEvent.keyboard("{Enter}");
+
+    expect(run).toHaveBeenCalledExactlyOnceWith("boots");
+  });
+
+  it("names a nested command with a rendered label by its text value in crumbs and the back button", async () => {
+    register({
+      id: "density",
+      label: () => <strong>Density</strong>,
+      textValue: "Change density",
+      items: [{ id: "compact", label: "Compact", run: () => run("compact") }],
+    });
+    await renderMenu();
+    await openMenu();
+
+    await search().fill("compact");
+    await expect.element(option(/Change density.*Compact/)).toBeVisible();
+
+    await search().fill("");
+    await userEvent.keyboard("{Enter}");
+
+    await expect
+      .element(page.getByRole("button", { name: "Back from Change density" }))
+      .toBeInTheDocument();
+  });
+
+  it("needs a text value for a rendered label", () => {
+    // @ts-expect-error Search, crumbs and screen readers need the text of a rendered label.
+    const definition: CommandDefinition = { id: "x", label: () => null, run: () => {} };
+
+    expect(definition.id).toBe("x");
+  });
+
+  it("marks the ranges of a text, in any order", async () => {
+    const screen = await render(
+      <Highlight
+        text="BT-100-RED"
+        ranges={[
+          [7, 10],
+          [0, 2],
+        ]}
+      />,
+    );
+
+    expect([...screen.container.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual([
+      "BT",
+      "RED",
+    ]);
+    expect(screen.container.textContent).toBe("BT-100-RED");
+  });
 });
 
 describe("registering", () => {
