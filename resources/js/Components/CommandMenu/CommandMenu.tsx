@@ -66,6 +66,8 @@ export default function CommandMenu() {
   const [shown, setShown] = useState<Shown | null>(null);
   // A view of items that are already the results of its search, e.g. from the server.
   const searched = nested && shown?.filterItems === false;
+  // Such a view has nothing to show below its search until there is one.
+  const bare = searched && view.search.trim() === "";
 
   // From the views as they are when it applies: cmdk reports the highlight in the same update
   // that opens a nested view, which must not bring back the view it was opened from.
@@ -165,7 +167,9 @@ export default function CommandMenu() {
                 }
               }}
             >
-              <div className="flex items-center gap-3 border-b border-border px-4.5">
+              <div
+                className={cn("flex items-center gap-3 px-4.5", !bare && "border-b border-border")}
+              >
                 {nested ? (
                   <button
                     type="button"
@@ -201,13 +205,14 @@ export default function CommandMenu() {
                   className="h-11 min-w-0 flex-1 bg-transparent type-body-md text-mauve-950 outline-none placeholder:text-mauve-500 dark:text-mauve-50"
                 />
               </div>
-              <Command.List className="max-h-80 scroll-py-1.5 overflow-y-auto p-1.5">
-                {/* A view that searches on its own has nothing to say before a search. */}
-                {!(searched && view.search === "") && (
-                  <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
-                    {nested && shown?.loading ? "Searching…" : "No results"}
-                  </Command.Empty>
-                )}
+              <Command.List
+                // Hidden, not left out: the commands' hooks run inside it, also while it's bare.
+                hidden={bare}
+                className="max-h-80 scroll-py-1.5 overflow-y-auto p-1.5"
+              >
+                <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
+                  {nested && shown?.loading ? "Searching…" : "No results"}
+                </Command.Empty>
                 {definitions.map((definition) => (
                   // Keyed by kind too, so a command never switches between calling a hook and not.
                   <Entry
