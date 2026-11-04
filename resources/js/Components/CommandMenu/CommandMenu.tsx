@@ -3,10 +3,24 @@ import { Icon } from "@larasell-dev/ui";
 import { ArrowLeftSLine, ArrowRightSLine, CheckLine, SearchLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider, useAppHotkeys, useHotkey } from "@tanstack/react-hotkeys";
 import { cn } from "cn";
-import { Command, defaultFilter } from "cmdk";
-import { Fragment, useEffect, useLayoutEffect, useState, useSyncExternalStore } from "react";
+import { Command, defaultFilter, useCommandState } from "cmdk";
+import {
+  Fragment,
+  type ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { overlayExclusive } from "../../utils/hotkeys";
-import { type CommandDefinition, type CommandFields, type CommandItem, commands } from "./commands";
+import {
+  type CommandDefinition,
+  type CommandFields,
+  type CommandItem,
+  type CommandLabelState,
+  commands,
+  textOf,
+} from "./commands";
 
 /**
  * A level of the menu: the ids leading to its nested view, none for the root, and its own search
@@ -236,7 +250,7 @@ function rows(items: CommandItem[], path: string[], crumbs: string[], deep: bool
     const row = { item, path: [...path, item.id], crumbs };
     // A disabled command can't be opened, so its items aren't found either.
     return deep && item.items && !item.disabled
-      ? [row, ...rows(item.items, row.path, [...crumbs, item.label], deep)]
+      ? [row, ...rows(item.items, row.path, [...crumbs, textOf(item)], deep)]
       : [row];
   });
 }
@@ -258,7 +272,7 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
   const node = own ? find(command, view.path.slice(1)) : null;
 
   useLayoutEffect(() => {
-    if (node) actions.showView(node.label, node.placeholder);
+    if (node) actions.showView(textOf(node), node.placeholder);
   });
   useEffect(() => {
     if (own && !node) actions.leaveView();
@@ -273,7 +287,7 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
     <Command.Item
       key={valueOf(path)}
       value={valueOf(path)}
-      keywords={[...crumbs, item.label, ...(item.keywords ?? [])]}
+      keywords={[...crumbs, textOf(item), ...(item.keywords ?? [])]}
       disabled={!!item.disabled}
       onSelect={() => (item.items ? actions.openView(path, item) : actions.run(item.run))}
       className={cn(
@@ -296,7 +310,17 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
             </span>
           </Fragment>
         ))}
-        <span>{item.label}</span>
+        {typeof item.label === "string" ? (
+          <span>{item.label}</span>
+        ) : (
+          <>
+            {/* Named by its text value, which says what the rendered label shows. */}
+            <span aria-hidden className="min-w-0">
+              <RenderedLabel label={item.label} value={valueOf(path)} />
+            </span>
+            <span className="sr-only">{item.textValue}</span>
+          </>
+        )}
       </span>
       {item.disabled ? (
         <span className="shrink-0 type-body-sm text-mauve-500">{item.disabled}</span>
@@ -312,4 +336,21 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
       )}
     </Command.Item>
   ));
+}
+
+/**
+ * Renders a label function from cmdk's own state. The menu's view only learns the highlight once
+ * it moves, not when cmdk picks the first item of a search.
+ */
+function RenderedLabel({
+  label,
+  value,
+}: {
+  label: (state: CommandLabelState) => ReactNode;
+  value: string;
+}) {
+  const search = useCommandState((state) => state.search);
+  const selected = useCommandState((state) => state.value === value);
+
+  return label({ search, selected });
 }

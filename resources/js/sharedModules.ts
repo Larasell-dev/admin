@@ -5,6 +5,7 @@ import * as React from "react";
 import * as JsxDevRuntime from "react/jsx-dev-runtime";
 import * as JsxRuntime from "react/jsx-runtime";
 import { defineCommand, useCommand } from "./Components/CommandMenu/commands";
+import { Highlight } from "./Components/CommandMenu/Highlight";
 import { Page } from "./Components/Page";
 import ResourceTable from "./Components/ResourceTable";
 import { Larasell } from "./extensions";
@@ -27,6 +28,7 @@ export const sharedModules = {
     Page,
     ResourceTable,
     SidebarLayout,
+    Highlight,
     defineCommand,
     useCommand,
   } satisfies typeof AdminApi,

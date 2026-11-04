@@ -1,9 +1,29 @@
 import type { Icon } from "@larasell-dev/ui";
-import { type ComponentProps, useEffect, useLayoutEffect, useRef } from "react";
+import { type ComponentProps, type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+
+/** What a rendered label can change with. */
+export type CommandLabelState = {
+  /** The search of the view the item is in. */
+  search: string;
+  /** Whether the item is highlighted. */
+  selected: boolean;
+};
+
+/** Text, or a function that renders the label from the label's state. */
+type CommandLabel =
+  | { label: string; textValue?: undefined }
+  | {
+      /**
+       * Renders the row between its icon and its check mark, e.g. a name and below it what the
+       * search matched. No buttons or links: the whole row is one option.
+       */
+      label: (state: CommandLabelState) => ReactNode;
+      /** The label as text, which search, crumbs and screen readers use instead. */
+      textValue: string;
+    };
 
 /** What a command, or an item in a command's nested view, shows and does. */
-export type CommandFields = {
-  label: string;
+export type CommandFields = CommandLabel & {
   /** A Remix icon from `@larasell-dev/ui/icons`, shown before the label. */
   icon?: ComponentProps<typeof Icon>["icon"];
   /** More words that find it, besides its label. */
@@ -13,15 +33,19 @@ export type CommandFields = {
   /** Why it can't be used right now; shown in its place. A disabled command can't be opened either. */
   disabled?: string | false;
 } & (
-  | { run: () => void; items?: undefined; placeholder?: undefined }
-  | {
-      /** Opens a nested view with these items. */
-      items: CommandItem[];
-      /** The search's placeholder in the nested view. */
-      placeholder?: string;
-      run?: undefined;
-    }
-);
+    | { run: () => void; items?: undefined; placeholder?: undefined }
+    | {
+        /** Opens a nested view with these items. */
+        items: CommandItem[];
+        /** The search's placeholder in the nested view. */
+        placeholder?: string;
+        run?: undefined;
+      }
+  );
+
+/** The label of a command or item as text. */
+export const textOf = (fields: CommandFields): string =>
+  fields.textValue === undefined ? fields.label : fields.textValue;
 
 export type CommandItem = CommandFields & {
   /** Unique among its siblings. */
