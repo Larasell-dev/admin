@@ -8,6 +8,7 @@ import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
+import { goToCommand, logOutCommand } from "./navigationCommands";
 import { SearchCommands } from "./searchCommands";
 import { themeCommand } from "./themeCommand";
 
@@ -555,5 +556,85 @@ describe("searching on the server", () => {
     await openMenu();
 
     await expect.element(page.getByText("No results")).toBeVisible();
+  });
+});
+
+describe("navigating", () => {
+  const navigationItem = (
+    label: string,
+    url: string,
+    children: Larasell.Admin.Data.ViewModel.NavigationItemData[] = [],
+  ) => ({ id: `larasell.admin.${label}`, label, url, icon: "Home", children });
+  const props = {
+    navigation: [
+      { ...navigationItem("Home", "/admin"), id: "larasell.admin.home" },
+      navigationItem("Products", "/admin/products"),
+      navigationItem("Settings", "/admin/settings", [
+        navigationItem("Admins", "/admin/settings/admins"),
+        navigationItem("Audit log", "/admin/settings/audit-log"),
+      ]),
+    ],
+    profileUrl: "/admin/profile",
+    logoutUrl: "/admin/logout",
+  };
+
+  it("goes to the pages of the navigation, those under settings included", async () => {
+    const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
+    register(goToCommand);
+    await renderMenu(undefined, props);
+    await openMenu();
+    await choose("Go to");
+
+    expect(options()).toEqual(["Home", "Products", "Admins", "Audit log", "Profile"]);
+
+    await choose("Audit log");
+
+    expect(visit).toHaveBeenCalledWith("/admin/settings/audit-log");
+    await expect.element(menu()).not.toBeInTheDocument();
+  });
+
+  it("finds the pages from the root, and the home page as the dashboard", async () => {
+    register(goToCommand);
+    await renderMenu(undefined, props);
+    await openMenu();
+
+    await search().fill("audit");
+    await expect.element(option(/Go to.*Audit log/)).toBeVisible();
+
+    await search().fill("dashboard");
+    await expect.element(option(/Go to.*Home/)).toBeVisible();
+  });
+
+  it("goes to the profile", async () => {
+    const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
+    register(goToCommand);
+    await renderMenu(undefined, props);
+    await openMenu();
+    await choose("Go to");
+
+    await choose("Profile");
+
+    expect(visit).toHaveBeenCalledWith("/admin/profile");
+  });
+
+  it("logs out only after a yes", async () => {
+    const post = vi.spyOn(router, "post").mockImplementation(() => {});
+    register(logOutCommand);
+    await renderMenu(undefined, props);
+    await openMenu();
+    await choose("Log out");
+
+    expect(options()).toEqual(["No", "Yes"]);
+    // A stray Enter picks No.
+    await userEvent.keyboard("{Enter}");
+
+    await expect.element(menu()).not.toBeInTheDocument();
+    expect(post).not.toHaveBeenCalled();
+
+    await openMenu();
+    await choose("Log out");
+    await choose("Yes");
+
+    expect(post).toHaveBeenCalledWith("/admin/logout");
   });
 });
