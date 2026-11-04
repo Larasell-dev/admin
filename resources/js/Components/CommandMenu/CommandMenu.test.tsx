@@ -7,7 +7,7 @@ import { AppHotkeysProvider } from "../../utils/hotkeys";
 import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
-import { Highlight } from "./Highlight";
+import { Highlight, matchRanges } from "./Highlight";
 import { themeCommand } from "./themeCommand";
 
 const cleanups: Array<() => void> = [];
@@ -295,6 +295,16 @@ describe("rendered labels", () => {
     const definition: CommandDefinition = { id: "x", label: () => null, run: () => {} };
 
     expect(definition.id).toBe("x");
+  });
+
+  it("finds the ranges a search matched the way the menu finds items, gaps and case included", () => {
+    expect(matchRanges("Oxford Shirt", "oxfordshirt")).toEqual([
+      [0, 6],
+      [7, 12],
+    ]);
+    expect(matchRanges("Rain Boots", "boot")).toEqual([[5, 9]]);
+    expect(matchRanges("Boots", "tb")).toEqual([]);
+    expect(matchRanges("Boots", "")).toEqual([]);
   });
 
   it("marks the ranges of a text, in any order", async () => {
