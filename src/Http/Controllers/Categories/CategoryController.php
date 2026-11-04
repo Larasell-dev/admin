@@ -15,7 +15,6 @@ use Larasell\Admin\Data\View\Categories\CreateCategoryPageData;
 use Larasell\Admin\Data\View\Categories\MissingCategoryPageData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryDetailData;
-use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Http\Requests\Categories\CategoryRequest;
 use Larasell\Admin\Tables\Categories\CategoryProducts;
 use Larasell\Larasell\Enums\Locale;
@@ -74,7 +73,6 @@ class CategoryController
             availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
             addProductUrl: route('larasell.admin.categories.products.store', $category),
             createProductUrl: Product::query()->exists() ? null : $this->createProductUrl(),
-            contentLocale: ContentLocaleData::of($locale),
         ))->toResponse($request);
     }
 
@@ -98,7 +96,6 @@ class CategoryController
             indexUrl: route('larasell.admin.categories.index'),
             parent: $parent ? CategoryDetailData::fromModel($parent, $locale) : null,
             createProductUrl: $this->createProductUrl(),
-            contentLocale: ContentLocaleData::of($locale),
         ));
     }
 

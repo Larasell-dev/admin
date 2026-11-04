@@ -4,7 +4,6 @@ namespace Larasell\Admin\Data\View\Categories;
 
 use Larasell\Admin\Data\ViewModel\Categories\CategoryData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryDetailData;
-use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Tables\Categories\CategoryProducts;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
@@ -25,6 +24,5 @@ class CategoryPageData extends Data
         public string $addProductUrl,
         /** Null once the store has products to add instead, or while the products are turned off. */
         public ?string $createProductUrl,
-        public ContentLocaleData $contentLocale,
     ) {}
 }

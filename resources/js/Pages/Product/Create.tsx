@@ -4,8 +4,9 @@ import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/ProductForm";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
+import type { SharedProps } from "../../types";
 
-type Props = Larasell.Admin.Data.View.CreateProductPageData;
+type Props = Larasell.Admin.Data.View.CreateProductPageData & Pick<SharedProps, "contentLocale">;
 
 export default function Create({
   storeUrl,
@@ -18,7 +19,7 @@ export default function Create({
   return (
     <Form
       // Remounts the select once switching the language reloads the page.
-      key={contentLocale.current}
+      key={contentLocale?.current}
       action={storeUrl}
       method="post"
       // Around the header too, so the language select knows about unsaved changes; `contents`

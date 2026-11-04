@@ -9,7 +9,6 @@ use Larasell\Admin\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Data\View\CreateProductPageData;
 use Larasell\Admin\Data\View\EditProductPageData;
 use Larasell\Admin\Data\ViewModel\Categories\CategoryOptionData;
-use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Larasell\Admin\Http\Requests\ProductRequest;
 use Larasell\Larasell\Enums\Locale;
@@ -33,7 +32,6 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            contentLocale: ContentLocaleData::of($locale),
         ));
     }
 
@@ -73,7 +71,6 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            contentLocale: ContentLocaleData::of($locale),
         ));
     }
 

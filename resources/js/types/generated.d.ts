@@ -13,7 +13,6 @@ declare namespace Larasell.Admin.Data.View {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
     createCategoryUrl: string | null;
     uploadImagesUrl: string;
-    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type EditAdminPageData = {
     editedAdmin: Larasell.Admin.Data.ViewModel.AdminData;
@@ -27,7 +26,6 @@ declare namespace Larasell.Admin.Data.View {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
     createCategoryUrl: string | null;
     uploadImagesUrl: string;
-    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type HomePageData = {
     createProductUrl: string | null;
@@ -91,7 +89,6 @@ declare namespace Larasell.Admin.Data.View.Categories {
     availableProductsUrl: string;
     addProductUrl: string;
     createProductUrl: string | null;
-    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
@@ -100,7 +97,6 @@ declare namespace Larasell.Admin.Data.View.Categories {
     indexUrl: string;
     parent: Larasell.Admin.Data.ViewModel.Categories.CategoryDetailData | null;
     createProductUrl: string | null;
-    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type MissingCategoryPageData = {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryData>;
