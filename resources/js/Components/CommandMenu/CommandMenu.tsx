@@ -248,8 +248,9 @@ type Row = { item: CommandItem; path: string[]; crumbs: string[] };
 function rows(items: CommandItem[], path: string[], crumbs: string[], deep: boolean): Row[] {
   return items.flatMap((item) => {
     const row = { item, path: [...path, item.id], crumbs };
-    // A disabled command can't be opened, so its items aren't found either.
-    return deep && item.items && !item.disabled
+    // A disabled command can't be opened, so its items aren't found either, and neither are those
+    // of a command whose items are only searched in its own view.
+    return deep && item.items && !item.disabled && item.searchItemsFromRoot !== false
       ? [row, ...rows(item.items, row.path, [...crumbs, textOf(item)], deep)]
       : [row];
   });
