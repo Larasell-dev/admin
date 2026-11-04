@@ -29,9 +29,19 @@ declare module "@larasell-dev/admin" {
     };
   };
 
+  /** What a rendered label can change with. */
+  export type CommandLabelState = { search: string; selected: boolean };
+
   /** What a command, or an item in a command's nested view, shows and does. */
-  export type CommandFields = {
-    label: string;
+  export type CommandFields = (
+    | { label: string; textValue?: undefined }
+    | {
+        /** Renders the row between its icon and check mark. No buttons or links inside. */
+        label: (state: CommandLabelState) => ReactNode;
+        /** The label as text, which search, crumbs and screen readers use instead. */
+        textValue: string;
+      }
+  ) & {
     /** A Remix icon from `@larasell-dev/ui/icons`, shown before the label. */
     icon?: import("react").ComponentProps<typeof import("@larasell-dev/ui").Icon>["icon"];
     /** More words that find it, besides its label. */
@@ -41,9 +51,9 @@ declare module "@larasell-dev/admin" {
     /** Why it can't be used right now; shown in its place. */
     disabled?: string | false;
   } & (
-    | { run: () => void; items?: undefined; placeholder?: undefined }
-    | { items: CommandItem[]; placeholder?: string; run?: undefined }
-  );
+      | { run: () => void; items?: undefined; placeholder?: undefined }
+      | { items: CommandItem[]; placeholder?: string; run?: undefined }
+    );
 
   export type CommandItem = CommandFields & { id: string };
 
@@ -54,6 +64,12 @@ declare module "@larasell-dev/admin" {
 
   /** Types a command defined in its own module, to register in Larasell.booting(). */
   export function defineCommand<T extends CommandDefinition>(definition: T): T;
+
+  /** The text with the ranges, [start, end) like String.slice(), marked, e.g. a search match. */
+  export const Highlight: ComponentType<{
+    text: string;
+    ranges: ReadonlyArray<readonly [start: number, end: number]>;
+  }>;
 
   /** Offers a command in the command menu while the component is mounted. */
   export function useCommand(definition: CommandDefinition): void;

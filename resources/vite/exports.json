@@ -123,6 +123,7 @@
     "useToastPosition"
   ],
   "@larasell-dev/admin": [
+    "Highlight",
     "Larasell",
     "Page",
     "ResourceTable",
