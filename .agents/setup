@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Amp orb setup: installs the PHP 8.3 toolchain and all project dependencies.
+# Amp orb setup: installs the PHP 8.4 toolchain and all project dependencies.
 # Safe to run repeatedly; a warm run skips package downloads and reinstalls.
 set -euo pipefail
 
@@ -29,17 +29,17 @@ else
     }
 fi
 
-# --- PHP 8.3 (Sury repository, Debian's default is 8.2) ---
+# --- PHP 8.4 (Sury repository, Debian's default is 8.2) ---
 PHP_PACKAGES=(
-    php8.3-cli
-    php8.3-mbstring
-    php8.3-xml
-    php8.3-curl
-    php8.3-sqlite3
-    php8.3-zip
-    php8.3-intl
-    php8.3-bcmath
-    php8.3-gd
+    php8.4-cli
+    php8.4-mbstring
+    php8.4-xml
+    php8.4-curl
+    php8.4-sqlite3
+    php8.4-zip
+    php8.4-intl
+    php8.4-bcmath
+    php8.4-gd
 )
 
 missing_php_packages=()
@@ -50,7 +50,7 @@ for package in "${PHP_PACKAGES[@]}"; do
 done
 
 if [ "${#missing_php_packages[@]}" -gt 0 ]; then
-    step "Installing PHP 8.3 packages: ${missing_php_packages[*]}"
+    step "Installing PHP 8.4 packages: ${missing_php_packages[*]}"
     as_root apt-get update -qq
     as_root apt-get install -y -qq ca-certificates curl gnupg2 >/dev/null
     as_root install -d /usr/share/keyrings
@@ -60,7 +60,7 @@ if [ "${#missing_php_packages[@]}" -gt 0 ]; then
     as_root apt-get update -qq
     as_root apt-get install -y -qq "${missing_php_packages[@]}" >/dev/null
 else
-    step "PHP 8.3 packages already installed"
+    step "PHP 8.4 packages already installed"
 fi
 
 # --- Composer ---
