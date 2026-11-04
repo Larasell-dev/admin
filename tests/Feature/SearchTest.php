@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use Illuminate\Support\Collection;
 use Inertia\Testing\AssertableInertia;
+use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Search\ProductSearch;
+use Larasell\Admin\Search\Products\ProductSearch;
+use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Search\SearchQuery;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
@@ -268,23 +270,43 @@ it('searches with the product search bound in the container', function () {
         ->assertJsonPath('results.*.id', [$boots->id]);
 });
 
-it('shares the search urls of the enabled modules with signed-in admins', function () {
+it('shares the searches of the enabled modules with signed-in admins', function () {
     $this->get(route('larasell.admin.login'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('searchUrls', null));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu', null));
 
     signInSearchAdmin();
 
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('searchUrls', [
-            'products' => route('larasell.admin.search.products'),
-            'categories' => route('larasell.admin.search.categories'),
-            'orders' => route('larasell.admin.search.orders'),
-            'customers' => route('larasell.admin.search.customers'),
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', [
+            ['id' => 'products', 'label' => 'Search products', 'icon' => 'ShoppingBag', 'placeholder' => 'Search by name, SKU or barcode', 'url' => route('larasell.admin.search.products')],
+            ['id' => 'categories', 'label' => 'Search categories', 'icon' => 'Folders', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.categories')],
+            ['id' => 'customers', 'label' => 'Search customers', 'icon' => 'Group', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.customers')],
+            ['id' => 'orders', 'label' => 'Search orders', 'icon' => 'Receipt', 'placeholder' => 'Search by number, customer or email', 'url' => route('larasell.admin.search.orders')],
         ]));
 
     $this->bootingWith(fn () => config(['larasell.admin.orders.enabled' => false]));
     signInSearchAdmin();
 
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('searchUrls', fn ($urls) => array_keys($urls->all()) === ['products', 'categories', 'customers']));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'customers']));
+});
+
+it('lets a plugin add its own search to the command menu', function () {
+    $this->bootingWith(fn () => app()->booted(fn () => app(Searches::class)->add(
+        'gift-cards',
+        label: 'Search gift cards',
+        icon: Icon::Gift,
+        placeholder: 'Search by code',
+        route: 'larasell.admin.search.products',
+    )));
+    signInSearchAdmin();
+
+    $this->get(route('larasell.admin.home'))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.4', [
+            'id' => 'gift-cards',
+            'label' => 'Search gift cards',
+            'icon' => 'Gift',
+            'placeholder' => 'Search by code',
+            'url' => route('larasell.admin.search.products'),
+        ]));
 });
