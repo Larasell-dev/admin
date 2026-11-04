@@ -36,3 +36,28 @@ export function Highlight({
 
   return <>{parts}</>;
 }
+
+/**
+ * Where the search matched the text, for Highlight. Matches like the menu's filter: the search's
+ * letters in order, ignoring case, with anything in between, so "oxfordshirt" marks both words
+ * of "Oxford Shirt". Empty when the text doesn't match.
+ */
+export function matchRanges(text: string, search: string): Array<[start: number, end: number]> {
+  const haystack = text.toLowerCase();
+  const ranges: Array<[number, number]> = [];
+  let from = 0;
+
+  for (const letter of search.toLowerCase()) {
+    if (letter.trim() === "") continue;
+
+    const at = haystack.indexOf(letter, from);
+    if (at < 0) return [];
+
+    const last = ranges[ranges.length - 1];
+    if (last && last[1] === at) last[1] = at + 1;
+    else ranges.push([at, at + 1]);
+    from = at + 1;
+  }
+
+  return ranges;
+}
