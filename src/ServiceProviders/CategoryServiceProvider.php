@@ -14,6 +14,9 @@ use Larasell\Admin\Http\Controllers\Categories\HideCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\SearchProductsNotInCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\UnhideCategoryController;
+use Larasell\Admin\Http\Controllers\Search\SearchCategoriesController;
+use Larasell\Admin\Search\CategorySearch;
+use Larasell\Admin\Search\DatabaseCategorySearch;
 
 /**
  * The categories module: the category tree, its navigation item, and the pages to add, edit,
@@ -26,6 +29,8 @@ class CategoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/categories.php', 'larasell.admin.categories');
+
+        $this->app->bind(CategorySearch::class, DatabaseCategorySearch::class);
     }
 
     public function boot(): void
@@ -48,6 +53,7 @@ class CategoryServiceProvider extends ServiceProvider
             Route::post('categories/{category}/hide', HideCategoryController::class)->name('categories.hide');
             Route::post('categories/{category}/unhide', UnhideCategoryController::class)->name('categories.unhide');
             Route::post('categories/{category}/move', MoveCategoryController::class)->name('categories.move');
+            Route::get('search/categories', SearchCategoriesController::class)->name('search.categories');
         });
     }
 }

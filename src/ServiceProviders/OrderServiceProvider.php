@@ -9,6 +9,9 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\Orders\OrderController;
+use Larasell\Admin\Http\Controllers\Search\SearchOrdersController;
+use Larasell\Admin\Search\DatabaseOrderSearch;
+use Larasell\Admin\Search\OrderSearch;
 use Larasell\Admin\Tables\Orders\Orders;
 
 /**
@@ -21,6 +24,8 @@ class OrderServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/orders.php', 'larasell.admin.orders');
+
+        $this->app->bind(OrderSearch::class, DatabaseOrderSearch::class);
     }
 
     public function boot(): void
@@ -33,6 +38,7 @@ class OrderServiceProvider extends ServiceProvider
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+            Route::get('search/orders', SearchOrdersController::class)->name('search.orders');
         });
     }
 }

@@ -10,6 +10,9 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\ProductController;
 use Larasell\Admin\Http\Controllers\ProductImageController;
+use Larasell\Admin\Http\Controllers\Search\SearchProductsController;
+use Larasell\Admin\Search\DatabaseProductSearch;
+use Larasell\Admin\Search\ProductSearch;
 use Larasell\Admin\Tables\Product\Products;
 
 /**
@@ -21,6 +24,8 @@ class ProductServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/products.php', 'larasell.admin.products');
+
+        $this->app->bind(ProductSearch::class, DatabaseProductSearch::class);
     }
 
     public function boot(): void
@@ -37,6 +42,7 @@ class ProductServiceProvider extends ServiceProvider
             Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
             Route::post('products/images', [ProductImageController::class, 'store'])->name('products.images.store');
+            Route::get('search/products', SearchProductsController::class)->name('search.products');
         });
     }
 }
