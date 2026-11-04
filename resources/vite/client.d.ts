@@ -51,8 +51,19 @@ declare module "@larasell-dev/admin" {
     /** Why it can't be used right now; shown in its place. */
     disabled?: string | false;
   } & (
-      | { run: () => void; items?: undefined; placeholder?: undefined }
-      | { items: CommandItem[]; placeholder?: string; run?: undefined }
+      | {
+          run: () => void;
+          items?: undefined;
+          placeholder?: undefined;
+          searchItemsFromRoot?: undefined;
+        }
+      | {
+          items: CommandItem[];
+          placeholder?: string;
+          /** Whether searching the root also finds these items. On unless set to false. */
+          searchItemsFromRoot?: boolean;
+          run?: undefined;
+        }
     );
 
   export type CommandItem = CommandFields & { id: string };

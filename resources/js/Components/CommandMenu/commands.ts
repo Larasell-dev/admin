@@ -33,12 +33,22 @@ export type CommandFields = CommandLabel & {
   /** Why it can't be used right now; shown in its place. A disabled command can't be opened either. */
   disabled?: string | false;
 } & (
-    | { run: () => void; items?: undefined; placeholder?: undefined }
+    | {
+        run: () => void;
+        items?: undefined;
+        placeholder?: undefined;
+        searchItemsFromRoot?: undefined;
+      }
     | {
         /** Opens a nested view with these items. */
         items: CommandItem[];
         /** The search's placeholder in the nested view. */
         placeholder?: string;
+        /**
+         * Whether searching the root also finds these items. Turn it off for items only worth
+         * searching in their own view, e.g. products looked up on the server.
+         */
+        searchItemsFromRoot?: boolean;
         run?: undefined;
       }
   );
