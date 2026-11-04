@@ -26,6 +26,10 @@ export const appHotkeys = defineAppHotkeys({
     // Fires once per press, so holding the keys doesn't flash through the themes.
     options: { requireReset: true },
   },
+  "commandMenu.open": {
+    hotkey: "Mod+K",
+    meta: { name: "Open the command menu", description: "Search and run the panel's commands." },
+  },
 });
 
 declare module "@tanstack/react-hotkeys" {

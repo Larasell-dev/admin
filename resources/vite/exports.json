@@ -126,6 +126,8 @@
     "Larasell",
     "Page",
     "ResourceTable",
-    "SidebarLayout"
+    "SidebarLayout",
+    "defineCommand",
+    "useCommand"
   ]
 }

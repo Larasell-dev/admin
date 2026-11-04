@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { type CommandDefinition, commands } from "./Components/CommandMenu/commands";
 
 export type PageModule = { default: ComponentType<any> };
 
@@ -13,6 +14,14 @@ export type BootingContext = {
      */
     register(name: string, loader: PageLoader): void;
   };
+  commands: {
+    /**
+     * Adds commands to the command menu (Mod+K) on every page. Prefix their ids with the
+     * extension's name, e.g. "acme-wishlists.export", so extensions can't clash. A command's
+     * `use` hook can read the page to leave itself out where it doesn't apply.
+     */
+    register(...definitions: CommandDefinition[]): void;
+  };
 };
 
 /**
@@ -26,6 +35,11 @@ export function createExtensions() {
     pages: {
       register(name, loader) {
         pages[name] = loader;
+      },
+    },
+    commands: {
+      register(...definitions) {
+        commands.register(...definitions);
       },
     },
   };

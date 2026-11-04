@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import CategoryLayout, { CategoryTreeTrigger } from "./CategoryLayout";
+import { AppHotkeysProvider } from "../../utils/hotkeys";
 import SidebarLayout from "../SidebarLayout";
 
 type Category = Larasell.Admin.Data.ViewModel.Categories.CategoryData;
@@ -57,11 +58,13 @@ function renderIndex() {
   };
 
   return render(
-    <App
-      initialPage={initialPage as never}
-      initialComponent={CategoryPage}
-      resolveComponent={() => CategoryPage}
-    />,
+    <AppHotkeysProvider>
+      <App
+        initialPage={initialPage as never}
+        initialComponent={CategoryPage}
+        resolveComponent={() => CategoryPage}
+      />
+    </AppHotkeysProvider>,
   );
 }
 

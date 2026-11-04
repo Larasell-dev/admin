@@ -4,6 +4,7 @@ import * as UI from "@larasell-dev/ui";
 import * as React from "react";
 import * as JsxDevRuntime from "react/jsx-dev-runtime";
 import * as JsxRuntime from "react/jsx-runtime";
+import { defineCommand, useCommand } from "./Components/CommandMenu/commands";
 import { Page } from "./Components/Page";
 import ResourceTable from "./Components/ResourceTable";
 import { Larasell } from "./extensions";
@@ -21,5 +22,12 @@ export const sharedModules = {
   "@inertiajs/react": Inertia,
   "@larasell-dev/ui": UI,
   // Checked against the types extensions see in resources/vite/client.d.ts.
-  "@larasell-dev/admin": { Larasell, Page, ResourceTable, SidebarLayout } satisfies typeof AdminApi,
+  "@larasell-dev/admin": {
+    Larasell,
+    Page,
+    ResourceTable,
+    SidebarLayout,
+    defineCommand,
+    useCommand,
+  } satisfies typeof AdminApi,
 };
