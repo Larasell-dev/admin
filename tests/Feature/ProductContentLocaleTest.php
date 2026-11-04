@@ -10,6 +10,8 @@ use Larasell\Admin\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Models\Admin;
 use Larasell\Chronicle\Facades\Chronicle;
 use Larasell\Larasell\Enums\Locale;
+use Larasell\Larasell\Enums\Plan;
+use Larasell\Larasell\Facades\Entitlement;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
@@ -252,4 +254,62 @@ it('edits products in the locale of the ContentLocaleResolver bound in the conta
         ->assertSessionHasNoErrors();
 
     expect($boots->refresh()->name->all())->toBe(['en' => 'Boots', 'de' => 'Gummistiefel']);
+});
+
+it('makes content translations a Pro entitlement', function () {
+    expect(Entitlement::all())->toHaveKey('admin.content-translations', true);
+
+    Entitlement::fake(Plan::Free);
+
+    expect(Entitlement::active('admin.content-translations'))->toBeFalse();
+});
+
+it('only edits products in the default locale without content translations, and offers no other', function () {
+    Entitlement::fake(Plan::Free);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+
+    $this->get(route('larasell.admin.products.edit', $boots))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('product.name', 'Boots')
+            ->where('contentLocale.current', 'en')
+            ->where('contentLocale.options', [['value' => 'en', 'label' => 'English']]));
+
+    $this->put(route('larasell.admin.content-locale.update'), ['locale' => 'de'])->assertSessionHasErrors('locale');
+});
+
+it('goes back to the default locale once the plan no longer has content translations, and keeps the others', function () {
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+
+    switchContentLocale('de');
+    Entitlement::fake(Plan::Free);
+
+    $this->get(route('larasell.admin.products.edit', $boots))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('contentLocale.current', 'en'));
+
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'slug' => 'rain-boots', 'status' => 'visible'])
+        ->assertSessionHasNoErrors();
+
+    expect($boots->refresh()->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel']);
+});
+
+it('also limits the locales of an AvailableLocales an app binds to the default one without content translations', function () {
+    // Like a sales channel's locales: bound after the panel, so its strategy can't skip the plan.
+    app()->bind(AvailableLocales::class, fn () => new class implements AvailableLocales
+    {
+        public function all(): array
+        {
+            return [Locale::FRENCH, Locale::ENGLISH];
+        }
+
+        public function default(): Locale
+        {
+            return Locale::FRENCH;
+        }
+    });
+    Entitlement::fake(Plan::Free);
+
+    $this->get(route('larasell.admin.products.create'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('contentLocale.current', 'fr')
+            ->where('contentLocale.options', [['value' => 'fr', 'label' => 'French']]));
 });
