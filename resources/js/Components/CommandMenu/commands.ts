@@ -38,6 +38,8 @@ export type CommandFields = CommandLabel & {
         items?: undefined;
         placeholder?: undefined;
         searchItemsFromRoot?: undefined;
+        filterItems?: undefined;
+        loading?: undefined;
       }
     | {
         /** Opens a nested view with these items. */
@@ -49,6 +51,13 @@ export type CommandFields = CommandLabel & {
          * searching in their own view, e.g. products looked up on the server.
          */
         searchItemsFromRoot?: boolean;
+        /**
+         * Whether the nested view filters its items by its search. Turn it off for items that
+         * are already the results of the search, e.g. from the server, to show them as they are.
+         */
+        filterItems?: boolean;
+        /** Says the items are loading, e.g. while the server searches, instead of "No results". */
+        loading?: boolean;
         run?: undefined;
       }
   );
@@ -62,13 +71,19 @@ export type CommandItem = CommandFields & {
   id: string;
 };
 
+/** What the menu tells a command's `use` hook. */
+export type CommandHookState = {
+  /** The search of the command's nested view while it is open, e.g. to search the server; else null. */
+  search: string | null;
+};
+
 /**
  * A command in the menu: its fields, or a `use` hook the menu calls while it is open, which can
  * read the page and other state and returns the fields, or null to leave the command out.
  */
 export type CommandDefinition =
   | (CommandItem & { use?: undefined })
-  | { id: string; use: () => CommandFields | null };
+  | { id: string; use: (state: CommandHookState) => CommandFields | null };
 
 /** Types a command defined once, e.g. in its own module, to register with commands.register(). */
 export function defineCommand<T extends CommandDefinition>(definition: T): T {

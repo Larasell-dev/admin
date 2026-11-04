@@ -56,22 +56,34 @@ declare module "@larasell-dev/admin" {
           items?: undefined;
           placeholder?: undefined;
           searchItemsFromRoot?: undefined;
+          filterItems?: undefined;
+          loading?: undefined;
         }
       | {
           items: CommandItem[];
           placeholder?: string;
           /** Whether searching the root also finds these items. On unless set to false. */
           searchItemsFromRoot?: boolean;
+          /** Whether the view filters its items by its search; off for items that are results already. */
+          filterItems?: boolean;
+          /** Says the items are loading, e.g. while a server searches, instead of "No results". */
+          loading?: boolean;
           run?: undefined;
         }
     );
 
   export type CommandItem = CommandFields & { id: string };
 
+  /** What the menu tells a command's `use` hook. */
+  export type CommandHookState = {
+    /** The search of the command's nested view while it is open, e.g. to search a server; else null. */
+    search: string | null;
+  };
+
   /** A command: its fields, or a `use` hook that returns them, or null to leave it out. */
   export type CommandDefinition =
     | (CommandItem & { use?: undefined })
-    | { id: string; use: () => CommandFields | null };
+    | { id: string; use: (state: CommandHookState) => CommandFields | null };
 
   /** Types a command defined in its own module, to register in Larasell.booting(). */
   export function defineCommand<T extends CommandDefinition>(definition: T): T;
