@@ -19,7 +19,44 @@ declare module "@larasell-dev/admin" {
        */
       register(name: string, loader: PageLoader): void;
     };
+    commands: {
+      /**
+       * Adds commands to the command menu (Mod+K) on every page. Prefix their ids with the
+       * extension's name, e.g. "acme-wishlists.export", so extensions can't clash. A command's
+       * `use` hook can read the page to leave itself out where it doesn't apply.
+       */
+      register(...definitions: CommandDefinition[]): void;
+    };
   };
+
+  /** What a command, or an item in a command's nested view, shows and does. */
+  export type CommandFields = {
+    label: string;
+    /** A Remix icon from `@larasell-dev/ui/icons`, shown before the label. */
+    icon?: import("react").ComponentProps<typeof import("@larasell-dev/ui").Icon>["icon"];
+    /** More words that find it, besides its label. */
+    keywords?: string[];
+    /** Marks it, e.g. the option in use, with a check on the right. */
+    checked?: boolean;
+    /** Why it can't be used right now; shown in its place. */
+    disabled?: string | false;
+  } & (
+    | { run: () => void; items?: undefined; placeholder?: undefined }
+    | { items: CommandItem[]; placeholder?: string; run?: undefined }
+  );
+
+  export type CommandItem = CommandFields & { id: string };
+
+  /** A command: its fields, or a `use` hook that returns them, or null to leave it out. */
+  export type CommandDefinition =
+    | (CommandItem & { use?: undefined })
+    | { id: string; use: () => CommandFields | null };
+
+  /** Types a command defined in its own module, to register in Larasell.booting(). */
+  export function defineCommand<T extends CommandDefinition>(definition: T): T;
+
+  /** Offers a command in the command menu while the component is mounted. */
+  export function useCommand(definition: CommandDefinition): void;
 
   export const Larasell: {
     /** Runs the callback just before the panel renders its first page, or right away after. */

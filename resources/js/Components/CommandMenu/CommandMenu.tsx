@@ -1,0 +1,313 @@
+import { Dialog } from "@base-ui/react/dialog";
+import { Icon } from "@larasell-dev/ui";
+import { ArrowLeftSLine, ArrowRightSLine, CheckLine, SearchLine } from "@larasell-dev/ui/icons";
+import { HotkeysProvider, useAppHotkeys, useHotkey } from "@tanstack/react-hotkeys";
+import { Command, defaultFilter } from "cmdk";
+import { Fragment, useEffect, useLayoutEffect, useState, useSyncExternalStore } from "react";
+import { overlayExclusive } from "../../utils/hotkeys";
+import { type CommandDefinition, type CommandFields, type CommandItem, commands } from "./commands";
+
+/**
+ * A level of the menu: the ids leading to its nested view, none for the root, and its own search
+ * and highlighted item, which going back to it restores.
+ */
+type View = { path: string[]; search: string; highlighted: string };
+
+const rootView: View = { path: [], search: "", highlighted: "" };
+
+/** cmdk tells items apart by a string; the ids leading to an item are unique. */
+const valueOf = (path: string[]) => path.join("\u001f");
+
+/** Scores the words an item shows and its keywords, not its value, which is made of ids. */
+const filter = (_value: string, search: string, keywords?: string[]) =>
+  defaultFilter(keywords?.join(" ") ?? "", search);
+
+type Actions = {
+  view: View;
+  openView: (path: string[], item: CommandFields) => void;
+  run: (run: () => void) => void;
+  /** Called by the command whose nested view is open, with what the search shows. */
+  showView: (label: string, placeholder: string | undefined) => void;
+  /** Called by the command whose nested view is open once that view no longer exists. */
+  leaveView: () => void;
+};
+
+/**
+ * Searches and runs the commands registered with `commands` or `useCommand`. Mod+K opens it.
+ * Arrow keys move the highlight while the search keeps focus. A command with items opens a
+ * nested view; searching also finds the items of nested views. Escape clears the search, then
+ * goes back a level, then closes; Backspace in an empty search also goes back.
+ */
+export default function CommandMenu() {
+  const definitions = useSyncExternalStore(commands.subscribe, commands.all);
+  const [open, setOpen] = useState(false);
+  const [views, setViews] = useState<View[]>([rootView]);
+  const view = views[views.length - 1] ?? rootView;
+  const nested = views.length > 1;
+  const [shown, setShown] = useState<{ label: string; placeholder?: string } | null>(null);
+
+  // From the views as they are when it applies: cmdk reports the highlight in the same update
+  // that opens a nested view, which must not bring back the view it was opened from.
+  const updateView = (changes: Partial<View>) =>
+    setViews((current) => [
+      ...current.slice(0, -1),
+      { ...(current[current.length - 1] ?? rootView), ...changes },
+    ]);
+  const back = () => setViews((current) => (current.length > 1 ? current.slice(0, -1) : current));
+  const leaveView = () => setViews((current) => current.slice(0, 1));
+
+  useHotkey(useAppHotkeys()["commandMenu.open"], () => {
+    setViews([rootView]);
+    setOpen(true);
+  });
+
+  // A command registered with useCommand goes away with its component, even while its view is
+  // open; the menu then goes back to the root.
+  useEffect(
+    () =>
+      commands.subscribe(() =>
+        setViews((current) => {
+          const open = current[current.length - 1]?.path[0];
+          return open === undefined || commands.all().some(({ id }) => id === open)
+            ? current
+            : current.slice(0, 1);
+        }),
+      ),
+    [],
+  );
+
+  const actions: Actions = {
+    view,
+    openView(path, item) {
+      const checked = item.items?.find((child) => child.checked);
+      const highlighted = checked ? valueOf([...path, checked.id]) : "";
+      setViews((current) => [...current, { path, search: "", highlighted }]);
+    },
+    run(run) {
+      setOpen(false);
+      run();
+    },
+    showView(label, placeholder) {
+      setShown((current) =>
+        current?.label === label && current.placeholder === placeholder
+          ? current
+          : { label, placeholder },
+      );
+    },
+    leaveView,
+  };
+
+  return (
+    <Dialog.Root
+      open={open}
+      onOpenChange={(next, details) => {
+        if (!next && details.reason === "escape-key") {
+          if (view.search !== "") {
+            details.cancel();
+            updateView({ search: "" });
+            return;
+          }
+          if (nested) {
+            details.cancel();
+            back();
+            return;
+          }
+        }
+        setOpen(next);
+      }}
+      // Closing forgets every search.
+      onOpenChangeComplete={(isOpen) => !isOpen && setViews([rootView])}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-40 bg-overlay backdrop-blur-overlay" />
+        <Dialog.Popup
+          aria-label="Command menu"
+          className="fixed top-[15vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 border border-border bg-elevated bg-clip-padding shadow-elevated outline-none"
+        >
+          {/* Suspends the page's hotkeys while open, like other overlays. */}
+          <HotkeysProvider scope="command-menu" exclusive={overlayExclusive} enabled={open}>
+            <Command
+              // A cmdk of its own for each level, which starts on the level's highlight. A shared
+              // one would highlight the first item once the search changes with the level.
+              key={views.length}
+              label="Command menu"
+              filter={filter}
+              value={view.highlighted || undefined}
+              onValueChange={(highlighted) => updateView({ highlighted })}
+              onKeyDown={(event) => {
+                // The page's hotkeys are suspended, so Mod+K closes the menu here.
+                if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) {
+                  event.preventDefault();
+                  setOpen(false);
+                }
+              }}
+            >
+              {/* Lined up with the items: the icon over theirs, the search over their labels. The
+                  input draws its text 1px lower than a span does, so the back chevron moves down 1px
+                  to stay centered on the capitals. The magnifier doesn't: its handle hangs below the
+                  lens, so centered on the row it already looks level with the text. */}
+              <div className="flex items-center gap-3 border-b border-border px-4.5">
+                {nested ? (
+                  <button
+                    type="button"
+                    aria-label={shown ? `Back from ${shown.label}` : "Back"}
+                    onClick={back}
+                    // Otherwise cmdk takes Enter for running the highlighted item.
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") event.stopPropagation();
+                    }}
+                    className="-m-1 flex shrink-0 p-1 text-mauve-500 hover:text-mauve-950 focus-visible:focus-ring dark:hover:text-mauve-50"
+                  >
+                    <span className="flex translate-y-px">
+                      <Icon icon={ArrowLeftSLine} size={4} />
+                    </span>
+                  </button>
+                ) : (
+                  <span aria-hidden className="flex shrink-0 text-mauve-500">
+                    <Icon icon={SearchLine} size={4} />
+                  </span>
+                )}
+                <Command.Input
+                  // Each level's cmdk has its own search.
+                  autoFocus
+                  value={view.search}
+                  onValueChange={(search) => updateView({ search })}
+                  onKeyDown={(event) => {
+                    if (event.key === "Backspace" && view.search === "" && nested) {
+                      event.preventDefault();
+                      back();
+                    }
+                  }}
+                  placeholder={nested ? (shown?.placeholder ?? "Search") : "Search commands"}
+                  className="h-11 min-w-0 flex-1 bg-transparent type-body-md text-mauve-950 outline-none placeholder:text-mauve-500 dark:text-mauve-50"
+                />
+              </div>
+              <Command.List className="max-h-80 scroll-py-1.5 overflow-y-auto p-1.5">
+                <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
+                  No results
+                </Command.Empty>
+                {definitions.map((definition) => (
+                  // Keyed by kind too, so a command never switches between calling a hook and not.
+                  <Entry
+                    key={`${definition.id}-${definition.use ? "hook" : "fields"}`}
+                    definition={definition}
+                    actions={actions}
+                  />
+                ))}
+              </Command.List>
+            </Command>
+          </HotkeysProvider>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+function Entry({ definition, actions }: { definition: CommandDefinition; actions: Actions }) {
+  return definition.use ? (
+    <HookEntry id={definition.id} use={definition.use} actions={actions} />
+  ) : (
+    <Rows command={definition} actions={actions} />
+  );
+}
+
+/** Its own component, so each command's hook keeps its state as other commands come and go. */
+function HookEntry({
+  id,
+  use,
+  actions,
+}: {
+  id: string;
+  use: () => CommandFields | null;
+  actions: Actions;
+}) {
+  const fields = use();
+  const gone = fields === null && actions.view.path[0] === id;
+
+  useEffect(() => {
+    if (gone) actions.leaveView();
+  });
+
+  return fields && <Rows command={{ ...fields, id } as CommandItem} actions={actions} />;
+}
+
+type Row = { item: CommandItem; path: string[]; crumbs: string[] };
+
+/** The items to the path, and below them, while searching, the items of their nested views. */
+function rows(items: CommandItem[], path: string[], crumbs: string[], deep: boolean): Row[] {
+  return items.flatMap((item) => {
+    const row = { item, path: [...path, item.id], crumbs };
+    // A disabled command can't be opened, so its items aren't found either.
+    return deep && item.items && !item.disabled
+      ? [row, ...rows(item.items, row.path, [...crumbs, item.label], deep)]
+      : [row];
+  });
+}
+
+/** Finds the item at the ids below the command, or null once it's gone or can't be opened. */
+function find(item: CommandItem, path: string[]): CommandItem | null {
+  if (item.disabled || !item.items) return null;
+  if (path.length === 0) return item;
+
+  const child = item.items.find(({ id }) => id === path[0]);
+  return child ? find(child, path.slice(1)) : null;
+}
+
+/** The rows a command adds to the open view: itself at the root, or the items of its nested view. */
+function Rows({ command, actions }: { command: CommandItem; actions: Actions }) {
+  const { view } = actions;
+  const atRoot = view.path.length === 0;
+  const own = view.path[0] === command.id;
+  const node = own ? find(command, view.path.slice(1)) : null;
+
+  useLayoutEffect(() => {
+    if (node) actions.showView(node.label, node.placeholder);
+  });
+  useEffect(() => {
+    if (own && !node) actions.leaveView();
+  });
+
+  if (!atRoot && !node) return null;
+
+  const items = node?.items ?? [command];
+  const basePath = node ? view.path : [];
+
+  return rows(items, basePath, [], view.search !== "").map(({ item, path, crumbs }) => (
+    <Command.Item
+      key={valueOf(path)}
+      value={valueOf(path)}
+      keywords={[...crumbs, item.label, ...(item.keywords ?? [])]}
+      disabled={!!item.disabled}
+      onSelect={() => (item.items ? actions.openView(path, item) : actions.run(item.run))}
+      className="flex min-h-9 cursor-default items-center gap-3 px-3 py-1.5 type-body-md text-mauve-950 select-none data-[disabled=true]:text-mauve-400 data-[selected=true]:bg-mauve-100 dark:text-mauve-50 dark:data-[disabled=true]:text-mauve-500 dark:data-[selected=true]:bg-mauve-800"
+    >
+      {/* An item without an icon keeps its place, so every label starts in the same column. */}
+      <span aria-hidden className="flex size-4 shrink-0">
+        {item.icon && <Icon icon={item.icon} size={4} />}
+      </span>
+      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+        {crumbs.map((crumb) => (
+          <Fragment key={crumb}>
+            <span className="shrink-0 text-mauve-500">{crumb}</span>
+            <span aria-hidden className="flex shrink-0 text-mauve-400">
+              <Icon icon={ArrowRightSLine} />
+            </span>
+          </Fragment>
+        ))}
+        <span>{item.label}</span>
+      </span>
+      {item.disabled ? (
+        <span className="shrink-0 type-body-sm text-mauve-500">{item.disabled}</span>
+      ) : (
+        item.checked && (
+          <>
+            <span aria-hidden className="flex shrink-0">
+              <Icon icon={CheckLine} />
+            </span>
+            <span className="sr-only">, current</span>
+          </>
+        )
+      )}
+    </Command.Item>
+  ));
+}

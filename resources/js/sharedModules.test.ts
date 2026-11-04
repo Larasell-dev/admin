@@ -22,5 +22,7 @@ it("shares the panel's own extension API", () => {
     "Page",
     "ResourceTable",
     "SidebarLayout",
+    "defineCommand",
+    "useCommand",
   ]);
 });
