@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Data\View;
 
 use Larasell\Admin\Data\ViewModel\Categories\CategoryOptionData;
+use Larasell\Admin\Data\ViewModel\ContentLocale\ContentLocaleData;
 use Larasell\Admin\Data\ViewModel\ProductDetailData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -18,5 +19,6 @@ class EditProductPageData extends Data
         public array $categories,
         public ?string $createCategoryUrl,
         public string $uploadImagesUrl,
+        public ContentLocaleData $contentLocale,
     ) {}
 }

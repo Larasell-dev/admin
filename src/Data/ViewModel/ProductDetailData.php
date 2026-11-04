@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Data\ViewModel;
 
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Product;
 use Spatie\LaravelData\Data;
@@ -12,8 +13,12 @@ class ProductDetailData extends Data
 {
     public function __construct(
         public int $id,
-        public string $name,
-        public string $slug,
+        /** In the content locale, null while the product has none in it. */
+        public ?string $name,
+        public ?string $slug,
+        /** What the store shows in the content locale, the name of another locale while it has none. */
+        public string $fallbackName,
+        public string $fallbackSlug,
         public bool $visible,
         public ?WeightData $weight,
         public ?DimensionsData $dimensions,
@@ -29,15 +34,17 @@ class ProductDetailData extends Data
         public array $images,
     ) {}
 
-    public static function fromModel(Product $product): self
+    public static function fromModel(Product $product, Locale $locale): self
     {
         // Qualified, as the pivot table has an id too.
         $categoryKey = $product->categories()->getRelated()->getQualifiedKeyName();
 
         return new self(
             id: $product->id,
-            name: $product->name->get(),
-            slug: $product->slug->get(),
+            name: $product->name->has($locale->value) ? $product->name->get($locale->value) : null,
+            slug: $product->slug->has($locale->value) ? $product->slug->get($locale->value) : null,
+            fallbackName: $product->name->get($locale->value),
+            fallbackSlug: $product->slug->get($locale->value),
             visible: $product->status === Visibility::Visible,
             weight: $product->weight === null ? null : WeightData::fromWeight($product->weight),
             dimensions: $product->dimensions === null ? null : DimensionsData::fromDimensions($product->dimensions),

@@ -13,6 +13,7 @@ declare namespace Larasell.Admin.Data.View {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
     createCategoryUrl: string | null;
     uploadImagesUrl: string;
+    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type EditAdminPageData = {
     editedAdmin: Larasell.Admin.Data.ViewModel.AdminData;
@@ -26,6 +27,7 @@ declare namespace Larasell.Admin.Data.View {
     categories: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
     createCategoryUrl: string | null;
     uploadImagesUrl: string;
+    contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
   };
   export type HomePageData = {
     createProductUrl: string | null;
@@ -144,8 +146,10 @@ declare namespace Larasell.Admin.Data.ViewModel {
   };
   export type ProductDetailData = {
     id: number;
-    name: string;
-    slug: string;
+    name: string | null;
+    slug: string | null;
+    fallbackName: string;
+    fallbackSlug: string;
     visible: boolean;
     weight: Larasell.Admin.Data.ViewModel.WeightData | null;
     dimensions: Larasell.Admin.Data.ViewModel.DimensionsData | null;
@@ -200,6 +204,17 @@ declare namespace Larasell.Admin.Data.ViewModel.Categories {
     visible: boolean;
     url: string | null;
     children: Array<Larasell.Admin.Data.ViewModel.Categories.CategoryOptionData>;
+  };
+}
+declare namespace Larasell.Admin.Data.ViewModel.ContentLocale {
+  export type ContentLocaleData = {
+    current: string;
+    options: Array<Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleOptionData>;
+    switchUrl: string;
+  };
+  export type ContentLocaleOptionData = {
+    value: string;
+    label: string;
   };
 }
 declare namespace Larasell.Admin.Data.ViewModel.Customers {

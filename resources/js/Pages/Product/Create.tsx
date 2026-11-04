@@ -1,4 +1,5 @@
 import { Form } from "@inertiajs/react";
+import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/ProductForm";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
@@ -12,21 +13,32 @@ export default function Create({
   categories,
   createCategoryUrl,
   uploadImagesUrl,
+  contentLocale,
 }: Props) {
   return (
-    <>
-      <Page.Header title="New product" backLink={{ href: indexUrl, label: "Back to products" }} />
+    <Form
+      // Remounts the select once switching the language reloads the page.
+      key={contentLocale.current}
+      action={storeUrl}
+      method="post"
+      // Around the header too, so the language select knows about unsaved changes; `contents`
+      // keeps the header and body stacked in the layout as if the form weren't there.
+      className="contents"
+    >
+      <Page.Header
+        title="New product"
+        backLink={{ href: indexUrl, label: "Back to products" }}
+        actions={<ContentLocaleSelect contentLocale={contentLocale} />}
+      />
       <Page.Body>
-        <Form action={storeUrl} method="post">
-          <ProductForm
-            categories={categories}
-            createCategoryUrl={createCategoryUrl}
-            uploadImagesUrl={uploadImagesUrl}
-          />
-          <UnsavedChangesToast />
-        </Form>
+        <ProductForm
+          categories={categories}
+          createCategoryUrl={createCategoryUrl}
+          uploadImagesUrl={uploadImagesUrl}
+        />
+        <UnsavedChangesToast />
       </Page.Body>
-    </>
+    </Form>
   );
 }
 

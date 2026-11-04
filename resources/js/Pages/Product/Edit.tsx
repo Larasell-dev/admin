@@ -1,4 +1,5 @@
 import { Form } from "@inertiajs/react";
+import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/ProductForm";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
@@ -13,29 +14,36 @@ export default function Edit({
   categories,
   createCategoryUrl,
   uploadImagesUrl,
+  contentLocale,
 }: Props) {
   return (
-    <>
-      <Page.Header title={product.name} backLink={{ href: indexUrl, label: "Back to products" }} />
+    <Form
+      // Inertia keeps this page mounted when moving between products or languages; remounting
+      // resets the fields to the new values.
+      key={`${updateUrl}-${contentLocale.current}`}
+      action={updateUrl}
+      method="put"
+      // The saved values become the new baseline, so the form is no longer dirty.
+      setDefaultsOnSuccess
+      // Around the header too, so the language select knows about unsaved changes; `contents`
+      // keeps the header and body stacked in the layout as if the form weren't there.
+      className="contents"
+    >
+      <Page.Header
+        title={product.name ?? product.fallbackName}
+        backLink={{ href: indexUrl, label: "Back to products" }}
+        actions={<ContentLocaleSelect contentLocale={contentLocale} />}
+      />
       <Page.Body>
-        <Form
-          // Inertia keeps this page mounted when moving between products; remounting resets the fields.
-          key={updateUrl}
-          action={updateUrl}
-          method="put"
-          // The saved values become the new baseline, so the form is no longer dirty.
-          setDefaultsOnSuccess
-        >
-          <ProductForm
-            product={product}
-            categories={categories}
-            createCategoryUrl={createCategoryUrl}
-            uploadImagesUrl={uploadImagesUrl}
-          />
-          <UnsavedChangesToast />
-        </Form>
+        <ProductForm
+          product={product}
+          categories={categories}
+          createCategoryUrl={createCategoryUrl}
+          uploadImagesUrl={uploadImagesUrl}
+        />
+        <UnsavedChangesToast />
       </Page.Body>
-    </>
+    </Form>
   );
 }
 

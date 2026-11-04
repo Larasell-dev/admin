@@ -143,6 +143,8 @@ it('shows the product\'s values to edit on its page', function () {
                 'id' => $boots->id,
                 'name' => 'Boots',
                 'slug' => 'boots',
+                'fallbackName' => 'Boots',
+                'fallbackSlug' => 'boots',
                 'visible' => false,
                 'weight' => null,
                 'dimensions' => null,

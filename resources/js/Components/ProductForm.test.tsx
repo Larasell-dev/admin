@@ -85,6 +85,8 @@ function savedPage(errors: Record<string, string> = {}) {
 const boots = {
   name: "Boots",
   slug: "boots",
+  fallbackName: "Boots",
+  fallbackSlug: "boots",
   visible: true,
   weight: null,
   dimensions: null,
