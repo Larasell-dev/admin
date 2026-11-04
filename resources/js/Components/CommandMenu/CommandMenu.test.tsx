@@ -4,8 +4,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import { AppHotkeysProvider } from "../../utils/hotkeys";
+import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
+import { themeCommand } from "./themeCommand";
 
 const cleanups: Array<() => void> = [];
 
@@ -281,5 +283,24 @@ describe("registering", () => {
 
     await expect.element(option("Go to orders")).toBeVisible();
     await expect.element(option("Light")).not.toBeInTheDocument();
+  });
+});
+
+describe("theme", () => {
+  afterEach(() => setTheme(Theme.System));
+
+  it("switches the theme from a nested list that marks the current one", async () => {
+    register(themeCommand);
+    await renderMenu();
+    await openMenu();
+    await choose("Switch theme");
+
+    expect(options()).toEqual(["Light", "Dark", "System, current"]);
+
+    await choose("Dark");
+
+    expect(storedTheme()).toBe(Theme.Dark);
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    await expect.element(menu()).not.toBeInTheDocument();
   });
 });
