@@ -10,9 +10,10 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\ProductController;
 use Larasell\Admin\Http\Controllers\ProductImageController;
-use Larasell\Admin\Http\Controllers\Search\SearchProductsController;
-use Larasell\Admin\Search\DatabaseProductSearch;
-use Larasell\Admin\Search\ProductSearch;
+use Larasell\Admin\Http\Controllers\SearchProductsController;
+use Larasell\Admin\Search\Products\DatabaseProductSearch;
+use Larasell\Admin\Search\Products\ProductSearch;
+use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Tables\Product\Products;
 
 /**
@@ -35,6 +36,8 @@ class ProductServiceProvider extends ServiceProvider
         }
 
         Navigation::index(NavItem::Products->label(), 'products', Products::class, icon: Icon::ShoppingBag)->position(NavItem::Products->position());
+
+        app(Searches::class)->add('products', 'Search products', Icon::ShoppingBag, 'Search by name, SKU or barcode', 'larasell.admin.search.products');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('products/create', [ProductController::class, 'create'])->name('products.create')->withHead(title: 'New product');

@@ -9,9 +9,10 @@ use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\Orders\OrderController;
-use Larasell\Admin\Http\Controllers\Search\SearchOrdersController;
-use Larasell\Admin\Search\DatabaseOrderSearch;
-use Larasell\Admin\Search\OrderSearch;
+use Larasell\Admin\Http\Controllers\Orders\SearchOrdersController;
+use Larasell\Admin\Search\Orders\DatabaseOrderSearch;
+use Larasell\Admin\Search\Orders\OrderSearch;
+use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Tables\Orders\Orders;
 
 /**
@@ -35,6 +36,8 @@ class OrderServiceProvider extends ServiceProvider
         }
 
         Navigation::index(NavItem::Orders->label(), 'orders', Orders::class, icon: Icon::Receipt)->position(NavItem::Orders->position());
+
+        app(Searches::class)->add('orders', 'Search orders', Icon::Receipt, 'Search by number, customer or email', 'larasell.admin.search.orders');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');

@@ -1,36 +1,33 @@
 import { router, usePage } from "@inertiajs/react";
-import { FoldersLine, GroupLine, ReceiptLine, ShoppingBagLine } from "@larasell-dev/ui/icons";
 import { useEffect, useState } from "react";
 import type { SharedProps } from "../../types";
-import {
-  type CommandDefinition,
-  type CommandFields,
-  type CommandItem,
-  defineCommand,
-} from "./commands";
+import { navigationIcon } from "../../utils/navigationIcon";
+import { type CommandItem, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
 
-type Resource = keyof NonNullable<SharedProps["searchUrls"]>;
+type Search = Larasell.Admin.Data.ViewModel.Search.SearchData;
 type Result = Larasell.Admin.Data.ViewModel.Search.SearchResultData;
 
 /**
- * A command whose nested view searches the resource on the server as the admin types, and opens
- * the result they pick. It's left out when the resource's module is turned off.
+ * Adds a command for each search the server shares: those of the modules that are turned on and
+ * those plugins add. Each searches its url as the admin types and opens the result they pick.
  */
-function searchCommand(
-  resource: Resource,
-  fields: Pick<CommandFields, "label" | "icon" | "placeholder"> & { label: string },
-): CommandDefinition {
-  return defineCommand({
-    id: `search.${resource}`,
+export function SearchCommands() {
+  const searches = usePage<SharedProps>().props.commandMenu?.searches ?? [];
+
+  return searches.map((search) => <SearchCommand key={search.id} search={search} />);
+}
+
+function SearchCommand({ search: { id, label, icon, placeholder, url } }: { search: Search }) {
+  useCommand({
+    id: `search.${id}`,
     use({ search }) {
-      const url = usePage<SharedProps>().props.searchUrls?.[resource];
       const { results, loading } = useSearch(url, search);
 
-      if (!url) return null;
-
       return {
-        ...fields,
+        label,
+        icon: navigationIcon(icon, false),
+        placeholder,
         // Searches the server only in its own view, and shows the server's results as they are.
         searchItemsFromRoot: false,
         filterItems: false,
@@ -39,10 +36,12 @@ function searchCommand(
       };
     },
   });
+
+  return null;
 }
 
 /** The server's results for the search, once the admin pauses typing for a moment. */
-function useSearch(url: string | undefined, search: string | null) {
+function useSearch(url: string, search: string | null) {
   const query = search?.trim() ?? "";
   const [found, setFound] = useState<{ query: string; results: Result[] }>({
     query: "",
@@ -50,7 +49,7 @@ function useSearch(url: string | undefined, search: string | null) {
   });
 
   useEffect(() => {
-    if (!url || query === "") return;
+    if (query === "") return;
 
     const controller = new AbortController();
     const timer = setTimeout(async () => {
@@ -105,33 +104,4 @@ function resultItem(result: Result): CommandItem {
     ),
     run: () => router.visit(result.url),
   };
-}
-
-/** Searches products, categories, orders and customers, in the navigation's order. */
-export const searchCommands: CommandDefinition[] = [
-  searchCommand("products", {
-    label: "Search products",
-    icon: ShoppingBagLine,
-    placeholder: "Search by name, SKU or barcode",
-  }),
-  searchCommand("categories", {
-    label: "Search categories",
-    icon: FoldersLine,
-    placeholder: "Search by name",
-  }),
-  searchCommand("orders", {
-    label: "Search orders",
-    icon: ReceiptLine,
-    placeholder: "Search by number, customer or email",
-  }),
-  searchCommand("customers", {
-    label: "Search customers",
-    icon: GroupLine,
-    placeholder: "Search by name",
-  }),
-];
-
-/** Not built yet: adds a command for each search the server shares. */
-export function SearchCommands() {
-  return null;
 }

@@ -129,6 +129,9 @@ declare namespace Larasell.Admin.Data.ViewModel {
     email: string;
     avatarUrl: string | null;
   };
+  export type CommandMenuData = {
+    searches: Array<Larasell.Admin.Data.ViewModel.Search.SearchData>;
+  };
   export type DimensionsData = {
     length: string;
     width: string;
@@ -275,6 +278,13 @@ declare namespace Larasell.Admin.Data.ViewModel.Orders {
   };
 }
 declare namespace Larasell.Admin.Data.ViewModel.Search {
+  export type SearchData = {
+    id: string;
+    label: string;
+    icon: string;
+    placeholder: string;
+    url: string;
+  };
   export type SearchMatchData = {
     label: string;
     value: string;

@@ -28,6 +28,7 @@ use Larasell\Admin\Http\Controllers\TableController;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Http\Middleware\LogLicensingPlan;
 use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Search\Searches;
 use Larasell\Admin\ServiceProviders\ApiTokenServiceProvider;
 use Larasell\Admin\ServiceProviders\AuditServiceProvider;
 use Larasell\Admin\ServiceProviders\CategoryServiceProvider;
@@ -64,6 +65,7 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->app->singleton(AdminPanel::class);
         $this->app->singleton(Navigation::class);
+        $this->app->singleton(Searches::class);
 
         // Which locales content is edited in, and how a request picks one. Apps rebind them, e.g.
         // to take both from a sales channel.
