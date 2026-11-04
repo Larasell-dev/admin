@@ -1,4 +1,4 @@
-import { App } from "@inertiajs/react";
+import { App, router } from "@inertiajs/react";
 import { type ComponentType, useEffect, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -8,6 +8,7 @@ import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
+import { searchCommands } from "./searchCommands";
 import { themeCommand } from "./themeCommand";
 
 const cleanups: Array<() => void> = [];
@@ -303,6 +304,8 @@ describe("rendered labels", () => {
       [7, 12],
     ]);
     expect(matchRanges("Rain Boots", "boot")).toEqual([[5, 9]]);
+    // Letters next to each other win over the first letters found, like a substring search.
+    expect(matchRanges("Big orange boots", "boot")).toEqual([[11, 15]]);
     expect(matchRanges("Boots", "tb")).toEqual([]);
     expect(matchRanges("Boots", "")).toEqual([]);
   });
@@ -413,5 +416,149 @@ describe("theme", () => {
     expect(storedTheme()).toBe(Theme.Dark);
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     await expect.element(menu()).not.toBeInTheDocument();
+  });
+});
+
+describe("views that search on their own", () => {
+  it("gives a command's hook the search of its open view, and null while it isn't open", async () => {
+    const searches: Array<string | null> = [];
+    register({
+      id: "lookup",
+      use: ({ search }) => {
+        searches.push(search);
+        return { label: "Look up", items: [{ id: "a", label: "Anything", run: () => {} }] };
+      },
+    });
+    await renderMenu();
+    await openMenu();
+    await search().fill("look");
+    expect(searches.at(-1)).toBeNull();
+
+    await userEvent.keyboard("{Enter}");
+    await search().fill("abc");
+
+    await expect.poll(() => searches.at(-1)).toBe("abc");
+  });
+
+  it("shows the items of a view that filters them itself as they are, in their order", async () => {
+    register({
+      id: "lookup",
+      label: "Look up",
+      filterItems: false,
+      items: [
+        { id: "z", label: "Zebra", run: () => {} },
+        { id: "a", label: "Aardvark", run: () => {} },
+      ],
+    });
+    await renderMenu();
+    await openMenu();
+    await choose("Look up");
+
+    await search().fill("xyz");
+
+    expect(options()).toEqual(["Zebra", "Aardvark"]);
+  });
+
+  it("says it's searching while a view's items load, and nothing before a search", async () => {
+    let loading = true;
+    register({
+      id: "lookup",
+      use: () => ({ label: "Look up", filterItems: false, loading, items: [] }),
+    });
+    await renderMenu();
+    await openMenu();
+    await choose("Look up");
+
+    await expect.element(page.getByText("No results")).not.toBeInTheDocument();
+    await search().fill("a");
+    await expect.element(page.getByText("Searching…")).toBeVisible();
+
+    loading = false;
+    await search().fill("ab");
+
+    await expect.element(page.getByText("No results")).toBeVisible();
+    await expect.element(page.getByText("Searching…")).not.toBeInTheDocument();
+  });
+});
+
+describe("searching on the server", () => {
+  const searchUrls = {
+    products: "/admin/search/products",
+    categories: "/admin/search/categories",
+    orders: "/admin/search/orders",
+    customers: "/admin/search/customers",
+  };
+
+  function respondWith(results: Larasell.Admin.Data.ViewModel.Search.SearchResultData[]) {
+    return vi.spyOn(window, "fetch").mockImplementation(async () => Response.json({ results }));
+  }
+
+  it("searches products once typing pauses, says what matched, and opens the one picked", async () => {
+    const fetch = respondWith([
+      {
+        id: 1,
+        label: "Chelsea Boots",
+        url: "/admin/products/1/edit",
+        match: { label: "SKU", value: "BT-100" },
+      },
+      { id: 2, label: "Boots", url: "/admin/products/2/edit", match: null },
+    ]);
+    const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
+    register(...searchCommands);
+    await renderMenu(undefined, { searchUrls });
+    await openMenu();
+
+    // Searching the root doesn't search the server.
+    await search().fill("products");
+    await expect.element(option("Search products")).toBeVisible();
+    await search().fill("");
+    await choose("Search products");
+    await userEvent.keyboard("bt-1");
+
+    await expect.element(option("Chelsea Boots, SKU: BT-100")).toBeVisible();
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(["/admin/search/products?q=bt-1"]);
+    // In the server's order.
+    await expect
+      .element(page.getByRole("option").nth(0))
+      .toHaveAccessibleName("Chelsea Boots, SKU: BT-100");
+    await expect.element(page.getByRole("option").nth(1)).toHaveAccessibleName("Boots");
+
+    await userEvent.keyboard("{Enter}");
+
+    expect(visit).toHaveBeenCalledWith("/admin/products/1/edit");
+    await expect.element(menu()).not.toBeInTheDocument();
+  });
+
+  it("offers a search for each resource whose module is turned on", async () => {
+    register(...searchCommands);
+    await renderMenu(undefined, { searchUrls: { orders: searchUrls.orders } });
+    await openMenu();
+
+    expect(options()).toEqual(["Search orders"]);
+  });
+
+  it("searches orders, customers and categories at their own urls", async () => {
+    const fetch = respondWith([]);
+    register(...searchCommands);
+    await renderMenu(undefined, { searchUrls });
+    await openMenu();
+
+    expect(options()).toEqual([
+      "Search products",
+      "Search categories",
+      "Search orders",
+      "Search customers",
+    ]);
+
+    for (const [name, url] of [
+      ["Search categories", searchUrls.categories],
+      ["Search orders", searchUrls.orders],
+      ["Search customers", searchUrls.customers],
+    ]) {
+      await choose(name);
+      await search().fill("ada");
+      await expect.poll(() => fetch.mock.calls.at(-1)?.[0]).toBe(`${url}?q=ada`);
+      await userEvent.keyboard("{Escape}{Escape}");
+    }
   });
 });
