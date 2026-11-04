@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use InvalidArgumentException;
 use Larasell\Admin\Http\Middleware\Authenticate;
 use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
+use Larasell\Admin\Http\Middleware\LogLicensingPlan;
 
 class AdminPanel
 {
@@ -58,7 +59,7 @@ class AdminPanel
         $this->registeringRoutes = true;
 
         try {
-            Route::middleware(['web', HandleAdminInertiaRequests::class, Authenticate::class])
+            Route::middleware(['web', LogLicensingPlan::class, HandleAdminInertiaRequests::class, Authenticate::class])
                 ->prefix(config('larasell.admin.panel.path'))
                 ->name('larasell.admin.')
                 ->withHead(title: self::TITLE)
