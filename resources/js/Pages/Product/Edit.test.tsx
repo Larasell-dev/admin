@@ -1,4 +1,3 @@
-import "../../../css/app.css";
 import { App, http, usePage } from "@inertiajs/react";
 import { ToastProvider } from "@larasell-dev/ui";
 import { afterEach, expect, it, vi } from "vitest";

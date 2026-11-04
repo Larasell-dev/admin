@@ -19,15 +19,17 @@ export default function ContentLocaleSelect({ contentLocale }: { contentLocale: 
         aria-label="Content language"
         defaultValue={contentLocale.current}
         disabled={form?.isDirty || form?.processing}
-        onChange={(event) =>
-          router.put(
-            contentLocale.switchUrl,
-            { locale: (event.currentTarget as unknown as HTMLSelectElement).value },
-            { preserveScroll: true },
-          )
-        }
         render={
-          <select>
+          // On the select, which types its own change events; Input types them for an input.
+          <select
+            onChange={(event) =>
+              router.put(
+                contentLocale.switchUrl,
+                { locale: event.currentTarget.value },
+                { preserveScroll: true },
+              )
+            }
+          >
             {contentLocale.options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
