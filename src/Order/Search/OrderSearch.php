@@ -1,23 +1,23 @@
 <?php
 
-namespace Larasell\Admin\Search\Customers;
+namespace Larasell\Admin\Order\Search;
 
 use Illuminate\Support\Collection;
 use Larasell\Admin\Search\SearchQuery;
-use Larasell\Larasell\Models\Customer;
+use Larasell\Larasell\Models\Order;
 
 /**
- * Finds customers, by their name, for the command menu.
+ * Finds orders, by their number and their customer's name and email, for the command menu.
  *
  * @public Bind another implementation in the container to search elsewhere, e.g. with Laravel Scout, or
  * extend() the bound one to change what it finds.
  */
-interface CustomerSearch
+interface OrderSearch
 {
     /**
      * The best matches first, at most $query->limit of them.
      *
-     * @return Collection<int, Customer>
+     * @return Collection<int, Order>
      */
     public function search(SearchQuery $query): Collection;
 }

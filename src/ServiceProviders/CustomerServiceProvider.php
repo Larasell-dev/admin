@@ -5,13 +5,13 @@ namespace Larasell\Admin\ServiceProviders;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Customer\Search\CustomerSearch;
+use Larasell\Admin\Customer\Search\DatabaseCustomerSearch;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\Customers\CustomerController;
 use Larasell\Admin\Http\Controllers\Customers\SearchCustomersController;
-use Larasell\Admin\Search\Customers\CustomerSearch;
-use Larasell\Admin\Search\Customers\DatabaseCustomerSearch;
 use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Tables\Customers\Customers;
 

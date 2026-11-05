@@ -11,8 +11,8 @@ use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\ProductController;
 use Larasell\Admin\Http\Controllers\ProductImageController;
 use Larasell\Admin\Http\Controllers\SearchProductsController;
-use Larasell\Admin\Search\Products\DatabaseProductSearch;
-use Larasell\Admin\Search\Products\ProductSearch;
+use Larasell\Admin\Product\Search\DatabaseProductSearch;
+use Larasell\Admin\Product\Search\ProductSearch;
 use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Tables\Product\Products;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Search\Orders;
+namespace Larasell\Admin\Order\Search;
 
 use Illuminate\Support\Collection;
 use Larasell\Admin\Search\SearchQuery;

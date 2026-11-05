@@ -10,8 +10,8 @@ use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
 use Larasell\Admin\Http\Controllers\Orders\OrderController;
 use Larasell\Admin\Http\Controllers\Orders\SearchOrdersController;
-use Larasell\Admin\Search\Orders\DatabaseOrderSearch;
-use Larasell\Admin\Search\Orders\OrderSearch;
+use Larasell\Admin\Order\Search\DatabaseOrderSearch;
+use Larasell\Admin\Order\Search\OrderSearch;
 use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Tables\Orders\Orders;
 

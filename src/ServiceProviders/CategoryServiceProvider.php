@@ -5,6 +5,8 @@ namespace Larasell\Admin\ServiceProviders;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Category\Search\CategorySearch;
+use Larasell\Admin\Category\Search\DatabaseCategorySearch;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Enums\NavItem;
 use Larasell\Admin\Facades\Navigation;
@@ -15,8 +17,6 @@ use Larasell\Admin\Http\Controllers\Categories\MoveCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\SearchCategoriesController;
 use Larasell\Admin\Http\Controllers\Categories\SearchProductsNotInCategoryController;
 use Larasell\Admin\Http\Controllers\Categories\UnhideCategoryController;
-use Larasell\Admin\Search\Categories\CategorySearch;
-use Larasell\Admin\Search\Categories\DatabaseCategorySearch;
 use Larasell\Admin\Search\Searches;
 
 /**
