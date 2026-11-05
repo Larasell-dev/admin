@@ -24,16 +24,21 @@ class Orders extends Table
         return Order::query()->latest();
     }
 
+    public function title(): string
+    {
+        return __('Orders');
+    }
+
     public function columns(): array
     {
         return [
-            TextColumn::make('number', 'Order'),
-            TextColumn::make('customer_name', 'Customer'),
-            BadgeColumn::make('status')
+            TextColumn::make('number', __('Order')),
+            TextColumn::make('customer_name', __('Customer')),
+            BadgeColumn::make('status', __('Status'))
                 ->map(fn (OrderStatus $status): string => BadgeData::fromOrderStatus($status)->label)
                 ->variant(fn (OrderStatus $status): Variant => BadgeData::fromOrderStatus($status)->variant),
-            TextColumn::make('total')->map(fn (Price $total, Order $order): string => Price::format($total, $order->currency, app()->getLocale())),
-            TextColumn::make('created_at', 'Date')->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
+            TextColumn::make('total', __('Total'))->map(fn (Price $total, Order $order): string => Price::format($total, $order->currency, app()->getLocale())),
+            TextColumn::make('created_at', __('Date'))->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
         ];
     }
 
@@ -45,8 +50,8 @@ class Orders extends Table
     public function emptyState(): array
     {
         return [
-            'title' => 'No orders yet',
-            'description' => 'Orders appear here once customers check out.',
+            'title' => __('No orders yet'),
+            'description' => __('Orders appear here once customers check out.'),
             'icon' => Icon::Receipt,
         ];
     }

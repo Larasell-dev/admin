@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { TableRowAction } from "../types";
 import { overlayExclusive } from "../utils/hotkeys";
 import Freeze from "./Freeze";
+import { fbs } from "fbtee";
 
 type Props = {
   /** The action waiting for confirmation, or null when the dialog is closed. */
@@ -50,7 +51,10 @@ function Confirmation({
     <AlertDialog.Popup title={confirm.title} description={confirm.message}>
       {confirm.confirmationText !== null && (
         <Field
-          label={`Type "${confirm.confirmationText}" to confirm`}
+          label={fbs(
+            ['Type "', fbs.param("confirmationText", confirm.confirmationText), '" to confirm'],
+            "Confirmation dialog of a table action, e.g. deleting: label of the field the admin types the given text into to confirm, e.g. 'Type \"DELETE\" to confirm'",
+          )}
           name="confirmation"
           error={error}
         >

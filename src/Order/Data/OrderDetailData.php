@@ -53,7 +53,7 @@ class OrderDetailData extends Data
             discount: $order->discount_total->isZero() ? null : $format($order->discount_total),
             shipping: $shippingPrice === null
                 ? null
-                : new AmountData($order->shipping_option_name ?? 'Shipping', $format($shippingPrice)),
+                : new AmountData($order->shipping_option_name ?? __('Shipping'), $format($shippingPrice)),
             taxes: self::taxes($order, $format),
             taxIncluded: $order->tax_price_mode === TaxPriceMode::Inclusive,
             total: $format($order->total),
@@ -83,7 +83,7 @@ class OrderDetailData extends Data
         $components = $order->tax_snapshot['components'] ?? [];
 
         if ($components === []) {
-            return [new AmountData('Tax', $format($order->tax_total))];
+            return [new AmountData(__('Tax'), $format($order->tax_total))];
         }
 
         return array_map(function (array $component) use ($format): AmountData {

@@ -25,3 +25,5 @@ yarn-error.log
 /.zed
 /public/vendor/larasell-admin
 /.vitest
+/.fbtee
+/resources/js/translations

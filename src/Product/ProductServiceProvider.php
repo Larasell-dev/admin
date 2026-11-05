@@ -5,6 +5,7 @@ namespace Larasell\Admin\Product;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -37,10 +38,10 @@ class ProductServiceProvider extends ServiceProvider
 
         Navigation::index(NavItem::Products->label(), 'products', Products::class, icon: Icon::ShoppingBag)->position(NavItem::Products->position());
 
-        app(Searches::class)->add('products', 'Search products', Icon::ShoppingBag, 'Search by name, SKU or barcode', 'larasell.admin.search.products');
+        app(Searches::class)->add('products', Translate::later('Search products'), Icon::ShoppingBag, Translate::later('Search by name, SKU or barcode'), 'larasell.admin.search.products');
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::get('products/create', [ProductController::class, 'create'])->name('products.create')->withHead(title: 'New product');
+            Route::get('products/create', [ProductController::class, 'create'])->name('products.create')->withHead(title: Translate::later('New product'));
             Route::post('products', [ProductController::class, 'store'])->name('products.store');
             Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');

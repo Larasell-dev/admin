@@ -179,6 +179,17 @@ declare namespace Larasell.Admin.Platform.ContentLocale.Data {
     label: string;
   };
 }
+declare namespace Larasell.Admin.Platform.InterfaceLocale.Data {
+  export type InterfaceLocaleData = {
+    current: string;
+    options: Array<Larasell.Admin.Platform.InterfaceLocale.Data.InterfaceLocaleOptionData>;
+    switchUrl: string;
+  };
+  export type InterfaceLocaleOptionData = {
+    value: string;
+    label: string;
+  };
+}
 declare namespace Larasell.Admin.Platform.Navigation {
   export type NavigationItemData = {
     id: string;

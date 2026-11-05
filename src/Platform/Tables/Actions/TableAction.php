@@ -83,9 +83,15 @@ final class TableAction implements JsonSerializable
         }
     }
 
+    /**
+     * In the request's language. Given in English, e.g. Translate::later('Add product'), which
+     * also names the action, so its name doesn't change with the language.
+     */
     public function label(): string
     {
-        return $this->label;
+        $label = __($this->label);
+
+        return is_string($label) ? $label : $this->label;
     }
 
     public function name(): string
@@ -124,7 +130,7 @@ final class TableAction implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'label' => $this->label,
+            'label' => $this->label(),
             'method' => 'get',
             // Paired with assertConfigured(), which the table calls first and which names the table.
             'url' => $this->url ?? throw new LogicException("Action [{$this->label}] needs a link: call to() or route()."),

@@ -169,9 +169,15 @@ class Action
         return Str::slug($this->label);
     }
 
+    /**
+     * In the request's language. Given in English, e.g. Translate::later('Delete'), which also
+     * names the action in its URL, so a page loaded before switching the language still finds it.
+     */
     public function label(): string
     {
-        return $this->label;
+        $label = __($this->label);
+
+        return is_string($label) ? $label : $this->label;
     }
 
     public function assertConfigured(): void
@@ -214,7 +220,7 @@ class Action
     {
         return [
             'name' => $this->name(),
-            'label' => $this->label,
+            'label' => $this->label(),
             'method' => $this->runs() ? 'post' : 'get',
             'url' => $this->runs() ? $table->actionUrl($this, $record) : $this->urlFor($record),
             'confirm' => $this->confirms ? $this->confirmationFor($record) : null,
@@ -241,7 +247,7 @@ class Action
             'title' => $this->confirmation['title'] ?? Str::ucfirst("{$verb} {$model}"),
             'message' => $this->confirmation['message'] ?? "Are you sure you want to {$verb} this {$model}?",
             'confirmButton' => $this->confirmation['confirmButton'] ?? $this->label,
-            'cancelButton' => $this->confirmation['cancelButton'] ?? 'Cancel',
+            'cancelButton' => $this->confirmation['cancelButton'] ?? __('Cancel'),
             'confirmationText' => $this->confirmationTextFor($record),
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Platform\Navigation;
 
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Support\Concerns\HasLabel;
 
 enum NavItem: string
@@ -18,12 +19,12 @@ enum NavItem: string
     public function label(): string
     {
         return match ($this) {
-            self::Home => 'Home',
-            self::Products => 'Products',
-            self::Categories => 'Categories',
-            self::Orders => 'Orders',
-            self::Customers => 'Customers',
-            self::Settings => 'Settings',
+            self::Home => Translate::later('Home'),
+            self::Products => Translate::later('Products'),
+            self::Categories => Translate::later('Categories'),
+            self::Orders => Translate::later('Orders'),
+            self::Customers => Translate::later('Customers'),
+            self::Settings => Translate::later('Settings'),
         };
     }
 

@@ -4,6 +4,7 @@ import { Button, Icon, IconButton, useScrollMaskScrollbar } from "@larasell-dev/
 import { AddLine, NodeTree } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { cn } from "cn";
+import { fbs } from "fbtee";
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
 import CategoryTree, { CategoryDeletion } from "../../Components/Category/CategoryTree";
 import Freeze from "../../Components/Freeze";
@@ -66,7 +67,10 @@ export function CategoryTreeTrigger() {
         <IconButton
           variant="tertiary"
           size="sm"
-          aria-label="Open categories"
+          aria-label={fbs(
+            "Open categories",
+            "Category pages, small screens: accessible name of the header button that opens the category tree in a side panel",
+          )}
           DANGEROUS_className="lg:hidden"
         >
           <Icon icon={NodeTree} />
@@ -101,7 +105,10 @@ function TreeDialog(
             category, which covers the page as well, so the page isn't dimmed twice. */}
         <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
         <Dialog.Popup
-          aria-label="Categories"
+          aria-label={fbs(
+            "Categories",
+            "Category pages, small screens: accessible name of the side panel that shows the category tree",
+          )}
           className={cn(
             // Panel
             "fixed top-(--mobile-nav-height) bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none lg:hidden dark:bg-mauve-950",
@@ -147,11 +154,15 @@ function TreePanel({
     >
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
         <h1 id={headingId} className="type-body-md text-mauve-950 dark:text-mauve-50">
-          Categories
+          <fbt desc="Category pages: heading above the tree that lists all categories of the store">
+            Categories
+          </fbt>
         </h1>
         <Button variant="tertiary" render={<Link href={createUrl} prefetch="hover" />}>
           <Icon icon={AddLine} />
-          Add
+          <fbt desc="Category pages: button next to the category tree heading that opens the form to create a new category">
+            Add
+          </fbt>
         </Button>
       </header>
       <div ref={treeScroll} className="scroll-mask-y-from-95% min-h-0 flex-1 overflow-y-auto pb-3">

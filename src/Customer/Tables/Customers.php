@@ -5,6 +5,7 @@ namespace Larasell\Admin\Customer\Tables;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Larasell\Admin\Customer\Actions\DeleteCustomer;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
@@ -22,12 +23,17 @@ class Customers extends Table
         return Customer::query()->withCount('orders')->latest();
     }
 
+    public function title(): string
+    {
+        return __('Customers');
+    }
+
     public function columns(): array
     {
         return [
-            TextColumn::make('name')->map(fn (mixed $value, Customer $customer): string => $customer->fullName()),
-            TextColumn::make('orders_count', 'Orders'),
-            TextColumn::make('created_at', 'Created')->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
+            TextColumn::make('name', __('Name'))->map(fn (mixed $value, Customer $customer): string => $customer->fullName()),
+            TextColumn::make('orders_count', __('Orders')),
+            TextColumn::make('created_at', __('Created'))->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
         ];
     }
 
@@ -39,15 +45,18 @@ class Customers extends Table
     public function headerActions(): array
     {
         return [
-            TableAction::make('Add customer')->route('larasell.admin.customers.create')->icon(Icon::Add),
+            TableAction::make(Translate::later('Add customer'))->route('larasell.admin.customers.create')->icon(Icon::Add),
         ];
     }
 
     public function actions(): array
     {
         return [
-            Action::make('Delete', handle: fn (Customer $customer) => app(DeleteCustomer::class)->handle($customer))
-                ->confirm(message: 'Their orders are kept, with the name and email they were placed with. This can\'t be undone.')
+            Action::make(Translate::later('Delete'), handle: fn (Customer $customer) => app(DeleteCustomer::class)->handle($customer))
+                ->confirm(
+                    title: __('Delete customer'),
+                    message: __('Their orders are kept, with the name and email they were placed with. This can\'t be undone.'),
+                )
                 ->icon(Icon::DeleteBin)
                 ->destructive(),
         ];
@@ -56,8 +65,8 @@ class Customers extends Table
     public function emptyState(): array
     {
         return [
-            'title' => 'No customers yet',
-            'description' => 'Customers appear here after they place their first order, or when you add one.',
+            'title' => __('No customers yet'),
+            'description' => __('Customers appear here after they place their first order, or when you add one.'),
             'icon' => Icon::Group,
             'actions' => $this->headerActions(),
         ];

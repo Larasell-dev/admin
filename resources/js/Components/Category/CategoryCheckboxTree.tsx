@@ -24,6 +24,7 @@ import { cn } from "cn";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { overlayExclusive } from "../../utils/hotkeys";
 import Tree, { TreeItem } from "../Tree";
+import { fbs } from "fbtee";
 
 type Category = Larasell.Admin.Category.Data.CategoryOptionData;
 type CheckedState = boolean | "mixed";
@@ -135,14 +136,22 @@ export default function CategoryCheckboxTree({
         <div className="flex justify-center px-(--inset) py-10">
           <EmptyState
             icon={FoldersLine}
-            title="No categories yet"
-            description="Create categories to list the product in the store."
+            title={fbs(
+              "No categories yet",
+              "Product form, categories section: heading shown while the store has no categories to pick from",
+            )}
+            description={fbs(
+              "Create categories to list the product in the store.",
+              "Product form, categories section: text below 'No categories yet', shown while the store has no categories",
+            )}
             // Only given children when it has an action; even `null` renders an empty actions row.
             {...(createUrl && {
               children: (
                 <Button render={<Link href={createUrl} prefetch="hover" />}>
                   <Icon icon={AddLine} />
-                  Create categories
+                  <fbt desc="Product form, categories section: button that goes to creating a category, shown while the store has none">
+                    Create categories
+                  </fbt>
                 </Button>
               ),
             })}
@@ -153,7 +162,10 @@ export default function CategoryCheckboxTree({
         <div ref={scroll} className="scroll-mask-y max-h-80 overflow-y-auto">
           <MotionConfig reducedMotion="user">
             <Tree
-              aria-label="Categories"
+              aria-label={fbs(
+                "Categories",
+                "Product form: accessible name of the tree of checkboxes that picks the categories the product is listed in",
+              )}
               items={categories}
               getLabel={(category) => category.name}
               expandedIds={expandedIds}
@@ -242,7 +254,17 @@ function CategoryRow({
             <IconButton
               variant="tertiary"
               size="sm"
-              aria-label={`${expanded ? "Close" : "Open"} ${category.name}`}
+              aria-label={
+                expanded
+                  ? fbs(
+                      ["Close ", fbs.param("categoryName", category.name)],
+                      "Product form, categories tree: accessible name of the button that collapses a category to hide its subcategories, e.g. 'Close Shirts'",
+                    )
+                  : fbs(
+                      ["Open ", fbs.param("categoryName", category.name)],
+                      "Product form, categories tree: accessible name of the button that expands a category to show its subcategories, e.g. 'Open Shirts'",
+                    )
+              }
               tabIndex={-1}
               onClick={onToggleOpen}
               DANGEROUS_className="pointer-events-auto focus-visible:-outline-offset-2"
@@ -279,7 +301,10 @@ function CategoryMenu({ url, name, tabbable }: { url: string; name: string; tabb
           <IconButton
             variant="tertiary"
             size="sm"
-            aria-label={`Actions for ${name}`}
+            aria-label={fbs(
+              ["Actions for ", fbs.param("categoryName", name)],
+              "Product form, categories tree: accessible name of the button that opens a category's menu of actions, e.g. 'Actions for Shirts'",
+            )}
             DANGEROUS_className="pointer-events-auto focus-visible:-outline-offset-2"
           >
             <Icon icon={More2Fill} />
@@ -289,7 +314,9 @@ function CategoryMenu({ url, name, tabbable }: { url: string; name: string; tabb
       <Menu.Popup>
         <HotkeysProvider scope="category-actions-menu" exclusive={overlayExclusive}>
           <Menu.Item icon={EyeLine} render={<Link href={url} prefetch="hover" />}>
-            View
+            <fbt desc="Product form, categories tree: menu item of a category that opens the category's page">
+              View
+            </fbt>
           </Menu.Item>
         </HotkeysProvider>
       </Menu.Popup>

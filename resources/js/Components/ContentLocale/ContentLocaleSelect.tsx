@@ -1,6 +1,7 @@
 import { router } from "@inertiajs/react";
 import { Input } from "@larasell-dev/ui";
 import { useUnsavedChanges } from "../UnsavedChangesToast";
+import { fbs } from "fbtee";
 
 type ContentLocale = Larasell.Admin.Platform.ContentLocale.Data.ContentLocaleData;
 
@@ -21,7 +22,10 @@ export default function ContentLocaleSelect({
   return (
     <div className="w-40">
       <Input
-        aria-label="Content language"
+        aria-label={fbs(
+          "Content language",
+          "Product and category pages: accessible name of the select that picks the language the content is edited in, not the panel's own language",
+        )}
         defaultValue={contentLocale.current}
         disabled={unsavedChanges}
         render={

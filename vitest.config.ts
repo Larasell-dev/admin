@@ -1,3 +1,4 @@
+import fbtee from "@nkzw/vite-plugin-fbtee";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
@@ -7,10 +8,11 @@ export default defineConfig({
   test: {
     projects: [
       {
-        plugins: [react(), tailwindcss()],
+        plugins: [fbtee(), react(), tailwindcss()],
         test: {
           name: "frontend",
           include: ["resources/js/**/*.test.{ts,tsx}"],
+          setupFiles: ["resources/js/vitest.setup.ts"],
           browser: {
             enabled: true,
             provider: playwright(),

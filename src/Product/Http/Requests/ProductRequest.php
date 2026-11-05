@@ -96,8 +96,8 @@ class ProductRequest extends FormRequest
      */
     public function messages(): array
     {
-        $amount = 'The :attribute must be a number of 0 or more, with a dot for decimals.';
-        $axis = 'Enter a :attribute too, or leave length, width and height empty.';
+        $amount = __('The :attribute must be a number of 0 or more, with a dot for decimals.');
+        $axis = __('Enter a :attribute too, or leave length, width and height empty.');
 
         return [
             'weight.amount.regex' => $amount,
@@ -112,18 +112,18 @@ class ProductRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'weight.amount' => 'weight',
-            'weight.unit' => 'weight unit',
-            'dimensions.length' => 'length',
-            'dimensions.width' => 'width',
-            'dimensions.height' => 'height',
-            'dimensions.unit' => 'dimensions unit',
-            'allow_backorders' => 'backorders',
-            'min_quantity' => 'minimum quantity',
-            'max_quantity' => 'maximum quantity',
+            'weight.amount' => __('weight'),
+            'weight.unit' => __('weight unit'),
+            'dimensions.length' => __('length'),
+            'dimensions.width' => __('width'),
+            'dimensions.height' => __('height'),
+            'dimensions.unit' => __('dimensions unit'),
+            'allow_backorders' => __('backorders'),
+            'min_quantity' => __('minimum quantity'),
+            'max_quantity' => __('maximum quantity'),
             // Shown beside the images, which have no key the admin would know.
-            'images.*' => 'image',
-            'image_alts.*' => 'alt text',
+            'images.*' => __('image'),
+            'image_alts.*' => __('alt text'),
         ];
     }
 

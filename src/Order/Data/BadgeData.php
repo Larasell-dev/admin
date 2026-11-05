@@ -22,21 +22,21 @@ class BadgeData extends Data
     public static function fromOrderStatus(OrderStatus $status): self
     {
         return match ($status) {
-            OrderStatus::PendingPayment => new self('Pending payment', Variant::Warning),
-            OrderStatus::Paid => new self('Paid', Variant::Success),
-            OrderStatus::PaymentFailed => new self('Payment failed', Variant::Danger),
-            OrderStatus::Fulfilled => new self('Fulfilled', Variant::Info),
-            OrderStatus::Cancelled => new self('Cancelled', Variant::Neutral),
+            OrderStatus::PendingPayment => new self(__('Pending payment'), Variant::Warning),
+            OrderStatus::Paid => new self(__('Paid'), Variant::Success),
+            OrderStatus::PaymentFailed => new self(__('Payment failed'), Variant::Danger),
+            OrderStatus::Fulfilled => new self(__('Fulfilled'), Variant::Info),
+            OrderStatus::Cancelled => new self(__('Cancelled'), Variant::Neutral),
         };
     }
 
     public static function fromPaymentStatus(PaymentStatus $status): self
     {
         return match ($status) {
-            PaymentStatus::Pending => new self('Pending', Variant::Warning),
-            PaymentStatus::Succeeded => new self('Succeeded', Variant::Success),
-            PaymentStatus::Failed => new self('Failed', Variant::Danger),
-            PaymentStatus::Cancelled => new self('Cancelled', Variant::Neutral),
+            PaymentStatus::Pending => new self(__('Pending'), Variant::Warning),
+            PaymentStatus::Succeeded => new self(__('Succeeded'), Variant::Success),
+            PaymentStatus::Failed => new self(__('Failed'), Variant::Danger),
+            PaymentStatus::Cancelled => new self(__('Cancelled'), Variant::Neutral),
         };
     }
 }

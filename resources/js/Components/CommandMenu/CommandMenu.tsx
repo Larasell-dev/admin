@@ -3,6 +3,7 @@ import { Icon } from "@larasell-dev/ui";
 import { ArrowLeftSLine, ArrowRightSLine, CheckLine, SearchLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider, useAppHotkeys, useHotkey } from "@tanstack/react-hotkeys";
 import { cn } from "cn";
+import { fbs } from "fbtee";
 import { objectKeys } from "ts-extras";
 import { Command, defaultFilter, useCommandState } from "cmdk";
 import {
@@ -143,7 +144,10 @@ export default function CommandMenu() {
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-overlay backdrop-blur-overlay" />
         <Dialog.Popup
-          aria-label="Command menu"
+          aria-label={fbs(
+            "Command menu",
+            "Accessible name of the command menu dialog, opened with Cmd+K",
+          )}
           className="fixed top-[15vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 border border-border bg-elevated bg-clip-padding shadow-elevated outline-none"
         >
           {/* Suspends the page's hotkeys while open, like other overlays. */}
@@ -152,7 +156,10 @@ export default function CommandMenu() {
               // A cmdk of its own for each level, which starts on the level's highlight. A shared
               // one would highlight the first item once the search changes with the level.
               key={views.length}
-              label="Command menu"
+              label={fbs(
+                "Command menu",
+                "Accessible name of the command menu dialog, opened with Cmd+K",
+              )}
               filter={filter}
               shouldFilter={!searched}
               value={view.highlighted || undefined}
@@ -171,7 +178,17 @@ export default function CommandMenu() {
                 {nested ? (
                   <button
                     type="button"
-                    aria-label={shown ? `Back from ${shown.label}` : "Back"}
+                    aria-label={
+                      shown
+                        ? fbs(
+                            ["Back from ", fbs.param("command", shown.label)],
+                            "Command menu: accessible name of the button that leaves a command's list, e.g. 'Back from Switch theme'",
+                          )
+                        : fbs(
+                            "Back",
+                            "Command menu: accessible name of the button that leaves a command's list",
+                          )
+                    }
                     onClick={back}
                     // Otherwise cmdk takes Enter for running the highlighted item.
                     onKeyDown={(event) => {
@@ -199,7 +216,15 @@ export default function CommandMenu() {
                       back();
                     }
                   }}
-                  placeholder={nested ? (shown?.placeholder ?? "Search") : "Search commands"}
+                  placeholder={
+                    nested
+                      ? (shown?.placeholder ??
+                        fbs("Search", "Command menu: search field placeholder in a command's list"))
+                      : fbs(
+                          "Search commands",
+                          "Command menu: search field placeholder in the list of commands",
+                        )
+                  }
                   className="h-11 min-w-0 flex-1 bg-transparent type-body-md text-mauve-950 outline-none placeholder:text-mauve-500 dark:text-mauve-50"
                 />
               </div>
@@ -209,7 +234,12 @@ export default function CommandMenu() {
                 className="max-h-80 scroll-py-1.5 overflow-y-auto p-1.5"
               >
                 <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
-                  {nested && shown?.loading ? "Searching…" : "No results"}
+                  {nested && shown?.loading
+                    ? fbs(
+                        "Searching…",
+                        "Command menu: shown while the server searches, e.g. for products",
+                      )
+                    : fbs("No results", "Command menu: shown when nothing matches the search")}
                 </Command.Empty>
                 {definitions.map((definition) => (
                   // Keyed by kind too, so a command never switches between calling a hook and not.
@@ -352,7 +382,11 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
             <span aria-hidden className="flex shrink-0">
               <Icon icon={CheckLine} />
             </span>
-            <span className="sr-only">, current</span>
+            <span className="sr-only">
+              <fbt desc="Command menu: read by screen readers after the checked item of a list, e.g. 'Dark, current' for the theme in use">
+                , current
+              </fbt>
+            </span>
           </>
         )
       )}

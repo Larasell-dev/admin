@@ -128,7 +128,8 @@ it('changes the language of the products, not of the interface', function () {
             // The options are named in the interface's language.
             ->where('contentLocale.options.1.label', 'German'));
 
-    expect(App::currentLocale())->toBe('en');
+    // Still the interface language the admin picked, English by default.
+    expect(App::currentLocale())->toBe('en-US');
 });
 
 it('saves the name and slug in the picked locale and keeps the other translations', function () {

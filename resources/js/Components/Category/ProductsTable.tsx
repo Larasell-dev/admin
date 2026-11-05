@@ -24,6 +24,7 @@ import { overlayExclusive } from "../../utils/hotkeys";
 import { isSameSite } from "../../utils/isSameSite";
 import { navigationIcon } from "../../utils/navigationIcon";
 import ConfirmActionDialog from "../ConfirmActionDialog";
+import { fbs } from "fbtee";
 
 type Props = (
   | /** The category doesn't exist yet, so it can't list or take products. */
@@ -90,24 +91,44 @@ export default function ProductsTable(props: Props) {
   const startAdding = () => setAdding(true);
   const empty =
     props.mode === "edit"
-      ? (props.table.emptyState ?? { title: "No products yet", description: null })
+      ? (props.table.emptyState ?? {
+          title: fbs(
+            "No products yet",
+            "Category page, products section: heading shown while the category lists no products",
+          ),
+          description: null,
+        })
       : {
-          title: "No products yet",
-          description: "Products show up here once the category is created.",
+          title: fbs(
+            "No products yet",
+            "Category page, products section: heading shown while the category lists no products",
+          ),
+          description: fbs(
+            "Products show up here once the category is created.",
+            "New category page, products section: text below 'No products yet', saying products can be added once the category is saved",
+          ),
         };
 
   return (
     <Section.Root>
       <Section.Header
-        title="Products"
-        description="The products listed in this category."
+        title={fbs(
+          "Products",
+          "Category page: heading of the section with the products listed in the category",
+        )}
+        description={fbs(
+          "The products listed in this category.",
+          "Category page: text below the heading of the products section",
+        )}
         action={
           canAdd &&
           rows.length > 0 &&
           !adding && (
             <Button type="button" variant="secondary" onClick={startAdding}>
               <Icon icon={AddLine} />
-              Add product
+              <fbt desc="Category page, products section: button that opens a search to add a product to the category">
+                Add product
+              </fbt>
             </Button>
           )
         }
@@ -124,12 +145,16 @@ export default function ProductsTable(props: Props) {
                 children: createProductUrl ? (
                   <Button render={<Link href={createProductUrl} prefetch="hover" />}>
                     <Icon icon={AddLine} />
-                    Create product
+                    <fbt desc="Category page, products section: button that goes to creating a product, shown while the store has no products">
+                      Create product
+                    </fbt>
                   </Button>
                 ) : (
                   <Button type="button" onClick={startAdding}>
                     <Icon icon={AddLine} />
-                    Add product
+                    <fbt desc="Category page, products section: button that opens a search to add a product to the category">
+                      Add product
+                    </fbt>
                   </Button>
                 ),
               })}
@@ -160,7 +185,11 @@ export default function ProductsTable(props: Props) {
                   ))}
                   {hasActions && (
                     <th scope="col" className="w-0 px-1.5">
-                      <span className="sr-only">Actions</span>
+                      <span className="sr-only">
+                        <fbt desc="Category page, products table: heading, for screen readers, of the column with each product's menu of actions">
+                          Actions
+                        </fbt>
+                      </span>
                     </th>
                   )}
                 </tr>
@@ -208,7 +237,21 @@ export default function ProductsTable(props: Props) {
                                 <IconButton
                                   variant="tertiary"
                                   size="sm"
-                                  aria-label={`Actions for ${String(row[table!.columns[0]?.name ?? "id"] as string | number | null)}`}
+                                  aria-label={fbs(
+                                    [
+                                      "Actions for ",
+                                      fbs.param(
+                                        "productName",
+                                        String(
+                                          row[table!.columns[0]?.name ?? "id"] as
+                                            | string
+                                            | number
+                                            | null,
+                                        ),
+                                      ),
+                                    ],
+                                    "Category page, products table: accessible name of the button that opens a product's menu of actions, e.g. 'Actions for Oxford Shirt'",
+                                  )}
                                 >
                                   <Icon icon={More2Fill} />
                                 </IconButton>
@@ -361,8 +404,14 @@ function AddProductBar({
             onOpenChange={(open) => open && products.length === 0 && find("")}
           >
             <Combobox.Input
-              aria-label="Product to add"
-              placeholder="Search products"
+              aria-label={fbs(
+                "Product to add",
+                "Category page: accessible name of the search field that picks a product to add to the category",
+              )}
+              placeholder={fbs(
+                "Search products",
+                "Category page: placeholder of the search field that picks a product to add to the category",
+              )}
               render={<Input />}
             />
             <Combobox.Portal>
@@ -370,7 +419,15 @@ function AddProductBar({
                 <Combobox.Popup className="max-h-72 overflow-y-auto border border-border bg-elevated bg-clip-padding py-1 shadow-popover">
                   <HotkeysProvider scope="product-search" exclusive={overlayExclusive}>
                     <Combobox.Empty className="px-3.5 py-2 type-body-md text-mauve-600 empty:hidden dark:text-mauve-400">
-                      {searching ? "Searching…" : "No products found."}
+                      {searching
+                        ? fbs(
+                            "Searching…",
+                            "Category page: shown in the product search's list while the server searches for products to add",
+                          )
+                        : fbs(
+                            "No products found.",
+                            "Category page: shown in the product search's list when no product that isn't in the category yet matches",
+                          )}
                     </Combobox.Empty>
                     <Combobox.List>
                       {(product: AvailableProduct) => (
@@ -392,14 +449,18 @@ function AddProductBar({
         </Field.Root>
         <div className="flex shrink-0 justify-end gap-1">
           <Button type="button" variant="tertiary" disabled={posting} onClick={onCancel}>
-            Close
+            <fbt desc="Category page: button that closes the bar for adding products to the category">
+              Close
+            </fbt>
           </Button>
           <Button
             type="button"
             {...(posting ? { loading: true } : { disabled: !selected })}
             onClick={add}
           >
-            Add product
+            <fbt desc="Category page: button that adds the product picked in the search to the category">
+              Add product
+            </fbt>
           </Button>
         </div>
       </div>

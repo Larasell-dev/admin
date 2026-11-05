@@ -27,8 +27,8 @@ class SearchOrdersController
             route('larasell.admin.orders.show', $order),
             match (true) {
                 $query->matches($order->number) => null,
-                $query->matches($order->customer_name) => new SearchMatchData('Customer', $order->customer_name),
-                $query->matches($order->customer_email) => new SearchMatchData('Email', $order->customer_email),
+                $query->matches($order->customer_name) => new SearchMatchData(__('Customer'), $order->customer_name),
+                $query->matches($order->customer_email) => new SearchMatchData(__('Email'), $order->customer_email),
                 default => null,
             },
         ));

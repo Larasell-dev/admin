@@ -35,6 +35,7 @@ import { overlayExclusive } from "../../utils/hotkeys";
 import ConfirmActionDialog from "../ConfirmActionDialog";
 import Tree, { TreeItem } from "../Tree";
 import { cn } from "cn";
+import { fbs } from "fbtee";
 
 type Category = Larasell.Admin.Category.Data.CategoryData;
 
@@ -423,7 +424,17 @@ function CategoryRow({
             <IconButton
               variant="tertiary"
               size="sm"
-              aria-label={`${expanded ? "Close" : "Open"} ${category.name}`}
+              aria-label={
+                expanded
+                  ? fbs(
+                      ["Close ", fbs.param("categoryName", category.name)],
+                      "Category tree in the sidebar of the categories pages: accessible name of the button that collapses a category to hide its subcategories, e.g. 'Close Shirts'",
+                    )
+                  : fbs(
+                      ["Open ", fbs.param("categoryName", category.name)],
+                      "Category tree in the sidebar of the categories pages: accessible name of the button that expands a category to show its subcategories, e.g. 'Open Shirts'",
+                    )
+              }
               tabIndex={-1}
               onClick={onToggle}
               DANGEROUS_className={rowButtonClassName}
@@ -496,7 +507,10 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
           <IconButton
             variant="tertiary"
             size="sm"
-            aria-label={`Actions for ${category.name}`}
+            aria-label={fbs(
+              ["Actions for ", fbs.param("categoryName", category.name)],
+              "Category tree in the sidebar of the categories pages: accessible name of the button that opens a category's menu of actions, e.g. 'Actions for Shirts'",
+            )}
             DANGEROUS_className={rowButtonClassName}
           >
             <Icon icon={More2Fill} />
@@ -509,15 +523,21 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
             icon={FolderAddLine}
             render={<Link href={category.createChildUrl} prefetch="hover" />}
           >
-            Add subcategory
+            <fbt desc="Category tree, a category's actions menu: goes to creating a new category inside this one">
+              Add subcategory
+            </fbt>
           </Menu.Item>
           {category.visible ? (
             <Menu.Item icon={EyeOffLine} onClick={() => post(category.hideUrl, false)}>
-              Hide
+              <fbt desc="Category tree, a category's actions menu: hides the category from the storefront">
+                Hide
+              </fbt>
             </Menu.Item>
           ) : (
             <Menu.Item icon={EyeLine} onClick={() => post(category.unhideUrl, true)}>
-              Make visible
+              <fbt desc="Category tree, a hidden category's actions menu: shows the category in the storefront again">
+                Make visible
+              </fbt>
             </Menu.Item>
           )}
           <Menu.Item
@@ -525,7 +545,9 @@ function CategoryMenu({ category, tabbable }: { category: Category; tabbable: bo
             icon={DeleteBinLine}
             onClick={() => askToDelete(category)}
           >
-            Delete
+            <fbt desc="Category tree, a category's actions menu: deletes the category, after a confirmation">
+              Delete
+            </fbt>
           </Menu.Item>
         </HotkeysProvider>
       </Menu.Popup>
@@ -548,14 +570,30 @@ export function CategoryDeletion({ children }: { children: ReactNode }) {
   // The admin types the name to confirm; the server checks it again.
   const deletion: TableRowAction | null = deleting && {
     name: "delete",
-    label: "Delete",
+    label: fbs("Delete", "Category tree: name of the action that deletes a category"),
     method: "post",
     url: deleting.deleteUrl,
     confirm: {
-      title: "Delete category",
-      message: `This also deletes all categories inside "${deleting.name}". Their products stay in the store.`,
-      confirmButton: "Delete",
-      cancelButton: "Cancel",
+      title: fbs(
+        "Delete category",
+        "Category tree: title of the dialog that asks the admin to confirm deleting a category",
+      ),
+      message: fbs(
+        [
+          'This also deletes all categories inside "',
+          fbs.param("categoryName", deleting.name),
+          '". Their products stay in the store.',
+        ],
+        "Category tree: text of the dialog that asks the admin to confirm deleting a category, with the category's name",
+      ),
+      confirmButton: fbs(
+        "Delete",
+        "Category tree: button in the confirmation dialog that deletes the category",
+      ),
+      cancelButton: fbs(
+        "Cancel",
+        "Category tree: button in the confirmation dialog that keeps the category and closes the dialog",
+      ),
       confirmationText: deleting.name,
     },
     destructive: true,

@@ -47,10 +47,12 @@ export default function UserMenu() {
           <Menu.Popup className="origin-(--transform-origin) border border-border bg-elevated bg-clip-padding shadow-popover outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0">
             <HotkeysProvider scope="user-menu" exclusive={overlayExclusive}>
               <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
-                Profile
+                <fbt desc="User menu: goes to the page where the admin edits their own name, avatar and password">
+                  Profile
+                </fbt>
               </UserMenuItem>
               <UserMenuItem icon={LogoutBoxRLine} onClick={() => router.post(logoutUrl)}>
-                Log out
+                <fbt desc="User menu: signs the admin out of the panel">Log out</fbt>
               </UserMenuItem>
             </HotkeysProvider>
           </Menu.Popup>

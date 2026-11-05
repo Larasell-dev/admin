@@ -1,6 +1,7 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import { Button, EmptyState, Field, Input } from "@larasell-dev/ui";
 import { FileShieldLine } from "@larasell-dev/ui/icons";
+import { fbs } from "fbtee";
 import type { FormEvent, ReactNode } from "react";
 import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
@@ -41,10 +42,23 @@ export default function Index({
         <div className="flex flex-1 items-center justify-center px-6 py-12">
           <EmptyState
             icon={FileShieldLine}
-            title={filtered ? "No records match these filters" : (auditLog.emptyState?.title ?? "")}
+            title={
+              filtered
+                ? fbs(
+                    "No records match these filters",
+                    "Audit log page: shown instead of the list of recorded changes when the filters exclude every record",
+                  )
+                : (auditLog.emptyState?.title ?? "")
+            }
             description={filtered ? undefined : (auditLog.emptyState?.description ?? undefined)}
           >
-            {filtered && <Button render={<Link href={indexUrl} />}>Clear filters</Button>}
+            {filtered && (
+              <Button render={<Link href={indexUrl} />}>
+                <fbt desc="Audit log page: button below 'No records match these filters' that removes all filters">
+                  Clear filters
+                </fbt>
+              </Button>
+            )}
           </EmptyState>
         </div>
       )}
@@ -83,52 +97,129 @@ function FilterBar({
   return (
     <form
       onSubmit={submit}
-      aria-label="Filter the audit log"
+      aria-label={fbs(
+        "Filter the audit log",
+        "Audit log page: accessible name of the bar of fields that filter the recorded changes",
+      )}
       className="flex shrink-0 flex-wrap items-start gap-3 border-b border-border px-6 py-4"
     >
       <Filter>
-        <Field label="Event" name="event" error={errors.event}>
-          <Select options={eventOptions} defaultValue={filters.event} all="All events" />
+        <Field
+          label={fbs(
+            "Event",
+            "Audit log filters: label of the select for the kind of recorded change, e.g. created or deleted",
+          )}
+          name="event"
+          error={errors.event}
+        >
+          <Select
+            options={eventOptions}
+            defaultValue={filters.event}
+            all={fbs(
+              "All events",
+              "Audit log filters: option of the event select that doesn't filter by the kind of change",
+            )}
+          />
         </Field>
       </Filter>
       <Filter>
-        <Field label="Actor" name="actor_type" error={errors.actor_type}>
-          <Select options={actorTypeOptions} defaultValue={filters.actor_type} all="Anyone" />
+        <Field
+          label={fbs(
+            "Actor",
+            "Audit log filters: label of the select for the kind of who made the change, e.g. an admin or an API token",
+          )}
+          name="actor_type"
+          error={errors.actor_type}
+        >
+          <Select
+            options={actorTypeOptions}
+            defaultValue={filters.actor_type}
+            all={fbs(
+              "Anyone",
+              "Audit log filters: option of the actor select that doesn't filter by who made the change",
+            )}
+          />
         </Field>
       </Filter>
       <Filter narrow>
-        <Field label="Actor ID" name="actor_id" error={errors.actor_id}>
+        <Field
+          label={fbs(
+            "Actor ID",
+            "Audit log filters: label of the field for the ID of who made the change",
+          )}
+          name="actor_id"
+          error={errors.actor_id}
+        >
           <Input defaultValue={filters.actor_id ?? ""} autoComplete="off" />
         </Field>
       </Filter>
       <Filter>
-        <Field label="Subject" name="subject_type" error={errors.subject_type}>
-          <Select options={subjectTypeOptions} defaultValue={filters.subject_type} all="Anything" />
+        <Field
+          label={fbs(
+            "Subject",
+            "Audit log filters: label of the select for the kind of record that was changed, e.g. a product or an order",
+          )}
+          name="subject_type"
+          error={errors.subject_type}
+        >
+          <Select
+            options={subjectTypeOptions}
+            defaultValue={filters.subject_type}
+            all={fbs(
+              "Anything",
+              "Audit log filters: option of the subject select that doesn't filter by the kind of record changed",
+            )}
+          />
         </Field>
       </Filter>
       <Filter narrow>
-        <Field label="Subject ID" name="subject_id" error={errors.subject_id}>
+        <Field
+          label={fbs(
+            "Subject ID",
+            "Audit log filters: label of the field for the ID of the record that was changed",
+          )}
+          name="subject_id"
+          error={errors.subject_id}
+        >
           <Input defaultValue={filters.subject_id ?? ""} autoComplete="off" />
         </Field>
       </Filter>
       <Filter>
-        <Field label="From" name="from" error={errors.from}>
+        <Field
+          label={fbs(
+            "From",
+            "Audit log filters: label of the date field for the earliest day of changes to show",
+          )}
+          name="from"
+          error={errors.from}
+        >
           <Input type="date" defaultValue={filters.from ?? ""} />
         </Field>
       </Filter>
       <Filter>
-        <Field label="Until" name="until" error={errors.until}>
+        <Field
+          label={fbs(
+            "Until",
+            "Audit log filters: label of the date field for the latest day of changes to show",
+          )}
+          name="until"
+          error={errors.until}
+        >
           <Input type="date" defaultValue={filters.until ?? ""} />
         </Field>
       </Filter>
       {/* Lined up with the inputs, below their labels. */}
       <div className="flex gap-2 pt-6">
         <Button type="submit" variant="primary">
-          Filter
+          <fbt desc="Audit log filters: button that applies the filters to the list of recorded changes">
+            Filter
+          </fbt>
         </Button>
         {filtered && (
           <Button variant="secondary" render={<Link href={indexUrl} />}>
-            Clear
+            <fbt desc="Audit log filters: button that removes all filters from the list of recorded changes">
+              Clear
+            </fbt>
           </Button>
         )}
       </div>

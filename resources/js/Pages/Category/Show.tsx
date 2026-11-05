@@ -1,6 +1,7 @@
 import { Form, Link } from "@inertiajs/react";
 import { Button, EmptyState, Icon, Section, SectionStack } from "@larasell-dev/ui";
 import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
+import { fbs } from "fbtee";
 
 import CategoryForm from "../../Components/Category/CategoryForm";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
@@ -24,7 +25,10 @@ export default function Show(props: Props) {
       <Page.Header
         title={
           props.category === null
-            ? "Category not found"
+            ? fbs(
+                "Category not found",
+                "Category page: title when the address names a category that no longer exists",
+              )
             : (props.category.name ?? props.category.fallbackName)
         }
         actions={
@@ -50,8 +54,14 @@ export default function Show(props: Props) {
             >
               <Section.Root>
                 <Section.Header
-                  title="General"
-                  description="How the category is named and found in the store."
+                  title={fbs(
+                    "General",
+                    "Category page: heading of the form section with the category's name, slug and description",
+                  )}
+                  description={fbs(
+                    "How the category is named and found in the store.",
+                    "Category page: explains the form section with the category's name, slug and description",
+                  )}
                 />
                 <CategoryForm category={props.category} />
               </Section.Root>
@@ -79,16 +89,27 @@ function CategoryNotFound({
     <div className="flex flex-1 items-center justify-center px-6 py-12">
       <EmptyState
         icon={FolderUnknowLine}
-        title="This category doesn't exist anymore"
-        description={`It may have been deleted, or the link you followed is out of date. ${
+        title={fbs(
+          "This category doesn't exist anymore",
+          "Category page: shown when the address names a category that was deleted or never existed",
+        )}
+        description={
           categories.length > 0
-            ? "Pick another category from the list or add a new one."
-            : "Add a category to start organizing your products."
-        }`}
+            ? fbs(
+                "It may have been deleted, or the link you followed is out of date. Pick another category from the list or add a new one.",
+                "Category page: explains why a category is missing, when other categories exist to pick from the tree",
+              )
+            : fbs(
+                "It may have been deleted, or the link you followed is out of date. Add a category to start organizing your products.",
+                "Category page: explains why a category is missing, when the store has no categories left",
+              )
+        }
       >
         <Button render={<Link href={createUrl} prefetch />}>
           <Icon icon={AddLine} />
-          Add category
+          <fbt desc="Category page, when the category is missing: button that opens the form to create a new category">
+            Add category
+          </fbt>
         </Button>
       </EmptyState>
     </div>

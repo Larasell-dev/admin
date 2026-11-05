@@ -11,6 +11,8 @@ export type SharedProps = {
   loginUrl: string;
   /** What the command menu needs from the server; null for guests. */
   commandMenu: Larasell.Admin.Platform.Panel.Data.CommandMenuData | null;
+  /** The language the panel's own text is shown in, and the others to switch to. Null for guests. */
+  interfaceLocale: Larasell.Admin.Platform.InterfaceLocale.Data.InterfaceLocaleData | null;
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;

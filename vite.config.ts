@@ -1,3 +1,4 @@
+import fbtee from "@nkzw/vite-plugin-fbtee";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import laravel from "laravel-vite-plugin";
@@ -26,6 +27,8 @@ export default defineConfig({
         }),
       ],
     }),
+    // Before React, which would otherwise compile <fbt> like any other element.
+    fbtee(),
     react(),
     tailwindcss(),
   ],

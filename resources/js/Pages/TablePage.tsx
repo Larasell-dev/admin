@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react";
 import { Button, EmptyState, Icon } from "@larasell-dev/ui";
 import { InboxLine } from "@larasell-dev/ui/icons";
+import { fbs } from "fbtee";
 import { Page } from "../Components/Page";
 import ResourceTable from "../Components/ResourceTable";
 import { isSameSite } from "../utils/isSameSite";
@@ -47,7 +48,14 @@ export default function TablePage({ table }: Props) {
         <div className="flex flex-1 items-center justify-center px-6 py-12">
           <EmptyState
             icon={table.emptyState?.icon ? lineIcon(table.emptyState.icon) : InboxLine}
-            title={table.emptyState?.title ?? `No ${table.title.toLowerCase()} yet`}
+            title={
+              table.emptyState?.title ??
+              // Not built from the table's title, whose case and grammar vary by language.
+              fbs(
+                "Nothing here yet",
+                "List page: shown instead of an empty list whose table names no empty state of its own",
+              )
+            }
             description={table.emptyState?.description ?? undefined}
           >
             {table.emptyState?.actions.map((action) => (

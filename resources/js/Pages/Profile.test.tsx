@@ -1,6 +1,6 @@
 import "../../css/app.css";
 import { App, http } from "@inertiajs/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
@@ -11,6 +11,14 @@ const props = {
   admin: { name: "Ada Lovelace", email: "ada@example.com", avatarUrl: null },
   updateUrl: "/admin/profile",
   avatarUploadUrl: "/admin/profile/avatar",
+  interfaceLocale: {
+    current: "en-US",
+    options: [
+      { value: "en-US", label: "English" },
+      { value: "de-DE", label: "Deutsch" },
+    ],
+    switchUrl: "/admin/interface-locale",
+  },
 };
 
 // Without the sidebar layout, which needs the whole panel's props; the toast's host stands in.
@@ -143,4 +151,39 @@ it("forgets why a picture was rejected once the profile is saved", async () => {
   await toast().getByRole("button", { name: "Save" }).click();
 
   await expect.element(page.getByText("The avatar must be square.")).not.toBeInTheDocument();
+});
+
+describe("interface language", () => {
+  const select = () => page.getByRole("combobox", { name: "Language" });
+
+  it("switches the panel's language on the server", async () => {
+    const requests: { method: string; url: string; data: unknown }[] = [];
+    vi.spyOn(http, "getClient").mockReturnValue({
+      async request({ method, url, data }) {
+        requests.push({ method, url, data });
+        const next = { component: "Profile", url: "/admin/profile", version: null, props };
+        return { status: 200, data: JSON.stringify(next), headers: { "x-inertia": "true" } };
+      },
+    });
+    await renderProfile();
+    await expect.element(select()).toHaveValue("en-US");
+
+    await select().selectOptions("Deutsch");
+
+    await expect.poll(() => requests).toHaveLength(1);
+    expect(requests[0]).toMatchObject({
+      method: "put",
+      url: expect.stringContaining("/admin/interface-locale"),
+    });
+    expect(JSON.stringify(requests[0]?.data)).toContain('"locale":"de-DE"');
+  });
+
+  it("can't switch while the profile has unsaved changes, which the reload would drop", async () => {
+    await renderProfile();
+
+    await name().fill("Ada King");
+
+    await expect.element(select()).toBeDisabled();
+    await expect.element(page.getByText("Save or discard your changes first")).toBeVisible();
+  });
 });

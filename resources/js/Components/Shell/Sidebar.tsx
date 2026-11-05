@@ -11,6 +11,7 @@ import { useFrozen } from "../Freeze";
 import { navigationIcon } from "../../utils/navigationIcon";
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
+import { fbs } from "fbtee";
 
 type NavigationItem = Larasell.Admin.Platform.Navigation.NavigationItemData;
 
@@ -29,7 +30,10 @@ export default function Sidebar({ frozen = false }: { frozen?: boolean }) {
       <div className="flex h-14 shrink-0 items-center border-b border-border px-6">
         <Link
           href={home.url}
-          aria-label="Home"
+          aria-label={fbs(
+            "Home",
+            "Sidebar: accessible name of the logo link that goes to the admin panel's home page",
+          )}
           className="inline-block outline-none focus-visible:focus-ring"
         >
           <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />
@@ -145,7 +149,17 @@ function GroupToggle({
       <IconButton
         variant="tertiary"
         size="sm"
-        aria-label={`${open ? "Close" : "Open"} ${label}`}
+        aria-label={
+          open
+            ? fbs(
+                ["Close ", fbs.param("navigationGroup", label)],
+                "Sidebar: accessible name of the button that collapses a navigation group, e.g. 'Close Settings'",
+              )
+            : fbs(
+                ["Open ", fbs.param("navigationGroup", label)],
+                "Sidebar: accessible name of the button that expands a navigation group, e.g. 'Open Settings'",
+              )
+        }
         aria-expanded={open}
         aria-controls={open ? controls : undefined}
         onClick={onClick}

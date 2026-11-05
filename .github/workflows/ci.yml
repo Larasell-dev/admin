@@ -112,6 +112,13 @@ jobs:
           npm run generate:icons
           git diff --exit-code src/Platform/Panel/Icon.php
 
+      # New text needs an entry in every translation file, the frontend's and the server's, so
+      # translators see it.
+      - name: Translation files match the text in the code
+        run: |
+          npm run translations:extract
+          git diff --exit-code resources/translations lang
+
       - name: Build
         run: npm run build
 

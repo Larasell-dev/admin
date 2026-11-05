@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react";
 import { Button, Dialog, EmptyState, Icon, Stack, useCopy } from "@larasell-dev/ui";
 import { AddLine, CheckLine, FileCopyLine, KeyLine } from "@larasell-dev/ui/icons";
+import { fbs } from "fbtee";
 import { useEffect, useState } from "react";
 import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
@@ -21,7 +22,9 @@ export default function Index({ apiTokens, createUrl }: Props) {
           hasRows && (
             <Button size="sm" render={<Link href={createUrl} prefetch="hover" />}>
               <Icon icon={AddLine} />
-              Create token
+              <fbt desc="API tokens page: header button that opens the form to create a token for apps calling the store's API">
+                Create token
+              </fbt>
             </Button>
           )
         }
@@ -32,12 +35,20 @@ export default function Index({ apiTokens, createUrl }: Props) {
         <div className="flex flex-1 items-center justify-center px-6 py-12">
           <EmptyState
             icon={KeyLine}
-            title={apiTokens.emptyState?.title ?? "No API tokens yet"}
+            title={
+              apiTokens.emptyState?.title ??
+              fbs(
+                "No API tokens yet",
+                "API tokens page: shown instead of the list of tokens when none exist",
+              )
+            }
             description={apiTokens.emptyState?.description ?? undefined}
           >
             <Button render={<Link href={createUrl} prefetch="hover" />}>
               <Icon icon={AddLine} />
-              Create token
+              <fbt desc="API tokens page, while there are no tokens: button that opens the form to create the first token">
+                Create token
+              </fbt>
             </Button>
           </EmptyState>
         </div>
@@ -62,8 +73,14 @@ function CreatedTokenDialog() {
       }}
     >
       <Dialog.Popup
-        title="API token created"
-        description="For security, the token is shown only this once. Store it somewhere safe; if it gets lost, revoke it and create a new one."
+        title={fbs(
+          "API token created",
+          "API tokens page: title of the dialog that shows a newly created token once",
+        )}
+        description={fbs(
+          "For security, the token is shown only this once. Store it somewhere safe; if it gets lost, revoke it and create a new one.",
+          "API tokens page: warning in the dialog that shows a newly created token once",
+        )}
       >
         {token && (
           <Stack spacing={5}>
@@ -77,7 +94,15 @@ function CreatedTokenDialog() {
                   variant="secondary"
                   onClick={() => void copy(token.plainTextToken)}
                 >
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? (
+                    <fbt desc="API token created dialog: copy button's text right after it copied the token to the clipboard">
+                      Copied
+                    </fbt>
+                  ) : (
+                    <fbt desc="API token created dialog: button that copies the new token to the clipboard">
+                      Copy
+                    </fbt>
+                  )}
                   <Icon icon={copied ? CheckLine : FileCopyLine} />
                 </Button>
               </div>
@@ -88,7 +113,9 @@ function CreatedTokenDialog() {
             </div>
             <Dialog.Actions>
               <Button variant="primary" onClick={dismiss}>
-                Done
+                <fbt desc="API token created dialog: button that closes the dialog once the admin has stored the token">
+                  Done
+                </fbt>
               </Button>
             </Dialog.Actions>
           </Stack>

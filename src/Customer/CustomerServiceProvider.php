@@ -10,6 +10,7 @@ use Larasell\Admin\Customer\Http\Controllers\SearchCustomersController;
 use Larasell\Admin\Customer\Search\CustomerSearch;
 use Larasell\Admin\Customer\Search\DatabaseCustomerSearch;
 use Larasell\Admin\Customer\Tables\Customers;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -36,10 +37,10 @@ class CustomerServiceProvider extends ServiceProvider
 
         Navigation::index(NavItem::Customers->label(), 'customers', Customers::class, icon: Icon::Group)->position(NavItem::Customers->position());
 
-        app(Searches::class)->add('customers', 'Search customers', Icon::Group, 'Search by name', 'larasell.admin.search.customers');
+        app(Searches::class)->add('customers', Translate::later('Search customers'), Icon::Group, Translate::later('Search by name'), 'larasell.admin.search.customers');
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->withHead(title: 'New customer');
+            Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->withHead(title: Translate::later('New customer'));
             Route::post('customers', [CustomerController::class, 'store'])->name('customers.store');
             Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
             Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');

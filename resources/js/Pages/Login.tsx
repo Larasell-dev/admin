@@ -1,5 +1,6 @@
 import { Form, Link } from "@inertiajs/react";
 import { Button, Container, Field, Input, PasswordInput, Stack } from "@larasell-dev/ui";
+import { fbs } from "fbtee";
 import { useState } from "react";
 
 export default function Login({
@@ -14,9 +15,15 @@ export default function Login({
         <div className="mx-auto w-full max-w-sm">
           <Stack spacing={8}>
             <Stack spacing={2}>
-              <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">Sign in</h1>
+              <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">
+                <fbt desc="Login page: main heading of the form where an admin signs in to the panel">
+                  Sign in
+                </fbt>
+              </h1>
               <p className="type-body-md text-mauve-600 dark:text-mauve-400">
-                Enter your credentials to access the admin panel.
+                <fbt desc="Login page: text below the 'Sign in' heading that asks the admin for their email and password">
+                  Enter your credentials to access the admin panel.
+                </fbt>
               </p>
             </Stack>
 
@@ -24,17 +31,33 @@ export default function Login({
               {({ errors, processing }) => (
                 <Stack spacing={6}>
                   <Stack spacing={5}>
-                    <Field label="Email" name="email" error={errors.email}>
+                    <Field
+                      label={fbs(
+                        "Email",
+                        "Login page: label of the field for the admin's email address",
+                      )}
+                      name="email"
+                      error={errors.email}
+                    >
                       <Input type="email" autoComplete="username" />
                     </Field>
 
-                    <Field label="Password" name="password" error={errors.password}>
+                    <Field
+                      label={fbs(
+                        "Password",
+                        "Login page: label of the field for the admin's password",
+                      )}
+                      name="password"
+                      error={errors.password}
+                    >
                       <PasswordInput autoComplete="current-password" />
                     </Field>
                   </Stack>
 
                   <Button type="submit" fullWidth loading={processing}>
-                    Sign in
+                    <fbt desc="Login page: button that submits the email and password to sign in">
+                      Sign in
+                    </fbt>
                   </Button>
 
                   {devLoginUrl && (
@@ -50,7 +73,9 @@ export default function Login({
                         />
                       }
                     >
-                      Log in as admin
+                      <fbt desc="Login page, only on a developer's machine: button that signs in as an admin without a password">
+                        Log in as admin
+                      </fbt>
                     </Button>
                   )}
                 </Stack>

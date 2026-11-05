@@ -19,7 +19,7 @@ class DeleteCategory
 
         if ($confirmation !== $name) {
             throw ValidationException::withMessages([
-                'confirmation' => "Type \"{$name}\" to confirm.",
+                'confirmation' => __('Type ":text" to confirm.', ['text' => $name]),
             ]);
         }
 

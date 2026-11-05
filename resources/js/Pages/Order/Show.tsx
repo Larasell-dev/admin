@@ -2,6 +2,7 @@ import { Link } from "@inertiajs/react";
 import { Badge, EmptyState, Inset, Section } from "@larasell-dev/ui";
 import { ShoppingBagLine } from "@larasell-dev/ui/icons";
 import { cn } from "cn";
+import { fbs } from "fbtee";
 import type { ReactNode } from "react";
 
 import { Page } from "../../Components/Page";
@@ -17,7 +18,13 @@ export default function Show({ order, indexUrl, customerUrl }: Props) {
     <>
       <Page.Header
         title={`#${order.number}`}
-        backLink={{ href: indexUrl, label: "Back to orders" }}
+        backLink={{
+          href: indexUrl,
+          label: fbs(
+            "Back to orders",
+            "Order page: accessible name of the back arrow that returns to the list of orders",
+          ),
+        }}
       />
       <Page.Body width="wide">
         <div className="flex flex-col gap-6">
@@ -30,20 +37,41 @@ export default function Show({ order, indexUrl, customerUrl }: Props) {
               <Items order={order} />
               <Customer order={order} customerUrl={customerUrl} />
               <div className="grid gap-6 sm:grid-cols-2">
-                <Address title="Billing address" address={order.billingAddress} />
-                <Address title="Shipping address" address={order.shippingAddress} />
+                <Address
+                  title={fbs(
+                    "Billing address",
+                    "Order page: heading of the card with the address the order is billed to",
+                  )}
+                  address={order.billingAddress}
+                />
+                <Address
+                  title={fbs(
+                    "Shipping address",
+                    "Order page: heading of the card with the address the order is shipped to",
+                  )}
+                  address={order.shippingAddress}
+                />
               </div>
             </div>
             <div className="flex min-w-0 flex-col gap-6">
               <Summary order={order} />
               <Payments order={order} />
-              <Card title="Shipping">
+              <Card
+                title={fbs(
+                  "Shipping",
+                  "Order page: heading of the card with the shipping method chosen for the order and its cost",
+                )}
+              >
                 {order.shipping ? (
                   <dl>
                     <Row label={order.shipping.label}>{order.shipping.amount}</Row>
                   </dl>
                 ) : (
-                  <Muted>No shipping</Muted>
+                  <Muted>
+                    <fbt desc="Order page: shown in the shipping card when the order isn't shipped">
+                      No shipping
+                    </fbt>
+                  </Muted>
                 )}
               </Card>
             </div>
@@ -57,15 +85,23 @@ export default function Show({ order, indexUrl, customerUrl }: Props) {
 function Items({ order }: { order: Order }) {
   return (
     <Section.Root>
-      <Section.Header title="Items" />
+      <Section.Header
+        title={fbs("Items", "Order page: heading of the section that lists the ordered products")}
+      />
       <Section.Card>
         {/* Checkout always adds items; this only covers orders created some other way. */}
         {order.items.length === 0 ? (
           <div className="flex justify-center px-(--inset) py-12">
             <EmptyState
               icon={ShoppingBagLine}
-              title="No items"
-              description="This order doesn't contain any items."
+              title={fbs(
+                "No items",
+                "Order page: shown in the section for ordered products when the order has none",
+              )}
+              description={fbs(
+                "This order doesn't contain any items.",
+                "Order page: below 'No items' in the section for ordered products",
+              )}
             />
           </div>
         ) : (
@@ -99,17 +135,50 @@ function Items({ order }: { order: Order }) {
 
 function Summary({ order }: { order: Order }) {
   return (
-    <Card title="Summary">
+    <Card
+      title={fbs(
+        "Summary",
+        "Order page: heading of the card that adds up the order's subtotal, discount, shipping, taxes and total",
+      )}
+    >
       <dl className="flex flex-col gap-2">
-        <Row label="Subtotal">{order.subtotal}</Row>
-        {order.discount && <Row label="Discount">−{order.discount}</Row>}
-        {order.shipping && <Row label="Shipping">{order.shipping.amount}</Row>}
+        <Row
+          label={fbs(
+            "Subtotal",
+            "Order summary: label of the sum of the ordered products, before discount, shipping and taxes",
+          )}
+        >
+          {order.subtotal}
+        </Row>
+        {order.discount && (
+          <Row label={fbs("Discount", "Order summary: label of the amount taken off the order")}>
+            −{order.discount}
+          </Row>
+        )}
+        {order.shipping && (
+          <Row label={fbs("Shipping", "Order summary: label of the shipping cost of the order")}>
+            {order.shipping.amount}
+          </Row>
+        )}
         {order.taxes.map((tax) => (
-          <Row key={tax.label} label={order.taxIncluded ? `Incl. ${tax.label}` : tax.label}>
+          <Row
+            key={tax.label}
+            label={
+              order.taxIncluded
+                ? fbs(
+                    ["Incl. ", fbs.param("taxName", tax.label)],
+                    "Order summary: label of a tax already included in the prices, with the tax's name filled in, e.g. 'Incl. VAT 19%'",
+                  )
+                : tax.label
+            }
+          >
             {tax.amount}
           </Row>
         ))}
-        <Row label="Total" strong>
+        <Row
+          label={fbs("Total", "Order summary: label of the amount the customer pays in total")}
+          strong
+        >
           {order.total}
         </Row>
       </dl>
@@ -120,9 +189,11 @@ function Summary({ order }: { order: Order }) {
 /** Each value under a label saying what it is, so long names and emails stay readable. */
 function Customer({ order, customerUrl }: { order: Order; customerUrl: string | null }) {
   return (
-    <Card title="Customer">
+    <Card title={fbs("Customer", "Order page: heading of the card with who placed the order")}>
       <Fields columns>
-        <Field label="Name">
+        <Field
+          label={fbs("Name", "Order page: label of the name of the customer who placed the order")}
+        >
           {customerUrl ? (
             <Link href={customerUrl} prefetch="hover" className="underline underline-offset-2">
               {order.customerName}
@@ -131,12 +202,30 @@ function Customer({ order, customerUrl }: { order: Order; customerUrl: string | 
             order.customerName
           )}
         </Field>
-        <Field label="Email">
+        <Field
+          label={fbs(
+            "Email",
+            "Order page: label of the email address of the customer who placed the order",
+          )}
+        >
           <a href={`mailto:${order.customerEmail}`} className="underline-offset-2 hover:underline">
             {order.customerEmail}
           </a>
         </Field>
-        <Field label="Phone">{order.customerPhone ?? <Muted>None</Muted>}</Field>
+        <Field
+          label={fbs(
+            "Phone",
+            "Order page: label of the phone number of the customer who placed the order",
+          )}
+        >
+          {order.customerPhone ?? (
+            <Muted>
+              <fbt desc="Order page: shown as the customer's phone number when they didn't give one">
+                None
+              </fbt>
+            </Muted>
+          )}
+        </Field>
       </Fields>
     </Card>
   );
@@ -148,22 +237,57 @@ function Address({ title, address }: { title: string; address: AddressData | nul
       {address ? (
         <address className="not-italic">
           <Fields>
-            <Field label="Name">{address.name}</Field>
-            {address.company && <Field label="Company">{address.company}</Field>}
-            <Field label="Street">
+            <Field label={fbs("Name", "Order page, address card: label of the recipient's name")}>
+              {address.name}
+            </Field>
+            {address.company && (
+              <Field
+                label={fbs("Company", "Order page, address card: label of the recipient's company")}
+              >
+                {address.company}
+              </Field>
+            )}
+            <Field
+              label={fbs(
+                "Street",
+                "Order page, address card: label of the street and house number lines of the address",
+              )}
+            >
               {address.street.map((line, index) => (
                 <div key={index}>{line}</div>
               ))}
             </Field>
-            <Field label="Postcode and city">
+            <Field
+              label={fbs(
+                "Postcode and city",
+                "Order page, address card: label of the address's postcode followed by its city",
+              )}
+            >
               {address.postcode} {address.city}
             </Field>
-            {address.state && <Field label="State or region">{address.state}</Field>}
-            <Field label="Country">{address.country}</Field>
+            {address.state && (
+              <Field
+                label={fbs(
+                  "State or region",
+                  "Order page, address card: label of the address's state, province or region",
+                )}
+              >
+                {address.state}
+              </Field>
+            )}
+            <Field
+              label={fbs("Country", "Order page, address card: label of the address's country")}
+            >
+              {address.country}
+            </Field>
           </Fields>
         </address>
       ) : (
-        <Muted>No address</Muted>
+        <Muted>
+          <fbt desc="Order page: shown in a billing or shipping address card when the order has no such address">
+            No address
+          </fbt>
+        </Muted>
       )}
     </Card>
   );
@@ -188,9 +312,18 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 function Payments({ order }: { order: Order }) {
   return (
-    <Card title="Payment">
+    <Card
+      title={fbs(
+        "Payment",
+        "Order page: heading of the card that lists the payments made for the order",
+      )}
+    >
       {order.payments.length === 0 ? (
-        <Muted>No payments yet</Muted>
+        <Muted>
+          <fbt desc="Order page: shown in the payment card when nothing was paid for the order yet">
+            No payments yet
+          </fbt>
+        </Muted>
       ) : (
         <ul className="flex flex-col gap-3">
           {order.payments.map((payment, index) => (
@@ -200,7 +333,17 @@ function Payments({ order }: { order: Order }) {
                 <Badge variant={payment.status.variant}>{payment.status.label}</Badge>
               </div>
               <div className="flex justify-between gap-2">
-                <Muted>{payment.reference ? `Ref. ${payment.reference}` : "No reference"}</Muted>
+                <Muted>
+                  {payment.reference ? (
+                    <fbt desc="Order page, payment card: the payment provider's reference for a payment, e.g. 'Ref. pi_3MtwBw'">
+                      Ref. <fbt:param name="paymentReference">{payment.reference}</fbt:param>
+                    </fbt>
+                  ) : (
+                    <fbt desc="Order page, payment card: shown when a payment has no reference from the payment provider">
+                      No reference
+                    </fbt>
+                  )}
+                </Muted>
                 <span className="text-mauve-950 tabular-nums dark:text-mauve-50">
                   {payment.amount}
                 </span>

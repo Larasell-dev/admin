@@ -10,6 +10,7 @@ use Larasell\Admin\Order\Http\Controllers\SearchOrdersController;
 use Larasell\Admin\Order\Search\DatabaseOrderSearch;
 use Larasell\Admin\Order\Search\OrderSearch;
 use Larasell\Admin\Order\Tables\Orders;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -37,7 +38,7 @@ class OrderServiceProvider extends ServiceProvider
 
         Navigation::index(NavItem::Orders->label(), 'orders', Orders::class, icon: Icon::Receipt)->position(NavItem::Orders->position());
 
-        app(Searches::class)->add('orders', 'Search orders', Icon::Receipt, 'Search by number, customer or email', 'larasell.admin.search.orders');
+        app(Searches::class)->add('orders', Translate::later('Search orders'), Icon::Receipt, Translate::later('Search by number, customer or email'), 'larasell.admin.search.orders');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+{{-- The interface language, which SetInterfaceLocale picked; the frontend loads its translations from lang. --}}
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ (new \Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale(app()->getLocale()))->direction() }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

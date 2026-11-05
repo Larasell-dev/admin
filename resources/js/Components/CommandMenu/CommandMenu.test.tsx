@@ -8,6 +8,7 @@ import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
 import { contentLocaleCommand } from "./contentLocaleCommand";
+import { interfaceLocaleCommand } from "./interfaceLocaleCommand";
 import { Highlight, matchRanges } from "./Highlight";
 import { logOutCommand } from "./logOutCommand";
 import { goToCommand } from "./goToCommand";
@@ -683,6 +684,61 @@ describe("content language", () => {
     await renderMenu(() => null, {
       contentLocale: { ...contentLocale, options: [contentLocale.options[0]] },
     });
+    await openMenu();
+
+    expect(options()).toEqual(["Go to orders"]);
+  });
+});
+
+describe("interface language", () => {
+  const interfaceLocale = {
+    current: "en-US",
+    options: [
+      { value: "en-US", label: "English" },
+      { value: "de-DE", label: "Deutsch" },
+    ],
+    switchUrl: "/admin/interface-locale",
+  };
+
+  it("switches the interface language on the server", async () => {
+    const requests: { method: string; url: string; data: unknown }[] = [];
+    vi.spyOn(http, "getClient").mockReturnValue({
+      async request({ method, url, data }) {
+        requests.push({ method, url, data });
+        const next = { component: "Test", url: "/admin", version: null, props: { errors: {} } };
+        return { status: 200, data: JSON.stringify(next), headers: { "x-inertia": "true" } };
+      },
+    });
+    register(interfaceLocaleCommand);
+    await renderMenu(() => null, { interfaceLocale });
+    await openMenu();
+    await choose("Change interface language");
+
+    expect(options()).toEqual(["English, current", "Deutsch"]);
+
+    await choose("Deutsch");
+
+    await expect.poll(() => requests).toHaveLength(1);
+    expect(requests[0]).toMatchObject({
+      method: "put",
+      url: expect.stringContaining("/admin/interface-locale"),
+    });
+    expect(JSON.stringify(requests[0]?.data)).toContain('"locale":"de-DE"');
+  });
+
+  it("finds a language by its name in the interface language too", async () => {
+    register(interfaceLocaleCommand);
+    await renderMenu(() => null, { interfaceLocale });
+    await openMenu();
+
+    await search().fill("german");
+
+    await expect.element(option(/Deutsch/)).toBeVisible();
+  });
+
+  it("is left out for guests", async () => {
+    register(orders, interfaceLocaleCommand);
+    await renderMenu(() => null, { interfaceLocale: null });
     await openMenu();
 
     expect(options()).toEqual(["Go to orders"]);

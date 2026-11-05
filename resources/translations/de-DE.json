@@ -1,0 +1,3382 @@
+{
+  "fb-locale": "de-DE",
+  "translations": {
+    "vbDKNuIxT/pf8ITvgBKLhg==": {
+      "description": "Name of the light color theme",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hell",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2KPk3RwuYGfnFILDsIrUhw==": {
+      "description": "Name of the dark color theme",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dunkel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Vg6Ua8Wo9+LmVtCaLQppkg==": {
+      "description": "Name of the color theme that follows the operating system's light or dark setting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "System",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C2domWVlwSHSpGe9eQTjCg==": {
+      "description": "Toast after the color theme changed, e.g. 'Changed theme to Dark'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Design zu {theme} gewechselt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xn6phkjW+Z7z1at+3LgTow==": {
+      "description": "User menu: goes to the page where the admin edits their own name, avatar and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Profil",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hSeZHRE+Qshh0/jL32YWEg==": {
+      "description": "User menu: signs the admin out of the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abmelden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AASgnJlhKM8Zj5uSllrkbw==": {
+      "description": "Accessible name of the command menu dialog, opened with Cmd+K",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Befehlsmenü",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bmktdqdgixEPxE8VK3V7oA==": {
+      "description": "Command menu: accessible name of the button that leaves a command's list, e.g. 'Back from Switch theme'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück von {command}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9GKBMn9tLmxz0B6y0p/gKw==": {
+      "description": "Command menu: accessible name of the button that leaves a command's list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5X8dO9MrjFzRop0tWN/q0w==": {
+      "description": "Command menu: search field placeholder in a command's list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+gngGV/vr3lhbEHr/jy31A==": {
+      "description": "Command menu: search field placeholder in the list of commands",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Befehle suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XWKVuZlYFthMyISJbTEWuA==": {
+      "description": "Command menu: shown while the server searches, e.g. for products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Suche läuft …",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YqN1QEj0gJtmGIGkI8jZBQ==": {
+      "description": "Command menu: shown when nothing matches the search",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Ergebnisse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4wOBLvll6Fv4Tb0h3trPGg==": {
+      "description": "Command menu: switches the language products and categories are edited in, not the language of the panel itself",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Inhaltssprache ändern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YIca5wana8Qgu3a0ZnzoiA==": {
+      "description": "Command menu: search keyword for the command that switches the content language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gebietsschema",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UFoWLPKBMqFPN7GbaHDa7g==": {
+      "description": "Command menu: search keyword for the command that switches the content language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Übersetzung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q7ICnBOrtFMrr0+kzFDq4A==": {
+      "description": "Command menu: search field placeholder in the list of content languages",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprachen suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JnhS6rMu7jkSU67aLoGfmQ==": {
+      "description": "Command menu: why switching the content language is disabled while a form has unsaved changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Speichere oder verwirf zuerst deine Änderungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZaxA2t42b21Pvr8DfZ7h8w==": {
+      "description": "Command menu: opens the list of pages of the admin panel to go to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gehe zu",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DDtU4vGLo4PBL1k95wMSZQ==": {
+      "description": "Command menu: search keyword for the command that goes to a page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "navigieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5tnac1+v7dIkMMr76lnIqQ==": {
+      "description": "Command menu: search keyword for the command that goes to a page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VOsSI6gqajER8LOsMUZcwQ==": {
+      "description": "Command menu: search keyword for the command that goes to a page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Seite",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HG+yNCAiQCca8cfS295Qyw==": {
+      "description": "Command menu: search field placeholder in the list of pages to go to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Seiten suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lG6eVcfcJKFTMzdhevhljg==": {
+      "description": "Command menu: search keyword for going to the home page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dashboard",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pr0cWeZTD25nDfxLUPp61g==": {
+      "description": "Command menu: goes to the page where the admin edits their own name, avatar and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Profil",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dTIem/ZcZ1lKmbrDSyywbQ==": {
+      "description": "Command menu: search keyword for going to the admin's profile page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Konto",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+nLq0vBA+vy9euePE1pO3A==": {
+      "description": "Command menu: search keyword for going to the admin's profile page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Avatar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Vi+WlmzDmSgXAJ969goMkA==": {
+      "description": "Command menu: search keyword for going to the admin's profile page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Passwort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oZFcgo7o+VbRrqMsYdCUCA==": {
+      "description": "Command menu: signs the admin out of the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abmelden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DCE1YoWziSebCBrMOQ4JbQ==": {
+      "description": "Command menu: search keyword for the command that logs the admin out",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ausloggen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YJohFpF7kI49fjUcI7R+1w==": {
+      "description": "Command menu: question asked before logging out, answered with Yes or No",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abmelden?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w7un1CVpA4xJrriCKQ2OTA==": {
+      "description": "Command menu: answer to 'Log out?' that keeps the admin signed in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fWBoX+59KFX1PYX5uQAxTQ==": {
+      "description": "Command menu: answer to 'Log out?' that logs the admin out",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ja",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XbHc/GpYbSBcQnhwK3KLoQ==": {
+      "description": "Command menu: switches between the light, dark and system color theme",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Design wechseln",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+lGZN3tKlP5IX6guiRl/jA==": {
+      "description": "Command menu: search keyword for the command that switches the color theme",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erscheinungsbild",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "z/nwUYDismzD8A7u/1szwA==": {
+      "description": "Command menu: search keyword for the command that switches the color theme",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dunkelmodus",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y0XsTzd+9s+rOHWYa2QuTQ==": {
+      "description": "Command menu: search keyword for the command that switches the color theme",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hellmodus",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CO0vusyhfUHmyDGDT++Bpw==": {
+      "description": "Command menu: search field placeholder in the list of color themes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Designs suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q75c70ZmaVxwrqNkx1WwNQ==": {
+      "description": "Command menu: switches the language the admin panel's own buttons, menus and messages are shown in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Oberflächensprache ändern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qRQkN+hABcgtE5xNq8ZUBQ==": {
+      "description": "Command menu: search keyword for the command that switches the interface language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HnXDbOsIgPaPPFddyyqkWA==": {
+      "description": "Command menu: search keyword for the command that switches the interface language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Übersetzung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "APDzBMTNyzWEhd4fnUmL2g==": {
+      "description": "Command menu: search field placeholder in the list of interface languages",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprachen suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pp/VfXah+imeNeACmCcCGQ==": {
+      "description": "Command menu: why switching the language is disabled while a form has unsaved changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Speichere oder verwirf zuerst deine Änderungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IYUmtYxQtGdt1MucjXrsVA==": {
+      "description": "Label with meaning 'at least number'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number}+",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZIF1WhVQwt7WZJvFTEbMWw==": {
+      "description": "Label with meaning 'less than number'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "<{number}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oc/9PrbjfyLHS60BXceD1A==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}; {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AXXbKEUZuc0ji1IClRrOOw==": {
+      "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items} • {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "89ACgPMtnwlLDSeqhLBx2Q==": {
+      "description": "A list of items of various types separated by commas, for example: \"San Francisco, London, Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}, {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5hL7VXOBVnetm46YAjpX0g==": {
+      "description": "A list of items of various types with a serial comma, for example: \"item1, item2, and item3\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} und {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "icNetEL/crQv/PS6yhySVQ==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3 and item4\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} und {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8kLAQ3ffiiFnQ/bWPqXfuQ==": {
+      "description": "A list of items of various types with a serial comma, for example: \"item1, item2, or item3\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} oder {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8eSaAzrWtAqn9ktNKfkaEg==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3 or item4\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} oder {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+IBI7kr/mMKdzp+3stDvkw==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} itself contains one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}; {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "55IeE8c0qqtjTU0lo7q9AA==": {
+      "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} contains one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} • {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6PRJS0QalZfvaN8CkKCUCw==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3, item4\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items}, {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HzX69Z1Cq6ifzV/poSoejA==": {
+      "description": "Home page: title of the panel's start page, which suggests first steps for setting up the store",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dashboard",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NzGb70pG4FnCU0cpDVt87g==": {
+      "description": "Home page: title of the suggested first step that opens the form to create a product",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkt erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MQ7R2intvvMES3mYqiTuNA==": {
+      "description": "Home page: explains the suggested first step that opens the form to create a product",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge dein erstes Produkt mit Name, Bildern und Preis hinzu.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vZyEwDBu4auBnSEz0fF6dw==": {
+      "description": "Home page: title of the suggested first step that opens the form to create a product category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorie erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "easJjgKE4JCLJ4RuceskYw==": {
+      "description": "Home page: explains the suggested first step that opens the form to create a product category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gruppiere deine Produkte, damit Kunden deinen Shop durchstöbern können.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZvXFBpRsZUJElzfebb5HLQ==": {
+      "description": "Home page: title of the suggested step that opens the form to add another admin to the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lade dein Team ein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NwndEAhjhg4T7zoW6SVitg==": {
+      "description": "Home page: explains the suggested step that opens the form to add another admin to the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib deinem Team Zugriff, um den Shop gemeinsam mit dir zu verwalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ws12Rq3h0Eh101kWv1tnxA==": {
+      "description": "Home page: title of the link that writes an email to the panel's support contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Brauchst du Hilfe?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6dJrx3qAIs9ICP+1fefXpw==": {
+      "description": "Home page: below 'Need help?', invites the admin to email the panel's support contact, whose email address is filled in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schreib an {helpEmail}, dann melde ich mich bei dir.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O//UFzMzmasVEv8AGRYiEw==": {
+      "description": "Login page: main heading of the form where an admin signs in to the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Anmelden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DiWAKXPgBmYtTKzsHV6Ngw==": {
+      "description": "Login page: text below the 'Sign in' heading that asks the admin for their email and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib deine Zugangsdaten ein, um auf das Admin-Panel zuzugreifen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZMHCTPWdW+E1uKkJJCVARw==": {
+      "description": "Login page: label of the field for the admin's email address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WBKliDsB7TypQPPO2ozjjQ==": {
+      "description": "Login page: label of the field for the admin's password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Passwort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xtmam6Hgt5jfbThvBf0Lxw==": {
+      "description": "Login page: button that submits the email and password to sign in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Anmelden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NXfOxAuCNDvPC9cmlWnDmQ==": {
+      "description": "Login page, only on a developer's machine: button that signs in as an admin without a password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Als Admin anmelden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ofw6T2MPsHmnIST2sLnZrw==": {
+      "description": "Profile page: heading of the page where the admin edits their own account",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Profil",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kp1vCaK3LozlrWr3m/bKgQ==": {
+      "description": "Profile page: heading of the section with the admin's name, email address and picture",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VeNktacLQDyiTZtrRRK5UA==": {
+      "description": "Profile page: explains what the General section holds",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Name, deine E-Mail-Adresse und dein Profilbild.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uoIci0PHYiITbZR9/aAH4w==": {
+      "description": "Profile page: label of the field for the admin's own full name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uHrJuUbqh/DUb8w6P0McLg==": {
+      "description": "Profile page: label of the field for the admin's own email address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZBqmFOjhvnDAYcI44qEP+g==": {
+      "description": "Profile page: error after uploading a profile picture whose file is too large",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Das Bild ist größer, als der Server akzeptiert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aJ0I0TWLQVyNIfk+mh8XRw==": {
+      "description": "Profile page: error after a profile picture upload failed, e.g. without a network",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Das Bild konnte nicht hochgeladen werden. Versuch es noch einmal.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "20uitIz5qz13i0RbTD2gVQ==": {
+      "description": "Profile page: button that opens the file picker for a new profile picture",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bild ändern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EmICiRVO9Ck9Fcz7Rv8OcA==": {
+      "description": "Profile page: button that removes the admin's profile picture",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aCwzmE3CPWd//hYXBTH7rw==": {
+      "description": "Profile page: heading of the section with the theme and the interface language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Präferenzen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7wJVzD1d5tDdmagjCkg6yw==": {
+      "description": "Profile page: explains what the Preference section holds; the choices only apply to this browser",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle, wie das Admin-Panel auf diesem Gerät aussieht.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JIDlwf+muTUQZCKdpm8npQ==": {
+      "description": "Profile page: accessible name of the group of light, dark and system theme choices",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Design",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f/Mwz5gsa8GrvzQmyDkUKA==": {
+      "description": "Profile page: label of the select for the language the admin panel's own text is shown in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UoaHdtSJCmRWf8RMt2hjag==": {
+      "description": "Profile page: why the language select is disabled while the profile has unsaved changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Speichere oder verwirf zuerst deine Änderungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/xs1AGOZvP19iKzi9nq/KQ==": {
+      "description": "List page: shown instead of an empty list whose table names no empty state of its own",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hier ist noch nichts",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6ihQq6GxkU2YHxtZq6kfsw==": {
+      "description": "New team member page: title of the page with the form that adds an admin to the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neues Mitglied",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1wn47ZJPsTXtZjiXGu9PYw==": {
+      "description": "New team member page: accessible name of the back arrow that returns to the list of team members",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zum Team",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nKS/WKEVGlhwf7fF9bmwiw==": {
+      "description": "New team member page: heading of the form section with the team member's name, email and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uBf2MX0ILNNsh9BfPXN3EQ==": {
+      "description": "New team member page: explains the form section with the team member's name, email and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wer das Mitglied ist und wie es sich anmeldet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MZnQxz8vyYEutdVc2g9ZIg==": {
+      "description": "Team member page: accessible name of the back arrow that returns to the list of team members",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zum Team",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vri6W/4nlA8T+3JuALH7iw==": {
+      "description": "Team member page: heading of the form section with the team member's name, email and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "J+wlxauw1fHTdRTW37H6iw==": {
+      "description": "Team member page: explains the form section with the team member's name, email and password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wer das Mitglied ist und wie es sich anmeldet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c6n0Bvl1B5W8yMq+mqLOVQ==": {
+      "description": "Team page: header button that opens the form to add an admin to the panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mitglied hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LuJebntsDuG4D5up76/Uug==": {
+      "description": "New product page: title of the page with the form that creates a product",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neues Produkt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gn1a1trG5qieY6uVR8RCvQ==": {
+      "description": "New product page: accessible name of the back arrow that returns to the list of products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Produkten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RcaL57RqoouI/UzJyrRBkw==": {
+      "description": "Product page: accessible name of the back arrow that returns to the list of products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Produkten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KU7qeV7dxs319lzU9+EWxw==": {
+      "description": "Order page: accessible name of the back arrow that returns to the list of orders",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Bestellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HOSIP+Q+NVEntz9qQEzPmw==": {
+      "description": "Order page: heading of the card with the address the order is billed to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rechnungsadresse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PIlwzYzV7H0y+YO6rEy53g==": {
+      "description": "Order page: heading of the card with the address the order is shipped to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lieferadresse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cmT9fzuJPO28rpoaN/Pn1w==": {
+      "description": "Order page: heading of the card with the shipping method chosen for the order and its cost",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Versand",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "H5DNyrqwLdsje0HexVJgfg==": {
+      "description": "Order page: shown in the shipping card when the order isn't shipped",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kein Versand",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q3WWeaTRyH5+BMnOUM043w==": {
+      "description": "Order page: heading of the section that lists the ordered products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Artikel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6W4F/Rpqz2m7U9N+JH+wGQ==": {
+      "description": "Order page: shown in the section for ordered products when the order has none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Artikel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fNbnvjmu7ZflSDRB/+ED+A==": {
+      "description": "Order page: below 'No items' in the section for ordered products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diese Bestellung enthält keine Artikel.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f9QmT5kDI5LA1gb8OR2jow==": {
+      "description": "Order page: heading of the card that adds up the order's subtotal, discount, shipping, taxes and total",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zusammenfassung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ck4CM5Rxvb+/Cw6wqLcSzw==": {
+      "description": "Order summary: label of the sum of the ordered products, before discount, shipping and taxes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zwischensumme",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FR8zHxs2sLJsE5GD9vzn/Q==": {
+      "description": "Order summary: label of the amount taken off the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rabatt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KoVU0Su0EWueHAWos7fcsg==": {
+      "description": "Order summary: label of the shipping cost of the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Versand",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wXDe3oyJZ6VRTi/oBOJQOQ==": {
+      "description": "Order summary: label of a tax already included in the prices, with the tax's name filled in, e.g. 'Incl. VAT 19%'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Inkl. {taxName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yK4mfRoO6Ezx6cE4mfexxw==": {
+      "description": "Order summary: label of the amount the customer pays in total",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gesamt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yEWO7O8yWK/97xEEuBxzoA==": {
+      "description": "Order page: heading of the card with who placed the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunde",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W4bhZbw0lgsg5NMmVkQbDg==": {
+      "description": "Order page: label of the name of the customer who placed the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z1kf6KclI1EKOXMOn7z+ng==": {
+      "description": "Order page: label of the email address of the customer who placed the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EIfAmBSwrAYkEgUpj2JYvg==": {
+      "description": "Order page: label of the phone number of the customer who placed the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Telefon",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0ihGmml8u3erBgftDniA1w==": {
+      "description": "Order page: shown as the customer's phone number when they didn't give one",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Fj47DykoCW3feD3IcfDgYg==": {
+      "description": "Order page, address card: label of the recipient's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KTxQShbZpmaANLsYgMe8nw==": {
+      "description": "Order page, address card: label of the recipient's company",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Firma",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gK3yStZHGZrk79qx9z9v7g==": {
+      "description": "Order page, address card: label of the street and house number lines of the address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Straße",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5mNxLhFBJDk81svl00z+/A==": {
+      "description": "Order page, address card: label of the address's postcode followed by its city",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PLZ und Ort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Uz7K+3X6jMnyGPGhwIiPbg==": {
+      "description": "Order page, address card: label of the address's state, province or region",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bundesland oder Region",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MGMnEctIwb9mGuOlmIWFig==": {
+      "description": "Order page, address card: label of the address's country",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Land",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9knxDVZOiNXCcCQqP5vjcg==": {
+      "description": "Order page: shown in a billing or shipping address card when the order has no such address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Adresse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+SPqaSDDJeH3CqW82DHU1Q==": {
+      "description": "Order page: heading of the card that lists the payments made for the order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zahlung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9nDyL5DBQKPMAi8thN5Nog==": {
+      "description": "Order page: shown in the payment card when nothing was paid for the order yet",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Zahlungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QE8ANy+0ubTa97tPpQ+0iA==": {
+      "description": "Order page, payment card: the payment provider's reference for a payment, e.g. 'Ref. pi_3MtwBw'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ref. {paymentReference}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IRcffvvTIH3thl8eMIwrLQ==": {
+      "description": "Order page, payment card: shown when a payment has no reference from the payment provider",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Referenz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xYxiCY0zBhSv0C1mHtP6Xw==": {
+      "description": "New customer page: title of the page with the form that adds a customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Kunde",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hRuj1/G1Ltdb7fF8nMwaOw==": {
+      "description": "New customer page: accessible name of the back arrow that returns to the list of customers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Kunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z143Xi7UNgt56x1gCwY0sA==": {
+      "description": "New customer page: heading of the form section with the customer's name and contact details",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c9F9h9p3EEI55lAPRbmzgQ==": {
+      "description": "New customer page: explains the form section with the customer's name and contact details",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wer der Kunde ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z/+DhsH2YOMtcotRMMXQOw==": {
+      "description": "Customer page: accessible name of the back arrow that returns to the list of customers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Kunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rFvpNmry4Lx/xPzATp0LUw==": {
+      "description": "Customer page: heading of the form section with the customer's name and contact details",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ItSKgFjgignS8g7l9oaRTQ==": {
+      "description": "Customer page: explains the form section with the customer's name and contact details",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wer der Kunde ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jA2sNNGgszyZz0BICalJ7w==": {
+      "description": "Customer page: explains the section that lists the customer's orders",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Bestellungen dieses Kunden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JeKQJwZ2/2acx87V02Kdgw==": {
+      "description": "Customer page: shown instead of the list of the customer's orders when they placed none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Bestellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nCsrhigkq4W9DegpmitArw==": {
+      "description": "Customer page: below 'No orders yet' in the section for the customer's orders",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bestellungen dieses Kunden erscheinen hier.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Kf5/dxrThcDfBDGm49NNOA==": {
+      "description": "New category page: title when the new category goes inside another one, whose name is filled in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Kategorie in {parentCategoryName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xx21sk+8phVmTOcj60Owhw==": {
+      "description": "New category page: title of the page with the form that creates a top-level category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Kategorie",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L0JMczGkoLvtBENzOZ7xoA==": {
+      "description": "New category page: accessible name of the back arrow that returns to the categories",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bRSyunbbwXHzeZRT79hChg==": {
+      "description": "New category page: heading of the form section with the category's name, slug and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HN7o5ERkBY02idcu8F+jZw==": {
+      "description": "New category page: explains the form section with the category's name, slug and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie die Kategorie heißt und im Shop gefunden wird.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SHPBmsI0MIixfwFOivyQTg==": {
+      "description": "Categories page: shown when the store has no categories at all",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QppnfdVw9iAmNQAmuiZGhA==": {
+      "description": "Categories page: below 'No categories yet', suggests creating the first category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge eine Kategorie hinzu, um deine Produkte zu ordnen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F/caH4HqIO7UKRYpt+6fhQ==": {
+      "description": "Categories page, while there are no categories: button that opens the form to create the first category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorie hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D1iypclm0BlRnLGt8W4jSQ==": {
+      "description": "Category page: title when the address names a category that no longer exists",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorie nicht gefunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n4JsGbzuLl56lP2VbH7+Ng==": {
+      "description": "Category page: heading of the form section with the category's name, slug and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GmPedzQbEGjn8NxccVIvLg==": {
+      "description": "Category page: explains the form section with the category's name, slug and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie die Kategorie heißt und im Shop gefunden wird.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WDurFvEyA35MQhSibz66KA==": {
+      "description": "Category page: shown when the address names a category that was deleted or never existed",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diese Kategorie existiert nicht mehr",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fa1zOU/XWTy4W+Qc2KelSg==": {
+      "description": "Category page: explains why a category is missing, when other categories exist to pick from the tree",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sie wurde vielleicht gelöscht, oder der Link ist veraltet. Wähle eine andere Kategorie aus der Liste oder füge eine neue hinzu.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vfbAFjTmDgOmZjUw4CZIiQ==": {
+      "description": "Category page: explains why a category is missing, when the store has no categories left",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sie wurde vielleicht gelöscht, oder der Link ist veraltet. Füge eine Kategorie hinzu, um deine Produkte zu ordnen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Vse2UIKQz3noZ3oBPKJj7Q==": {
+      "description": "Category page, when the category is missing: button that opens the form to create a new category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorie hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SKbK98GM1WSqq467/B7uiw==": {
+      "description": "Audit log page: shown instead of the list of recorded changes when the filters exclude every record",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Einträge passen zu diesen Filtern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TCw2ZIVvZpPdmhglZ4bVEg==": {
+      "description": "Audit log page: button below 'No records match these filters' that removes all filters",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Filter zurücksetzen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hb18tFg5fzWE2N274Fw51A==": {
+      "description": "Audit log page: accessible name of the bar of fields that filter the recorded changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Änderungsprotokoll filtern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oevW4FeATSDSbWKU30UGxw==": {
+      "description": "Audit log filters: label of the select for the kind of recorded change, e.g. created or deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ereignis",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iwEktD9kr2QfeWG32NV57w==": {
+      "description": "Audit log filters: option of the event select that doesn't filter by the kind of change",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Ereignisse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ek+91PHuFhbQpsV0pg7q1Q==": {
+      "description": "Audit log filters: label of the select for the kind of who made the change, e.g. an admin or an API token",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Akteur",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GvXvzgvKRSnHpevtqvPuVg==": {
+      "description": "Audit log filters: option of the actor select that doesn't filter by who made the change",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2YBSsFguy071SQnoV3zHFA==": {
+      "description": "Audit log filters: label of the field for the ID of who made the change",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Akteur-ID",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CX6tVtPObfY8yr8sNz/t0Q==": {
+      "description": "Audit log filters: label of the select for the kind of record that was changed, e.g. a product or an order",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Objekt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UNNF5RKrZo4a/QiY5XIP1Q==": {
+      "description": "Audit log filters: option of the subject select that doesn't filter by the kind of record changed",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F8vGJOEQ/6NnM/kbQmSFZg==": {
+      "description": "Audit log filters: label of the field for the ID of the record that was changed",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Objekt-ID",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IhR7Xqy0agHzrnnDkxXCsg==": {
+      "description": "Audit log filters: label of the date field for the earliest day of changes to show",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GrFf7gOypXymcHJeRGo+NQ==": {
+      "description": "Audit log filters: label of the date field for the latest day of changes to show",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bis",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dx6PJ77h5KUBZxprnb1C1w==": {
+      "description": "Audit log filters: button that applies the filters to the list of recorded changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Filtern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Kyis+uzQ87zOpo3K8ZvM2w==": {
+      "description": "Audit log filters: button that removes all filters from the list of recorded changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurücksetzen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tLg0MCtVaHx7n6dO1KiNug==": {
+      "description": "New API token page: title of the page with the form that creates a token for apps calling the store's API",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer API-Token",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yqL/7mygfdbl+1YoAhSH/A==": {
+      "description": "New API token page: accessible name of the back arrow that returns to the list of API tokens",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den API-Tokens",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Y0c7uuggUF85ZLPjpFUrKQ==": {
+      "description": "New API token page: heading of the form section with the token's name, description and expiry",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jvk50BWxpWxIeX/k4/hDGA==": {
+      "description": "New API token page: advice below the heading of the form that creates a token",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle einen Token pro App, die die API aufruft, damit du jeden einzeln widerrufen kannst.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Eiiik2vxTZXTdBUyITQjsw==": {
+      "description": "New API token page: label of the field for the token's name, which tells tokens apart",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tPz5BYG2OqHxVCBUlH3FtA==": {
+      "description": "New API token page: label of the optional field for a note on what the token is for",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qh0P+GUXAQqfmZb/kYZ7Wg==": {
+      "description": "New API token page: label of the select for how long the token stays valid",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Läuft ab",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "clbbVYBVKLUIStdJfR7ODg==": {
+      "description": "API tokens page: header button that opens the form to create a token for apps calling the store's API",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Token erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jWl1pDDKmI3A6NikNeFSLg==": {
+      "description": "API tokens page: shown instead of the list of tokens when none exist",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine API-Tokens",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "k40JF0aduCzpWvoETe81NQ==": {
+      "description": "API tokens page, while there are no tokens: button that opens the form to create the first token",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Token erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "88av/43/qZ6OY6tJCFCTjg==": {
+      "description": "API tokens page: title of the dialog that shows a newly created token once",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "API-Token erstellt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wlbW/VX6t+Hdr8N3RLCezw==": {
+      "description": "API tokens page: warning in the dialog that shows a newly created token once",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus Sicherheitsgründen wird der Token nur dieses eine Mal angezeigt. Bewahre ihn sicher auf; falls er verloren geht, widerrufe ihn und erstelle einen neuen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MoJ28KHZwgSScC9jLPkW7Q==": {
+      "description": "API token created dialog: copy button's text right after it copied the token to the clipboard",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kopiert",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n8O/dqtY537o+nAunJ47Xg==": {
+      "description": "API token created dialog: button that copies the new token to the clipboard",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kopieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6S8n5V80+Rry7ajBiFe5pw==": {
+      "description": "API token created dialog: button that closes the dialog once the admin has stored the token",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MqHDBRXFR6jTus2mp4HJWw==": {
+      "description": "Category pages, small screens: accessible name of the header button that opens the category tree in a side panel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorien öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WDrkt19bT0bNSOOogh+BfA==": {
+      "description": "Category pages, small screens: accessible name of the side panel that shows the category tree",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "r8RNowvhHhG5J7mfqJmuVg==": {
+      "description": "Category pages: heading above the tree that lists all categories of the store",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lmym5pFMODPb6k/oLf0csw==": {
+      "description": "Category pages: button next to the category tree heading that opens the form to create a new category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "urGPK/OG6vAgiPDoPxL9SA==": {
+      "description": "Confirmation dialog of a table action, e.g. deleting: label of the field the admin types the given text into to confirm, e.g. 'Type \"DELETE\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib „{confirmationText}“ zur Bestätigung ein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "utFb54tg4zWqSDbuA+sLiw==": {
+      "description": "Heading shown when the page the admin opened doesn't exist",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Seite nicht gefunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8EWdiVB/Vm14LIDwNu6ROQ==": {
+      "description": "Text below the 'Page not found' heading, shown when the page the admin opened doesn't exist",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die gesuchte Seite existiert nicht. Sie wurde vielleicht verschoben oder gelöscht, oder der Link ist veraltet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4DE/r71rxc8dKd3Ttaj/2A==": {
+      "description": "Tables: accessible name of the button that opens a row's menu of actions, with the row's name, e.g. 'Actions for Oxford Shirt'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {rowName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QzCwbl45vXo3Qm5BzLM3/g==": {
+      "description": "Tables: heading of the column with each row's menu of actions, such as edit and delete",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cHoVjU0bYQY6KSBWrieBxg==": {
+      "description": "Unsaved changes toast: accessible name of the bar at the bottom of a form with unsaved changes, with Cancel and Save buttons",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ungespeicherte Änderungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BmfihQJ7SwyqEfycMaAX3g==": {
+      "description": "Unsaved changes toast: message in the bar at the bottom of a form that has changes not saved yet",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ungespeicherte Änderungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ntKdA+8vuphOfKsmV9cY/Q==": {
+      "description": "Unsaved changes toast: button that discards the form's unsaved changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yc2bM8EVoUJt1soiq107sg==": {
+      "description": "Unsaved changes toast: button that saves the form's changes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4YNKJDJqe9sA1bVFU0DFoA==": {
+      "description": "Category and product forms: label of the checkbox that shows the category or product in the storefront, or hides it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Im Shop sichtbar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qRI7VtSW4Ntpk07a+8eC2w==": {
+      "description": "Team member form: label of the field for the member's full name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b8DqyHyt/vdh+QXozJkQMw==": {
+      "description": "Team member form: label of the field for the member's email address, which they sign in with",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RN/+8r2GUmcX0CNz7W+v7g==": {
+      "description": "Team member form: label of the password field when editing an existing member, who keeps their password if it's left empty",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neues Passwort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JVjZPTnx8UMr3jWt+JD17Q==": {
+      "description": "Team member form: label of the password field when adding a new member",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Passwort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9+OH2s3RXg/RpgN8dAo4sw==": {
+      "description": "Team member form: hint below the new password field when editing an existing member",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leer lassen, um das aktuelle Passwort zu behalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vxn4EYZh/gd0mwmODz7zIA==": {
+      "description": "Team member form: hint below the password field of a new member, listing the password rules",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mindestens 12 Zeichen, mit Groß- und Kleinbuchstaben, einer Zahl und einem Sonderzeichen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Po6BfK+QJ5ToLb10Jg0LEg==": {
+      "description": "Mobile header: accessible name of the logo link that goes to the admin panel's home page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Startseite",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "moNxzJ+PTwtM1aqYTC2APQ==": {
+      "description": "Mobile header: accessible name of the button that opens the navigation drawer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Menü öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C+jbSTpwY4jKM+vN7apxiA==": {
+      "description": "Mobile: accessible name of the drawer with the admin panel's navigation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Navigation",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "airN7WRWaQdT2HKY/iPzgw==": {
+      "description": "Session expired dialog: error below the password field when signing back in failed for a reason other than a wrong password",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Anmeldung fehlgeschlagen. Versuch es noch einmal.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "k0sHF14I/Ho4z+Kl29P3Cg==": {
+      "description": "Session expired dialog: error below the password field after too many sign-in attempts",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zu viele Versuche. Versuch es in einer Minute noch einmal.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g8PtFRrNavgXx3weAElMOg==": {
+      "description": "Session expired dialog: title of the dialog that asks the admin for their password after they were signed out for inactivity",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Sitzung ist abgelaufen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SZKm0rmf24G1BzVquZlBSg==": {
+      "description": "Session expired dialog: text below the title, with the signed-in admin's email address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du wurdest nach einer Weile ohne Aktivität abgemeldet. Gib das Passwort für {email} ein, um dort weiterzumachen, wo du aufgehört hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bn+x5pf/vrzzdyHfYQxHfQ==": {
+      "description": "Session expired dialog: label of the field for the admin's password to sign back in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Passwort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XkJe1hjIQaSBAP5aNzF2+w==": {
+      "description": "Session expired dialog: button that goes to the sign-in page to sign in as a different admin",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Anderes Konto verwenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RKuzPU/Ivd0GiH2zdKtLRQ==": {
+      "description": "Session expired dialog: submit button that signs back in with the entered password and returns to the page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weiter",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CJIjVE+WRwJPyxd8l6kywg==": {
+      "description": "Sidebar: accessible name of the logo link that goes to the admin panel's home page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Startseite",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m76ORXCP/n8ekocRVnGiaA==": {
+      "description": "Sidebar: accessible name of the button that collapses a navigation group, e.g. 'Close Settings'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{navigationGroup} schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4UDz46iQkXZIbNBnHZHnrQ==": {
+      "description": "Sidebar: accessible name of the button that expands a navigation group, e.g. 'Open Settings'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{navigationGroup} öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wG0adb95hTqxh5sJOPjuyw==": {
+      "description": "Link for keyboard and screen reader users, shown on focus at the top of every page, that jumps past the navigation to the page's content",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zum Hauptinhalt springen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qlD70rkmnh3BcXUJuWqCGQ==": {
+      "description": "Product form: heading of the section with the product's name, slug and visibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g2nDEANtQDFKpA6GUnZ0Gw==": {
+      "description": "Product form: text below the heading of the General section, with the name, slug and visibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie das Produkt heißt und im Shop gefunden wird.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s9YVNTJoLyTtPawO2RFqtA==": {
+      "description": "Product form: heading of the section with the product's images",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bilder",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MZOehasGK06kK4qsOyTPNw==": {
+      "description": "Product form: text below the heading of the Images section, saying the first image is shown as the product's thumbnail",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Das erste Bild ist das Vorschaubild des Produkts.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MhWgOOfF2aTc/Eoi9aWXMA==": {
+      "description": "Product form: heading of the section that picks the categories the product is listed in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WBDMtj8R7US7pPU6l+wBrg==": {
+      "description": "Product form: text below the heading of the Categories section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wo das Produkt im Shop gelistet ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9fAhYJFRKO3FJFas2ONlNQ==": {
+      "description": "Product form: heading of the section with the stock level, backorders and order quantity limits",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bestand",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bUJpEiidt7+qxdg6A5d93w==": {
+      "description": "Product form: text below the heading of the Stock section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie viele verkauft werden können und wie viele ein Kunde auf einmal kaufen kann.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sqP6ljw6kxeNC7ZTStUY1g==": {
+      "description": "Product form: heading of the section with the product's shipping weight, length, width and height",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gewicht und Maße",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cf2NUkVE9U+2rYQtzUwmzw==": {
+      "description": "Product form: text below the heading of the Weight and dimensions section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Damit werden Versandarten und ihre Preise bestimmt. Lass die Felder bei Produkten leer, die nicht versendet werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mB7V0IdNmunXfFbeJz0hNg==": {
+      "description": "Product form: heading of the section with the stock keeping unit and the barcode (e.g. EAN or UPC)",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "SKU und Barcode",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q5NJ6qphw6Z4cuMvAY5JPg==": {
+      "description": "Product form: text below the heading of the SKU and barcode section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Damit erkennst du das Produkt in deinem Bestand und beim Scannen. Jeder Code gehört zu genau einem Produkt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q+qM6feKQvBK/JlHKMZ92A==": {
+      "description": "Product form: label of the field for the product's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NUhxQmF6FftkrbZEBtYqmQ==": {
+      "description": "Product form: label of the field for the product's URL slug, the part of its storefront address made from its name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Slug",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VAFXHBvQsr3tjWIY1/oA6w==": {
+      "description": "Product form: toast when a link opened the full-screen view of an image the product doesn't have (anymore)",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bild nicht gefunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l7GqTc+bMI4XUDqx5Kk3EA==": {
+      "description": "Product form: the reason after 'Couldn't upload <file name>.' when uploading an image failed for no known reason",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Versuch es noch einmal.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qs8NEMhYC4F2ZRqZypfWJg==": {
+      "description": "Product form: the reason after 'Couldn't upload <file name>.' when the image file is too large",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Datei ist größer, als der Server akzeptiert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "H04WUAGdAg20NqilNxy+xw==": {
+      "description": "Product form, images: error below the image grid when an image wasn't uploaded, with the file's name and why, e.g. 'Couldn't upload photo.png. Try again.'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{fileName} konnte nicht hochgeladen werden. {reason}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RfrABoK4bQerm4OPWGFuog==": {
+      "description": "Product form: accessible name of the grid of the product's images",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bilder",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QsEF73ymMwbybfBi15Kg9A==": {
+      "description": "Product form, images: accessible name of the spinner in place of an image that is still uploading, with the file's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{fileName} wird hochgeladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+YAh/DMTvX8om2X7Iln5zw==": {
+      "description": "Product form, images: accessible name of the square that opens the file picker to upload images",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bilder hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FUMrOUMkD6bsxvVcPTw9sg==": {
+      "description": "Product form, images: accessible name of an image that opens it in a full-screen view, with its position in the grid, e.g. 'Open image 2'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bild {imagePosition} öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BJ8ZIyepe8j8RlZAuvWWnQ==": {
+      "description": "Product form, images: fallback alternative text of an image in the grid, with its position, e.g. 'Image 2'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bild {imagePosition}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DsIEmHXGE3YZz7djHicwSw==": {
+      "description": "Product form, images: badge on the first image, which is shown as the product's thumbnail",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorschaubild",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+l9E3zpamNvQe1lZVQcOxQ==": {
+      "description": "Product form, images: accessible name of the button that opens an image's menu of actions, with its position, e.g. 'Actions for image 2'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für Bild {imagePosition}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8CAGpmD9yQc/MR40gHkgGA==": {
+      "description": "Product form, an image's actions menu: takes the image out of the product's images (saved with the product)",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LrNQYGeVOMFWnEYFqe+U4g==": {
+      "description": "Product form: label of the field for the stock keeping unit, the store's own product code",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "SKU",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c/Z74dHaIlAiLadyeoHSvw==": {
+      "description": "Product form: label of the field for the product's barcode number, e.g. EAN or UPC",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Barcode",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2Zh1O0ghkErZbg2nmn5kvw==": {
+      "description": "Product form: label of the field for how many items are in stock",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bestand",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Fop3Wt5vm8rNIWHBaW13yQ==": {
+      "description": "Product form: hint below the stock field, saying an empty stock isn't tracked",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leer lassen, um ohne Bestandsführung zu verkaufen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "unyhscX/4nHCBl8L9z7f6g==": {
+      "description": "Product form: label of the checkbox that lets customers order the product while it's out of stock",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lieferrückstände erlauben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8LG1FfrBGStfdenin3Py3w==": {
+      "description": "Product form: label of the field for the fewest items of the product a customer must buy at once",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mindestmenge",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XhdeSHUpYmc9nY5MmzChsw==": {
+      "description": "Product form: label of the field for the most items of the product a customer can buy at once",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Höchstmenge",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gTrfhgaTrbKHcy3FOYpX2A==": {
+      "description": "Product form: label of the field for the product's shipping length",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Länge",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ljOkLSM3yo2G1ZuA+/rPlQ==": {
+      "description": "Product form: accessible name of the select next to the length field that picks the unit, e.g. cm",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Längeneinheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "phcXphWi0N0N2BfhacZn1A==": {
+      "description": "Product form: label of the field for the product's shipping width",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Breite",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lIs7gryszJa0bT6S+Iu3Zw==": {
+      "description": "Product form: accessible name of the select next to the width field that picks the unit, e.g. cm",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Breiteneinheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lqBRz+U6tvRXUDQLesEoEA==": {
+      "description": "Product form: label of the field for the product's shipping height",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Höhe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YsSSBRbV0nBKAy87EPhE8A==": {
+      "description": "Product form: accessible name of the select next to the height field that picks the unit, e.g. cm",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Höheneinheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jaR0Q5EarIaDGh6EQyiJ8A==": {
+      "description": "Product form: label of the field for the product's shipping weight",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gewicht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5VX5lZ8SYdQUEU56tvTnHw==": {
+      "description": "Product form: accessible name of the select next to the weight field that picks the unit, e.g. kg",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gewichtseinheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jJlBpHQEzWGsFc65PV3MqQ==": {
+      "description": "Product image lightbox: tooltip of the image's file name in the header, which opens the image file in a new browser tab",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "In neuem Tab öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kqTGYK72oveA7T0+Zk1HdA==": {
+      "description": "Product image lightbox: accessible name of the button that closes the full-screen image view",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Y7QM+l9eJlTBwmPufbaLdw==": {
+      "description": "Product image lightbox: accessible name of the group of zoom out, fit to screen and zoom in buttons",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zoom",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RSp8fkU/erg/4Hab5PVk3w==": {
+      "description": "Product image lightbox: accessible name of the button that makes the image smaller",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkleinern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eVtk80W19QsBYLRBQQCHow==": {
+      "description": "Product image lightbox: accessible name of the button that resets the zoom so the whole image fits",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "An Bildschirm anpassen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qtSzhAiC+f4SLP2J2VTeCg==": {
+      "description": "Product image lightbox: accessible name of the button that makes the image larger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vergrößern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "byZz/H1pofIGOr2kvsFGNw==": {
+      "description": "Product image lightbox: accessible name of the toggle button that shows a checkerboard behind the image, so its transparent parts stand out",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schachbrett-Hintergrund",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5W4oMMce4kEPYCwhUSPhDg==": {
+      "description": "Product image lightbox: label of the field for the image's alternative text, read to people who can't see it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alternativtext",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "j7/4f7Q0ibUjRu2iKgCfWQ==": {
+      "description": "Product image lightbox: hint below the alt text field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibt das Bild für Menschen, die es nicht sehen können.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "U1EBp6/nu4ual7bowws6aw==": {
+      "description": "Customer form: label of the field for the customer's first name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/ZxM3nIl15in3tAQIxrKTA==": {
+      "description": "Customer form: label of the field for the customer's last name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nachname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5XWzgKC1TRuZ4BO//m2PsA==": {
+      "description": "Product and category pages: accessible name of the select that picks the language the content is edited in, not the panel's own language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Inhaltssprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yjoVw5vKSlEwx4yiui0k0Q==": {
+      "description": "Command menu: read by screen readers after the checked item of a list, e.g. 'Dark, current' for the theme in use",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": ", aktuell",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fJpRomWIVzYI8muF6ARxNw==": {
+      "description": "Command menu, search results: what screen readers read for a result found by another field than its name, e.g. 'Oxford Shirt, SKU: OX-123'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{resultName}, {matchedField}: {matchedValue}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "M50JqQJYkmrfn2H1POITTQ==": {
+      "description": "Command menu, search results: line below a result's name with the other field the search matched and its value, e.g. 'SKU: OX-123'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{matchedField}: {matchedValue}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CDrDXK/3qhdKGzAMN2EwQg==": {
+      "description": "Product form, categories section: heading shown while the store has no categories to pick from",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jxWCl1Nv34hnRXfEgqK9MA==": {
+      "description": "Product form, categories section: text below 'No categories yet', shown while the store has no categories",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle Kategorien, um das Produkt im Shop zu listen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NAuLZY2SbtQH9jHVVnjKXw==": {
+      "description": "Product form, categories section: button that goes to creating a category, shown while the store has none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorien erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "M0kZwr2vbAGaDcWiDLMt/A==": {
+      "description": "Product form: accessible name of the tree of checkboxes that picks the categories the product is listed in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BQxIp8AqzE7eJkDwGeVR4A==": {
+      "description": "Product form, categories tree: accessible name of the button that collapses a category to hide its subcategories, e.g. 'Close Shirts'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{categoryName} schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HtZc3R0MzRqlPtnV5E6Nog==": {
+      "description": "Product form, categories tree: accessible name of the button that expands a category to show its subcategories, e.g. 'Open Shirts'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{categoryName} öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Kg4jo01GiCXeiQE95C/S6g==": {
+      "description": "Product form, categories tree: accessible name of the button that opens a category's menu of actions, e.g. 'Actions for Shirts'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {categoryName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xgyeldemzmqO7mVr3z30kg==": {
+      "description": "Product form, categories tree: menu item of a category that opens the category's page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ansehen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HsH4iQJ17Im/8tHZ8i4McQ==": {
+      "description": "Category form: label of the field for the category's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MwRyA7VQXT7+s2zrLSzFSw==": {
+      "description": "Category form: label of the field for the category's URL slug, the part of its storefront address made from its name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Slug",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QuJxIae9U1t8+2ebqcjEGQ==": {
+      "description": "Category tree in the sidebar of the categories pages: accessible name of the button that collapses a category to hide its subcategories, e.g. 'Close Shirts'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{categoryName} schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D7LnvZ2DeaEajKkaZmYbHA==": {
+      "description": "Category tree in the sidebar of the categories pages: accessible name of the button that expands a category to show its subcategories, e.g. 'Open Shirts'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{categoryName} öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v4JWcdWORHZa9ndRdlsYwA==": {
+      "description": "Category tree in the sidebar of the categories pages: accessible name of the button that opens a category's menu of actions, e.g. 'Actions for Shirts'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {categoryName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CdwqR7X9x6Qh4OF97L0gtA==": {
+      "description": "Category tree, a category's actions menu: goes to creating a new category inside this one",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unterkategorie hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KkoSSXnPOSyOsKYokaGrJw==": {
+      "description": "Category tree, a category's actions menu: hides the category from the storefront",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EW7abP1OCyKeXKFgtn3bFA==": {
+      "description": "Category tree, a hidden category's actions menu: shows the category in the storefront again",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sichtbar machen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WuqvXK8OR+TJqgPC6+uwkA==": {
+      "description": "Category tree, a category's actions menu: deletes the category, after a confirmation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HIOC1ALCgDGOkc/Qf3lwng==": {
+      "description": "Category tree: name of the action that deletes a category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v2L0j5qdOzGw6Nb+aXkNGw==": {
+      "description": "Category tree: title of the dialog that asks the admin to confirm deleting a category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kategorie löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "a0HpS7SVAZkilZ+4SKjTBA==": {
+      "description": "Category tree: text of the dialog that asks the admin to confirm deleting a category, with the category's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dadurch werden auch alle Kategorien in „{categoryName}“ gelöscht. Ihre Produkte bleiben im Shop.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F8eDXdltJfQYWa2ky5T7HQ==": {
+      "description": "Category tree: button in the confirmation dialog that deletes the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OKnPoBOgJshR9fNd0QSiwQ==": {
+      "description": "Category tree: button in the confirmation dialog that keeps the category and closes the dialog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CKqwpoJa9PL7g41/vEXV0A==": {
+      "description": "Category page, products section: heading shown while the category lists no products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Produkte",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8pV/BlRpb06vU89z2ZIulw==": {
+      "description": "New category page, products section: text below 'No products yet', saying products can be added once the category is saved",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkte erscheinen hier, sobald die Kategorie erstellt ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rYLqwaqtxpYQwXHsfGJHXw==": {
+      "description": "Category page: heading of the section with the products listed in the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkte",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l52ChgXROiuFWC2SvisIDw==": {
+      "description": "Category page: text below the heading of the products section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Produkte in dieser Kategorie.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TS8zFtH4K6092T9jATFtLw==": {
+      "description": "Category page, products section: button that opens a search to add a product to the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CtmUJ4cYOrdHiybfJstBFg==": {
+      "description": "Category page, products section: button that goes to creating a product, shown while the store has no products",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkt erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4qGfNwgsAVO91RS5Z0HBlA==": {
+      "description": "Category page, products table: heading, for screen readers, of the column with each product's menu of actions",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HwA0h66MKIwMtGfOMWQcNQ==": {
+      "description": "Category page, products table: accessible name of the button that opens a product's menu of actions, e.g. 'Actions for Oxford Shirt'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {productName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RAQP8Z7nPSXTF53Wa1z4HQ==": {
+      "description": "Category page: accessible name of the search field that picks a product to add to the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hinzuzufügendes Produkt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aCnSKfU+/m3LU6LMnjN6Dg==": {
+      "description": "Category page: placeholder of the search field that picks a product to add to the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkte suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4gyQnlYRvcIEhGRaJQpsJg==": {
+      "description": "Category page: shown in the product search's list while the server searches for products to add",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Suche läuft …",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FiV+5BZ4qsyovzC4WzRFxg==": {
+      "description": "Category page: shown in the product search's list when no product that isn't in the category yet matches",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Produkte gefunden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QY6G3z04D0J/J00yHFpxHw==": {
+      "description": "Category page: button that closes the bar for adding products to the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7oZ8JYOOgDJ0vv89KXzlYA==": {
+      "description": "Category page: button that adds the product picked in the search to the category",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Produkt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    }
+  }
+}

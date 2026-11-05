@@ -24,7 +24,9 @@ export default function VisibilityField({
           uncheckedValue="hidden"
           defaultChecked={defaultVisible}
         />
-        Visible in the store
+        <fbt desc="Category and product forms: label of the checkbox that shows the category or product in the storefront, or hides it">
+          Visible in the store
+        </fbt>
       </Checkbox.Label>
       {error && <Error match>{error}</Error>}
     </BaseField.Root>

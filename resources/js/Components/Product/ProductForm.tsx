@@ -42,6 +42,7 @@ import FormCheckbox from "../FormCheckbox";
 import { useFrozen } from "../Freeze";
 import ProductImageLightbox from "./ProductImageLightbox";
 import VisibilityField from "../VisibilityField";
+import { fbs } from "fbtee";
 
 type Product = Omit<Larasell.Admin.Product.Data.ProductDetailData, "id">;
 type Category = Larasell.Admin.Category.Data.CategoryOptionData;
@@ -73,19 +74,37 @@ export default function ProductForm({
     <SectionStack>
       <Section.Root>
         <Section.Header
-          title="General"
-          description="How the product is named and found in the store."
+          title={fbs(
+            "General",
+            "Product form: heading of the section with the product's name, slug and visibility",
+          )}
+          description={fbs(
+            "How the product is named and found in the store.",
+            "Product form: text below the heading of the General section, with the name, slug and visibility",
+          )}
         />
         <GeneralFields product={product} errors={errors} />
       </Section.Root>
       <Section.Root>
-        <Section.Header title="Images" description="The first image is the product's thumbnail." />
+        <Section.Header
+          title={fbs("Images", "Product form: heading of the section with the product's images")}
+          description={fbs(
+            "The first image is the product's thumbnail.",
+            "Product form: text below the heading of the Images section, saying the first image is shown as the product's thumbnail",
+          )}
+        />
         <ImageGrid images={product?.images ?? []} uploadUrl={uploadImagesUrl} saveErrors={errors} />
       </Section.Root>
       <Section.Root>
         <Section.Header
-          title="Categories"
-          description="Where the product is listed in the store."
+          title={fbs(
+            "Categories",
+            "Product form: heading of the section that picks the categories the product is listed in",
+          )}
+          description={fbs(
+            "Where the product is listed in the store.",
+            "Product form: text below the heading of the Categories section",
+          )}
         />
         <CategoryCheckboxTree
           categories={categories}
@@ -95,22 +114,40 @@ export default function ProductForm({
       </Section.Root>
       <Section.Root>
         <Section.Header
-          title="Stock"
-          description="How many can be sold, and how many a customer can buy at once."
+          title={fbs(
+            "Stock",
+            "Product form: heading of the section with the stock level, backorders and order quantity limits",
+          )}
+          description={fbs(
+            "How many can be sold, and how many a customer can buy at once.",
+            "Product form: text below the heading of the Stock section",
+          )}
         />
         <StockFields product={product} errors={errors} />
       </Section.Root>
       <Section.Root>
         <Section.Header
-          title="Weight and dimensions"
-          description="Used to choose shipping methods and their prices. Leave them empty for products that aren't shipped."
+          title={fbs(
+            "Weight and dimensions",
+            "Product form: heading of the section with the product's shipping weight, length, width and height",
+          )}
+          description={fbs(
+            "Used to choose shipping methods and their prices. Leave them empty for products that aren't shipped.",
+            "Product form: text below the heading of the Weight and dimensions section",
+          )}
         />
         <WeightAndDimensionsFields product={product} errors={errors} />
       </Section.Root>
       <Section.Root>
         <Section.Header
-          title="SKU and barcode"
-          description="Identify the product in your inventory and when it's scanned. Each belongs to one product only."
+          title={fbs(
+            "SKU and barcode",
+            "Product form: heading of the section with the stock keeping unit and the barcode (e.g. EAN or UPC)",
+          )}
+          description={fbs(
+            "Identify the product in your inventory and when it's scanned. Each belongs to one product only.",
+            "Product form: text below the heading of the SKU and barcode section",
+          )}
         />
         <IdentifierFields product={product} errors={errors} />
       </Section.Root>
@@ -132,7 +169,11 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
       {/* Side by side when the form is wide enough, stacked otherwise. */}
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
-          <Field label="Name" name="name" error={errors.name}>
+          <Field
+            label={fbs("Name", "Product form: label of the field for the product's name")}
+            name="name"
+            error={errors.name}
+          >
             <Input
               {...slug.source}
               defaultValue={product?.name ?? undefined}
@@ -141,7 +182,14 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
             />
           </Field>
 
-          <Field label="Slug" name="slug" error={errors.slug}>
+          <Field
+            label={fbs(
+              "Slug",
+              "Product form: label of the field for the product's URL slug, the part of its storefront address made from its name",
+            )}
+            name="slug"
+            error={errors.slug}
+          >
             <Input
               {...slug.target}
               defaultValue={product?.slug ?? undefined}
@@ -201,7 +249,13 @@ function ImageGrid({
   const dropMissingImage = useEffectEvent(() => {
     lightbox.close();
     // By id, so strict mode's second run doesn't show it twice.
-    toast.add({ id: "missing-lightbox-image", title: "Image not found" });
+    toast.add({
+      id: "missing-lightbox-image",
+      title: fbs(
+        "Image not found",
+        "Product form: toast when a link opened the full-screen view of an image the product doesn't have (anymore)",
+      ),
+    });
   });
   const missingImage = lightbox.imageId !== null && openImage === undefined;
   useEffect(() => {
@@ -265,7 +319,10 @@ function ImageGrid({
     setUploading(files);
 
     for (const file of files) {
-      let reason = "Try again.";
+      let reason: string = fbs(
+        "Try again.",
+        "Product form: the reason after 'Couldn't upload <file name>.' when uploading an image failed for no known reason",
+      );
       let response: { image: Image } | undefined;
       upload.transform(() => ({ image: file }));
       try {
@@ -273,7 +330,12 @@ function ImageGrid({
         response = await upload.post(uploadUrl, {
           onError: (fieldErrors) => (reason = Object.values(fieldErrors)[0] ?? reason),
           onHttpException: ({ status }) => {
-            if (status === 413) reason = "It's larger than the server accepts.";
+            if (status === 413) {
+              reason = fbs(
+                "It's larger than the server accepts.",
+                "Product form: the reason after 'Couldn't upload <file name>.' when the image file is too large",
+              );
+            }
           },
         });
       } catch {
@@ -283,7 +345,13 @@ function ImageGrid({
 
       const uploaded = response?.image;
       if (uploaded) setImages((images) => [...images, uploaded]);
-      else setErrors((errors) => [...errors, `Couldn't upload ${file.name}. ${reason}`]);
+      else {
+        const error = fbs(
+          ["Couldn't upload ", fbs.param("fileName", file.name), ". ", fbs.param("reason", reason)],
+          "Product form, images: error below the image grid when an image wasn't uploaded, with the file's name and why, e.g. 'Couldn't upload photo.png. Try again.'",
+        );
+        setErrors((errors) => [...errors, error]);
+      }
       setUploading((files) => files.slice(1));
     }
   }
@@ -310,7 +378,10 @@ function ImageGrid({
       <div className="@container">
         <ul
           ref={grid}
-          aria-label="Images"
+          aria-label={fbs(
+            "Images",
+            "Product form: accessible name of the grid of the product's images",
+          )}
           aria-busy={uploading.length > 0}
           className="grid auto-rows-fr grid-cols-1 gap-3 @xs:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4"
         >
@@ -331,7 +402,13 @@ function ImageGrid({
               key={index}
               className="border-border flex aspect-square items-center justify-center border bg-mauve-50 text-mauve-600 dark:bg-mauve-900 dark:text-mauve-300"
             >
-              <Spinner aria-label={`Uploading ${file.name}`} size={6} />
+              <Spinner
+                aria-label={fbs(
+                  ["Uploading ", fbs.param("fileName", file.name)],
+                  "Product form, images: accessible name of the spinner in place of an image that is still uploading, with the file's name",
+                )}
+                size={6}
+              />
             </li>
           ))}
           <li>
@@ -354,7 +431,10 @@ function ImageGrid({
                 type="file"
                 multiple
                 accept={IMAGE_TYPES}
-                aria-label="Add images"
+                aria-label={fbs(
+                  "Add images",
+                  "Product form, images: accessible name of the square that opens the file picker to upload images",
+                )}
                 disabled={uploading.length > 0}
                 className="sr-only"
                 onChange={(event) => uploadFiles(event.currentTarget)}
@@ -422,14 +502,20 @@ function ImageCard({
       <input type="hidden" name="images[]" value={image.id} />
       <input type="hidden" name={`image_alts[${image.id}]`} value={image.alt ?? ""} />
       <BaseButton
-        aria-label={`Open image ${index + 1}`}
+        aria-label={fbs(
+          ["Open image ", fbs.param("imagePosition", String(index + 1))],
+          "Product form, images: accessible name of an image that opens it in a full-screen view, with its position in the grid, e.g. 'Open image 2'",
+        )}
         onClick={onOpen}
         className="size-full cursor-[inherit] outline-none"
       >
         {/* A native image drag would take over the pointer before ours starts. */}
         <img
           src={image.url}
-          alt={`Image ${index + 1}`}
+          alt={fbs(
+            ["Image ", fbs.param("imagePosition", String(index + 1))],
+            "Product form, images: fallback alternative text of an image in the grid, with its position, e.g. 'Image 2'",
+          )}
           draggable={false}
           className="size-full object-cover"
         />
@@ -437,11 +523,21 @@ function ImageCard({
       {index === 0 && (
         // Flex, so the badge doesn't sit on a text line that adds space above it.
         <div className="absolute top-2 left-2 flex">
-          <Badge>Thumbnail</Badge>
+          <Badge>
+            <fbt desc="Product form, images: badge on the first image, which is shown as the product's thumbnail">
+              Thumbnail
+            </fbt>
+          </Badge>
         </div>
       )}
       <div className="absolute top-2 right-2">
-        <ImageMenu label={`Actions for image ${index + 1}`} onRemove={onRemove} />
+        <ImageMenu
+          label={fbs(
+            ["Actions for image ", fbs.param("imagePosition", String(index + 1))],
+            "Product form, images: accessible name of the button that opens an image's menu of actions, with its position, e.g. 'Actions for image 2'",
+          )}
+          onRemove={onRemove}
+        />
       </div>
     </li>
   );
@@ -465,7 +561,9 @@ function ImageMenu({ label, onRemove }: { label: string; onRemove: () => void })
       <Menu.Popup>
         <HotkeysProvider scope="image-actions-menu" exclusive={overlayExclusive}>
           <Menu.Item variant="destructive" icon={FileReduceLine} onClick={onRemove}>
-            Remove
+            <fbt desc="Product form, an image's actions menu: takes the image out of the product's images (saved with the product)">
+              Remove
+            </fbt>
           </Menu.Item>
         </HotkeysProvider>
       </Menu.Popup>
@@ -534,11 +632,25 @@ function IdentifierFields({ product, errors }: { product?: Product; errors: Erro
   return (
     <div className="@container">
       <div className="grid items-start gap-5 @md:grid-cols-2">
-        <Field label="SKU" name="sku" error={errors.sku}>
+        <Field
+          label={fbs(
+            "SKU",
+            "Product form: label of the field for the stock keeping unit, the store's own product code",
+          )}
+          name="sku"
+          error={errors.sku}
+        >
           <Input defaultValue={product?.sku ?? ""} autoComplete="off" spellCheck={false} />
         </Field>
 
-        <Field label="Barcode" name="barcode" error={errors.barcode}>
+        <Field
+          label={fbs(
+            "Barcode",
+            "Product form: label of the field for the product's barcode number, e.g. EAN or UPC",
+          )}
+          name="barcode"
+          error={errors.barcode}
+        >
           <Input defaultValue={product?.barcode ?? ""} autoComplete="off" spellCheck={false} />
         </Field>
       </div>
@@ -553,10 +665,13 @@ function StockFields({ product, errors }: { product?: Product; errors: Errors })
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
           <Field
-            label="Stock"
+            label={fbs("Stock", "Product form: label of the field for how many items are in stock")}
             name="stock"
             error={errors.stock}
-            description="Leave empty to sell without counting."
+            description={fbs(
+              "Leave empty to sell without counting.",
+              "Product form: hint below the stock field, saying an empty stock isn't tracked",
+            )}
           >
             <Input defaultValue={product?.stock ?? ""} inputMode="numeric" autoComplete="off" />
           </Field>
@@ -575,7 +690,9 @@ function StockFields({ product, errors }: { product?: Product; errors: Errors })
                 uncheckedValue="0"
                 defaultChecked={product?.allowBackorders ?? false}
               />
-              Allow backorders
+              <fbt desc="Product form: label of the checkbox that lets customers order the product while it's out of stock">
+                Allow backorders
+              </fbt>
             </Checkbox.Label>
             {errors.allow_backorders && <Error match>{errors.allow_backorders}</Error>}
           </BaseField.Root>
@@ -584,7 +701,14 @@ function StockFields({ product, errors }: { product?: Product; errors: Errors })
 
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
-          <Field label="Minimum quantity" name="min_quantity" error={errors.min_quantity}>
+          <Field
+            label={fbs(
+              "Minimum quantity",
+              "Product form: label of the field for the fewest items of the product a customer must buy at once",
+            )}
+            name="min_quantity"
+            error={errors.min_quantity}
+          >
             <Input
               defaultValue={product?.minQuantity ?? ""}
               inputMode="numeric"
@@ -592,7 +716,14 @@ function StockFields({ product, errors }: { product?: Product; errors: Errors })
             />
           </Field>
 
-          <Field label="Maximum quantity" name="max_quantity" error={errors.max_quantity}>
+          <Field
+            label={fbs(
+              "Maximum quantity",
+              "Product form: label of the field for the most items of the product a customer can buy at once",
+            )}
+            name="max_quantity"
+            error={errors.max_quantity}
+          >
             <Input
               defaultValue={product?.maxQuantity ?? ""}
               inputMode="numeric"
@@ -605,11 +736,35 @@ function StockFields({ product, errors }: { product?: Product; errors: Errors })
   );
 }
 
-const AXES = [
-  ["length", "Length"],
-  ["width", "Width"],
-  ["height", "Height"],
-] as const;
+/** The dimensions, with their field's label and their unit select's, in the interface language. */
+function axes() {
+  return [
+    {
+      axis: "length",
+      label: fbs("Length", "Product form: label of the field for the product's shipping length"),
+      unitLabel: fbs(
+        "Length unit",
+        "Product form: accessible name of the select next to the length field that picks the unit, e.g. cm",
+      ),
+    },
+    {
+      axis: "width",
+      label: fbs("Width", "Product form: label of the field for the product's shipping width"),
+      unitLabel: fbs(
+        "Width unit",
+        "Product form: accessible name of the select next to the width field that picks the unit, e.g. cm",
+      ),
+    },
+    {
+      axis: "height",
+      label: fbs("Height", "Product form: label of the field for the product's shipping height"),
+      unitLabel: fbs(
+        "Height unit",
+        "Product form: accessible name of the select next to the height field that picks the unit, e.g. cm",
+      ),
+    },
+  ] as const;
+}
 
 /** The units Larasell's WeightUnit and LengthUnit define. */
 const WEIGHT_UNITS = ["g", "kg", "oz", "lb"];
@@ -638,7 +793,10 @@ function WeightAndDimensionsFields({ product, errors }: { product?: Product; err
       <div className="@container">
         <div className="grid items-start gap-5 @min-[40rem]:grid-cols-2">
           <Field
-            label="Weight"
+            label={fbs(
+              "Weight",
+              "Product form: label of the field for the product's shipping weight",
+            )}
             name="weight[amount]"
             error={errors["weight.amount"] ?? errors["weight.unit"]}
           >
@@ -649,7 +807,10 @@ function WeightAndDimensionsFields({ product, errors }: { product?: Product; err
               suffix={
                 <UnitSelect
                   name="weight[unit]"
-                  label="Weight unit"
+                  label={fbs(
+                    "Weight unit",
+                    "Product form: accessible name of the select next to the weight field that picks the unit, e.g. kg",
+                  )}
                   units={WEIGHT_UNITS}
                   defaultValue={weightUnit}
                 />
@@ -661,7 +822,7 @@ function WeightAndDimensionsFields({ product, errors }: { product?: Product; err
 
       <div className="@container">
         <div className="grid items-start gap-5 @min-[40rem]:grid-cols-2">
-          {AXES.map(([axis, label], index) => (
+          {axes().map(({ axis, label, unitLabel }, index) => (
             <Field
               key={axis}
               label={label}
@@ -683,7 +844,7 @@ function WeightAndDimensionsFields({ product, errors }: { product?: Product; err
                     }}
                     onChange={syncDimensionsUnits}
                     name={index === 0 ? "dimensions[unit]" : undefined}
-                    label={`${label} unit`}
+                    label={unitLabel}
                     units={LENGTH_UNITS}
                     defaultValue={dimensionsUnit}
                   />

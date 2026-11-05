@@ -4,6 +4,7 @@ import type { SharedProps } from "../../types";
 import { navigationIcon } from "../../utils/navigationIcon";
 import { type CommandItem, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
+import { fbs } from "fbtee";
 
 type Search = Larasell.Admin.Platform.Search.Data.SearchData;
 type Result = Larasell.Admin.Platform.Search.Data.SearchResultData;
@@ -87,7 +88,18 @@ function resultItem(result: Result): CommandItem {
 
   return {
     id: String(result.id),
-    textValue: match ? `${result.label}, ${match.label}: ${match.value}` : result.label,
+    textValue: match
+      ? fbs(
+          [
+            fbs.param("resultName", result.label),
+            ", ",
+            fbs.param("matchedField", match.label),
+            ": ",
+            fbs.param("matchedValue", match.value),
+          ],
+          "Command menu, search results: what screen readers read for a result found by another field than its name, e.g. 'Oxford Shirt, SKU: OX-123'",
+        )
+      : result.label,
     label: ({ search }) => (
       <span className="flex flex-col">
         <span>
@@ -96,8 +108,12 @@ function resultItem(result: Result): CommandItem {
         </span>
         {match && (
           <span className="type-body-sm text-mauve-500">
-            {match.label}:{" "}
-            <Highlight text={match.value} ranges={matchRanges(match.value, search)} />
+            <fbt desc="Command menu, search results: line below a result's name with the other field the search matched and its value, e.g. 'SKU: OX-123'">
+              <fbt:param name="matchedField">{match.label}</fbt:param>:{" "}
+              <fbt:param name="matchedValue">
+                <Highlight text={match.value} ranges={matchRanges(match.value, search)} />
+              </fbt:param>
+            </fbt>
           </span>
         )}
       </span>

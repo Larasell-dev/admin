@@ -14,6 +14,7 @@ import { cn } from "cn";
 import { useRef, useState } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { overlayExclusive } from "../../utils/hotkeys";
+import { fbs } from "fbtee";
 
 type Image = Larasell.Admin.Product.Data.ProductImageData;
 
@@ -73,13 +74,21 @@ export default function ProductImageLightbox({
                     }
                   />
                   <Tooltip.Popup side="bottom" align="start">
-                    Open in a new tab
+                    <fbt desc="Product image lightbox: tooltip of the image's file name in the header, which opens the image file in a new browser tab">
+                      Open in a new tab
+                    </fbt>
                   </Tooltip.Popup>
                 </Tooltip.Root>
               </Dialog.Title>
               <Dialog.Close
                 render={
-                  <IconButton variant="tertiary" aria-label="Close">
+                  <IconButton
+                    variant="tertiary"
+                    aria-label={fbs(
+                      "Close",
+                      "Product image lightbox: accessible name of the button that closes the full-screen image view",
+                    )}
+                  >
                     <Icon icon={CloseLine} />
                   </IconButton>
                 }
@@ -116,24 +125,38 @@ export default function ProductImageLightbox({
                       </TransformComponent>
                     </div>
                     <div className="absolute top-3 right-3 flex gap-2">
-                      <ButtonGroup label="Zoom">
+                      <ButtonGroup
+                        label={fbs(
+                          "Zoom",
+                          "Product image lightbox: accessible name of the group of zoom out, fit to screen and zoom in buttons",
+                        )}
+                      >
                         <IconButton
                           variant="secondary"
-                          aria-label="Zoom out"
+                          aria-label={fbs(
+                            "Zoom out",
+                            "Product image lightbox: accessible name of the button that makes the image smaller",
+                          )}
                           onClick={() => zoomOut()}
                         >
                           <Icon icon={ZoomOutLine} />
                         </IconButton>
                         <IconButton
                           variant="secondary"
-                          aria-label="Fit to screen"
+                          aria-label={fbs(
+                            "Fit to screen",
+                            "Product image lightbox: accessible name of the button that resets the zoom so the whole image fits",
+                          )}
                           onClick={() => resetTransform()}
                         >
                           <Icon icon={AspectRatioLine} />
                         </IconButton>
                         <IconButton
                           variant="secondary"
-                          aria-label="Zoom in"
+                          aria-label={fbs(
+                            "Zoom in",
+                            "Product image lightbox: accessible name of the button that makes the image larger",
+                          )}
                           onClick={() => zoomIn()}
                         >
                           <Icon icon={ZoomInLine} />
@@ -141,7 +164,10 @@ export default function ProductImageLightbox({
                       </ButtonGroup>
                       <IconButton
                         variant="secondary"
-                        aria-label="Checkerboard background"
+                        aria-label={fbs(
+                          "Checkerboard background",
+                          "Product image lightbox: accessible name of the toggle button that shows a checkerboard behind the image, so its transparent parts stand out",
+                        )}
                         aria-pressed={checkerboard}
                         onClick={() => setCheckerboard((on) => !on)}
                       >
@@ -155,9 +181,15 @@ export default function ProductImageLightbox({
               </TransformWrapper>
               <aside className="border-border border-t p-4 md:w-80 md:border-t-0 md:border-l">
                 <Field
-                  label="Alt text"
+                  label={fbs(
+                    "Alt text",
+                    "Product image lightbox: label of the field for the image's alternative text, read to people who can't see it",
+                  )}
                   name="alt"
-                  description="Describes the image to those who can't see it."
+                  description={fbs(
+                    "Describes the image to those who can't see it.",
+                    "Product image lightbox: hint below the alt text field",
+                  )}
                 >
                   <Input
                     ref={altInput}

@@ -4,6 +4,7 @@ namespace Larasell\Admin\Category\Tables;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Larasell\Admin\Platform\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Attributes\Remember;
@@ -33,7 +34,7 @@ class CategoryProducts extends Table
 
     public function title(): string
     {
-        return 'Products';
+        return __('Products');
     }
 
     public function columns(): array
@@ -42,9 +43,9 @@ class CategoryProducts extends Table
         $locale = app(ContentLocaleResolver::class)->resolve(request())->value;
 
         return [
-            TextColumn::make('name')->map(fn (Translatable $name): string => $name->get($locale)),
-            TextColumn::make('status', 'Visibility')
-                ->map(fn (Visibility $status): string => $status === Visibility::Visible ? 'Visible' : 'Hidden'),
+            TextColumn::make('name', __('Name'))->map(fn (Translatable $name): string => $name->get($locale)),
+            TextColumn::make('status', __('Visibility'))
+                ->map(fn (Visibility $status): string => $status === Visibility::Visible ? __('Visible') : __('Hidden')),
         ];
     }
 
@@ -56,14 +57,14 @@ class CategoryProducts extends Table
     public function actions(): array
     {
         return [
-            Action::make('View')
+            Action::make(Translate::later('View'))
                 ->route('larasell.admin.products.edit')
                 ->icon(Icon::Eye)
                 ->hidden(! config('larasell.admin.products.enabled')),
-            Action::make('Remove', handle: fn (Product $product) => $this->category->products()->detach($product))
+            Action::make(Translate::later('Remove'), handle: fn (Product $product) => $this->category->products()->detach($product))
                 ->confirm(
-                    title: 'Remove product',
-                    message: 'The product is only removed from this category. It stays in the store and its other categories.',
+                    title: __('Remove product'),
+                    message: __('The product is only removed from this category. It stays in the store and its other categories.'),
                 )
                 // Not a bin: the product isn't deleted, only taken out of this category.
                 ->icon(Icon::FolderReduce)
@@ -74,8 +75,8 @@ class CategoryProducts extends Table
     public function emptyState(): array
     {
         return [
-            'title' => 'No products yet',
-            'description' => 'Products in this category show up here.',
+            'title' => __('No products yet'),
+            'description' => __('Products in this category show up here.'),
         ];
     }
 }

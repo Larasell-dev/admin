@@ -9,6 +9,7 @@ import type { Page } from "../../types";
 import { overlayExclusive } from "../../utils/hotkeys";
 import Logo from "./Logo";
 import Sidebar from "./Sidebar";
+import { fbs } from "fbtee";
 
 export default function MobileNav() {
   const { props } = usePage<Page>();
@@ -22,14 +23,24 @@ export default function MobileNav() {
         <div className="flex h-full items-center justify-between px-6">
           <Link
             href={home.url}
-            aria-label="Home"
+            aria-label={fbs(
+              "Home",
+              "Mobile header: accessible name of the logo link that goes to the admin panel's home page",
+            )}
             className="inline-block outline-none focus-visible:focus-ring"
           >
             <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />
           </Link>
           <Drawer.Trigger
             render={
-              <IconButton variant="tertiary" size="sm" aria-label="Open menu">
+              <IconButton
+                variant="tertiary"
+                size="sm"
+                aria-label={fbs(
+                  "Open menu",
+                  "Mobile header: accessible name of the button that opens the navigation drawer",
+                )}
+              >
                 <Icon icon={MenuLine} />
               </IconButton>
             }
@@ -42,7 +53,10 @@ export default function MobileNav() {
         <Drawer.Viewport className="fixed inset-0 z-50 pointer-events-none">
           {/* The sidebar extends a screen width to the left, so dragging the panel right keeps its background, border and highlight. */}
           <Drawer.Popup
-            aria-label="Navigation"
+            aria-label={fbs(
+              "Navigation",
+              "Mobile: accessible name of the drawer with the admin panel's navigation",
+            )}
             className="pointer-events-auto h-full w-fit translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0 [&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_nav_a]:pl-[calc(100vw+1.5rem)] [&_aside>button]:pl-[calc(100vw+1.5rem)]"
           >
             <HotkeysProvider scope="mobile-nav" exclusive={overlayExclusive} enabled={open}>

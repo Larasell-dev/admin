@@ -20,11 +20,11 @@ enum ApiTokenExpiry: string
     public function label(): string
     {
         return match ($this) {
-            self::OneWeek => 'After 1 week',
-            self::OneMonth => 'After 1 month',
-            self::ThreeMonths => 'After 3 months',
-            self::SixMonths => 'After 6 months',
-            self::NineMonths => 'After 9 months',
+            self::OneWeek => __('After 1 week'),
+            self::OneMonth => __('After 1 month'),
+            self::ThreeMonths => __('After 3 months'),
+            self::SixMonths => __('After 6 months'),
+            self::NineMonths => __('After 9 months'),
         };
     }
 

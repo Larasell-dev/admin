@@ -175,7 +175,8 @@ class NavigationItem
     {
         return new NavigationItemData(
             id: $this->id(),
-            label: $this->label,
+            // Registered while the app boots, so translated now, in the request's language.
+            label: __($this->label),
             url: $this->url(),
             icon: $this->icon->name,
             children: $children,

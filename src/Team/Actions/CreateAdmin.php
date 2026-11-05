@@ -32,7 +32,7 @@ class CreateAdmin
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(Admin::class)],
             'password' => ['required', 'string', new AdminPassword],
         ], [
-            'email.unique' => 'An admin with the email [:input] already exists.',
+            'email.unique' => __('An admin with the email [:input] already exists.'),
         ])->validate();
 
         return DB::transaction(function () use ($validated, $actor): Admin {

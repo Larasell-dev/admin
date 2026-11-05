@@ -119,7 +119,8 @@ class Auditor
 
     /**
      * @internal Called by the modules whose models act, so the audit log names their actors, e.g.
-     * "API token: Deploy", from the model's name attribute.
+     * "API token: Deploy", from the model's name attribute. The label is marked with
+     * Translate::later(), since it's registered while the app boots; the audit log translates it.
      *
      * @param  class-string<Model>  $model
      */
