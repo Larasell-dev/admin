@@ -167,8 +167,7 @@ class NavigationItem
 
     /**
      * The item as the sidebar receives it. The icon is sent as its case name, which
-     *
-     * @larasell-dev/ui/icons exports with a Fill or Line suffix.
+     * `@larasell-dev/ui/icons` exports with a Fill or Line suffix.
      *
      * @param  list<NavigationItemData>  $children
      */
