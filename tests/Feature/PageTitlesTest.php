@@ -63,8 +63,8 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'customers' => ['/admin/customers', 'Customers - Admin'],
     'new customer' => ['/admin/customers/create', 'New customer - Admin'],
     'profile' => ['/admin/profile', 'Profile - Admin'],
-    'admins' => ['/admin/settings/admins', 'Admins - Admin'],
-    'new admin' => ['/admin/settings/admins/create', 'New admin - Admin'],
+    'team' => ['/admin/settings/team', 'Team - Admin'],
+    'new member' => ['/admin/settings/team/create', 'New member - Admin'],
     'API tokens' => ['/admin/settings/api-tokens', 'API tokens - Admin'],
     'new API token' => ['/admin/settings/api-tokens/create', 'New API token - Admin'],
 ]);
@@ -72,7 +72,7 @@ it('titles the signed-in pages', function (string $uri, string $title) {
 it('titles an admin\'s page with their name', function () {
     signedInAdmin();
 
-    expect(pageTitle($this->get(route('larasell.admin.settings.admins.edit', 1))))->toBe('Ada Lovelace - Admin');
+    expect(pageTitle($this->get(route('larasell.admin.settings.team.edit', 1))))->toBe('Ada Lovelace - Admin');
 });
 
 it('titles a customer\'s page with their name', function () {

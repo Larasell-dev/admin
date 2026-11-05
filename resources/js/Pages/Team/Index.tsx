@@ -5,21 +5,21 @@ import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Team.Data.AdminsPageData;
+type Props = Larasell.Admin.Team.Data.TeamPageData;
 
-export default function Index({ admins, createUrl }: Props) {
+export default function Index({ members, createUrl }: Props) {
   return (
     <>
       <Page.Header
-        title={admins.title}
+        title={members.title}
         actions={
           <Button size="sm" render={<Link href={createUrl} prefetch="hover" />}>
             <Icon icon={AddLine} />
-            Add admin
+            Add member
           </Button>
         }
       />
-      <ResourceTable resource={admins} />
+      <ResourceTable resource={members} />
     </>
   );
 }

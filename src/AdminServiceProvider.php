@@ -36,6 +36,7 @@ use Larasell\Admin\Product\ProductServiceProvider;
 use Larasell\Admin\Team\Console\CreateAdminUserCommand;
 use Larasell\Admin\Team\Console\ListAdminsCommand;
 use Larasell\Admin\Team\Console\RemoveAdminCommand;
+use Larasell\Admin\Team\TeamServiceProvider;
 use Larasell\Chronicle\ChronicleServiceProvider;
 use Larasell\Larasell\Enums\Plan;
 use Larasell\Larasell\Facades\Entitlement;
@@ -63,6 +64,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->register(CustomerServiceProvider::class);
         $this->app->register(OrderServiceProvider::class);
         $this->app->register(ApiTokenServiceProvider::class);
+        $this->app->register(TeamServiceProvider::class);
 
         $this->app->singleton(AdminPanel::class);
         $this->app->singleton(Navigation::class);

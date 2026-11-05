@@ -10,7 +10,7 @@ use Larasell\Admin\Team\Rules\AdminPassword;
 /**
  * Editing an admin. Adding one goes through CreateAdmin, which validates on its own.
  */
-class AdminRequest extends FormRequest
+class MemberRequest extends FormRequest
 {
     /**
      * @return array<string, array<int, mixed>>

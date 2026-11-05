@@ -12,8 +12,13 @@ use Larasell\Admin\Team\Actions\DeleteAdmin;
 use LogicException;
 
 #[UseModel(Admin::class)]
-class Admins extends Table
+class Members extends Table
 {
+    public function title(): string
+    {
+        return 'Team';
+    }
+
     public function columns(): array
     {
         return [
@@ -24,7 +29,7 @@ class Admins extends Table
 
     public function rowLink(Admin $admin): string
     {
-        return route('larasell.admin.settings.admins.edit', $admin);
+        return route('larasell.admin.settings.team.edit', $admin);
     }
 
     public function actions(): array
@@ -32,6 +37,7 @@ class Admins extends Table
         return [
             Action::make('Delete', handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin, $this->signedInAdmin()))
                 ->confirm(
+                    title: 'Delete member',
                     message: 'They can no longer sign in to the admin panel. This can\'t be undone.',
                     confirmationText: fn (Admin $admin): string => $admin->email,
                 )
@@ -49,7 +55,7 @@ class Admins extends Table
         $admin = auth('larasell-admin')->user();
 
         if (! $admin instanceof Admin) {
-            throw new LogicException('The admins table runs actions only for a signed-in admin.');
+            throw new LogicException('The team table runs actions only for a signed-in admin.');
         }
 
         return $admin;

@@ -11,7 +11,7 @@ class HomePageData extends Data
     public function __construct(
         public ?string $createProductUrl,
         public ?string $createCategoryUrl,
-        public string $inviteAdminUrl,
+        public string $inviteMemberUrl,
         public string $helpEmail,
     ) {}
 }

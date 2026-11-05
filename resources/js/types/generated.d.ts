@@ -195,7 +195,7 @@ declare namespace Larasell.Admin.Platform.Panel.Data {
   export type HomePageData = {
     createProductUrl: string | null;
     createCategoryUrl: string | null;
-    inviteAdminUrl: string;
+    inviteMemberUrl: string;
     helpEmail: string;
   };
 }
@@ -275,16 +275,12 @@ declare namespace Larasell.Admin.Team.Data {
     email: string;
     avatarUrl: string | null;
   };
-  export type AdminsPageData = {
-    createUrl: string;
-    admins: import("./index").TableResource;
-  };
-  export type CreateAdminPageData = {
+  export type CreateMemberPageData = {
     storeUrl: string;
     indexUrl: string;
   };
-  export type EditAdminPageData = {
-    editedAdmin: Larasell.Admin.Team.Data.AdminData;
+  export type EditMemberPageData = {
+    member: Larasell.Admin.Team.Data.AdminData;
     updateUrl: string;
     indexUrl: string;
   };
@@ -292,5 +288,9 @@ declare namespace Larasell.Admin.Team.Data {
     admin: Larasell.Admin.Team.Data.AdminData;
     updateUrl: string;
     avatarUploadUrl: string;
+  };
+  export type TeamPageData = {
+    createUrl: string;
+    members: import("./index").TableResource;
   };
 }

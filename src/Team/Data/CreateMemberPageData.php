@@ -6,7 +6,7 @@ use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
-class CreateAdminPageData extends Data
+class CreateMemberPageData extends Data
 {
     public function __construct(
         public string $storeUrl,

@@ -10,7 +10,7 @@ type Props = Larasell.Admin.Platform.Panel.Data.HomePageData;
 export default function Home({
   createProductUrl,
   createCategoryUrl,
-  inviteAdminUrl,
+  inviteMemberUrl,
   helpEmail,
 }: Props) {
   return (
@@ -36,9 +36,9 @@ export default function Home({
               />
             )}
             <OnboardingLink
-              href={inviteAdminUrl}
+              href={inviteMemberUrl}
               icon={UserAddLine}
-              title="Invite other admins"
+              title="Invite your team"
               description="Give your team access to manage the store with you."
             />
             <OnboardingLink

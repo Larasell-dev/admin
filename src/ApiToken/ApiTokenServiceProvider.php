@@ -33,10 +33,10 @@ class ApiTokenServiceProvider extends ServiceProvider
             return;
         }
 
-        // After Admins, which routes/web.php adds once every module has booted.
+        // After Team.
         Navigation::add('API tokens', 'larasell.admin.settings.api-tokens.index', Icon::Key)
             ->under(NavItem::Settings)
-            ->after('larasell.admin.settings.admins.index');
+            ->after('larasell.admin.settings.team.index');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])->name('settings.api-tokens.index')->withHead(title: 'API tokens');

@@ -11,6 +11,6 @@ class SettingsController
      */
     public function __invoke(): RedirectResponse
     {
-        return redirect()->route('larasell.admin.settings.admins.index');
+        return redirect()->route('larasell.admin.settings.team.index');
     }
 }

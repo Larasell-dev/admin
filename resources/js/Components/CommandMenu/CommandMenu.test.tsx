@@ -572,7 +572,7 @@ describe("navigating", () => {
       { ...navigationItem("Home", "/admin"), id: "larasell.admin.home" },
       navigationItem("Products", "/admin/products"),
       navigationItem("Settings", "/admin/settings", [
-        navigationItem("Admins", "/admin/settings/admins"),
+        navigationItem("Team", "/admin/settings/team"),
         navigationItem("Audit log", "/admin/settings/audit-log"),
       ]),
     ],
@@ -587,7 +587,7 @@ describe("navigating", () => {
     await openMenu();
     await choose("Go to");
 
-    expect(options()).toEqual(["Home", "Products", "Admins", "Audit log", "Profile"]);
+    expect(options()).toEqual(["Home", "Products", "Team", "Audit log", "Profile"]);
 
     await choose("Audit log");
 

@@ -102,7 +102,7 @@ it('audits signing out as the admin who did', function () {
 
 it('audits adding an admin as the admin who did, without their password', function () {
     $this->actingAs($this->ada, 'larasell-admin')
-        ->post(route('larasell.admin.settings.admins.store'), ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'])
+        ->post(route('larasell.admin.settings.team.store'), ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'])
         ->assertRedirect();
 
     $grace = Admin::query()->where('email', 'grace@example.com')->sole();
@@ -122,8 +122,8 @@ it('audits adding an admin as the admin who did, without their password', functi
 it('audits deleting an admin, keeping their email once they are gone', function () {
     Storage::fake(config('larasell.admin.panel.disk'));
     $delete = $this->actingAs($this->alan, 'larasell-admin')
-        ->get(route('larasell.admin.settings.admins.index'))
-        ->inertiaProps('admins.rows.0._actions.0.url');
+        ->get(route('larasell.admin.settings.team.index'))
+        ->inertiaProps('members.rows.0._actions.0.url');
 
     $this->post($delete, ['confirmation' => 'ada@example.com'])->assertRedirect();
 
@@ -140,7 +140,7 @@ it('audits deleting an admin, keeping their email once they are gone', function 
 
 it('audits which of an admin\'s fields changed in the settings, with the email before and after', function () {
     $this->actingAs($this->ada, 'larasell-admin')
-        ->put(route('larasell.admin.settings.admins.update', $this->alan), ['name' => 'Alan M. Turing', 'email' => 'turing@example.com', 'password' => 'Brand-New-Pass-2'])
+        ->put(route('larasell.admin.settings.team.update', $this->alan), ['name' => 'Alan M. Turing', 'email' => 'turing@example.com', 'password' => 'Brand-New-Pass-2'])
         ->assertRedirect();
 
     $record = auditRecord('admin.updated');
@@ -177,7 +177,7 @@ it('does not audit saving an admin without changes, or changing only an avatar',
     $this->ada->update(['avatar_path' => 'avatars/ada.png']);
 
     $this->actingAs($this->ada, 'larasell-admin')
-        ->put(route('larasell.admin.settings.admins.update', $this->alan), ['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => ''])
+        ->put(route('larasell.admin.settings.team.update', $this->alan), ['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => ''])
         ->assertRedirect();
     $this->put(route('larasell.admin.profile.update'), ['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'remove_avatar' => true])
         ->assertRedirect();
@@ -190,8 +190,8 @@ it('changes no admin when the change can\'t be audited', function () {
     Schema::drop('larasell_audit_log');
     $this->actingAs($this->ada, 'larasell-admin');
 
-    $this->post(route('larasell.admin.settings.admins.store'), ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'])->assertServerError();
-    $this->put(route('larasell.admin.settings.admins.update', $this->alan), ['name' => 'Alan M. Turing', 'email' => 'alan@example.com', 'password' => ''])->assertServerError();
+    $this->post(route('larasell.admin.settings.team.store'), ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'])->assertServerError();
+    $this->put(route('larasell.admin.settings.team.update', $this->alan), ['name' => 'Alan M. Turing', 'email' => 'alan@example.com', 'password' => ''])->assertServerError();
     $this->put(route('larasell.admin.profile.update'), ['name' => 'Ada King', 'email' => 'ada@example.com'])->assertServerError();
 
     expect(Admin::query()->orderBy('id')->pluck('name')->all())->toBe(['Ada Lovelace', 'Alan Turing']);

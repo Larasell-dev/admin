@@ -23,7 +23,7 @@ it('shows the 404 page in the panel for unknown admin addresses and missing reco
     expect($response->getContent())->toContain('>Page not found - Admin</title>');
 })->with([
     'unknown address' => '/admin/does/not/exist',
-    'missing admin' => '/admin/settings/admins/999/edit',
+    'missing admin' => '/admin/settings/team/999/edit',
 ]);
 
 it('shows guests the 404 page without the panel', function () {
@@ -49,6 +49,6 @@ it('keeps plain 404s for other methods, JSON requests and other addresses', func
     );
 
     $this->post('/admin/does-not-exist')->assertNotFound()->assertHeaderMissing('X-Inertia'); // @phpstan-ignore larasell.preferRouteHelper
-    $this->getJson(route('larasell.admin.settings.admins.edit', 999))->assertNotFound()->assertJsonMissingPath('component');
+    $this->getJson(route('larasell.admin.settings.team.edit', 999))->assertNotFound()->assertJsonMissingPath('component');
     expect($this->get('/does-not-exist')->assertNotFound()->getContent())->not->toContain('data-page'); // @phpstan-ignore larasell.preferRouteHelper
 });

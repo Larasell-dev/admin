@@ -245,17 +245,17 @@ it('adds the audit log to the settings navigation, after API tokens', function (
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Admins', 'API tokens', 'Audit log']));
+            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Team', 'API tokens', 'Audit log']));
 });
 
-it('puts the audit log after Admins when API tokens are turned off', function () {
+it('puts the audit log after Team when API tokens are turned off', function () {
     $this->bootingWith(fn () => config(['larasell.admin.api_tokens.enabled' => false]));
     $this->ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Admins', 'Audit log']));
+            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Team', 'Audit log']));
 });
 
 it('lets the larasell.admin.view-audit-log gate decide who may see the log', function () {

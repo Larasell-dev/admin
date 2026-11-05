@@ -57,10 +57,10 @@ class AuditServiceProvider extends ServiceProvider
 
         Feature::define('audit-log-filters', fn (Admin $admin): bool => false);
 
-        // After API tokens, or Admins when that module is turned off.
+        // After API tokens, or Team when that module is turned off.
         Navigation::add('Audit log', 'larasell.admin.settings.audit-log.index', Icon::FileShield)
             ->under(NavItem::Settings)
-            ->after(config('larasell.admin.api_tokens.enabled') ? 'larasell.admin.settings.api-tokens.index' : 'larasell.admin.settings.admins.index');
+            ->after(config('larasell.admin.api_tokens.enabled') ? 'larasell.admin.settings.api-tokens.index' : 'larasell.admin.settings.team.index');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('settings/audit-log', [AuditLogController::class, 'index'])->name('settings.audit-log.index')->withHead(title: 'Audit log');
