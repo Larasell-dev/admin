@@ -4,9 +4,9 @@ namespace Larasell\Admin\Http\Controllers\Customers;
 
 use Illuminate\Http\JsonResponse;
 use Larasell\Admin\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Customer\Search\CustomerSearch;
 use Larasell\Admin\Data\ViewModel\Search\SearchResultData;
 use Larasell\Admin\Http\Requests\SearchRequest;
-use Larasell\Admin\Search\Customers\CustomerSearch;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Customer;
 

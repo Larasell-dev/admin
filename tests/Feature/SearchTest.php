@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Enums\Icon;
 use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Search\Products\ProductSearch;
+use Larasell\Admin\Product\Search\ProductSearch;
 use Larasell\Admin\Search\Searches;
 use Larasell\Admin\Search\SearchQuery;
 use Larasell\Larasell\Enums\Currency;

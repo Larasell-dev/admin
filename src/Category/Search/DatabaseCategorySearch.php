@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Search\Categories;
+namespace Larasell\Admin\Category\Search;
 
 use Illuminate\Support\Collection;
 use Larasell\Admin\ContentLocale\AvailableLocales;
