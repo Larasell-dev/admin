@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 function profileAdmin(array $attributes = []): Admin
 {

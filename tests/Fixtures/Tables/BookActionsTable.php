@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Larasell\Admin\Tests\Fixtures\Tables;
 
 use Closure;
-use Larasell\Admin\Tables\Actions\Action;
-use Larasell\Admin\Tables\Columns\TextColumn;
-use Larasell\Admin\Tables\Table;
+use Larasell\Admin\Platform\Tables\Actions\Action;
+use Larasell\Admin\Platform\Tables\Columns\TextColumn;
+use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 
 /**

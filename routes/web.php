@@ -1,23 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Enums\NavItem;
-use Larasell\Admin\Facades\Navigation;
-use Larasell\Admin\Http\Controllers\AdminController;
-use Larasell\Admin\Http\Controllers\AvatarController;
-use Larasell\Admin\Http\Controllers\ContentLocale\SwitchContentLocaleController;
-use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
-use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
-use Larasell\Admin\Http\Controllers\HomeController;
-use Larasell\Admin\Http\Controllers\LoginController;
-use Larasell\Admin\Http\Controllers\LogoutController;
-use Larasell\Admin\Http\Controllers\ProfileController;
-use Larasell\Admin\Http\Controllers\SettingsController;
-use Larasell\Admin\Http\Controllers\TableActionController;
-use Larasell\Admin\Http\Middleware\Authenticate;
-use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
-use Larasell\Admin\NavigationGroup;
+use Larasell\Admin\Platform\Auth\Http\Controllers\LoginController;
+use Larasell\Admin\Platform\Auth\Http\Controllers\LogoutController;
+use Larasell\Admin\Platform\Auth\Http\Middleware\Authenticate;
+use Larasell\Admin\Platform\Auth\Http\Middleware\RedirectIfAuthenticated;
+use Larasell\Admin\Platform\ContentLocale\Http\Controllers\SwitchContentLocaleController;
+use Larasell\Admin\Platform\Navigation\Facades\Navigation;
+use Larasell\Admin\Platform\Navigation\NavigationGroup;
+use Larasell\Admin\Platform\Navigation\NavItem;
+use Larasell\Admin\Platform\Panel\Http\Controllers\Dev\RouteController as DevRouteController;
+use Larasell\Admin\Platform\Panel\Http\Controllers\Dev\SessionController as DevSessionController;
+use Larasell\Admin\Platform\Panel\Http\Controllers\HomeController;
+use Larasell\Admin\Platform\Panel\Http\Controllers\SettingsController;
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Tables\Http\Controllers\TableActionController;
+use Larasell\Admin\Team\Http\Controllers\AdminController;
+use Larasell\Admin\Team\Http\Controllers\AvatarController;
+use Larasell\Admin\Team\Http\Controllers\ProfileController;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');

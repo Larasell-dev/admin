@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\AdminPanel;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Facades\Navigation;
-use Larasell\Admin\Http\Controllers\TableController;
-use Larasell\Admin\Http\Middleware\Authenticate;
-use Larasell\Admin\NavigationGroup;
+use Larasell\Admin\Platform\Auth\Http\Middleware\Authenticate;
+use Larasell\Admin\Platform\Navigation\Facades\Navigation;
+use Larasell\Admin\Platform\Navigation\NavigationGroup;
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Tables\Http\Controllers\TableController;
 use Larasell\Admin\Tests\Fixtures\Tables\Books;
 use Larasell\Admin\Tests\Fixtures\Tables\Library\AudioBookTable;
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\AuditRecords\Products\ProductCreated;
 use Illuminate\Support\Facades\File;
-use Larasell\Admin\Audit\AuditCategory;
-use Larasell\Admin\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\AuditCategory;
+use Larasell\Admin\Platform\Audit\AuditRecord;
 
 afterEach(function () {
     File::deleteDirectory(app_path('AuditRecords'));

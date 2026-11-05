@@ -21,7 +21,7 @@ import { initials } from "../utils/initials";
 import { setTheme, Theme, themeLabels, useTheme } from "../utils/theme";
 import type { Page } from "../types";
 
-type ProfilePageProps = Larasell.Admin.Data.View.ProfilePageData;
+type ProfilePageProps = Larasell.Admin.Team.Data.ProfilePageData;
 
 export default function Profile({ admin, updateUrl }: ProfilePageProps) {
   return (

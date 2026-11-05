@@ -8,16 +8,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Larasell\Admin\Audit\Actor;
-use Larasell\Admin\Audit\AuditCategory;
-use Larasell\Admin\Audit\Auditor;
-use Larasell\Admin\Audit\AuditRecord;
-use Larasell\Admin\Audit\Subject;
-use Larasell\Admin\Audit\SystemActor;
-use Larasell\Admin\Audit\UnknownActor;
-use Larasell\Admin\Exceptions\AuditFailed;
-use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Models\ApiToken;
+use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\Actor;
+use Larasell\Admin\Platform\Audit\AuditCategory;
+use Larasell\Admin\Platform\Audit\AuditFailed;
+use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Admin\Platform\Audit\SystemActor;
+use Larasell\Admin\Platform\Audit\UnknownActor;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));

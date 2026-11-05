@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\OrderStatus;
 use Larasell\Larasell\Models\Customer;

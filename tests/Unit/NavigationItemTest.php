@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Exceptions\InvalidNavigationItem;
-use Larasell\Admin\ValueObjects\NavigationItem;
+use Larasell\Admin\Platform\Navigation\InvalidNavigationItem;
+use Larasell\Admin\Platform\Navigation\NavigationItem;
+use Larasell\Admin\Platform\Panel\Icon;
 
 beforeEach(function () {
     Route::get('/admin/home', fn () => '')->name('larasell.admin.home');

@@ -5,7 +5,7 @@ import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.AdminsPageData;
+type Props = Larasell.Admin.Team.Data.AdminsPageData;
 
 export default function Index({ admins, createUrl }: Props) {
   return (

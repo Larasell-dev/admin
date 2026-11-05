@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 it('registers the admin routes under the configured prefix', function () {
     expect(Route::has('larasell.admin.login'))->toBeTrue()

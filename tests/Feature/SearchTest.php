@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Support\Collection;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Search\Searches;
+use Larasell\Admin\Platform\Search\SearchQuery;
 use Larasell\Admin\Product\Search\ProductSearch;
-use Larasell\Admin\Search\Searches;
-use Larasell\Admin\Search\SearchQuery;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Category;

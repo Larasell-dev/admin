@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;

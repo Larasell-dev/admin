@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 /**
  * The admins table rows as the signed-in admin sees them.

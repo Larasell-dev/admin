@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\AdminPanel;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Exceptions\InvalidTableAction;
-use Larasell\Admin\Exceptions\InvalidTableEmptyState;
-use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Tables\Actions\TableAction;
-use Larasell\Admin\Tables\Columns\TextColumn;
-use Larasell\Admin\Tables\Table;
+use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Tables\Actions\TableAction;
+use Larasell\Admin\Platform\Tables\Columns\TextColumn;
+use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableAction;
+use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableEmptyState;
+use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 
 /**

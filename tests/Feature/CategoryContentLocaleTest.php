@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Plan;
 use Larasell\Larasell\Enums\Visibility;

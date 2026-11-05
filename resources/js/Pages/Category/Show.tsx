@@ -2,19 +2,19 @@ import { Form, Link } from "@inertiajs/react";
 import { Button, EmptyState, Icon, Section, SectionStack } from "@larasell-dev/ui";
 import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
 
-import CategoryForm from "../../Components/Categories/CategoryForm";
-import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
+import CategoryForm from "../../Components/Category/CategoryForm";
+import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
-import ProductsTable from "../../Components/ProductsTable";
+import ProductsTable from "../../Components/Category/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
-import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Categories/CategoryLayout";
+import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Category/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 import type { SharedProps } from "../../types";
 
 // The server sends a null category, and none of its urls, when the address names one that is gone.
 type Props = (
-  | Larasell.Admin.Data.View.Categories.CategoryPageData
-  | Larasell.Admin.Data.View.Categories.MissingCategoryPageData
+  | Larasell.Admin.Category.Data.CategoryPageData
+  | Larasell.Admin.Category.Data.MissingCategoryPageData
 ) &
   Pick<SharedProps, "contentLocale">;
 
@@ -74,7 +74,7 @@ export default function Show(props: Props) {
 function CategoryNotFound({
   categories,
   createUrl,
-}: Larasell.Admin.Data.View.Categories.MissingCategoryPageData) {
+}: Larasell.Admin.Category.Data.MissingCategoryPageData) {
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-12">
       <EmptyState

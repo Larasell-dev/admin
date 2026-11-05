@@ -4,7 +4,7 @@ import { Page } from "../../Components/Page";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.ApiTokens.CreateApiTokenPageData;
+type Props = Larasell.Admin.ApiToken.Data.CreateApiTokenPageData;
 
 export default function Create({ storeUrl, indexUrl, expiryOptions, defaultExpiresIn }: Props) {
   return (

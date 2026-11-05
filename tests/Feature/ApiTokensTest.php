@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\TestResponse;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Models\ApiToken;
+use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));

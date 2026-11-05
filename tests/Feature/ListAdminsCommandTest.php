@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 it('lists all admins', function () {
     Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);

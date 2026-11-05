@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Symfony\Component\HttpFoundation\Response;
 
 it('shows the 404 page in the panel for unknown admin addresses and missing records', function (string $uri) {

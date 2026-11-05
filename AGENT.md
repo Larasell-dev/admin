@@ -5,7 +5,7 @@
 The admin panel registers a few shortcut routes **only when the app runs in the
 `local` environment** (`APP_ENV=local`). In any other environment (production,
 staging, testing, …) they are never registered and return 404. See
-`routes/web.php` and `src/Http/Controllers/Dev/`;
+`routes/web.php` and `src/Platform/Panel/Http/Controllers/Dev/`;
 `tests/Feature/DevRoutesTest.php` guards that they stay local-only.
 
 The admin path prefix is configurable (`LARASELL_ADMIN_PATH`, default `admin`).

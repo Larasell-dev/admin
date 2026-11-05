@@ -1,11 +1,11 @@
 import { Form } from "@inertiajs/react";
 import { Section } from "@larasell-dev/ui";
-import CustomerForm from "../../Components/Customers/CustomerForm";
+import CustomerForm from "../../Components/Customer/CustomerForm";
 import { Page } from "../../Components/Page";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.Customers.CreateCustomerPageData;
+type Props = Larasell.Admin.Customer.Data.CreateCustomerPageData;
 
 export default function Create({ storeUrl, indexUrl }: Props) {
   return (

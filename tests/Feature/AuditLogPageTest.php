@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Audit\AuditCategory;
-use Larasell\Admin\Audit\Auditor;
-use Larasell\Admin\Audit\AuditRecord;
-use Larasell\Admin\Audit\Subject;
-use Larasell\Admin\Audit\SystemActor;
-use Larasell\Admin\Audit\UnknownActor;
-use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Models\ApiToken;
+use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\AuditCategory;
+use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Admin\Platform\Audit\SystemActor;
+use Larasell\Admin\Platform\Audit\UnknownActor;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Laravel\Pennant\Feature;
 
 beforeEach(function () {

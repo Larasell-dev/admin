@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import CommandMenu from "../Components/CommandMenu/CommandMenu";
 import { SearchCommands } from "../Components/CommandMenu/searchCommands";
-import MobileNav from "../Components/MobileNav";
-import SessionExpiredDialog from "../Components/SessionExpiredDialog";
-import Sidebar from "../Components/Sidebar";
-import { SkipLink } from "../Components/SkipLink";
+import MobileNav from "../Components/Shell/MobileNav";
+import SessionExpiredDialog from "../Components/Shell/SessionExpiredDialog";
+import Sidebar from "../Components/Shell/Sidebar";
+import { SkipLink } from "../Components/Shell/SkipLink";
 import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {

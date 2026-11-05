@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Inertia\Testing\AssertableInertia as Assert;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 
 it('logs an admin in with valid credentials', function () {
     Admin::create([

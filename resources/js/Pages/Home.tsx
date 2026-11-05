@@ -5,7 +5,7 @@ import type { ComponentProps } from "react";
 import { Page } from "../Components/Page";
 import SidebarLayout from "../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.HomePageData;
+type Props = Larasell.Admin.Platform.Panel.Data.HomePageData;
 
 export default function Home({
   createProductUrl,

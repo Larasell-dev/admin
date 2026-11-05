@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Larasell\Admin\Actions\Categories\MoveCategory;
-use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Payloads\Categories\MoveCategoryPayload;
+use Larasell\Admin\Category\Actions\MoveCategory;
+use Larasell\Admin\Category\Actions\MoveCategoryPayload;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Translatable;
 

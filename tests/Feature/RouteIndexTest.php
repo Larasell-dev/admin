@@ -5,9 +5,9 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\AdminPanel;
-use Larasell\Admin\Models\Admin;
-use Larasell\Admin\Tables\Columns\TextColumn;
-use Larasell\Admin\Tables\Table;
+use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Tables\Columns\TextColumn;
+use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 
 class LibraryTable extends Table

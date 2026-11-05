@@ -1,16 +1,16 @@
 export type AdminSummary = { name: string; email: string; avatarUrl: string | null };
 
 export type SharedProps = {
-  navigation: Larasell.Admin.Data.ViewModel.NavigationItemData[];
+  navigation: Larasell.Admin.Platform.Navigation.NavigationItemData[];
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;
   /** The language content is edited in, and the others to switch to. Null for guests. */
-  contentLocale: Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData | null;
+  contentLocale: Larasell.Admin.Platform.ContentLocale.Data.ContentLocaleData | null;
   /** Signs in with a POST; the session expired dialog posts JSON to it. */
   loginUrl: string;
   /** What the command menu needs from the server; null for guests. */
-  commandMenu: Larasell.Admin.Data.ViewModel.CommandMenuData | null;
+  commandMenu: Larasell.Admin.Platform.Panel.Data.CommandMenuData | null;
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;
@@ -51,7 +51,7 @@ export type TableRow = {
   _variants: Record<string, BadgeVariant>;
 } & Record<string, string | number | null | TableRowAction[] | Record<string, BadgeVariant>>;
 
-/** The JSON shape of a Larasell\Admin\Tables\Actions\TableAction: an action for the whole table. */
+/** The JSON shape of a Larasell\Admin\Platform\Tables\Actions\TableAction: an action for the whole table. */
 export type TableAction = {
   /** Unique among the actions of the same list. */
   label: string;
@@ -70,7 +70,7 @@ export type TableEmptyState = {
   actions: TableAction[];
 };
 
-/** The JSON shape of a Larasell\Admin\Tables\Table. */
+/** The JSON shape of a Larasell\Admin\Platform\Tables\Table. */
 export type TableResource = {
   title: string;
   /** Shown when there are no rows; null for the default. */

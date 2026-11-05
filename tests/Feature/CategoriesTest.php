@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Product;

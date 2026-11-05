@@ -17,7 +17,7 @@ it('scaffolds a table that names the singular model of a plural table name', fun
         ->toContain('namespace App\Tables;')
         ->toContain('use App\Models\ProductReview;')
         ->toContain('class ProductReviews extends Table')
-        ->toContain('use Larasell\Admin\Tables\Attributes\UseModel;')
+        ->toContain('use Larasell\Admin\Platform\Tables\Attributes\UseModel;')
         ->toContain('#[UseModel(ProductReview::class)]')
         ->toContain('public function columns(): array');
 });
@@ -36,7 +36,7 @@ it('uses the given model', function () {
 
     expect(File::get(app_path('Tables/Books.php')))
         ->toContain('use Larasell\Admin\Tests\Fixtures\Book;')
-        ->toContain('use Larasell\Admin\Tables\Attributes\UseModel;')
+        ->toContain('use Larasell\Admin\Platform\Tables\Attributes\UseModel;')
         ->toContain('#[UseModel(Book::class)]');
 });
 

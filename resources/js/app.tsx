@@ -7,7 +7,7 @@ import { contentLocaleCommand } from "./Components/CommandMenu/contentLocaleComm
 import { goToCommand } from "./Components/CommandMenu/goToCommand";
 import { logOutCommand } from "./Components/CommandMenu/logOutCommand";
 import { themeCommand } from "./Components/CommandMenu/themeCommand";
-import { ThemeChangedToasts } from "./Components/ThemeChangedToast";
+import { ThemeChangedToasts } from "./Components/Shell/ThemeChangedToast";
 import { extensions } from "./extensions";
 import { sharedModules } from "./sharedModules";
 import { AppHotkeysProvider } from "./utils/hotkeys";

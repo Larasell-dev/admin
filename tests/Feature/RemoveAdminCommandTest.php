@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Exceptions\AdminRemovalFailed;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Team\Exceptions\AdminRemovalFailed;
 
 beforeEach(function () {
     Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);

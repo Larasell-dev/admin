@@ -1,11 +1,11 @@
 import { Form } from "@inertiajs/react";
 import { Section } from "@larasell-dev/ui";
-import AdminForm from "../../Components/AdminForm";
+import AdminForm from "../../Components/Team/AdminForm";
 import { Page } from "../../Components/Page";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.EditAdminPageData;
+type Props = Larasell.Admin.Team.Data.EditAdminPageData;
 
 export default function Edit({ editedAdmin, updateUrl, indexUrl }: Props) {
   return (

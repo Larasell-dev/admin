@@ -5,10 +5,10 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Actions\CreateAdmin;
-use Larasell\Admin\Actions\DeleteAdmin;
-use Larasell\Admin\Audit\SystemActor;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Audit\SystemActor;
+use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Team\Actions\CreateAdmin;
+use Larasell\Admin\Team\Actions\DeleteAdmin;
 
 beforeEach(function () {
     $this->ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'Correct-Horse-9']);

@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Data\ViewModel\NavigationItemData;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Enums\NavItem;
-use Larasell\Admin\Exceptions\InvalidNavigationItem;
-use Larasell\Admin\Facades\Navigation as NavigationFacade;
-use Larasell\Admin\Navigation;
+use Larasell\Admin\Platform\Navigation\Facades\Navigation as NavigationFacade;
+use Larasell\Admin\Platform\Navigation\InvalidNavigationItem;
+use Larasell\Admin\Platform\Navigation\Navigation;
+use Larasell\Admin\Platform\Navigation\NavigationItemData;
+use Larasell\Admin\Platform\Navigation\NavItem;
+use Larasell\Admin\Platform\Panel\Icon;
 
 beforeEach(function () {
     Route::get('/admin/home', fn () => '')->name('larasell.admin.home');

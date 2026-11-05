@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Category\Search;
 
 use Illuminate\Support\Collection;
-use Larasell\Admin\Search\SearchQuery;
+use Larasell\Admin\Platform\Search\SearchQuery;
 use Larasell\Larasell\Models\Category;
 
 /**

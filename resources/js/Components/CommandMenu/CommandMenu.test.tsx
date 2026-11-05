@@ -500,7 +500,7 @@ describe("searching on the server", () => {
     search_("gift-cards", "Search gift cards", "Gift"),
   ];
 
-  function respondWith(results: Larasell.Admin.Data.ViewModel.Search.SearchResultData[]) {
+  function respondWith(results: Larasell.Admin.Platform.Search.Data.SearchResultData[]) {
     return vi.spyOn(window, "fetch").mockImplementation(async () => Response.json({ results }));
   }
 
@@ -565,7 +565,7 @@ describe("navigating", () => {
   const navigationItem = (
     label: string,
     url: string,
-    children: Larasell.Admin.Data.ViewModel.NavigationItemData[] = [],
+    children: Larasell.Admin.Platform.Navigation.NavigationItemData[] = [],
   ) => ({ id: `larasell.admin.${label}`, label, url, icon: "Home", children });
   const props = {
     navigation: [

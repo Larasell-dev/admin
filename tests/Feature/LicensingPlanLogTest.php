@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Chronicle\Facades\Chronicle;
 use Larasell\Larasell\Enums\Plan;
 use Larasell\Larasell\Facades\Entitlement;

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Str;
-use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Platform\Panel\Icon;
 
 // Icon names are rejected for a -line or -fill suffix before they are looked up,
 // so a case with such a value could never be passed by name.
