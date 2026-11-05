@@ -1,4 +1,4 @@
-// Generates src/Enums/Icon.php from the icons @larasell-dev/ui ships, so PHP
+// Generates src/Platform/Panel/Icon.php from the icons @larasell-dev/ui ships, so PHP
 // accepts exactly the icon names the sidebar can render. Run after bumping
 // @larasell-dev/ui: npm run generate:icons
 import { readFileSync, writeFileSync } from "node:fs";
@@ -56,10 +56,10 @@ const lines = [...cases]
   .map(([caseName, value]) => `    case ${caseName} = '${value}';`);
 
 writeFileSync(
-  path.resolve(import.meta.dirname, "../src/Enums/Icon.php"),
+  path.resolve(import.meta.dirname, "../src/Platform/Panel/Icon.php"),
   `<?php
 
-namespace Larasell\\Admin\\Enums;
+namespace Larasell\\Admin\\Platform\\Panel;
 
 /**
  * Remix icons a navigation item can use, named like the @larasell-dev/ui/icons
@@ -74,7 +74,7 @@ ${lines.join("\n")}
 `,
 );
 
-console.log(`Wrote ${cases.size} icons to src/Enums/Icon.php.`);
+console.log(`Wrote ${cases.size} icons to src/Platform/Panel/Icon.php.`);
 
 function assert(condition, message) {
   if (!condition) {
