@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 use Larasell\Admin\AdminPanel;
 
 beforeEach(function () {
-    $this->panelHot = dirname(__DIR__, 2).'/public/hot';
+    $this->panelHot = dirname(__DIR__, 4).'/public/hot';
     $this->extensionPublic = sys_get_temp_dir().'/'.uniqid('acme-public-');
     mkdir($this->extensionPublic);
 });

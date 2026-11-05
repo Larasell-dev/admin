@@ -14,6 +14,6 @@ it('publishes the config files to config/larasell/admin', function () {
     foreach (['panel.php', 'products.php', 'categories.php', 'customers.php', 'orders.php', 'api_tokens.php', 'audit.php'] as $file) {
         expect(config_path("larasell/admin/{$file}"))->toBeFile()
             ->and(File::get(config_path("larasell/admin/{$file}")))
-            ->toBe(File::get(__DIR__."/../../config/larasell/admin/{$file}"));
+            ->toBe(File::get(__DIR__."/../../../../config/larasell/admin/{$file}"));
     }
 });
