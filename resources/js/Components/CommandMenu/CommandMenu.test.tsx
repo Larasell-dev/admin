@@ -1,4 +1,4 @@
-import { App, router } from "@inertiajs/react";
+import { App, http, router } from "@inertiajs/react";
 import { type ComponentType, useEffect, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -7,6 +7,7 @@ import { AppHotkeysProvider } from "../../utils/hotkeys";
 import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
+import { contentLocaleCommand } from "./contentLocaleCommand";
 import { Highlight, matchRanges } from "./Highlight";
 import { logOutCommand } from "./logOutCommand";
 import { goToCommand } from "./goToCommand";
@@ -637,5 +638,53 @@ describe("navigating", () => {
     await choose("Yes");
 
     expect(post).toHaveBeenCalledWith("/admin/logout");
+  });
+});
+
+describe("content language", () => {
+  const contentLocale = {
+    current: "en",
+    options: [
+      { value: "en", label: "English" },
+      { value: "de", label: "German" },
+    ],
+    switchUrl: "/admin/content-locale",
+  };
+
+  it("switches the content language of the page", async () => {
+    const requests: { method: string; url: string; data: unknown }[] = [];
+    vi.spyOn(http, "getClient").mockReturnValue({
+      async request({ method, url, data }) {
+        requests.push({ method, url, data });
+        const next = { component: "Test", url: "/admin", version: null, props: { errors: {} } };
+        return { status: 200, data: JSON.stringify(next), headers: { "x-inertia": "true" } };
+      },
+    });
+    register(contentLocaleCommand);
+    await renderMenu(() => null, { contentLocale });
+    await openMenu();
+    await choose("Change content language");
+
+    expect(options()).toEqual(["English, current", "German"]);
+
+    await choose("German");
+
+    await expect.poll(() => requests).toHaveLength(1);
+    expect(requests[0]).toMatchObject({
+      method: "put",
+      url: expect.stringContaining("/admin/content-locale"),
+    });
+    expect(JSON.stringify(requests[0]?.data)).toContain('"locale":"de"');
+    await expect.element(menu()).not.toBeInTheDocument();
+  });
+
+  it("is left out on pages without a content language, or with only one", async () => {
+    register(orders, contentLocaleCommand);
+    await renderMenu(() => null, {
+      contentLocale: { ...contentLocale, options: [contentLocale.options[0]] },
+    });
+    await openMenu();
+
+    expect(options()).toEqual(["Go to orders"]);
   });
 });
