@@ -2,12 +2,12 @@
 
 namespace Larasell\Admin\Platform\Audit;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Larasell\Admin\ApiToken\Http\Middleware\AuthenticateApiToken;
 
 /**
  * Writes audit records to the shop's database, the audit log's source of truth. Records can only
@@ -37,6 +37,16 @@ class Auditor
     private const string CORRELATION_ID = 'correlation_id';
 
     private int $runningJobs = 0;
+
+    /** The guard that authenticates API requests, once a module registers one. */
+    private ?string $apiGuard = null;
+
+    /**
+     * What the audit log calls actors other than admins, by actor type.
+     *
+     * @var array<string, array{label: string, model: class-string<Model>}>
+     */
+    private array $actorTypes = [];
 
     /**
      * Stores the record, failing rather than losing it, so the change it describes rolls back too.
@@ -98,6 +108,36 @@ class Auditor
         $this->runningJobs = max(0, $this->runningJobs - 1);
     }
 
+    /**
+     * @internal Called by the module whose guard authenticates API requests, so records made in
+     * them get the api source.
+     */
+    public function apiGuard(string $guard): void
+    {
+        $this->apiGuard = $guard;
+    }
+
+    /**
+     * @internal Called by the modules whose models act, so the audit log names their actors, e.g.
+     * "API token: Deploy", from the model's name attribute.
+     *
+     * @param  class-string<Model>  $model
+     */
+    public function actorType(string $type, string $label, string $model): void
+    {
+        $this->actorTypes[$type] = ['label' => $label, 'model' => $model];
+    }
+
+    /**
+     * @internal
+     *
+     * @return array{label: string, model: class-string<Model>}|null
+     */
+    public function findActorType(string $type): ?array
+    {
+        return $this->actorTypes[$type] ?? null;
+    }
+
     private function source(): AuditSource
     {
         if ($this->runningJobs > 0) {
@@ -109,7 +149,7 @@ class Auditor
             return AuditSource::Cli;
         }
 
-        return Auth::getDefaultDriver() === AuthenticateApiToken::GUARD ? AuditSource::Api : AuditSource::Web;
+        return $this->apiGuard !== null && Auth::getDefaultDriver() === $this->apiGuard ? AuditSource::Api : AuditSource::Web;
     }
 
     /**

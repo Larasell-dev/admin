@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\ApiToken\Http\Controllers\ApiTokenController;
 use Larasell\Admin\ApiToken\Http\Middleware\AuthenticateApiToken;
+use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -28,6 +30,11 @@ class ApiTokenServiceProvider extends ServiceProvider
     {
         // Even when disabled, so extension routes behind larasell.api answer 401 rather than fail.
         AuthenticateApiToken::register();
+
+        // Even when disabled, so the audit log still names the tokens of older records.
+        $auditor = $this->app->make(Auditor::class);
+        $auditor->apiGuard(AuthenticateApiToken::GUARD);
+        $auditor->actorType('api_token', 'API token', ApiToken::class);
 
         if (! config('larasell.admin.api_tokens.enabled')) {
             return;

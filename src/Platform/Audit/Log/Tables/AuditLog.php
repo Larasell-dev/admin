@@ -4,8 +4,9 @@ namespace Larasell\Admin\Platform\Audit\Log\Tables;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\Log\Models\AuditLogEntry;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
@@ -17,7 +18,7 @@ use Larasell\Admin\Platform\Tables\Table;
 class AuditLog extends Table
 {
     /**
-     * Names of admins and API tokens by ID, looked up once per page.
+     * Names of admins, and of the actors modules register, such as API tokens, by ID, looked up once per page.
      *
      * @var array<string, array<string, ?string>>
      */
@@ -82,17 +83,25 @@ class AuditLog extends Table
     {
         return match ($entry->actor_type) {
             'admin' => 'Admin'.$this->name(Admin::class, $entry->actor_id),
-            'api_token' => 'API token'.$this->name(ApiToken::class, $entry->actor_id),
             'system' => 'System: '.$entry->actor_id,
             'unknown' => 'Unknown: '.$entry->unknown_actor_reason,
-            default => Str::ucfirst(str_replace('_', ' ', $entry->actor_type)).' #'.$entry->actor_id,
+            default => $this->registeredActor($entry->actor_type, $entry->actor_id),
         };
+    }
+
+    private function registeredActor(string $type, ?string $id): string
+    {
+        $actorType = app(Auditor::class)->findActorType($type);
+
+        return $actorType === null
+            ? Str::ucfirst(str_replace('_', ' ', $type)).' #'.$id
+            : $actorType['label'].$this->name($actorType['model'], $id);
     }
 
     /**
      * ": Ada Lovelace", or " #5" once the admin or token is deleted.
      *
-     * @param  class-string<Admin|ApiToken>  $model
+     * @param  class-string<Model>  $model
      */
     private function name(string $model, ?string $id): string
     {
