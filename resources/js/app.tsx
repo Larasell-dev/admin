@@ -3,6 +3,7 @@ import { createInertiaApp, type ResolvedComponent } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
 import { ToastProvider } from "@larasell-dev/ui";
 import { commands } from "./Components/CommandMenu/commands";
+import { contentLocaleCommand } from "./Components/CommandMenu/contentLocaleCommand";
 import { goToCommand } from "./Components/CommandMenu/goToCommand";
 import { logOutCommand } from "./Components/CommandMenu/logOutCommand";
 import { themeCommand } from "./Components/CommandMenu/themeCommand";
@@ -29,7 +30,7 @@ window.LarasellAdmin = {
   modules: sharedModules,
   boot() {
     // Before the extensions' commands, which the menu lists after the panel's.
-    commands.register(goToCommand, themeCommand, logOutCommand);
+    commands.register(goToCommand, themeCommand, contentLocaleCommand, logOutCommand);
     extensions.boot();
 
     void createInertiaApp({
