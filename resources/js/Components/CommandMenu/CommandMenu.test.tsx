@@ -8,7 +8,8 @@ import { setTheme, storedTheme, Theme } from "../../utils/theme";
 import CommandMenu from "./CommandMenu";
 import { type CommandDefinition, commands, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
-import { goToCommand, logOutCommand } from "./navigationCommands";
+import { logOutCommand } from "./logOutCommand";
+import { goToCommand } from "./goToCommand";
 import { SearchCommands } from "./searchCommands";
 import { themeCommand } from "./themeCommand";
 
