@@ -9,6 +9,7 @@ use Larasell\Admin\ApiToken\Http\Controllers\ApiTokenController;
 use Larasell\Admin\ApiToken\Http\Middleware\AuthenticateApiToken;
 use Larasell\Admin\ApiToken\Models\ApiToken;
 use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -34,21 +35,21 @@ class ApiTokenServiceProvider extends ServiceProvider
         // Even when disabled, so the audit log still names the tokens of older records.
         $auditor = $this->app->make(Auditor::class);
         $auditor->apiGuard(AuthenticateApiToken::GUARD);
-        $auditor->actorType('api_token', 'API token', ApiToken::class);
+        $auditor->actorType('api_token', Translate::later('API token'), ApiToken::class);
 
         if (! config('larasell.admin.api_tokens.enabled')) {
             return;
         }
 
         // After Team.
-        Navigation::add('API tokens', 'larasell.admin.settings.api-tokens.index', Icon::Key)
+        Navigation::add(Translate::later('API tokens'), 'larasell.admin.settings.api-tokens.index', Icon::Key)
             ->under(NavItem::Settings)
             ->after('larasell.admin.settings.team.index');
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])->name('settings.api-tokens.index')->withHead(title: 'API tokens');
+            Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])->name('settings.api-tokens.index')->withHead(title: Translate::later('API tokens'));
             Route::post('settings/api-tokens', [ApiTokenController::class, 'store'])->name('settings.api-tokens.store');
-            Route::get('settings/api-tokens/create', [ApiTokenController::class, 'create'])->name('settings.api-tokens.create')->withHead(title: 'New API token');
+            Route::get('settings/api-tokens/create', [ApiTokenController::class, 'create'])->name('settings.api-tokens.create')->withHead(title: Translate::later('New API token'));
         });
     }
 }

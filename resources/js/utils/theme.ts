@@ -1,3 +1,4 @@
+import { fbs } from "fbtee";
 import { useSyncExternalStore } from "react";
 
 export enum Theme {
@@ -6,11 +7,20 @@ export enum Theme {
   System = "system",
 }
 
-export const themeLabels: Record<Theme, string> = {
-  [Theme.Light]: "Light",
-  [Theme.Dark]: "Dark",
-  [Theme.System]: "System",
-};
+/** The theme's name, in the interface language. */
+export function themeLabel(theme: Theme): string {
+  switch (theme) {
+    case Theme.Light:
+      return fbs("Light", "Name of the light color theme");
+    case Theme.Dark:
+      return fbs("Dark", "Name of the dark color theme");
+    case Theme.System:
+      return fbs(
+        "System",
+        "Name of the color theme that follows the operating system's light or dark setting",
+      );
+  }
+}
 
 const themeStorageKey = "larasell-admin-theme";
 

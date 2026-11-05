@@ -16,7 +16,7 @@ class OrderController
 {
     public function show(Order $order): Response
     {
-        Head::title("Order #{$order->number}");
+        Head::title(__('Order #:number', ['number' => $order->number]));
 
         return Inertia::render('Order/Show', new OrderPageData(
             order: OrderDetailData::fromModel($order),

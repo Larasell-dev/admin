@@ -32,7 +32,7 @@ class TableActionController
 
         if ($expected !== null && $request->input('confirmation') !== $expected) {
             throw ValidationException::withMessages([
-                'confirmation' => "Type \"{$expected}\" to confirm.",
+                'confirmation' => __('Type ":text" to confirm.', ['text' => $expected]),
             ]);
         }
 

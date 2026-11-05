@@ -1,3 +1,4 @@
+/// <reference types="fbtee/ReactTypes.d.ts" />
 import "react";
 
 // Lets `style` set CSS custom properties, such as `--tree-level`, without a cast. This only

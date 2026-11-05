@@ -8,6 +8,7 @@ import { type Cookies, useCookies } from "../../utils/cookies";
 import { overlayExclusive } from "../../utils/hotkeys";
 import { useInterval } from "../../utils/useInterval";
 import { useOnPageVisible } from "../../utils/useOnPageVisible";
+import { fbs } from "fbtee";
 
 /** How often to check whether the session is still alive. */
 const checkInterval = 5_000;
@@ -95,8 +96,12 @@ function SignInAgain({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const failed = (message = "Couldn't sign you in. Try again.") =>
-      form.setError("password", message);
+    const failed = (
+      message = fbs(
+        "Couldn't sign you in. Try again.",
+        "Session expired dialog: error below the password field when signing back in failed for a reason other than a wrong password",
+      ),
+    ) => form.setError("password", message);
 
     try {
       // Without the cookie there is no CSRF token to sign in with; any request starts a new
@@ -111,18 +116,42 @@ function SignInAgain({
     await form.post(loginUrl, {
       onSuccess: onSignedIn,
       onHttpException: ({ status }) =>
-        failed(status === 429 ? "Too many attempts. Try again in a minute." : undefined),
+        failed(
+          status === 429
+            ? fbs(
+                "Too many attempts. Try again in a minute.",
+                "Session expired dialog: error below the password field after too many sign-in attempts",
+              )
+            : undefined,
+        ),
       onNetworkError: () => failed(),
     });
   }
 
   return (
     <AlertDialog.Popup
-      title="Your session expired"
-      description={`You were signed out after a while without activity. Enter the password for ${email} to continue where you left off.`}
+      title={fbs(
+        "Your session expired",
+        "Session expired dialog: title of the dialog that asks the admin for their password after they were signed out for inactivity",
+      )}
+      description={fbs(
+        [
+          "You were signed out after a while without activity. Enter the password for ",
+          fbs.param("email", email),
+          " to continue where you left off.",
+        ],
+        "Session expired dialog: text below the title, with the signed-in admin's email address",
+      )}
     >
       <form onSubmit={submit} className="contents">
-        <Field label="Password" name="password" error={form.errors.password ?? form.errors.email}>
+        <Field
+          label={fbs(
+            "Password",
+            "Session expired dialog: label of the field for the admin's password to sign back in",
+          )}
+          name="password"
+          error={form.errors.password ?? form.errors.email}
+        >
           <PasswordInput
             autoComplete="current-password"
             autoFocus
@@ -132,10 +161,14 @@ function SignInAgain({
         </Field>
         <AlertDialog.Actions>
           <Button variant="secondary" render={<Link href={loginUrl} />}>
-            Use another account
+            <fbt desc="Session expired dialog: button that goes to the sign-in page to sign in as a different admin">
+              Use another account
+            </fbt>
           </Button>
           <AlertDialog.Confirm type="submit" loading={form.processing}>
-            Continue
+            <fbt desc="Session expired dialog: submit button that signs back in with the entered password and returns to the page">
+              Continue
+            </fbt>
           </AlertDialog.Confirm>
         </AlertDialog.Actions>
       </form>

@@ -6,6 +6,8 @@ use Larasell\Admin\Platform\Auth\Http\Controllers\LogoutController;
 use Larasell\Admin\Platform\Auth\Http\Middleware\Authenticate;
 use Larasell\Admin\Platform\Auth\Http\Middleware\RedirectIfAuthenticated;
 use Larasell\Admin\Platform\ContentLocale\Http\Controllers\SwitchContentLocaleController;
+use Larasell\Admin\Platform\InterfaceLocale\Http\Controllers\SwitchInterfaceLocaleController;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Http\Controllers\Dev\RouteController as DevRouteController;
@@ -16,15 +18,16 @@ use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Http\Controllers\TableActionController;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
-    Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');
+    Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: Translate::later('Sign in'));
     Route::post('login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
 });
 
 Route::middleware(Authenticate::class)->group(function () {
-    Route::get('/', HomeController::class)->name('home')->withHead(title: 'Dashboard');
+    Route::get('/', HomeController::class)->name('home')->withHead(title: Translate::later('Dashboard'));
     Route::get('settings', SettingsController::class)->name('settings');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::put('content-locale', SwitchContentLocaleController::class)->name('content-locale.update');
+    Route::put('interface-locale', SwitchInterfaceLocaleController::class)->name('interface-locale.update');
     Route::post('logout', LogoutController::class)->name('logout');
 });
 

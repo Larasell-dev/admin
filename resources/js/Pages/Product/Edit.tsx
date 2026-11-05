@@ -1,4 +1,5 @@
 import { Form } from "@inertiajs/react";
+import { fbs } from "fbtee";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/Product/ProductForm";
@@ -32,7 +33,13 @@ export default function Edit({
     >
       <Page.Header
         title={product.name ?? product.fallbackName}
-        backLink={{ href: indexUrl, label: "Back to products" }}
+        backLink={{
+          href: indexUrl,
+          label: fbs(
+            "Back to products",
+            "Product page: accessible name of the back arrow that returns to the list of products",
+          ),
+        }}
         actions={<ContentLocaleSelect contentLocale={contentLocale} />}
       />
       <Page.Body>

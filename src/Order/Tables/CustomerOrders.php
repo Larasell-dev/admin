@@ -34,18 +34,18 @@ class CustomerOrders extends Table
 
     public function title(): string
     {
-        return 'Orders';
+        return __('Orders');
     }
 
     public function columns(): array
     {
         return [
-            TextColumn::make('number', 'Order'),
-            BadgeColumn::make('status')
+            TextColumn::make('number', __('Order')),
+            BadgeColumn::make('status', __('Status'))
                 ->map(fn (OrderStatus $status): string => BadgeData::fromOrderStatus($status)->label)
                 ->variant(fn (OrderStatus $status): Variant => BadgeData::fromOrderStatus($status)->variant),
-            TextColumn::make('total')->map(fn (Price $total, Order $order): string => Price::format($total, $order->currency, app()->getLocale())),
-            TextColumn::make('created_at', 'Date')->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
+            TextColumn::make('total', __('Total'))->map(fn (Price $total, Order $order): string => Price::format($total, $order->currency, app()->getLocale())),
+            TextColumn::make('created_at', __('Date'))->map(fn (?CarbonInterface $createdAt): ?string => $createdAt?->diffForHumans()),
         ];
     }
 

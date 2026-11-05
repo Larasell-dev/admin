@@ -52,11 +52,11 @@ class SearchProductsController
             }
         }
 
-        $identifiers = [['SKU', $product->sku], ['Barcode', $product->barcode]];
+        $identifiers = [[__('SKU'), $product->sku], [__('Barcode'), $product->barcode]];
 
         foreach ($product->variants->where('is_default', false) as $variant) {
-            $identifiers[] = ['Variant SKU', $variant->sku];
-            $identifiers[] = ['Variant barcode', $variant->barcode];
+            $identifiers[] = [__('Variant SKU'), $variant->sku];
+            $identifiers[] = [__('Variant barcode'), $variant->barcode];
         }
 
         foreach ($identifiers as [$label, $value]) {

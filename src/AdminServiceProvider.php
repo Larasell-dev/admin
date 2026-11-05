@@ -25,6 +25,11 @@ use Larasell\Admin\Platform\ContentLocale\ContentLocaleResolver;
 use Larasell\Admin\Platform\ContentLocale\EntitledLocales;
 use Larasell\Admin\Platform\ContentLocale\SessionContentLocaleResolver;
 use Larasell\Admin\Platform\ContentLocale\StoreLocales;
+use Larasell\Admin\Platform\InterfaceLocale\AvailableInterfaceLocales;
+use Larasell\Admin\Platform\InterfaceLocale\CookieInterfaceLocaleResolver;
+use Larasell\Admin\Platform\InterfaceLocale\Http\Middleware\SetInterfaceLocale;
+use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocaleResolver;
+use Larasell\Admin\Platform\InterfaceLocale\PanelInterfaceLocales;
 use Larasell\Admin\Platform\Navigation\Navigation;
 use Larasell\Admin\Platform\Panel\Console\LinkAdminAssetsCommand;
 use Larasell\Admin\Platform\Panel\Http\Middleware\HandleAdminInertiaRequests;
@@ -76,6 +81,11 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->bind(ContentLocaleResolver::class, SessionContentLocaleResolver::class);
         // Extenders outlive rebinding, so apps' AvailableLocales are limited by the plan too.
         $this->app->extend(AvailableLocales::class, fn (AvailableLocales $locales): AvailableLocales => new EntitledLocales($locales));
+
+        // Which languages the panel's own text is shown in, and how a request picks one. Apps
+        // rebind them, e.g. to keep the pick on the admin's account.
+        $this->app->bind(AvailableInterfaceLocales::class, PanelInterfaceLocales::class);
+        $this->app->bind(InterfaceLocaleResolver::class, CookieInterfaceLocaleResolver::class);
     }
 
     public function boot(): void
@@ -87,8 +97,10 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'larasell-admin');
+        // The panel's server text, keyed by its English text; an app's lang/<code>.json overrides it.
+        $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
 
-        Route::middleware(['web', LogLicensingPlan::class, HandleAdminInertiaRequests::class])
+        Route::middleware(['web', SetInterfaceLocale::class, LogLicensingPlan::class, HandleAdminInertiaRequests::class])
             ->prefix(config('larasell.admin.panel.path'))
             ->name('larasell.admin.')
             ->withHead(title: AdminPanel::TITLE)
@@ -171,7 +183,7 @@ class AdminServiceProvider extends ServiceProvider
                     return null;
                 }
 
-                Head::title('Page not found');
+                Head::title(__('Page not found'));
 
                 return (new ExceptionResponse($exception, $request, new Response(status: 404), app(Router::class), app(Kernel::class)))
                     ->usingMiddleware(HandleAdminInertiaRequests::class)

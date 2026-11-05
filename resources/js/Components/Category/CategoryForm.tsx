@@ -4,6 +4,7 @@ import { slugify } from "../../utils/slugify";
 import { truncate } from "../../utils/truncate";
 import { useCoupledField } from "../../utils/useCoupledField";
 import VisibilityField from "../VisibilityField";
+import { fbs } from "fbtee";
 
 type Category = Pick<
   Larasell.Admin.Category.Data.CategoryDetailData,
@@ -28,7 +29,11 @@ export default function CategoryForm({ category }: { category?: Category }) {
           own width, since the sidebars decide how much of the viewport it gets. */}
       <div className="@container">
         <div className="grid items-start gap-5 @md:grid-cols-2">
-          <Field label="Name" name="name" error={errors.name}>
+          <Field
+            label={fbs("Name", "Category form: label of the field for the category's name")}
+            name="name"
+            error={errors.name}
+          >
             {/* Untranslated fields stay empty and show what the store shows instead. */}
             <Input
               {...slug.source}
@@ -38,7 +43,14 @@ export default function CategoryForm({ category }: { category?: Category }) {
             />
           </Field>
 
-          <Field label="Slug" name="slug" error={errors.slug}>
+          <Field
+            label={fbs(
+              "Slug",
+              "Category form: label of the field for the category's URL slug, the part of its storefront address made from its name",
+            )}
+            name="slug"
+            error={errors.slug}
+          >
             <Input
               {...slug.target}
               defaultValue={category?.slug ?? undefined}

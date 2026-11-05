@@ -8,6 +8,7 @@ import { overlayExclusive } from "../utils/hotkeys";
 import { isSameSite } from "../utils/isSameSite";
 import { navigationIcon } from "../utils/navigationIcon";
 import ConfirmActionDialog from "./ConfirmActionDialog";
+import { fbs } from "fbtee";
 
 type Props = {
   resource: TableResource;
@@ -113,7 +114,13 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
     row._actions.length > 0 && (
       <Table.Actions>
         <Table.ActionsTrigger
-          aria-label={`Actions for ${primary ? cell(row, primary.name) : row.id}`}
+          aria-label={fbs(
+            [
+              "Actions for ",
+              fbs.param("rowName", String(primary ? cell(row, primary.name) : row.id)),
+            ],
+            "Tables: accessible name of the button that opens a row's menu of actions, with the row's name, e.g. 'Actions for Oxford Shirt'",
+          )}
         />
         <Table.ActionsPopup>
           <HotkeysProvider scope="row-actions-menu" exclusive={overlayExclusive}>
@@ -169,7 +176,13 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
               {resource.columns.map((column) => (
                 <Table.Column key={column.name}>{column.label}</Table.Column>
               ))}
-              {hasActions && <Table.Column type="action">Actions</Table.Column>}
+              {hasActions && (
+                <Table.Column type="action">
+                  <fbt desc="Tables: heading of the column with each row's menu of actions, such as edit and delete">
+                    Actions
+                  </fbt>
+                </Table.Column>
+              )}
             </Table.Header>
             <Table.Body>
               {resource.rows.map((row) => (

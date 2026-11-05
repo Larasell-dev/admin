@@ -53,38 +53,39 @@ class AuditLog extends Table
 
     public function title(): string
     {
-        return 'Audit log';
+        return __('Audit log');
     }
 
     public function columns(): array
     {
         return [
             // With the zone: records are stored in UTC, and shown in the shop's time.
-            TextColumn::make('occurred_at', 'Time ('.config('app.timezone').')')
+            TextColumn::make('occurred_at', __('Time (:timezone)', ['timezone' => config('app.timezone')]))
                 ->map(fn (CarbonImmutable $occurredAt): string => $occurredAt->setTimezone(config('app.timezone'))->format('M j, Y H:i:s')),
-            TextColumn::make('event'),
-            TextColumn::make('actor')->map(fn (mixed $value, AuditLogEntry $entry): string => $this->actor($entry)),
+            TextColumn::make('event', __('Event')),
+            TextColumn::make('actor', __('Actor'))->map(fn (mixed $value, AuditLogEntry $entry): string => $this->actor($entry)),
             // The stable type, as the subject filter offers it.
-            TextColumn::make('subject')->map(fn (mixed $value, AuditLogEntry $entry): ?string => $entry->subject_type === null ? null : $entry->subject_type.' #'.$entry->subject_id),
-            TextColumn::make('source')->map(fn (string $source): string => in_array($source, ['api', 'cli'], true) ? Str::upper($source) : Str::ucfirst($source)),
-            TextColumn::make('details')->map(fn (mixed $value, AuditLogEntry $entry): ?string => $this->details($entry->properties)),
+            TextColumn::make('subject', __('Subject'))->map(fn (mixed $value, AuditLogEntry $entry): ?string => $entry->subject_type === null ? null : $entry->subject_type.' #'.$entry->subject_id),
+            TextColumn::make('source', __('Source'))->map(fn (string $source): string => in_array($source, ['api', 'cli'], true) ? Str::upper($source) : Str::ucfirst($source)),
+            TextColumn::make('details', __('Details'))->map(fn (mixed $value, AuditLogEntry $entry): ?string => $this->details($entry->properties)),
         ];
     }
 
     public function emptyState(): array
     {
         return [
-            'title' => 'No audit records yet',
-            'description' => 'Security- and business-critical changes, such as creating API tokens, show up here.',
+            'title' => __('No audit records yet'),
+            'description' => __('Security- and business-critical changes, such as creating API tokens, show up here.'),
         ];
     }
 
     private function actor(AuditLogEntry $entry): string
     {
         return match ($entry->actor_type) {
-            'admin' => 'Admin'.$this->name(Admin::class, $entry->actor_id),
-            'system' => 'System: '.$entry->actor_id,
-            'unknown' => 'Unknown: '.$entry->unknown_actor_reason,
+            'admin' => $this->named(__('Admin'), Admin::class, $entry->actor_id),
+            'system' => __('System: :id', ['id' => $entry->actor_id]),
+            // The reason is stored with the record, so it stays as it was written.
+            'unknown' => __('Unknown: :reason', ['reason' => $entry->unknown_actor_reason]),
             default => $this->registeredActor($entry->actor_type, $entry->actor_id),
         };
     }
@@ -95,15 +96,16 @@ class AuditLog extends Table
 
         return $actorType === null
             ? Str::ucfirst(str_replace('_', ' ', $type)).' #'.$id
-            : $actorType['label'].$this->name($actorType['model'], $id);
+            // Registered while the app boots, so translated now, in the request's language.
+            : $this->named(__($actorType['label']), $actorType['model'], $id);
     }
 
     /**
-     * ": Ada Lovelace", or " #5" once the admin or token is deleted.
+     * "Admin: Ada Lovelace", or "Admin #5" once the admin or token is deleted.
      *
      * @param  class-string<Model>  $model
      */
-    private function name(string $model, ?string $id): string
+    private function named(string $label, string $model, ?string $id): string
     {
         $this->names[$model] ??= [];
 
@@ -113,7 +115,9 @@ class AuditLog extends Table
 
         $name = $this->names[$model][(string) $id];
 
-        return $name === null ? ' #'.$id : ': '.$name;
+        return $name === null
+            ? __(':actor #:id', ['actor' => $label, 'id' => $id])
+            : __(':actor: :name', ['actor' => $label, 'name' => $name]);
     }
 
     /**

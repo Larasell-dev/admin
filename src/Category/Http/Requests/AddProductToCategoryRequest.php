@@ -30,7 +30,7 @@ class AddProductToCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_id.unique' => 'The product is already in this category.',
+            'product_id.unique' => __('The product is already in this category.'),
         ];
     }
 }

@@ -5,7 +5,7 @@
 The panel is a modular monolith. Each feature is a module at the top of `src/`:
 `ApiToken`, `Category`, `Customer`, `Order`, `Product` and `Team`. What modules and
 apps plug into lives under `src/Platform/`: `Panel`, `Auth`, `Navigation`, `Tables`,
-`Search`, `Audit`, `ContentLocale` and `Support`.
+`Search`, `Audit`, `ContentLocale`, `InterfaceLocale` and `Support`.
 
 Every module has the same layout, with only the folders it needs:
 `<Module>ServiceProvider.php` (config, bindings, routes, navigation, searches),
@@ -55,6 +55,39 @@ In `agent-browser`, open `/admin/__dev/login?redirect=/admin/profile` to land on
 a page as a signed-in admin. Hit `/admin/__dev` to discover any newly added
 shortcuts. When adding a new dev shortcut, put it in the `__dev` group in
 `routes/web.php` so it is listed automatically and inherits the local-only guard.
+
+## Interface language (i18n)
+
+The panel's own text, its buttons, menus and messages, is shown in the interface language. Each
+admin picks it (command menu → "Change interface language"). It is separate from the content
+locale, which products and categories are edited in. Both use full codes such as `de-DE`, in the
+frontend's files and the server's alike.
+
+- **Server:** `src/Platform/InterfaceLocale`. `SetInterfaceLocale` asks the bound
+  `InterfaceLocaleResolver` (a strategy; `CookieInterfaceLocaleResolver` by default) for one of
+  `AvailableInterfaceLocales` and sets the app locale. `<html lang dir>` comes from it, and the
+  frontend loads its translations from `lang`. These are the panel's own classes, not the
+  content locales of `larasell-dev/larasell`.
+- **Frontend text** is translated with [fbtee](https://fbtee.dev): `<fbt desc="…">` in JSX,
+  `fbs("…", "…")` for plain strings such as `aria-label` and command labels. The description is
+  all a translator sees, so say where the text shows. Use `<fbt:param>`/`fbs.param()` for values
+  instead of concatenating, and `<fbt:plural>` for counts. Never translate at module level: it runs
+  before the translations load. Use a function, like `themeLabel()`.
+- **Server text** uses Laravel's JSON translations, keyed by the English text: `__('Products')`.
+  Text registered while the app boots, such as navigation and search labels, is marked with
+  `Translate::later('Products')` and translated with `__()` when it's shown. Route titles
+  (`->withHead(title: Translate::later('Dashboard'))`) are translated by `SetInterfaceLocale`.
+  Table action labels are given the same way, `Action::make(Translate::later('Delete'))`: the
+  action translates its label when shown and keeps the English one for its URL slug.
+- After adding or changing text, run `npm run translations:extract`. New frontend text gets
+  `"status": "new"` in `resources/translations/<code>.json`; translate it and remove the status.
+  New server text gets `""` in `lang/<code>.json`; fill it in. CI fails when the files are out of
+  date. Untranslated text shows in English. Add a language with
+  `npm run translations:extract -- fr-FR` and list it in `PanelInterfaceLocales::TRANSLATED`.
+- **Pseudo-languages** are offered only when `APP_ENV=local`: `en-XA` (accented and about 40%
+  longer, in brackets) and `ar-XB` (right to left). They are made up from the English text, by
+  `npm run translations:compile` for the frontend and at runtime for the server. Pick one to spot
+  hard-coded text, which stays plain English, and layouts that break.
 
 ## Best-before markers
 

@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Team\Tables;
 
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Attributes\UseModel;
@@ -16,14 +17,14 @@ class Members extends Table
 {
     public function title(): string
     {
-        return 'Team';
+        return __('Team');
     }
 
     public function columns(): array
     {
         return [
-            TextColumn::make('name'),
-            TextColumn::make('email'),
+            TextColumn::make('name', __('Name')),
+            TextColumn::make('email', __('Email')),
         ];
     }
 
@@ -35,10 +36,10 @@ class Members extends Table
     public function actions(): array
     {
         return [
-            Action::make('Delete', handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin, $this->signedInAdmin()))
+            Action::make(Translate::later('Delete'), handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin, $this->signedInAdmin()))
                 ->confirm(
-                    title: 'Delete member',
-                    message: 'They can no longer sign in to the admin panel. This can\'t be undone.',
+                    title: __('Delete member'),
+                    message: __('They can no longer sign in to the admin panel. This can\'t be undone.'),
                     confirmationText: fn (Admin $admin): string => $admin->email,
                 )
                 ->icon(Icon::DeleteBin)

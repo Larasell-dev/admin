@@ -1,4 +1,5 @@
 import { Form } from "@inertiajs/react";
+import { fbs } from "fbtee";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/Product/ProductForm";
@@ -27,8 +28,17 @@ export default function Create({
       className="contents"
     >
       <Page.Header
-        title="New product"
-        backLink={{ href: indexUrl, label: "Back to products" }}
+        title={fbs(
+          "New product",
+          "New product page: title of the page with the form that creates a product",
+        )}
+        backLink={{
+          href: indexUrl,
+          label: fbs(
+            "Back to products",
+            "New product page: accessible name of the back arrow that returns to the list of products",
+          ),
+        }}
         actions={<ContentLocaleSelect contentLocale={contentLocale} />}
       />
       <Page.Body>

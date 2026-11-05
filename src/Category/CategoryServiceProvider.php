@@ -14,6 +14,7 @@ use Larasell\Admin\Category\Http\Controllers\SearchProductsNotInCategoryControll
 use Larasell\Admin\Category\Http\Controllers\UnhideCategoryController;
 use Larasell\Admin\Category\Search\CategorySearch;
 use Larasell\Admin\Category\Search\DatabaseCategorySearch;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -42,12 +43,12 @@ class CategoryServiceProvider extends ServiceProvider
 
         Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
 
-        app(Searches::class)->add('categories', 'Search categories', Icon::Folders, 'Search by name', 'larasell.admin.search.categories');
+        app(Searches::class)->add('categories', Translate::later('Search categories'), Icon::Folders, Translate::later('Search by name'), 'larasell.admin.search.categories');
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::get('categories', [CategoryController::class, 'index'])->name('categories.index')->withHead(title: 'Categories');
+            Route::get('categories', [CategoryController::class, 'index'])->name('categories.index')->withHead(title: Translate::later('Categories'));
             Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
-            Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create')->withHead(title: 'New category');
+            Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create')->withHead(title: Translate::later('New category'));
             Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
             Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
             Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');

@@ -5,6 +5,7 @@ import { use, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { assertDefined } from "ts-extras";
 import { PageBodyContext } from "./Page";
+import { fbs } from "fbtee";
 
 type Position = { left: string; bottom: string };
 
@@ -200,7 +201,10 @@ export function UnsavedChangesToastHost() {
               return () => observer.disconnect();
             }}
             role="region"
-            aria-label="Unsaved changes"
+            aria-label={fbs(
+              "Unsaved changes",
+              "Unsaved changes toast: accessible name of the bar at the bottom of a form with unsaved changes, with Cancel and Save buttons",
+            )}
             style={{
               left: toast.position.left,
               bottom: `calc(${toast.position.bottom} + 1.5rem)`,
@@ -253,18 +257,22 @@ function ToastContent({ toast }: { toast: ToastState }) {
       className="flex w-(--toast-width) max-w-[calc(100vw-2rem)] items-center justify-between gap-6 border border-border bg-elevated bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-elevated"
     >
       <p className="type-body-md whitespace-nowrap text-mauve-950 dark:text-mauve-50">
-        Unsaved changes
+        <fbt desc="Unsaved changes toast: message in the bar at the bottom of a form that has changes not saved yet">
+          Unsaved changes
+        </fbt>
       </p>
       <div className="flex gap-1">
         <Button type="button" variant="tertiary" disabled={toast.processing} onClick={toast.cancel}>
-          Cancel
+          <fbt desc="Unsaved changes toast: button that discards the form's unsaved changes">
+            Cancel
+          </fbt>
         </Button>
         <Button
           type="button"
           {...(toast.processing ? { loading: true } : { disabled: toast.busy })}
           onClick={toast.save}
         >
-          Save
+          <fbt desc="Unsaved changes toast: button that saves the form's changes">Save</fbt>
         </Button>
       </div>
     </div>

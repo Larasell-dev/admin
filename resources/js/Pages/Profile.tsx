@@ -13,12 +13,13 @@ import {
   SectionStack,
   Stack,
 } from "@larasell-dev/ui";
+import { fbs } from "fbtee";
 import { useEffect, useId, useRef, useState } from "react";
 import { assertDefined } from "ts-extras";
-import UnsavedChangesToast from "../Components/UnsavedChangesToast";
+import UnsavedChangesToast, { useUnsavedChanges } from "../Components/UnsavedChangesToast";
 import SidebarLayout from "../Layouts/SidebarLayout";
 import { initials } from "../utils/initials";
-import { setTheme, Theme, themeLabels, useTheme } from "../utils/theme";
+import { setTheme, Theme, themeLabel, useTheme } from "../utils/theme";
 import type { Page } from "../types";
 
 type ProfilePageProps = Larasell.Admin.Team.Data.ProfilePageData;
@@ -28,7 +29,11 @@ export default function Profile({ admin, updateUrl }: ProfilePageProps) {
     <Container>
       <div className="max-w-lg py-10">
         <Stack spacing={8}>
-          <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">Profile</h1>
+          <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">
+            <fbt desc="Profile page: heading of the page where the admin edits their own account">
+              Profile
+            </fbt>
+          </h1>
 
           <SectionStack>
             <Form
@@ -40,8 +45,14 @@ export default function Profile({ admin, updateUrl }: ProfilePageProps) {
             >
               <Section.Root>
                 <Section.Header
-                  title="General"
-                  description="Your name, email address, and profile picture."
+                  title={fbs(
+                    "General",
+                    "Profile page: heading of the section with the admin's name, email address and picture",
+                  )}
+                  description={fbs(
+                    "Your name, email address, and profile picture.",
+                    "Profile page: explains what the General section holds",
+                  )}
                 />
                 <ProfileFields />
               </Section.Root>
@@ -64,11 +75,19 @@ function ProfileFields() {
       <AvatarInput error={errors.avatar} />
 
       <Stack spacing={5}>
-        <Field label="Name" name="name" error={errors.name}>
+        <Field
+          label={fbs("Name", "Profile page: label of the field for the admin's own full name")}
+          name="name"
+          error={errors.name}
+        >
           <Input defaultValue={admin.name} autoComplete="name" />
         </Field>
 
-        <Field label="Email" name="email" error={errors.email}>
+        <Field
+          label={fbs("Email", "Profile page: label of the field for the admin's own email address")}
+          name="email"
+          error={errors.email}
+        >
           <Input type="email" defaultValue={admin.email} autoComplete="email" />
         </Field>
       </Stack>
@@ -129,8 +148,14 @@ function AvatarInput({ error }: { error?: string }) {
       upload.setError(
         "avatar",
         status === 413
-          ? "The picture is larger than the server accepts."
-          : "The picture couldn't be uploaded. Try again.",
+          ? fbs(
+              "The picture is larger than the server accepts.",
+              "Profile page: error after uploading a profile picture whose file is too large",
+            )
+          : fbs(
+              "The picture couldn't be uploaded. Try again.",
+              "Profile page: error after a profile picture upload failed, e.g. without a network",
+            ),
       );
     upload.transform(() => ({ avatar: file }));
 
@@ -185,11 +210,13 @@ function AvatarInput({ error }: { error?: string }) {
           loading={upload.processing}
           onClick={() => fileInput.current?.click()}
         >
-          Change picture
+          <fbt desc="Profile page: button that opens the file picker for a new profile picture">
+            Change picture
+          </fbt>
         </Button>
         {currentUrl && (
           <Button type="button" variant="tertiary" onClick={removeAvatar}>
-            Remove
+            <fbt desc="Profile page: button that removes the admin's profile picture">Remove</fbt>
           </Button>
         )}
       </div>
@@ -204,11 +231,20 @@ function PreferenceSection() {
   return (
     <Section.Root>
       <Section.Header
-        title="Preference"
-        description="Choose how the admin panel looks on this device."
+        title={fbs(
+          "Preference",
+          "Profile page: heading of the section with the theme and the interface language",
+        )}
+        description={fbs(
+          "Choose how the admin panel looks on this device.",
+          "Profile page: explains what the Preference section holds; the choices only apply to this browser",
+        )}
       />
       <RadioGroup
-        aria-label="Theme"
+        aria-label={fbs(
+          "Theme",
+          "Profile page: accessible name of the group of light, dark and system theme choices",
+        )}
         value={theme}
         onValueChange={setTheme}
         className="grid grid-cols-2 gap-8 sm:grid-cols-3"
@@ -224,12 +260,63 @@ function PreferenceSection() {
               <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border bg-white group-data-checked:border-mauve-950 group-data-checked:bg-mauve-950 dark:bg-mauve-900 dark:group-data-checked:border-mauve-100 dark:group-data-checked:bg-mauve-100">
                 <Radio.Indicator className="size-1.5 rounded-full bg-white dark:bg-mauve-950" />
               </span>
-              {themeLabels[value]}
+              {themeLabel(value)}
             </span>
           </Radio.Root>
         ))}
       </RadioGroup>
+      <InterfaceLocaleField />
     </Section.Root>
+  );
+}
+
+/**
+ * Picks the language of the panel itself, not of the content, like the command menu does. The
+ * server reloads the page in it, so it is disabled while the profile has unsaved changes.
+ */
+function InterfaceLocaleField() {
+  const { interfaceLocale } = usePage<Page<ProfilePageProps>>().props;
+  const unsavedChanges = useUnsavedChanges();
+
+  if (!interfaceLocale || interfaceLocale.options.length < 2) return null;
+
+  return (
+    <div className="max-w-sm pt-8">
+      <Field
+        label={fbs(
+          "Language",
+          "Profile page: label of the select for the language the admin panel's own text is shown in",
+        )}
+        name="interface_locale"
+        description={
+          unsavedChanges
+            ? fbs(
+                "Save or discard your changes first",
+                "Profile page: why the language select is disabled while the profile has unsaved changes",
+              )
+            : undefined
+        }
+      >
+        <Input
+          defaultValue={interfaceLocale.current}
+          disabled={unsavedChanges}
+          render={
+            // On the select, which types its own change events; Input types them for an input.
+            <select
+              onChange={(event) =>
+                router.put(interfaceLocale.switchUrl, { locale: event.currentTarget.value })
+              }
+            >
+              {interfaceLocale.options.map((option) => (
+                <option key={option.value} value={option.value} lang={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          }
+        />
+      </Field>
+    </div>
   );
 }
 

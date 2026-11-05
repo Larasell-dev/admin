@@ -34,9 +34,10 @@ class Searches
         return array_map(
             fn (string $id, array $search): SearchData => new SearchData(
                 $id,
-                $search['label'],
+                // Added while the app boots, so translated now, in the request's language.
+                __($search['label']),
                 $search['icon']->name,
-                $search['placeholder'],
+                __($search['placeholder']),
                 route($search['route']),
             ),
             array_keys($this->searches),

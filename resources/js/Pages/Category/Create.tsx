@@ -1,5 +1,6 @@
 import { Form } from "@inertiajs/react";
 import { Section, SectionStack } from "@larasell-dev/ui";
+import { fbs } from "fbtee";
 
 import CategoryForm from "../../Components/Category/CategoryForm";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
@@ -24,10 +25,30 @@ export default function Create({
   return (
     <>
       <Page.Header
-        title={parent ? `New category in ${parent.name ?? parent.fallbackName}` : "New category"}
+        title={
+          parent
+            ? fbs(
+                [
+                  "New category in ",
+                  fbs.param("parentCategoryName", parent.name ?? parent.fallbackName),
+                ],
+                "New category page: title when the new category goes inside another one, whose name is filled in",
+              )
+            : fbs(
+                "New category",
+                "New category page: title of the page with the form that creates a top-level category",
+              )
+        }
         backLink={
           categories.length === 0
-            ? { href: indexUrl, label: "Back to categories", mobileOnly: true }
+            ? {
+                href: indexUrl,
+                label: fbs(
+                  "Back to categories",
+                  "New category page: accessible name of the back arrow that returns to the categories",
+                ),
+                mobileOnly: true,
+              }
             : undefined
         }
         actions={
@@ -49,8 +70,14 @@ export default function Create({
             {parent && <input type="hidden" name="parent_id" value={parent.id} />}
             <Section.Root>
               <Section.Header
-                title="General"
-                description="How the category is named and found in the store."
+                title={fbs(
+                  "General",
+                  "New category page: heading of the form section with the category's name, slug and description",
+                )}
+                description={fbs(
+                  "How the category is named and found in the store.",
+                  "New category page: explains the form section with the category's name, slug and description",
+                )}
               />
               <CategoryForm />
             </Section.Root>

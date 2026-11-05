@@ -1,6 +1,7 @@
 import { Form } from "@inertiajs/react";
 import { EmptyState, Section, SectionStack } from "@larasell-dev/ui";
 import { ReceiptLine } from "@larasell-dev/ui/icons";
+import { fbs } from "fbtee";
 import CustomerForm from "../../Components/Customer/CustomerForm";
 import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
@@ -14,7 +15,13 @@ export default function Edit({ customer, updateUrl, indexUrl, orders }: Props) {
     <>
       <Page.Header
         title={customer.name}
-        backLink={{ href: indexUrl, label: "Back to customers" }}
+        backLink={{
+          href: indexUrl,
+          label: fbs(
+            "Back to customers",
+            "Customer page: accessible name of the back arrow that returns to the list of customers",
+          ),
+        }}
       />
       <Page.Body>
         <SectionStack>
@@ -27,13 +34,28 @@ export default function Edit({ customer, updateUrl, indexUrl, orders }: Props) {
             setDefaultsOnSuccess
           >
             <Section.Root>
-              <Section.Header title="General" description="Who the customer is." />
+              <Section.Header
+                title={fbs(
+                  "General",
+                  "Customer page: heading of the form section with the customer's name and contact details",
+                )}
+                description={fbs(
+                  "Who the customer is.",
+                  "Customer page: explains the form section with the customer's name and contact details",
+                )}
+              />
               <CustomerForm customer={customer} />
             </Section.Root>
             <UnsavedChangesToast />
           </Form>
           <Section.Root>
-            <Section.Header title={orders.title} description="The orders this customer placed." />
+            <Section.Header
+              title={orders.title}
+              description={fbs(
+                "The orders this customer placed.",
+                "Customer page: explains the section that lists the customer's orders",
+              )}
+            />
             <Section.Card>
               {orders.pagination.total > 0 ? (
                 <ResourceTable resource={orders} />
@@ -41,8 +63,14 @@ export default function Edit({ customer, updateUrl, indexUrl, orders }: Props) {
                 <div className="flex justify-center px-(--inset) py-12">
                   <EmptyState
                     icon={ReceiptLine}
-                    title="No orders yet"
-                    description="Orders this customer places show up here."
+                    title={fbs(
+                      "No orders yet",
+                      "Customer page: shown instead of the list of the customer's orders when they placed none",
+                    )}
+                    description={fbs(
+                      "Orders this customer places show up here.",
+                      "Customer page: below 'No orders yet' in the section for the customer's orders",
+                    )}
                   />
                 </div>
               )}

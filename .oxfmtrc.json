@@ -6,6 +6,7 @@
     "composer.lock",
     "package-lock.json",
     "public/**",
-    "resources/vite/exports.json"
+    "resources/vite/exports.json",
+    "resources/translations/**"
   ]
 }

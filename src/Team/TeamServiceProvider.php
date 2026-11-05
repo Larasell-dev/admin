@@ -5,6 +5,7 @@ namespace Larasell\Admin\Team;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -21,15 +22,15 @@ class TeamServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Navigation::add('Team', 'larasell.admin.settings.team.index', Icon::Team)->under(NavItem::Settings);
+        Navigation::add(Translate::later('Team'), 'larasell.admin.settings.team.index', Icon::Team)->under(NavItem::Settings);
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team.index')->withHead(title: 'Team');
+            Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team.index')->withHead(title: Translate::later('Team'));
             Route::post('settings/team', [TeamController::class, 'store'])->name('settings.team.store');
-            Route::get('settings/team/create', [TeamController::class, 'create'])->name('settings.team.create')->withHead(title: 'New member');
+            Route::get('settings/team/create', [TeamController::class, 'create'])->name('settings.team.create')->withHead(title: Translate::later('New member'));
             Route::get('settings/team/{admin}/edit', [TeamController::class, 'edit'])->name('settings.team.edit');
             Route::put('settings/team/{admin}', [TeamController::class, 'update'])->name('settings.team.update');
-            Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
+            Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: Translate::later('Profile'));
             Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
             Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
         });

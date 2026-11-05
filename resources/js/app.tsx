@@ -7,10 +7,12 @@ import { contentLocaleCommand } from "./Components/CommandMenu/contentLocaleComm
 import { goToCommand } from "./Components/CommandMenu/goToCommand";
 import { logOutCommand } from "./Components/CommandMenu/logOutCommand";
 import { themeCommand } from "./Components/CommandMenu/themeCommand";
+import { interfaceLocaleCommand } from "./Components/CommandMenu/interfaceLocaleCommand";
 import { ThemeChangedToasts } from "./Components/Shell/ThemeChangedToast";
 import { extensions } from "./extensions";
 import { sharedModules } from "./sharedModules";
 import { AppHotkeysProvider } from "./utils/hotkeys";
+import { setUpInterfaceLocale } from "./utils/interfaceLocale";
 
 type PageModule = { default: ResolvedComponent };
 
@@ -30,39 +32,48 @@ window.LarasellAdmin = {
   modules: sharedModules,
   boot() {
     // Before the extensions' commands, which the menu lists after the panel's.
-    commands.register(goToCommand, themeCommand, contentLocaleCommand, logOutCommand);
+    commands.register(
+      goToCommand,
+      themeCommand,
+      interfaceLocaleCommand,
+      contentLocaleCommand,
+      logOutCommand,
+    );
     extensions.boot();
 
-    void createInertiaApp({
-      serverHead: true,
-      resolve: async (name) => {
-        const page = await extensions.resolve(name);
+    // The translations load before the first render, so the panel never shows in English first.
+    void setUpInterfaceLocale().then(() =>
+      createInertiaApp({
+        serverHead: true,
+        resolve: async (name) => {
+          const page = await extensions.resolve(name);
 
-        if (page) {
-          return page;
-        }
+          if (page) {
+            return page;
+          }
 
-        const loader = pages[`./Pages/${name}.tsx`];
+          const loader = pages[`./Pages/${name}.tsx`];
 
-        if (!loader) {
-          throw new Error(`Admin page [${name}] not found.`);
-        }
+          if (!loader) {
+            throw new Error(`Admin page [${name}] not found.`);
+          }
 
-        return (await loader()).default;
-      },
-      progress: {
-        color: "var(--color-progress)",
-      },
-      setup({ el, App, props }) {
-        createRoot(el).render(
-          <AppHotkeysProvider>
-            <ToastProvider>
-              <App {...props} />
-              <ThemeChangedToasts />
-            </ToastProvider>
-          </AppHotkeysProvider>,
-        );
-      },
-    });
+          return (await loader()).default;
+        },
+        progress: {
+          color: "var(--color-progress)",
+        },
+        setup({ el, App, props }) {
+          createRoot(el).render(
+            <AppHotkeysProvider>
+              <ToastProvider>
+                <App {...props} />
+                <ThemeChangedToasts />
+              </ToastProvider>
+            </AppHotkeysProvider>,
+          );
+        },
+      }),
+    );
   },
 };

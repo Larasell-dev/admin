@@ -23,7 +23,7 @@ class MoveCategoryRequest extends FormRequest
                 Rule::exists(Category::class, 'id'),
                 function (string $attribute, mixed $value, Closure $fail): void {
                     if ($this->isWithinMovedCategory((int) $value)) {
-                        $fail('A category cannot be moved into itself or a category below it.');
+                        $fail(__('A category cannot be moved into itself or a category below it.'));
                     }
                 },
             ],

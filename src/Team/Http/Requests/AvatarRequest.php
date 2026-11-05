@@ -30,7 +30,7 @@ class AvatarRequest extends FormRequest
     {
         return [
             // Mostly files over PHP's upload_max_filesize, which it drops before the max rule runs.
-            'avatar.uploaded' => 'The picture may be larger than the server accepts.',
+            'avatar.uploaded' => __('The picture may be larger than the server accepts.'),
         ];
     }
 }

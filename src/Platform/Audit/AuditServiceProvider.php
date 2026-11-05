@@ -12,6 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Platform\Audit\Log\Http\Controllers\AuditLogController;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -58,12 +59,12 @@ class AuditServiceProvider extends ServiceProvider
         Feature::define('audit-log-filters', fn (Admin $admin): bool => false);
 
         // After API tokens, or Team when that module is turned off.
-        Navigation::add('Audit log', 'larasell.admin.settings.audit-log.index', Icon::FileShield)
+        Navigation::add(Translate::later('Audit log'), 'larasell.admin.settings.audit-log.index', Icon::FileShield)
             ->under(NavItem::Settings)
             ->after(config('larasell.admin.api_tokens.enabled') ? 'larasell.admin.settings.api-tokens.index' : 'larasell.admin.settings.team.index');
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::get('settings/audit-log', [AuditLogController::class, 'index'])->name('settings.audit-log.index')->withHead(title: 'Audit log');
+            Route::get('settings/audit-log', [AuditLogController::class, 'index'])->name('settings.audit-log.index')->withHead(title: Translate::later('Audit log'));
         });
     }
 }

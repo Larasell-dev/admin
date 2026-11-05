@@ -53,7 +53,7 @@ class CategoryController
         $category = Category::query()->find($category);
 
         if ($category === null) {
-            Head::title('Category not found');
+            Head::title(__('Category not found'));
 
             // Inertia still renders a page that comes with an error status.
             return Inertia::render('Category/Show', new MissingCategoryPageData(
@@ -86,7 +86,7 @@ class CategoryController
             : null;
 
         if ($parent !== null) {
-            Head::title("New category in {$parent->name->get($locale->value)}");
+            Head::title(__('New category in :category', ['category' => $parent->name->get($locale->value)]));
         }
 
         return Inertia::render('Category/Create', new CreateCategoryPageData(

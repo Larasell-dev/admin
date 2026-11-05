@@ -15,7 +15,9 @@ export default function Index({ members, createUrl }: Props) {
         actions={
           <Button size="sm" render={<Link href={createUrl} prefetch="hover" />}>
             <Icon icon={AddLine} />
-            Add member
+            <fbt desc="Team page: header button that opens the form to add an admin to the panel">
+              Add member
+            </fbt>
           </Button>
         }
       />
