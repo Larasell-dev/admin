@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use Larasell\Admin\Platform\Tables\Table;
+
+class {{ class }} extends Table
+{
+    public function columns(): array
+    {
+        return [
+            //
+        ];
+    }
+}

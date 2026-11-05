@@ -158,7 +158,7 @@ declare module "@larasell-dev/admin" {
     actions: TableAction[];
   };
 
-  /** The JSON shape of a Larasell\Admin\Tables\Table. */
+  /** The JSON shape of a Larasell\Admin\Platform\Tables\Table. */
   export type TableResource = {
     title: string;
     emptyState: TableEmptyState | null;

@@ -7,9 +7,9 @@ import type { ReactNode } from "react";
 import { Page } from "../../Components/Page";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.Orders.OrderPageData;
-type Order = Larasell.Admin.Data.ViewModel.Orders.OrderDetailData;
-type AddressData = Larasell.Admin.Data.ViewModel.Orders.AddressData;
+type Props = Larasell.Admin.Order.Data.OrderPageData;
+type Order = Larasell.Admin.Order.Data.OrderDetailData;
+type AddressData = Larasell.Admin.Order.Data.AddressData;
 
 /** An order as it was placed. Read only: orders record what was bought, so they aren't edited. */
 export default function Show({ order, indexUrl, customerUrl }: Props) {

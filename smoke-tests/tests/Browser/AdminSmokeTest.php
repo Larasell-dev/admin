@@ -97,7 +97,7 @@ it('signs an admin in and renders the panel', function () {
     expect($adminAssetTypes)->toContain('js', 'css');
 });
 
-it('navigates between the main pages', function () {
+it('opens Categories and Customers from the sidebar, Profile from the user menu and the dashboard from the logo, without errors or failed requests', function () {
     $page = signIn()
         ->click('aside > nav a[href$="/categories"]')
         ->assertPathIs(adminPath('categories'))

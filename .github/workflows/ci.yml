@@ -110,7 +110,7 @@ jobs:
       - name: Icon matches the installed icon set
         run: |
           npm run generate:icons
-          git diff --exit-code src/Enums/Icon.php
+          git diff --exit-code src/Platform/Panel/Icon.php
 
       - name: Build
         run: npm run build

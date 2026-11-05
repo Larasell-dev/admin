@@ -7,7 +7,7 @@ import { UnsavedChangesToastHost } from "../../Components/UnsavedChangesToast";
 import Edit from "./Edit";
 
 type Props = Parameters<typeof Edit>[0];
-type ContentLocale = Larasell.Admin.Data.ViewModel.ContentLocale.ContentLocaleData;
+type ContentLocale = Larasell.Admin.Platform.ContentLocale.Data.ContentLocaleData;
 
 const english = { value: "en", label: "English" };
 const german = { value: "de", label: "German" };

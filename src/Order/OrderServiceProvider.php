@@ -1,0 +1,47 @@
+<?php
+
+namespace Larasell\Admin\Order;
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Order\Http\Controllers\OrderController;
+use Larasell\Admin\Order\Http\Controllers\SearchOrdersController;
+use Larasell\Admin\Order\Search\DatabaseOrderSearch;
+use Larasell\Admin\Order\Search\OrderSearch;
+use Larasell\Admin\Order\Tables\Orders;
+use Larasell\Admin\Platform\Navigation\Facades\Navigation;
+use Larasell\Admin\Platform\Navigation\NavItem;
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Search\Searches;
+
+/**
+ * The orders module: its table page, its navigation item, and the page that shows an order.
+ * Orders aren't edited, so there are no pages to change them. Setting
+ * larasell.admin.orders.enabled to false leaves all of them out.
+ */
+class OrderServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../../config/larasell/admin/orders.php', 'larasell.admin.orders');
+
+        $this->app->bind(OrderSearch::class, DatabaseOrderSearch::class);
+    }
+
+    public function boot(): void
+    {
+        if (! config('larasell.admin.orders.enabled')) {
+            return;
+        }
+
+        Navigation::index(NavItem::Orders->label(), 'orders', Orders::class, icon: Icon::Receipt)->position(NavItem::Orders->position());
+
+        app(Searches::class)->add('orders', 'Search orders', Icon::Receipt, 'Search by number, customer or email', 'larasell.admin.search.orders');
+
+        AdminPanel::resolve()->routes(function (): void {
+            Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+            Route::get('search/orders', SearchOrdersController::class)->name('search.orders');
+        });
+    }
+}

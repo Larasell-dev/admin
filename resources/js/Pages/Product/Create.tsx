@@ -1,12 +1,12 @@
 import { Form } from "@inertiajs/react";
-import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
+import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
-import ProductForm from "../../Components/ProductForm";
+import ProductForm from "../../Components/Product/ProductForm";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 import type { SharedProps } from "../../types";
 
-type Props = Larasell.Admin.Data.View.CreateProductPageData & Pick<SharedProps, "contentLocale">;
+type Props = Larasell.Admin.Product.Data.CreateProductPageData & Pick<SharedProps, "contentLocale">;
 
 export default function Create({
   storeUrl,

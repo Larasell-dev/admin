@@ -5,8 +5,8 @@ import { navigationIcon } from "../../utils/navigationIcon";
 import { type CommandItem, useCommand } from "./commands";
 import { Highlight, matchRanges } from "./Highlight";
 
-type Search = Larasell.Admin.Data.ViewModel.Search.SearchData;
-type Result = Larasell.Admin.Data.ViewModel.Search.SearchResultData;
+type Search = Larasell.Admin.Platform.Search.Data.SearchData;
+type Result = Larasell.Admin.Platform.Search.Data.SearchResultData;
 
 /**
  * Adds a command for each search the server shares: those of the modules that are turned on and

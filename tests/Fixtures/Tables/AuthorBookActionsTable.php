@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Larasell\Admin\Tests\Fixtures\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
-use Larasell\Admin\Tables\Attributes\Remember;
+use Larasell\Admin\Platform\Tables\Attributes\Remember;
 use Larasell\Admin\Tests\Fixtures\Book;
 
 /**

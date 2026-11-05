@@ -4,7 +4,7 @@ import type { SharedProps } from "../../types";
 import { navigationIcon } from "../../utils/navigationIcon";
 import { defineCommand } from "./commands";
 
-type NavigationItem = Larasell.Admin.Data.ViewModel.NavigationItemData;
+type NavigationItem = Larasell.Admin.Platform.Navigation.NavigationItemData;
 
 /** The pages an item stands for: itself, or the pages under it, e.g. those of Settings. */
 const pages = (item: NavigationItem): NavigationItem[] =>

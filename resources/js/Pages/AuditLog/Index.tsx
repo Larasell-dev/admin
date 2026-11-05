@@ -6,8 +6,8 @@ import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.AuditLog.AuditLogPageData;
-type Filters = Larasell.Admin.Data.View.AuditLog.AuditLogFiltersData;
+type Props = Larasell.Admin.Platform.Audit.Log.Data.AuditLogPageData;
+type Filters = Larasell.Admin.Platform.Audit.Log.Data.AuditLogFiltersData;
 
 export default function Index({
   indexUrl,

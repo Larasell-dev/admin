@@ -2,7 +2,10 @@ import { Form, Link } from "@inertiajs/react";
 import { Button, Container, Field, Input, PasswordInput, Stack } from "@larasell-dev/ui";
 import { useState } from "react";
 
-export default function Login({ loginUrl, devLoginUrl }: Larasell.Admin.Data.View.LoginPageData) {
+export default function Login({
+  loginUrl,
+  devLoginUrl,
+}: Larasell.Admin.Platform.Auth.Data.LoginPageData) {
   const [devLoginLoading, setDevLoginLoading] = useState(false);
 
   return (

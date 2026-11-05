@@ -1,0 +1,19 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use Larasell\Admin\Platform\Tables\Attributes\UseModel;
+use Larasell\Admin\Platform\Tables\Table;
+
+#[UseModel({{ model }}::class)]
+class {{ class }} extends Table
+{
+
+    public function columns(): array
+    {
+        return [
+            //
+        ];
+    }
+}

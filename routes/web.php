@@ -1,23 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Enums\Icon;
-use Larasell\Admin\Enums\NavItem;
-use Larasell\Admin\Facades\Navigation;
-use Larasell\Admin\Http\Controllers\AdminController;
-use Larasell\Admin\Http\Controllers\AvatarController;
-use Larasell\Admin\Http\Controllers\ContentLocale\SwitchContentLocaleController;
-use Larasell\Admin\Http\Controllers\Dev\RouteController as DevRouteController;
-use Larasell\Admin\Http\Controllers\Dev\SessionController as DevSessionController;
-use Larasell\Admin\Http\Controllers\HomeController;
-use Larasell\Admin\Http\Controllers\LoginController;
-use Larasell\Admin\Http\Controllers\LogoutController;
-use Larasell\Admin\Http\Controllers\ProfileController;
-use Larasell\Admin\Http\Controllers\SettingsController;
-use Larasell\Admin\Http\Controllers\TableActionController;
-use Larasell\Admin\Http\Middleware\Authenticate;
-use Larasell\Admin\Http\Middleware\RedirectIfAuthenticated;
-use Larasell\Admin\NavigationGroup;
+use Larasell\Admin\Platform\Auth\Http\Controllers\LoginController;
+use Larasell\Admin\Platform\Auth\Http\Controllers\LogoutController;
+use Larasell\Admin\Platform\Auth\Http\Middleware\Authenticate;
+use Larasell\Admin\Platform\Auth\Http\Middleware\RedirectIfAuthenticated;
+use Larasell\Admin\Platform\ContentLocale\Http\Controllers\SwitchContentLocaleController;
+use Larasell\Admin\Platform\Navigation\Facades\Navigation;
+use Larasell\Admin\Platform\Navigation\NavItem;
+use Larasell\Admin\Platform\Panel\Http\Controllers\Dev\RouteController as DevRouteController;
+use Larasell\Admin\Platform\Panel\Http\Controllers\Dev\SessionController as DevSessionController;
+use Larasell\Admin\Platform\Panel\Http\Controllers\HomeController;
+use Larasell\Admin\Platform\Panel\Http\Controllers\SettingsController;
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Tables\Http\Controllers\TableActionController;
 
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login')->withHead(title: 'Sign in');
@@ -26,15 +22,7 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home')->withHead(title: 'Dashboard');
-    Route::get('profile', [ProfileController::class, 'edit'])->name('profile')->withHead(title: 'Profile');
-    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('settings', SettingsController::class)->name('settings');
-    Route::get('settings/admins', [AdminController::class, 'index'])->name('settings.admins.index')->withHead(title: 'Admins');
-    Route::post('settings/admins', [AdminController::class, 'store'])->name('settings.admins.store');
-    Route::get('settings/admins/create', [AdminController::class, 'create'])->name('settings.admins.create')->withHead(title: 'New admin');
-    Route::get('settings/admins/{admin}/edit', [AdminController::class, 'edit'])->name('settings.admins.edit');
-    Route::put('settings/admins/{admin}', [AdminController::class, 'update'])->name('settings.admins.update');
-    Route::post('profile/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1')->name('profile.avatar.store');
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::put('content-locale', SwitchContentLocaleController::class)->name('content-locale.update');
     Route::post('logout', LogoutController::class)->name('logout');
@@ -52,8 +40,4 @@ if (app()->environment('local')) {
 }
 
 Navigation::add(NavItem::Home->label(), NavItem::Home->value, icon: Icon::Home)->position(NavItem::Home->position());
-Navigation::add(NavItem::Settings->label(), NavItem::Settings->value, icon: Icon::Settings)
-    ->position(NavItem::Settings->position())
-    ->children(function (NavigationGroup $settings): void {
-        $settings->add('Admins', 'larasell.admin.settings.admins.index', Icon::Team);
-    });
+Navigation::add(NavItem::Settings->label(), NavItem::Settings->value, icon: Icon::Settings)->position(NavItem::Settings->position());

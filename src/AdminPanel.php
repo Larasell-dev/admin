@@ -6,9 +6,10 @@ use Closure;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Route;
 use InvalidArgumentException;
-use Larasell\Admin\Http\Middleware\Authenticate;
-use Larasell\Admin\Http\Middleware\HandleAdminInertiaRequests;
-use Larasell\Admin\Http\Middleware\LogLicensingPlan;
+use Larasell\Admin\Platform\Auth\Http\Middleware\Authenticate;
+use Larasell\Admin\Platform\Navigation\Navigation;
+use Larasell\Admin\Platform\Panel\Http\Middleware\HandleAdminInertiaRequests;
+use Larasell\Admin\Platform\Panel\Http\Middleware\LogLicensingPlan;
 
 class AdminPanel
 {

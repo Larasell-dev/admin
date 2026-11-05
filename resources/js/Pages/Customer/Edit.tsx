@@ -1,13 +1,13 @@
 import { Form } from "@inertiajs/react";
 import { EmptyState, Section, SectionStack } from "@larasell-dev/ui";
 import { ReceiptLine } from "@larasell-dev/ui/icons";
-import CustomerForm from "../../Components/Customers/CustomerForm";
+import CustomerForm from "../../Components/Customer/CustomerForm";
 import { Page } from "../../Components/Page";
 import ResourceTable from "../../Components/ResourceTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Data.View.Customers.EditCustomerPageData;
+type Props = Larasell.Admin.Customer.Data.EditCustomerPageData;
 
 export default function Edit({ customer, updateUrl, indexUrl, orders }: Props) {
   return (

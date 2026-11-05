@@ -1,12 +1,31 @@
 # Agent notes
 
+## Code layout
+
+The panel is a modular monolith. Each feature is a module at the top of `src/`:
+`ApiToken`, `Category`, `Customer`, `Order`, `Product` and `Team`. What modules and
+apps plug into lives under `src/Platform/`: `Panel`, `Auth`, `Navigation`, `Tables`,
+`Search`, `Audit`, `ContentLocale` and `Support`.
+
+Every module has the same layout, with only the folders it needs:
+`<Module>ServiceProvider.php` (config, bindings, routes, navigation, searches),
+`Actions/` (with their payloads), `AuditRecords/`, `Console/`, `Data/` (page props
+and their parts), `Enums/`, `Exceptions/`, `Http/{Controllers,Middleware,Requests}/`,
+`Models/`, `Rules/`, `Search/` and `Tables/`. The frontend follows the same names:
+`resources/js/Components/<Module>/`, and tests in `tests/Feature/<Module>/` or
+`tests/Feature/Platform/<Area>/`.
+
+The platform never uses a module, and a module uses another one only when
+`tests/Arch/ModulesTest.php` lists it as what it builds on. When a module needs the
+platform to know about it, it registers itself, e.g. `Auditor::actorType()`.
+
 ## Dev-only endpoints (`/admin/__dev`)
 
 The admin panel registers a few shortcut routes **only when the app runs in the
 `local` environment** (`APP_ENV=local`). In any other environment (production,
 staging, testing, …) they are never registered and return 404. See
-`routes/web.php` and `src/Http/Controllers/Dev/`;
-`tests/Feature/DevRoutesTest.php` guards that they stay local-only.
+`routes/web.php` and `src/Platform/Panel/Http/Controllers/Dev/`;
+`tests/Feature/Platform/Panel/DevRoutesTest.php` guards that they stay local-only.
 
 The admin path prefix is configurable (`LARASELL_ADMIN_PATH`, default `admin`).
 

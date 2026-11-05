@@ -1,16 +1,16 @@
 import { Form } from "@inertiajs/react";
 import { Section, SectionStack } from "@larasell-dev/ui";
 
-import CategoryForm from "../../Components/Categories/CategoryForm";
-import ContentLocaleSelect from "../../Components/ContentLocaleSelect";
+import CategoryForm from "../../Components/Category/CategoryForm";
+import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
-import ProductsTable from "../../Components/ProductsTable";
+import ProductsTable from "../../Components/Category/ProductsTable";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
-import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Categories/CategoryLayout";
+import CategoryLayout, { CategoryTreeTrigger } from "../../Layouts/Category/CategoryLayout";
 import SidebarLayout from "../../Layouts/SidebarLayout";
 import type { SharedProps } from "../../types";
 
-type Props = Larasell.Admin.Data.View.Categories.CreateCategoryPageData &
+type Props = Larasell.Admin.Category.Data.CreateCategoryPageData &
   Pick<SharedProps, "contentLocale">;
 
 export default function Create({
