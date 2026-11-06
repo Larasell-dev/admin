@@ -8,3 +8,4 @@ parameters:
 
 rules:
     - Larasell\Admin\Lint\PHPStan\PreferRouteHelperRule
+    - Larasell\Admin\Lint\PHPStan\ArrangeActAssertRule

@@ -29,6 +29,13 @@ export default defineConfig({
           environment: "node",
         },
       },
+      {
+        test: {
+          name: "lint",
+          include: ["lint/**/*.test.mjs"],
+          environment: "node",
+        },
+      },
     ],
   },
 });
