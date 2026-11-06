@@ -2,6 +2,7 @@ import { router, usePage } from "@inertiajs/react";
 import { LogoutBoxRLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import type { SharedProps } from "../../types";
+import { signOutTransition } from "../../utils/authTransition";
 import { defineCommand } from "./commands";
 
 /** Logs out after a yes, so a stray Enter doesn't. */
@@ -31,7 +32,7 @@ export const logOutCommand = defineCommand({
         {
           id: "yes",
           label: fbs("Yes", "Command menu: answer to 'Log out?' that logs the admin out"),
-          run: () => router.post(logoutUrl),
+          run: () => router.post(logoutUrl, {}, { viewTransition: signOutTransition() }),
         },
       ],
     };

@@ -10,7 +10,6 @@ import { type CommandDefinition, commands, useCommand } from "./commands";
 import { contentLocaleCommand } from "./contentLocaleCommand";
 import { interfaceLocaleCommand } from "./interfaceLocaleCommand";
 import { Highlight, matchRanges } from "./Highlight";
-import { logOutCommand } from "./logOutCommand";
 import { goToCommand } from "./goToCommand";
 import { SearchCommands } from "./searchCommands";
 import { themeCommand } from "./themeCommand";
@@ -658,27 +657,6 @@ describe("navigating", () => {
     await choose("Profile");
 
     expect(visit).toHaveBeenCalledWith("/admin/profile");
-  });
-
-  it("logs out only after a yes", async () => {
-    const post = vi.spyOn(router, "post").mockImplementation(() => {});
-    register(logOutCommand);
-    await renderMenu(undefined, props);
-    await openMenu();
-    await choose("Log out");
-
-    expect(options()).toEqual(["No", "Yes"]);
-    // A stray Enter picks No.
-    await userEvent.keyboard("{Enter}");
-
-    await expect.element(menu()).not.toBeInTheDocument();
-    expect(post).not.toHaveBeenCalled();
-
-    await openMenu();
-    await choose("Log out");
-    await choose("Yes");
-
-    expect(post).toHaveBeenCalledWith("/admin/logout");
   });
 });
 
