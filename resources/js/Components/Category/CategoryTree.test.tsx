@@ -56,11 +56,14 @@ const opacity = (name: string) => getComputedStyle(trigger(name).element()).opac
 
 describe("category menu", () => {
   it("does not follow the category's link when its menu is clicked", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await item("Clothing").hover();
     await trigger("Clothing").click();
 
+    // Assert
     await expect.element(page.getByRole("menu")).toBeVisible();
     expect(visit).not.toHaveBeenCalled();
     // The tree's own click handling does not run either: Clothing stays closed.
@@ -68,15 +71,18 @@ describe("category menu", () => {
   });
 
   it("shows every menu button without hover or focus", async () => {
+    // Arrange & Act
     await renderTree();
     // The pointer stays where the previous test left it, possibly over a row.
     await page.getByRole("heading", { name: "Categories" }).hover();
 
+    // Assert
     await expect.poll(() => opacity("Clothing")).toBe("1");
     await expect.poll(() => opacity("Sale")).toBe("1");
   });
 
   it("puts only the focused item's menu button in the tab order", async () => {
+    // Arrange
     await render(
       <>
         <h2 id="heading">Categories</h2>
@@ -85,8 +91,11 @@ describe("category menu", () => {
       </>,
     );
 
+    // Act
     await userEvent.tab();
     await userEvent.tab();
+
+    // Assert
     await expect.element(trigger("Clothing")).toHaveFocus();
 
     // Sale's menu button comes next in the page, but Sale is not the focused item.
@@ -95,12 +104,16 @@ describe("category menu", () => {
   });
 
   it("returns focus to the menu button when the menu closes", async () => {
+    // Arrange
     await renderTree();
     await page.getByRole("heading", { name: "Categories" }).hover();
 
+    // Act
     await userEvent.tab();
     await userEvent.tab();
     await userEvent.keyboard("{Enter}");
+
+    // Assert
     await expect.element(page.getByRole("menu")).toBeVisible();
     await userEvent.keyboard("{Escape}");
 
@@ -109,10 +122,14 @@ describe("category menu", () => {
   });
 
   it("hides a visible category", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await item("Clothing").hover();
     await trigger("Clothing").click();
+
+    // Assert
     await expect
       .element(page.getByRole("menuitem", { name: "Make visible" }))
       .not.toBeInTheDocument();
@@ -127,10 +144,14 @@ describe("category menu", () => {
   });
 
   it("makes a hidden category visible again", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await item("Sale").hover();
     await trigger("Sale").click();
+
+    // Assert
     await expect.element(page.getByRole("menuitem", { name: "Hide" })).not.toBeInTheDocument();
     await page.getByRole("menuitem", { name: "Make visible" }).click();
 
@@ -146,9 +167,13 @@ describe("opening categories", () => {
   const chevron = (name: string) => page.getByRole("button", { name: `Open ${name}`, exact: true });
 
   it("opens and closes a category with its chevron, without following its link", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await chevron("Clothing").click();
+
+    // Assert
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Shirts")).toBeVisible();
 
@@ -159,6 +184,7 @@ describe("opening categories", () => {
   });
 
   it("shows the number of direct children next to the chevron, and neither without children", async () => {
+    // Act
     await render(
       <>
         <h2 id="heading">Categories</h2>
@@ -175,6 +201,7 @@ describe("opening categories", () => {
       </>,
     );
 
+    // Assert
     // Clothing has four categories below it, but only two directly.
     await expect.element(page.getByText("(2)", { exact: true })).toBeVisible();
     await expect.element(chevron("Clothing")).toBeVisible();
@@ -183,10 +210,13 @@ describe("opening categories", () => {
   });
 
   it("only follows the link when its row is clicked, without opening it", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await item("Clothing").click();
 
+    // Assert
     expect(visit).toHaveBeenCalledWith("/admin/categories/1", expect.anything());
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
   });
@@ -194,11 +224,15 @@ describe("opening categories", () => {
 
 describe("keyboard navigation with menus", () => {
   it("moves through the items with the arrow keys and never onto a menu button", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await expect.element(item("Clothing")).toHaveFocus();
 
+    // Act
     await userEvent.keyboard("{ArrowDown}");
+
+    // Assert
     await expect.element(item("Sale")).toHaveFocus();
     await userEvent.keyboard("{ArrowDown}");
     await expect.element(item("Toys")).toHaveFocus();
@@ -221,12 +255,16 @@ describe("keyboard navigation with menus", () => {
   });
 
   it("moves to an item's menu button with Tab and back with Shift+Tab, then arrows work again", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}");
     await expect.element(item("Sale")).toHaveFocus();
 
+    // Act
     await userEvent.tab();
+
+    // Assert
     await expect.element(trigger("Sale")).toHaveFocus();
 
     await userEvent.tab({ shift: true });
@@ -239,13 +277,16 @@ describe("keyboard navigation with menus", () => {
   });
 
   it("opens the menu with Arrow Down without moving to the next item", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.tab();
     await expect.element(trigger("Clothing")).toHaveFocus();
 
+    // Act
     await userEvent.keyboard("{ArrowDown}");
 
+    // Assert
     await expect.element(page.getByRole("menu")).toBeVisible();
     await expect.element(page.getByRole("menuitem", { name: "Add subcategory" })).toHaveFocus();
     await expect.element(item("Sale")).not.toHaveFocus();
@@ -277,8 +318,10 @@ describe("path to the current category", () => {
   );
 
   it("opens every category above the current one, which can still be closed", async () => {
+    // Act
     await render(tree(5));
 
+    // Assert
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Men")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Shirts")).toHaveAttribute("aria-current", "page");
@@ -292,8 +335,10 @@ describe("path to the current category", () => {
   });
 
   it("opens the current category when it has children, also when the page loads again", async () => {
+    // Act
     const screen = await render(tree(1));
 
+    // Assert
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Men")).toHaveAttribute("aria-expanded", "false");
 
@@ -302,24 +347,30 @@ describe("path to the current category", () => {
   });
 
   it("opens the path again when the page loads again after it was closed", async () => {
+    // Arrange
     const screen = await render(tree(5));
     await userEvent.tab();
     await userEvent.keyboard("{ArrowLeft}{ArrowLeft}{ArrowLeft}{ArrowLeft}");
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "false");
 
+    // Act
     // The layout stays mounted across Inertia visits, such as after saving the category.
     await screen.rerender(tree(5));
 
+    // Assert
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Men")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Shirts")).toBeVisible();
   });
 
   it("opens the path to a category that becomes current and keeps other open categories open", async () => {
+    // Arrange
     const screen = await render(tree(5));
 
+    // Act
     await screen.rerender(tree(6));
 
+    // Assert
     await expect.element(item("Sale")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Clearance")).toHaveAttribute("aria-current", "page");
     await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
@@ -366,9 +417,13 @@ describe("dragging categories", () => {
   }
 
   it("moves a category before or after another, counting its position without itself", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await drag("Toys", "Clothing", 3);
+
+    // Assert
     expect(post).toHaveBeenLastCalledWith(
       "/admin/categories/4/move",
       { parent_id: null, position: 0 },
@@ -384,10 +439,13 @@ describe("dragging categories", () => {
   });
 
   it("moves a category inside another when dropped onto its middle", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await drag("Toys", "Sale", 18);
 
+    // Assert
     expect(post).toHaveBeenCalledExactlyOnceWith(
       "/admin/categories/4/move",
       { parent_id: 3, position: 0 },
@@ -396,10 +454,13 @@ describe("dragging categories", () => {
   });
 
   it("does not move a category dropped where it already is", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await drag("Toys", "Sale", 33);
 
+    // Assert
     expect(post).not.toHaveBeenCalled();
   });
 });

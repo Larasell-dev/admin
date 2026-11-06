@@ -40,8 +40,10 @@ const item = (name: string) => page.getByRole("treeitem", { name, exact: true })
 
 describe("roles, states and properties", () => {
   it("labels the tree and nests child nodes in groups", async () => {
+    // Act
     await renderTree();
 
+    // Assert
     const tree = page.getByRole("tree", { name: "Food" });
     await expect.element(tree).toBeInTheDocument();
     await expect.element(tree).not.toHaveAttribute("aria-multiselectable", "true");
@@ -55,8 +57,10 @@ describe("roles, states and properties", () => {
   });
 
   it("sets aria-expanded on parent nodes only", async () => {
+    // Act
     await renderTree();
 
+    // Assert
     await expect.element(item("Fruits")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Vegetables")).toHaveAttribute("aria-expanded", "false");
     await expect.element(item("Apple")).not.toHaveAttribute("aria-expanded");
@@ -64,20 +68,26 @@ describe("roles, states and properties", () => {
   });
 
   it("does not render the children of closed nodes", async () => {
+    // Act
     await renderTree();
 
+    // Assert
     await expect.element(item("Carrot")).not.toBeInTheDocument();
   });
 
   it("leaves aria-selected off when nodes are not selectable", async () => {
+    // Act
     await renderTree();
 
+    // Assert
     await expect.element(item("Fruits")).not.toHaveAttribute("aria-selected");
   });
 
   it("marks exactly the selected node with aria-selected when selectable", async () => {
+    // Act
     await renderTree({ selectedId: "banana", onSelect: () => {} });
 
+    // Assert
     await expect.element(item("Banana")).toHaveAttribute("aria-selected", "true");
     await expect.element(item("Apple")).toHaveAttribute("aria-selected", "false");
     await expect.element(item("Fruits")).toHaveAttribute("aria-selected", "false");
@@ -86,8 +96,10 @@ describe("roles, states and properties", () => {
 
 describe("focus", () => {
   it("is a single tab stop that starts on the first node", async () => {
+    // Arrange
     await renderTree();
 
+    // Act & Assert
     await expect.element(item("Fruits")).toHaveAttribute("tabindex", "0");
     await expect.element(item("Apple")).toHaveAttribute("tabindex", "-1");
     await expect.element(item("Grains")).toHaveAttribute("tabindex", "-1");
@@ -97,30 +109,41 @@ describe("focus", () => {
   });
 
   it("starts on the selected node when one is selected", async () => {
+    // Arrange
     await renderTree({ selectedId: "grains", onSelect: () => {} });
 
+    // Act
     await userEvent.tab();
+
+    // Assert
     await expect.element(item("Grains")).toHaveFocus();
   });
 
   it("returns to the last focused node when tabbing back in", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}");
     await userEvent.tab();
     await userEvent.tab({ shift: true });
 
+    // Assert
     await expect.element(item("Banana")).toHaveFocus();
   });
 });
 
 describe("keyboard", () => {
   it("moves down and up through visible nodes, skipping closed ones", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
+
+    // Assert
     await expect.element(item("Vegetables")).toHaveFocus();
 
     await userEvent.keyboard("{ArrowDown}");
@@ -131,10 +154,14 @@ describe("keyboard", () => {
   });
 
   it("does not move past the first or last node", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("{ArrowUp}");
+
+    // Assert
     await expect.element(item("Fruits")).toHaveFocus();
 
     await userEvent.keyboard("{End}{ArrowDown}");
@@ -142,11 +169,15 @@ describe("keyboard", () => {
   });
 
   it("opens a closed node with Right Arrow without moving focus, then moves to its first child", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
 
+    // Act
     await userEvent.keyboard("{ArrowRight}");
+
+    // Assert
     await expect.element(item("Vegetables")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Vegetables")).toHaveFocus();
 
@@ -155,50 +186,70 @@ describe("keyboard", () => {
   });
 
   it("does nothing on Right Arrow at an end node", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}");
 
+    // Act
     await userEvent.keyboard("{ArrowRight}");
+
+    // Assert
     await expect.element(item("Apple")).toHaveFocus();
   });
 
   it("closes an open node with Left Arrow without moving focus", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("{ArrowLeft}");
+
+    // Assert
     await expect.element(item("Fruits")).toHaveAttribute("aria-expanded", "false");
     await expect.element(item("Fruits")).toHaveFocus();
     await expect.element(item("Apple")).not.toBeInTheDocument();
   });
 
   it("moves from a child node to its parent with Left Arrow", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}");
 
+    // Act
     await userEvent.keyboard("{ArrowLeft}");
+
+    // Assert
     await expect.element(item("Fruits")).toHaveFocus();
     await expect.element(item("Fruits")).toHaveAttribute("aria-expanded", "true");
   });
 
   it("does nothing on Left Arrow at a root end node", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.keyboard("{End}");
 
+    // Act
     await userEvent.keyboard("{ArrowLeft}");
+
+    // Assert
     await expect.element(item("Cherries")).toHaveFocus();
   });
 
   it("moves to the first node with Home and the last visible node with End", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{ArrowRight}");
 
+    // Act
     // Vegetables is open now, but its children sit above the last node.
     await userEvent.keyboard("{End}");
+
+    // Assert
     await expect.element(item("Cherries")).toHaveFocus();
 
     await userEvent.keyboard("{Home}");
@@ -206,10 +257,14 @@ describe("keyboard", () => {
   });
 
   it("opens every sibling of the focused node with *", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("*");
+
+    // Assert
     await expect.element(item("Vegetables")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Fruits")).toHaveAttribute("aria-expanded", "true");
     // Only siblings open, not their descendants.
@@ -218,11 +273,15 @@ describe("keyboard", () => {
   });
 
   it("moves to the next visible node starting with a typed character, wrapping around", async () => {
+    // Arrange
     await renderTree();
     await userEvent.tab();
 
+    // Act
     // Carrot and Celery start with "c" but are hidden inside the closed Vegetables.
     await userEvent.keyboard("c");
+
+    // Assert
     await expect.element(item("Cherries")).toHaveFocus();
 
     await userEvent.keyboard("b");
@@ -232,6 +291,7 @@ describe("keyboard", () => {
 
 describe("controls inside a row", () => {
   it("tells each row whether it is the tree's tab stop", async () => {
+    // Arrange
     await render(
       <Tree
         aria-label="Food"
@@ -245,6 +305,7 @@ describe("controls inside a row", () => {
       />,
     );
 
+    // Act & Assert
     await expect.element(item("Fruits")).toHaveAttribute("data-tabbable", "true");
     await expect.element(item("Grains")).toHaveAttribute("data-tabbable", "false");
 
@@ -255,6 +316,7 @@ describe("controls inside a row", () => {
   });
 
   it("leaves keys pressed in a control to that control", async () => {
+    // Arrange
     await render(
       <Tree
         aria-label="Food"
@@ -271,21 +333,27 @@ describe("controls inside a row", () => {
       />,
     );
 
+    // Act
     const edit = page.getByRole("button", { name: "Edit Fruits" });
     edit.element().focus();
     await userEvent.keyboard("{ArrowDown}{End}g");
 
+    // Assert
     await expect.element(edit).toHaveFocus();
   });
 });
 
 describe("selection", () => {
   it("selects the focused node with Enter and Space", async () => {
+    // Arrange
     const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("{ArrowDown}{Enter}");
+
+    // Assert
     expect(onSelect).toHaveBeenLastCalledWith("apple");
 
     await userEvent.keyboard("{ArrowDown} ");
@@ -293,29 +361,41 @@ describe("selection", () => {
   });
 
   it("does not select when moving focus", async () => {
+    // Arrange
     const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{End}{Home}");
+
+    // Assert
     expect(onSelect).not.toHaveBeenCalled();
   });
 });
 
 describe("pointer", () => {
   it("focuses and selects a clicked node", async () => {
+    // Arrange
     const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
 
+    // Act
     await item("Banana").getByText("Banana").click();
+
+    // Assert
     await expect.element(item("Banana")).toHaveFocus();
     expect(onSelect).toHaveBeenCalledExactlyOnceWith("banana");
   });
 
   it("toggles a clicked parent node", async () => {
+    // Arrange
     await renderTree();
 
+    // Act
     await item("Vegetables").getByText("Vegetables").click();
+
+    // Assert
     await expect.element(item("Vegetables")).toHaveAttribute("aria-expanded", "true");
     await expect.element(item("Vegetables")).toHaveFocus();
 
@@ -324,10 +404,14 @@ describe("pointer", () => {
   });
 
   it("selects only the clicked child, not its ancestors", async () => {
+    // Arrange
     const onSelect = vi.fn<(id: string) => void>();
     await renderTree({ onSelect });
 
+    // Act
     await item("Apple").getByText("Apple").click();
+
+    // Assert
     expect(onSelect).toHaveBeenCalledExactlyOnceWith("apple");
     await expect.element(item("Fruits")).toHaveAttribute("aria-expanded", "true");
   });
@@ -359,8 +443,10 @@ describe("render prop", () => {
   }
 
   it("renders each tree item as the given element, keeping its tree semantics", async () => {
+    // Act
     await renderLinkTree(() => {});
 
+    // Assert
     const fruits = item("Fruits");
     expect(fruits.element().tagName).toBe("A");
     await expect.element(fruits).toHaveAttribute("href", "#fruits");
@@ -370,11 +456,15 @@ describe("render prop", () => {
   });
 
   it("activates the focused item with Enter, running the tree's and the consumer's click handlers", async () => {
+    // Arrange
     const onLinkClick = vi.fn<(href: string) => void>();
     await renderLinkTree(onLinkClick);
     await userEvent.tab();
 
+    // Act
     await userEvent.keyboard("{End}{Enter}");
+
+    // Assert
     expect(onLinkClick).toHaveBeenCalledExactlyOnceWith("#cherries");
 
     await userEvent.keyboard("{Home}{Enter}");
@@ -385,6 +475,7 @@ describe("render prop", () => {
   });
 
   it("passes the item state to a render function", async () => {
+    // Act
     await render(
       <Tree
         aria-label="Food"
@@ -405,6 +496,7 @@ describe("render prop", () => {
       />,
     );
 
+    // Assert
     await expect.element(page.getByTestId("fruits-0-true")).toBeInTheDocument();
     await expect.element(page.getByTestId("apple-1-undefined")).toBeInTheDocument();
     await expect.element(page.getByTestId("vegetables-0-false")).toBeInTheDocument();

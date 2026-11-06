@@ -61,6 +61,7 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 it("asks for the password once the session expired and signs back in on the same page", async () => {
+  // Arrange
   const requests = fakeServer(
     {
       status: 422,
@@ -71,7 +72,10 @@ it("asks for the password once the session expired and signs back in on the same
   await renderPage();
   await expect.element(dialog()).not.toBeInTheDocument();
 
+  // Act
   expireSession();
+
+  // Assert
   await expect.element(dialog()).toBeVisible();
 
   await dialog().getByLabelText("Password").fill("wrong");
@@ -100,13 +104,16 @@ it("asks for the password once the session expired and signs back in on the same
 });
 
 it("holds back visits while the session is expired, except to the sign-in page", async () => {
+  // Arrange
   const signInPage = { component: "Page", url: "/admin/login", version: null, props };
   const requests = fakeServer({ status: 200, data: JSON.stringify(signInPage) });
   await renderPage();
   cookies.delete("XSRF-TOKEN");
 
+  // Act
   router.visit("/admin/categories");
 
+  // Assert
   await expect.element(dialog()).toBeVisible();
   expect(requests).toEqual([]);
 

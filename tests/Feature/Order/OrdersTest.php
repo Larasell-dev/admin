@@ -37,10 +37,12 @@ function signInOrdersAdmin(): Admin
 }
 
 it('lists orders with their customer, status and total, newest first', function () {
+    // Arrange
     signInOrdersAdmin();
     createOrder('1001', ['customer_name' => 'Ada Lovelace', 'status' => OrderStatus::Paid, 'total' => Price::of(1250), 'created_at' => now()->subDays(2)]);
     createOrder('1002', ['customer_name' => 'Alan Turing', 'currency' => Currency::USD, 'total' => Price::of(99)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -65,9 +67,11 @@ it('lists orders with their customer, status and total, newest first', function 
 });
 
 it('colours each order status', function (OrderStatus $status, string $label, string $variant) {
+    // Arrange
     signInOrdersAdmin();
     createOrder('1001', ['status' => $status]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('table.rows.0.status', $label)
@@ -81,8 +85,10 @@ it('colours each order status', function (OrderStatus $status, string $label, st
 ]);
 
 it('explains that there are no orders yet', function () {
+    // Arrange
     signInOrdersAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('table.pagination.total', 0)
@@ -91,21 +97,26 @@ it('explains that there are no orders yet', function () {
 });
 
 it('redirects guests away from the orders', function () {
+    // Act & Assert
     $this->get(route('larasell.admin.orders.index'))->assertRedirect(route('larasell.admin.login'));
 });
 
 it('shows Orders in the navigation between Categories and Customers', function () {
+    // Arrange
     signInOrdersAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Customers', 'Settings']));
 });
 
 it('turns the orders off when disabled in the config', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.orders.enabled' => false]));
     signInOrdersAdmin();
 
+    // Act & Assert
     expect(Route::has('larasell.admin.orders.index'))->toBeFalse();
 
     expect(Route::has('larasell.admin.orders.show'))->toBeFalse();
@@ -170,10 +181,12 @@ function createPlacedOrder(array $attributes = []): Order
 }
 
 it('shows an order with its items, summary, customer, addresses, payments and shipping', function () {
+    // Arrange
     signInOrdersAdmin();
     $order = createPlacedOrder();
     $order->payments()->create(['provider' => 'manual', 'method' => 'cash', 'status' => PaymentStatus::Succeeded, 'reference' => '2026-REF-1', 'amount' => Price::of(5662)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -204,9 +217,11 @@ it('shows an order with its items, summary, customer, addresses, payments and sh
 });
 
 it('shows an order without discount, shipping, tax, addresses or payments', function () {
+    // Arrange
     signInOrdersAdmin();
     $order = createOrder('1001', ['subtotal' => Price::of(1000), 'total' => Price::of(1000)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('order.status', ['label' => 'Pending payment', 'variant' => 'warning'])
@@ -220,9 +235,11 @@ it('shows an order without discount, shipping, tax, addresses or payments', func
 });
 
 it('shows the tax that prices include, and a tax total without a breakdown', function () {
+    // Arrange
     signInOrdersAdmin();
     $order = createPlacedOrder(['tax_price_mode' => TaxPriceMode::Inclusive, 'tax_snapshot' => null, 'total' => Price::of(4750)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('order.taxes', [['label' => 'Tax', 'amount' => '€9.12']])
@@ -231,11 +248,13 @@ it('shows the tax that prices include, and a tax total without a breakdown', fun
 });
 
 it('lists the order\'s payments, newest first', function () {
+    // Arrange
     signInOrdersAdmin();
     $order = createPlacedOrder();
     $order->payments()->create(['provider' => 'stripe', 'method' => 'card', 'status' => PaymentStatus::Failed, 'amount' => Price::of(5662), 'created_at' => now()->subHour()]);
     $order->payments()->create(['provider' => 'manual', 'method' => 'cash', 'status' => PaymentStatus::Pending, 'amount' => Price::of(5662)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('order.payments.0.method', 'cash')
@@ -246,40 +265,50 @@ it('lists the order\'s payments, newest first', function () {
 });
 
 it('links the order to its customer', function () {
+    // Arrange
     signInOrdersAdmin();
     $customer = Customer::create(['first_name' => 'Jane', 'last_name' => 'Doe']);
     $order = createPlacedOrder(['customer_id' => $customer->id]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('customerUrl', route('larasell.admin.customers.edit', $customer)));
 });
 
 it('does not link the order to its customer while the customers are turned off', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.customers.enabled' => false]));
     signInOrdersAdmin();
     $customer = Customer::create(['first_name' => 'Jane', 'last_name' => 'Doe']);
     $order = createPlacedOrder(['customer_id' => $customer->id]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('customerUrl', null));
 });
 
 it('links each order in the table to its page', function () {
+    // Arrange
     signInOrdersAdmin();
     $order = createOrder('1001');
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.rows.0._link', route('larasell.admin.orders.show', $order)));
 });
 
 it('shows the not found page for an order that does not exist', function () {
+    // Arrange
     signInOrdersAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', 999))->assertNotFound();
 });
 
 it('redirects guests away from an order', function () {
+    // Arrange
     $order = createOrder('1001');
 
+    // Act & Assert
     $this->get(route('larasell.admin.orders.show', $order))->assertRedirect(route('larasell.admin.login'));
 });

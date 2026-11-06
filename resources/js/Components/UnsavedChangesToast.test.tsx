@@ -58,10 +58,14 @@ const toast = () => page.getByRole("region", { name: "Unsaved changes" });
 const name = () => page.getByLabelText("Name");
 
 it("only appears once the form has unsaved changes", async () => {
+  // Arrange
   await renderPage();
   await expect.element(toast()).not.toBeInTheDocument();
 
+  // Act
   await name().fill("Boots");
+
+  // Assert
   await expect.element(toast()).toBeVisible();
 
   await name().fill("Shoes");
@@ -69,43 +73,55 @@ it("only appears once the form has unsaved changes", async () => {
 });
 
 it("resets the whole form on cancel", async () => {
+  // Arrange
   await renderPage();
   await name().fill("Boots");
 
+  // Act
   await toast().getByRole("button", { name: "Cancel" }).click();
 
+  // Assert
   await expect.element(name()).toHaveValue("Shoes");
   await expect.element(toast()).not.toBeInTheDocument();
 });
 
 it("blocks navigating away only while the form has unsaved changes", async () => {
+  // Arrange
   await renderPage();
   expect(wasCancelled(() => router.visit("/admin/elsewhere"))).toBe(false);
 
+  // Act
   await name().fill("Boots");
+
+  // Assert
   await expect.element(toast()).toBeVisible();
   // The toast starts blocking in an effect, just after it appears.
   await expect.poll(() => wasCancelled(() => router.visit("/admin/elsewhere"))).toBe(true);
 });
 
 it("still prefetches links while the form has unsaved changes", async () => {
+  // Arrange
   await renderPage();
   await name().fill("Boots");
   await expect.element(toast()).toBeVisible();
 
+  // Act & Assert
   expect(wasCancelled(() => router.prefetch("/admin/elsewhere"))).toBe(false);
 });
 
 it("lets its save button submit the form", async () => {
+  // Arrange
   await renderPage();
   await name().fill("Boots");
   await expect.element(toast()).toBeVisible();
   const save = toast().getByRole("button", { name: "Save" }).element() as HTMLButtonElement;
 
+  // Act & Assert
   expect(wasCancelled(() => save.click())).toBe(false);
 });
 
 it("doesn't save while anything in the form is busy, like an upload", async () => {
+  // Arrange
   await renderPage();
   await name().fill("Boots");
   const save = toast().getByRole("button", { name: "Save" });
@@ -113,8 +129,10 @@ it("doesn't save while anything in the form is busy, like an upload", async () =
   const upload = document.createElement("div");
   upload.setAttribute("aria-busy", "true");
 
+  // Act
   name().element().after(upload);
 
+  // Assert
   await expect.element(save).toBeDisabled();
 
   upload.setAttribute("aria-busy", "false");
@@ -123,6 +141,7 @@ it("doesn't save while anything in the form is busy, like an upload", async () =
 });
 
 it("asks before leaving the site only while the form has unsaved changes", async () => {
+  // Arrange
   await renderPage();
   const unload = () => {
     const event = new Event("beforeunload", { cancelable: true });
@@ -131,7 +150,11 @@ it("asks before leaving the site only while the form has unsaved changes", async
   };
 
   expect(unload()).toBe(false);
+
+  // Act
   await name().fill("Boots");
+
+  // Assert
   await expect.element(toast()).toBeVisible();
   await expect.poll(unload).toBe(true);
 });
@@ -147,12 +170,14 @@ class Boundary extends Component<{ children: ReactNode }, { error: string | null
 }
 
 it("throws outside an Inertia form", async () => {
+  // Act
   await render(
     <Boundary>
       <UnsavedChangesToast />
     </Boundary>,
   );
 
+  // Assert
   await expect
     .element(page.getByText("UnsavedChangesToast must be rendered inside an Inertia <Form>."))
     .toBeInTheDocument();

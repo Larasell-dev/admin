@@ -6,16 +6,19 @@ const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 describe("slugify", () => {
   it("lowercases words and joins them with dashes", () => {
+    // Act & Assert
     expect(slugify("Running Shoes")).toBe("running-shoes");
     expect(slugify("SHOES")).toBe("shoes");
   });
 
   it("keeps numbers", () => {
+    // Act & Assert
     expect(slugify("Summer Sale 2026")).toBe("summer-sale-2026");
     expect(slugify("42")).toBe("42");
   });
 
   it("treats every kind of whitespace as one separator", () => {
+    // Act & Assert
     expect(slugify("Running   Shoes")).toBe("running-shoes");
     expect(slugify("Running\tShoes\nfor Kids")).toBe("running-shoes-for-kids");
     expect(slugify("Running\u00a0Shoes")).toBe("running-shoes");
@@ -23,12 +26,14 @@ describe("slugify", () => {
   });
 
   it("trims separators from both ends", () => {
+    // Act & Assert
     expect(slugify("  Shoes  ")).toBe("shoes");
     expect(slugify("--Shoes--")).toBe("shoes");
     expect(slugify("!Shoes?")).toBe("shoes");
   });
 
   it("collapses runs of separators into a single dash", () => {
+    // Act & Assert
     expect(slugify("Shoes -- Socks")).toBe("shoes-socks");
     expect(slugify("Shoes & Socks")).toBe("shoes-socks");
     expect(slugify("Shoes / Socks / Hats")).toBe("shoes-socks-hats");
@@ -36,6 +41,7 @@ describe("slugify", () => {
   });
 
   it("treats punctuation and typographic dashes as separators", () => {
+    // Act & Assert
     expect(slugify("Size 42.5")).toBe("size-42-5");
     expect(slugify("Shoes, Socks; Hats: Gloves")).toBe("shoes-socks-hats-gloves");
     expect(slugify("Shoes (Kids)")).toBe("shoes-kids");
@@ -44,12 +50,14 @@ describe("slugify", () => {
   });
 
   it("drops apostrophes instead of splitting the word", () => {
+    // Act & Assert
     expect(slugify("Men's Shoes")).toBe("mens-shoes");
     expect(slugify("Men’s Shoes")).toBe("mens-shoes");
     expect(slugify("Rock 'n' Roll")).toBe("rock-n-roll");
   });
 
   it("strips accents from letters", () => {
+    // Act & Assert
     expect(slugify("Café Crème")).toBe("cafe-creme");
     expect(slugify("Ñandú")).toBe("nandu");
     expect(slugify("Čevapčići")).toBe("cevapcici");
@@ -58,6 +66,7 @@ describe("slugify", () => {
   });
 
   it("spells out letters that have no accent to strip", () => {
+    // Act & Assert
     expect(slugify("Straße")).toBe("strasse");
     expect(slugify("STRAẞE")).toBe("strasse");
     expect(slugify("Æble Œuvre")).toBe("aeble-oeuvre");
@@ -70,6 +79,7 @@ describe("slugify", () => {
   });
 
   it("folds compatibility characters to their plain form", () => {
+    // Act & Assert
     expect(slugify("ﬁne ﬂour")).toBe("fine-flour");
     expect(slugify("ＳＨＯＥＳ")).toBe("shoes");
     expect(slugify("Size ½")).toBe("size-1-2");
@@ -77,6 +87,7 @@ describe("slugify", () => {
   });
 
   it("drops characters it cannot spell in ASCII", () => {
+    // Act & Assert
     expect(slugify("Shoes 👟")).toBe("shoes");
     expect(slugify("Обувь Shoes")).toBe("shoes");
     expect(slugify("靴 Shoes 靴")).toBe("shoes");
@@ -84,6 +95,7 @@ describe("slugify", () => {
   });
 
   it("returns an empty slug when nothing can be kept", () => {
+    // Act & Assert
     expect(slugify("")).toBe("");
     expect(slugify("   ")).toBe("");
     expect(slugify("---")).toBe("");
@@ -93,18 +105,21 @@ describe("slugify", () => {
   });
 
   it("leaves a valid slug unchanged", () => {
+    // Act & Assert
     for (const slug of ["shoes", "running-shoes", "summer-sale-2026", "a-1-b-2"]) {
       expect(slugify(slug)).toBe(slug);
     }
   });
 
   it("gives the same slug when applied twice", () => {
+    // Act & Assert
     for (const name of ["Men's Shoes", "Straße & Café", " --Size ½-- ", "ﬁne 👟 Łódź"]) {
       expect(slugify(slugify(name))).toBe(slugify(name));
     }
   });
 
   it("only produces slugs the server accepts", () => {
+    // Arrange
     const names = [
       "Running Shoes",
       "  Men’s Shoes & Socks (Kids) – 2026!  ",
@@ -115,6 +130,7 @@ describe("slugify", () => {
       "Shoes 👟 Обувь",
     ];
 
+    // Act & Assert
     for (const name of names) {
       expect(slugify(name)).toMatch(VALID_SLUG);
     }

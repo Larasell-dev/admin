@@ -83,8 +83,10 @@ function audit(AuditRecord $record, Actor|UnknownActor|null $actor = null): void
 }
 
 it('stores a record with its event, actor, subject and properties', function () {
+    // Act
     audit(bookArchived(), new SystemActor('inventory-reconciliation'));
 
+    // Assert
     $record = DB::table('larasell_audit_log')->sole();
 
     expect(Str::isUlid($record->id))->toBeTrue()
@@ -106,10 +108,12 @@ it('stores a record with its event, actor, subject and properties', function () 
 });
 
 it('has no updated_at, since records never change', function () {
+    // Act & Assert
     expect(Schema::getColumnListing('larasell_audit_log'))->toContain('created_at')->not->toContain('updated_at');
 });
 
 it('stores times in UTC, and when it happened apart from when it was recorded', function () {
+    // Arrange
     config(['app.timezone' => 'Europe/Berlin']);
     date_default_timezone_set('Europe/Berlin');
 
@@ -117,8 +121,10 @@ it('stores times in UTC, and when it happened apart from when it was recorded', 
         // 14:00 in Berlin is 13:00 UTC.
         $this->travelTo(Carbon::parse('2026-10-30 14:00:00'));
 
+        // Act
         audit(bookArchived(occurredAt: now()->subMinutes(5)), new SystemActor('inventory-reconciliation'));
 
+        // Assert
         expect(DB::table('larasell_audit_log')->sole())->toMatchArray([
             'occurred_at' => '2026-10-30 12:55:00.000000',
             'created_at' => '2026-10-30 13:00:00.000000',
@@ -129,6 +135,7 @@ it('stores times in UTC, and when it happened apart from when it was recorded', 
 });
 
 it('refuses to record outside a transaction, where the change could commit without its record', function () {
+    // Act & Assert
     expect(fn () => app(Auditor::class)->record(bookArchived(), new SystemActor('inventory-reconciliation')))
         ->toThrow(AuditFailed::class);
 
@@ -136,6 +143,7 @@ it('refuses to record outside a transaction, where the change could commit witho
 });
 
 it('records outside a transaction when the record changes nothing it must commit with', function () {
+    // Arrange
     $signInFailed = new class extends AuditRecord
     {
         public function event(): string
@@ -164,20 +172,25 @@ it('records outside a transaction when the record changes nothing it must commit
         }
     };
 
+    // Act
     app(Auditor::class)->record($signInFailed, new UnknownActor('No one was signed in.'));
 
+    // Assert
     expect(DB::table('larasell_audit_log')->sole()->event)->toBe('admin.sign_in_failed');
 });
 
 it('requires an explicit actor on the command line', function () {
+    // Act & Assert
     expect(fn () => audit(bookArchived()))->toThrow(AuditFailed::class);
 
     expect(DB::table('larasell_audit_log')->count())->toBe(0);
 });
 
 it('stores an unknown actor with the reason it is unknown', function () {
+    // Act
     audit(bookArchived(), new UnknownActor('Imported from the previous shop system.'));
 
+    // Assert
     expect(DB::table('larasell_audit_log')->sole())->toMatchArray([
         'actor_type' => 'unknown',
         'actor_id' => null,
@@ -186,6 +199,7 @@ it('stores an unknown actor with the reason it is unknown', function () {
 });
 
 it('requires a name for system actors and a reason for unknown ones', function (Closure $actor) {
+    // Act & Assert
     expect($actor)->toThrow(AuditFailed::class);
 })->with([
     'a system actor without a name' => [fn () => new SystemActor('')],
@@ -193,11 +207,14 @@ it('requires a name for system actors and a reason for unknown ones', function (
 ]);
 
 it('records the API token as the actor of API requests', function () {
+    // Arrange
     $apiToken = ApiToken::query()->create(['name' => 'ERP sync', 'token_hash' => hash('sha256', 'larasell_erp'), 'expires_at' => now()->addMonth()]);
     Route::middleware(['api', 'larasell.api'])->post('api/books/archive', fn () => audit(bookArchived()));
 
+    // Act
     $this->postJson('api/books/archive', headers: ['Authorization' => 'Bearer larasell_erp'])->assertOk();
 
+    // Assert
     expect(DB::table('larasell_audit_log')->sole())->toMatchArray([
         'actor_type' => 'api_token',
         'actor_id' => (string) $apiToken->id,
@@ -206,6 +223,7 @@ it('records the API token as the actor of API requests', function () {
 });
 
 it('shares the correlation ID of a request with the jobs it dispatches, which record as jobs', function () {
+    // Arrange
     Route::middleware('web')->post('books/archive', function () {
         audit(bookArchived());
         dispatch(static function (): void {
@@ -214,8 +232,10 @@ it('shares the correlation ID of a request with the jobs it dispatches, which re
         audit(bookArchived());
     });
 
+    // Act
     $this->actingAs($this->ada, 'larasell-admin')->post('books/archive')->assertOk();
 
+    // Assert
     $records = DB::table('larasell_audit_log')->orderBy('id')->get();
 
     expect($records->pluck('source')->all())->toBe(['web', 'job', 'web'])
@@ -225,6 +245,7 @@ it('shares the correlation ID of a request with the jobs it dispatches, which re
 });
 
 it('requires an explicit actor in jobs, even ones a signed-in admin\'s request runs', function () {
+    // Arrange
     Route::middleware('web')->post('books/archive', function (): void {
         dispatch(static function (): void {
             audit(bookArchived());
@@ -232,8 +253,10 @@ it('requires an explicit actor in jobs, even ones a signed-in admin\'s request r
     });
     Route::middleware('web')->post('books/restore', fn () => audit(bookArchived()));
 
+    // Act
     $this->actingAs($this->ada, 'larasell-admin')->post('books/archive')->assertServerError();
 
+    // Assert
     expect(DB::table('larasell_audit_log')->count())->toBe(0);
 
     // The failed job is over, so the next request's record is the admin's again.
@@ -243,6 +266,7 @@ it('requires an explicit actor in jobs, even ones a signed-in admin\'s request r
 });
 
 it('rejects properties that look like credentials', function (array $properties) {
+    // Act & Assert
     expect(fn () => audit(bookArchived($properties), new SystemActor('inventory-reconciliation')))
         ->toThrow(AuditFailed::class);
 
@@ -256,6 +280,7 @@ it('rejects properties that look like credentials', function (array $properties)
 ]);
 
 it('rejects properties that aren\'t plain values, so each record decides how to store them', function (array $properties) {
+    // Act & Assert
     expect(fn () => audit(bookArchived($properties), new SystemActor('inventory-reconciliation')))
         ->toThrow(AuditFailed::class);
 })->with([

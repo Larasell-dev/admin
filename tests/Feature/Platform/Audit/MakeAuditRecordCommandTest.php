@@ -12,8 +12,10 @@ afterEach(function () {
 });
 
 it('scaffolds an audit record in the AuditRecords namespace', function () {
+    // Act
     $this->artisan('make:larasell-audit-record', ['name' => 'Products/ProductCreated'])->assertSuccessful();
 
+    // Assert
     $path = app_path('AuditRecords/Products/ProductCreated.php');
 
     expect(File::get($path))
@@ -32,8 +34,10 @@ it('scaffolds an audit record in the AuditRecords namespace', function () {
 });
 
 it('names the event after what happened to what', function (string $name, string $event) {
+    // Act
     $this->artisan('make:larasell-audit-record', ['name' => $name])->assertSuccessful();
 
+    // Assert
     expect(File::get(app_path('AuditRecords/'.$name.'.php')))->toContain("return '{$event}';");
 })->with([
     'a two-word subject' => ['ProductReviewApproved', 'product_review.approved'],
@@ -41,9 +45,11 @@ it('names the event after what happened to what', function (string $name, string
 ]);
 
 it('keeps an existing record unless forced', function () {
+    // Arrange
     $this->artisan('make:larasell-audit-record', ['name' => 'OrderRefunded'])->assertSuccessful();
     File::put(app_path('AuditRecords/OrderRefunded.php'), '<?php // edited');
 
+    // Act & Assert
     // Like Laravel's own make commands: it says so rather than failing.
     $this->artisan('make:larasell-audit-record', ['name' => 'OrderRefunded'])->expectsOutputToContain('already exists');
     expect(File::get(app_path('AuditRecords/OrderRefunded.php')))->toBe('<?php // edited');

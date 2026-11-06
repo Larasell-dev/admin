@@ -12,14 +12,18 @@ beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
 it("calls the latest callback without restarting the timer, until ms changes", async () => {
+  // Arrange
   const first = vi.fn<() => void>();
   const second = vi.fn<() => void>();
   const screen = await render(<Ticker onTick={first} ms={1000} />);
 
+  // Act
   vi.advanceTimersByTime(600);
   await screen.rerender(<Ticker onTick={second} ms={1000} />);
   // The timer kept going, so it fires 400ms after the rerender, and calls the new callback.
   vi.advanceTimersByTime(400);
+
+  // Assert
   expect(first).not.toHaveBeenCalled();
   expect(second).toHaveBeenCalledTimes(1);
 
@@ -33,11 +37,15 @@ it("calls the latest callback without restarting the timer, until ms changes", a
 });
 
 it("stops when cleared or unmounted", async () => {
+  // Arrange
   const onTick = vi.fn<() => void>();
   const screen = await render(<Ticker onTick={onTick} ms={1000} />);
 
+  // Act
   (page.getByRole("button", { name: "Stop" }).element() as HTMLButtonElement).click();
   vi.advanceTimersByTime(3000);
+
+  // Assert
   expect(onTick).not.toHaveBeenCalled();
 
   await screen.rerender(<Ticker onTick={onTick} ms={2000} />);

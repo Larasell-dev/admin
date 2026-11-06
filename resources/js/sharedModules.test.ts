@@ -4,6 +4,7 @@ import { sharedModules } from "./sharedModules";
 // The admin Vite plugin generates the stand-in modules that extensions import from this file,
 // so every export of the panel's copies is available to them. Update it with `npx vitest -u`.
 it("lists every export that extensions can import from the panel", async () => {
+  // Act
   const exports = Object.fromEntries(
     Object.entries(sharedModules).map(([id, module]) => [
       id,
@@ -13,10 +14,12 @@ it("lists every export that extensions can import from the panel", async () => {
     ]),
   );
 
+  // Assert
   await expect(`${JSON.stringify(exports, null, 2)}\n`).toMatchFileSnapshot("../vite/exports.json");
 });
 
 it("shares the panel's own extension API", () => {
+  // Act & Assert
   expect(Object.keys(sharedModules["@larasell-dev/admin"]).sort()).toEqual([
     "Highlight",
     "Larasell",

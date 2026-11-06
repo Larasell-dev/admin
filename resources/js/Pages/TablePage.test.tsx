@@ -36,8 +36,10 @@ const table = (total: number, overrides: Partial<TableResource> = {}): TableReso
 });
 
 it("links each header action, in order, next to the title", async () => {
+  // Act
   await render(<TablePage table={table(1, { headerActions: [importBooks, addBook] })} />);
 
+  // Assert
   const header = page.getByRole("banner");
   await expect.element(header.getByRole("heading", { name: "Books" })).toBeVisible();
   await expect
@@ -55,6 +57,7 @@ it("links each header action, in order, next to the title", async () => {
 });
 
 it("keeps the header but swaps its actions for the empty state's when the table has no rows", async () => {
+  // Act
   await render(
     <TablePage
       table={table(0, {
@@ -64,6 +67,7 @@ it("keeps the header but swaps its actions for the empty state's when the table 
     />,
   );
 
+  // Assert
   await expect.element(page.getByText("No books yet")).toBeVisible();
   await expect
     .element(page.getByRole("link", { name: "Add book" }))

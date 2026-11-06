@@ -108,11 +108,14 @@ const formData = () => new FormData(page.getByTestId("form").element() as HTMLFo
 const submitted = () => Object.fromEntries(formData());
 
 it("starts a new product empty and visible, with a slug that follows the name", async () => {
+  // Arrange
   await renderForm();
   await expect.element(visible()).toBeChecked();
 
+  // Act
   await userEvent.type(nameInput(), "Linen Shirt");
 
+  // Assert
   await expect.element(slugInput()).toHaveValue("linen-shirt");
   expect(submitted()).toMatchObject({
     name: "Linen Shirt",
@@ -122,12 +125,15 @@ it("starts a new product empty and visible, with a slug that follows the name", 
 });
 
 it("shows an existing product's values and leaves its slug alone", async () => {
+  // Arrange
   await renderForm({ ...boots, visible: false });
   await expect.element(nameInput()).toHaveValue("Boots");
   await expect.element(visible()).not.toBeChecked();
 
+  // Act
   await userEvent.type(nameInput(), " for rain");
 
+  // Assert
   await expect.element(slugInput()).toHaveValue("boots");
   expect(submitted()).toMatchObject({ name: "Boots for rain", slug: "boots", status: "hidden" });
 });
@@ -142,8 +148,10 @@ const dimensionsUnit = () => unitOf("Length");
 
 describe("weight and dimensions", () => {
   it("starts a new product without them, in kilograms and centimeters", async () => {
+    // Act
     await renderForm();
 
+    // Assert
     await expect.element(weight()).toHaveValue("");
     await expect.element(weightUnit()).toHaveValue("kg");
     await expect.element(dimensionsUnit()).toHaveValue("cm");
@@ -158,12 +166,14 @@ describe("weight and dimensions", () => {
   });
 
   it("shows an existing product's weight and dimensions in the units they were saved in", async () => {
+    // Act
     await renderForm({
       ...boots,
       weight: { amount: "12.5", unit: "lb" },
       dimensions: { length: "50", width: "35.5", height: "0", unit: "in" },
     });
 
+    // Assert
     await expect.element(weight()).toHaveValue("12.5");
     await expect.element(weightUnit()).toHaveValue("lb");
     await expect.element(axis("Width")).toHaveValue("35.5");
@@ -172,22 +182,28 @@ describe("weight and dimensions", () => {
   });
 
   it("only relabels the weight when its unit changes", async () => {
+    // Arrange
     await renderForm({ ...boots, weight: { amount: "1.5", unit: "kg" } });
 
+    // Act
     await userEvent.selectOptions(weightUnit(), "g");
 
+    // Assert
     await expect.element(weight()).toHaveValue("1.5");
     expect(submitted()).toMatchObject({ "weight[amount]": "1.5", "weight[unit]": "g" });
   });
 
   it("keeps one unit for all three dimensions, whichever select changes it", async () => {
+    // Arrange
     await renderForm({
       ...boots,
       dimensions: { length: "50", width: "35", height: "5", unit: "cm" },
     });
 
+    // Act
     await userEvent.selectOptions(unitOf("Height"), "in");
 
+    // Assert
     await expect.element(unitOf("Length")).toHaveValue("in");
     await expect.element(unitOf("Width")).toHaveValue("in");
     expect(formData().getAll("dimensions[unit]")).toEqual(["in"]);
@@ -200,16 +216,20 @@ const barcode = () => page.getByRole("textbox", { name: "Barcode" });
 
 describe("SKU and barcode", () => {
   it("starts a new product without them", async () => {
+    // Act
     await renderForm();
 
+    // Assert
     await expect.element(sku()).toHaveValue("");
     await expect.element(barcode()).toHaveValue("");
     expect(submitted()).toMatchObject({ sku: "", barcode: "" });
   });
 
   it("shows an existing product's SKU and barcode", async () => {
+    // Act
     await renderForm({ ...boots, sku: "BOOT-42", barcode: "4006381333931" });
 
+    // Assert
     await expect.element(sku()).toHaveValue("BOOT-42");
     await expect.element(barcode()).toHaveValue("4006381333931");
   });
@@ -222,8 +242,10 @@ const maxQuantity = () => page.getByRole("textbox", { name: "Maximum quantity" }
 
 describe("stock", () => {
   it("starts a new product untracked, without backorders and with no quantity limits", async () => {
+    // Act
     await renderForm();
 
+    // Assert
     await expect.element(stock()).toHaveValue("");
     await expect.element(backorders()).not.toBeChecked();
     await expect.element(minQuantity()).toHaveValue("");
@@ -237,6 +259,7 @@ describe("stock", () => {
   });
 
   it("shows an existing product's stock and limits, and submits backorders turned on", async () => {
+    // Act
     await renderForm({
       ...boots,
       stock: -3,
@@ -245,6 +268,7 @@ describe("stock", () => {
       maxQuantity: 24,
     });
 
+    // Assert
     await expect.element(stock()).toHaveValue("-3");
     await expect.element(backorders()).not.toBeChecked();
     await expect.element(minQuantity()).toHaveValue("6");
@@ -286,8 +310,10 @@ const toast = () => page.getByRole("region", { name: "Unsaved changes" });
 
 describe("categories", () => {
   it("starts with every category closed and opens and closes them with their chevron", async () => {
+    // Act
     await renderForm(undefined, categories);
 
+    // Assert
     await expect.element(page.getByRole("tree", { name: "Categories" })).toBeVisible();
     await expect.element(categoryItem("Clothing")).toHaveAttribute("aria-expanded", "false");
     await expect.element(categoryItem("Shirts")).not.toBeInTheDocument();
@@ -307,10 +333,13 @@ describe("categories", () => {
   });
 
   it("selects and unselects a category with every category inside it, even while closed", async () => {
+    // Arrange
     await renderForm(undefined, categories);
 
+    // Act
     await categoryItem("Clothing").click();
 
+    // Assert
     await expect.element(categoryItem("Clothing")).toHaveAttribute("aria-checked", "true");
     expect(submittedCategories()).toEqual([1, 2, 3, 4, 5]);
     await openButton("Clothing").click();
@@ -325,12 +354,15 @@ describe("categories", () => {
   });
 
   it("marks a category mixed while only some categories inside it are selected", async () => {
+    // Arrange
     await renderForm(undefined, categories);
     await openButton("Clothing").click();
     await openButton("Trousers").click();
 
+    // Act
     await categoryItem("Jeans").click();
 
+    // Assert
     await expect.element(categoryItem("Jeans")).toHaveAttribute("aria-checked", "true");
     await expect.element(categoryItem("Trousers")).toHaveAttribute("aria-checked", "mixed");
     await expect.element(categoryItem("Clothing")).toHaveAttribute("aria-checked", "mixed");
@@ -361,8 +393,10 @@ describe("categories", () => {
   });
 
   it("shows an existing product's categories without unsaved changes", async () => {
+    // Act
     await renderForm({ ...boots, categoryIds: [4, 6] }, categories);
 
+    // Assert
     await expect.element(categoryItem("Shoes")).toHaveAttribute("aria-checked", "true");
     await expect.element(categoryItem("Clothing")).toHaveAttribute("aria-checked", "mixed");
     expect(submittedCategories()).toEqual([4, 6]);
@@ -370,21 +404,27 @@ describe("categories", () => {
   });
 
   it("selects the focused category with Space", async () => {
+    // Arrange
     await renderForm(undefined, categories);
     (categoryItem("Shoes").element() as HTMLElement).focus();
 
+    // Act
     await userEvent.keyboard(" ");
 
+    // Assert
     await expect.element(categoryItem("Shoes")).toHaveAttribute("aria-checked", "true");
     expect(submittedCategories()).toEqual([6]);
   });
 
   it("shows the unsaved changes toast once a category is clicked, and puts them back on cancel", async () => {
+    // Arrange
     await renderForm({ ...boots, categoryIds: [4] }, categories);
     await expect.element(toast()).not.toBeInTheDocument();
 
+    // Act
     await categoryItem("Clothing").click();
 
+    // Assert
     await expect.element(toast()).toBeVisible();
     expect(submittedCategories()).toEqual([1, 2, 3, 4, 5]);
 
@@ -396,8 +436,10 @@ describe("categories", () => {
   });
 
   it("offers to create categories when the store has none", async () => {
+    // Act
     await renderForm();
 
+    // Assert
     await expect.element(page.getByRole("tree")).not.toBeInTheDocument();
     await expect.element(page.getByText("No categories yet")).toBeVisible();
     await expect
@@ -406,11 +448,14 @@ describe("categories", () => {
   });
 
   it("links to each category's page from its menu", async () => {
+    // Arrange
     await renderForm(undefined, categories);
     await openButton("Clothing").click();
 
+    // Act
     await page.getByRole("button", { name: "Actions for Shirts" }).click();
 
+    // Assert
     await expect
       .element(page.getByRole("menuitem", { name: "View" }))
       .toHaveAttribute("href", "/admin/categories/2");
@@ -419,12 +464,15 @@ describe("categories", () => {
   });
 
   it("lists the categories without links while they're turned off", async () => {
+    // Arrange
     const unlinked = (list: Category[]): Category[] =>
       list.map((c) => ({ ...c, url: null, children: unlinked(c.children) }));
     await renderForm(undefined, unlinked(categories), undefined, null);
 
+    // Act
     await categoryItem("Shoes").click();
 
+    // Assert
     await expect.element(categoryItem("Shoes")).toHaveAttribute("aria-checked", "true");
     expect(submittedCategories()).toEqual([6]);
     await expect
@@ -433,8 +481,10 @@ describe("categories", () => {
   });
 
   it("doesn't offer to create categories while they're turned off", async () => {
+    // Act
     await renderForm(undefined, [], undefined, null);
 
+    // Assert
     await expect.element(page.getByText("No categories yet")).toBeVisible();
     await expect
       .element(page.getByRole("link", { name: "Create categories" }))
@@ -505,11 +555,13 @@ describe("images", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("shows a product's images in their order, the first one as its thumbnail", async () => {
+    // Act
     await renderForm({
       ...boots,
       images: [image(7, "red"), image(3, "blue")],
     });
 
+    // Assert
     await expect.element(imageGrid()).toBeVisible();
     expect(gridImages()).toEqual([swatch("red"), swatch("blue")]);
     const [first, second] = imageGrid().getByRole("listitem").elements();
@@ -518,6 +570,7 @@ describe("images", () => {
   });
 
   it("adds the chosen images after the product's, to be linked when it's saved", async () => {
+    // Arrange
     const uploads = fakeUploads(
       [201, { image: image(8, "green") }],
       [201, { image: image(9, "yellow") }],
@@ -528,8 +581,10 @@ describe("images", () => {
     await expect.element(addImages()).toHaveAttribute("multiple");
     expect(formData().getAll("images[]")).toEqual(["7"]);
 
+    // Act
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
+    // Assert
     await expect.poll(gridImages).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
     // One at a time, so a rejected image keeps none of the others out.
     expect(uploads.map(({ url, files }) => ({ url, files }))).toEqual([
@@ -541,13 +596,16 @@ describe("images", () => {
   });
 
   it("shows a loading card per chosen image, and no more can be added until they're uploaded", async () => {
+    // Arrange
     const side = answerLater();
     const back = answerLater();
     fakeUploads([201, side.body], [201, back.body]);
     await renderForm({ ...boots, images: [image(7, "red")] });
 
+    // Act
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
+    // Assert
     // After the product's image, where the uploaded ones will appear.
     await expect.poll(() => uploadingCards().elements()).toHaveLength(2);
     const [, first, second, add] = imageGrid().getByRole("listitem").elements();
@@ -574,14 +632,17 @@ describe("images", () => {
   });
 
   it("doesn't save while images upload, since they'd be left out", async () => {
+    // Arrange
     const upload = answerLater();
     fakeUploads([201, upload.body]);
     await renderForm({ ...boots, images: [image(7, "red")] });
     await nameInput().fill("Rain boots");
     await expect.element(toast()).toBeVisible();
 
+    // Act
     await userEvent.upload(addImages(), [png("side.png")]);
 
+    // Assert
     await expect.element(toast().getByRole("button", { name: "Save" })).toBeDisabled();
 
     upload.respond({ image: image(8, "green") });
@@ -590,6 +651,7 @@ describe("images", () => {
   });
 
   it("stops uploading when the changes are cancelled, and adds nothing once it would have answered", async () => {
+    // Arrange
     const upload = answerLater();
     const uploads = fakeUploads([201, upload.body]);
     await renderForm({ ...boots, images: [image(7, "red")] });
@@ -597,8 +659,10 @@ describe("images", () => {
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
     await expect.poll(() => uploadingCards().elements()).toHaveLength(2);
 
+    // Act
     await toast().getByRole("button", { name: "Cancel" }).click();
 
+    // Assert
     await expect.element(toast()).not.toBeInTheDocument();
     expect(uploadingCards().elements()).toHaveLength(0);
     await expect.element(addImages()).toBeEnabled();
@@ -615,25 +679,31 @@ describe("images", () => {
   });
 
   it("stops uploading when the form goes away", async () => {
+    // Arrange
     const uploads = fakeUploads([201, answerLater().body]);
     const screen = await renderForm();
     await userEvent.upload(addImages(), [png("side.png")]);
     await expect.poll(() => uploads).toHaveLength(1);
 
+    // Act
     await screen.unmount();
 
+    // Assert
     expect(uploads[0].signal?.aborted).toBe(true);
   });
 
   it("removes an image from its menu, to be unlinked when saved, and puts it back on cancel", async () => {
+    // Arrange
     await renderForm({
       ...boots,
       images: [image(7, "red"), image(3, "blue"), image(5, "green")],
     });
 
+    // Act
     await page.getByRole("button", { name: "Actions for image 1" }).click();
     await page.getByRole("menuitem", { name: "Remove" }).click();
 
+    // Assert
     // No confirmation: the unsaved changes toast is the way back.
     await expect.poll(gridImages).toEqual([swatch("blue"), swatch("green")]);
     expect(formData().getAll("images[]")).toEqual(["3", "5"]);
@@ -661,14 +731,17 @@ describe("images", () => {
     ["the last image", [7, 3, 5]],
     ["the only image", [7]],
   ])("puts %s back when the removal is cancelled", async (_, ids) => {
+    // Arrange
     const colors = ["red", "blue", "green"];
     await renderForm({ ...boots, images: ids.map((id, i) => image(id, colors[i])) });
     await page.getByRole("button", { name: `Actions for image ${ids.length}` }).click();
     await page.getByRole("menuitem", { name: "Remove" }).click();
     await expect.element(toast()).toBeVisible();
 
+    // Act
     await toast().getByRole("button", { name: "Cancel" }).click();
 
+    // Assert
     await expect.element(toast()).not.toBeInTheDocument();
     expect(formData().getAll("images[]")).toEqual(ids.map(String));
     expect(gridImages()).toHaveLength(ids.length);
@@ -679,6 +752,7 @@ describe("images", () => {
     ["the last image before the first", 3, 1, ["5", "7", "3"]],
     ["the first image after the last", 1, 3, ["3", "5", "7"]],
   ])("drags %s, to be saved in that order", async (_, from, to, order) => {
+    // Arrange
     await renderForm({
       ...boots,
       images: [image(7, "red"), image(3, "blue"), image(5, "green")],
@@ -688,8 +762,10 @@ describe("images", () => {
         .getByRole("listitem")
         .nth(n - 1);
 
+    // Act
     await userEvent.dragAndDrop(item(from), item(to));
 
+    // Assert
     await expect.poll(() => formData().getAll("images[]")).toEqual(order);
     // Dropping isn't a click that opens the image.
     await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
@@ -706,19 +782,23 @@ describe("images", () => {
   });
 
   it("drops the uploaded images when the changes are cancelled", async () => {
+    // Arrange
     fakeUploads([201, { image: image(8, "green") }]);
     await renderForm({ ...boots, images: [image(7, "red")] });
     await userEvent.upload(addImages(), [png("side.png")]);
     await expect.element(toast()).toBeVisible();
 
+    // Act
     await toast().getByRole("button", { name: "Cancel" }).click();
 
+    // Assert
     await expect.element(toast()).not.toBeInTheDocument();
     expect(gridImages()).toEqual([swatch("red")]);
     expect(formData().getAll("images[]")).toEqual(["7"]);
   });
 
   it("uploads the other images when one is rejected, and says which and why", async () => {
+    // Arrange
     fakeUploads(
       [201, { image: image(8, "green") }],
       [422, { message: "Invalid", errors: { image: [notAnImage] } }],
@@ -726,8 +806,10 @@ describe("images", () => {
     );
     await renderForm({ ...boots, images: [image(7, "red")] });
 
+    // Act
     await userEvent.upload(addImages(), [png("side.png"), png("manual.pdf"), png("back.png")]);
 
+    // Assert
     await expect.element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`)).toBeVisible();
     expect(gridImages()).toEqual([swatch("red"), swatch("green"), swatch("yellow")]);
     expect(uploadingCards().elements()).toHaveLength(0);
@@ -738,30 +820,37 @@ describe("images", () => {
     ["the server takes no files that large", 413, "It's larger than the server accepts."],
     ["the server fails", 500, "Try again."],
   ])("says so when %s", async (_, status, reason) => {
+    // Arrange
     fakeUploads([status, { message: "Error" }]);
     await renderForm();
 
+    // Act
     await userEvent.upload(addImages(), [png("huge.png")]);
 
+    // Assert
     await expect.element(page.getByText(`Couldn't upload huge.png. ${reason}`)).toBeVisible();
     expect(uploadingCards().elements()).toHaveLength(0);
   });
 
   it("forgets why images were rejected once the product is saved", async () => {
+    // Arrange
     fakeUploads([422, { message: "Invalid", errors: { image: [notAnImage] } }]);
     await renderForm({ ...boots, images: [image(7, "red")] });
     await userEvent.upload(addImages(), [png("manual.pdf")]);
     await expect.element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`)).toBeVisible();
     await nameInput().fill("Rain boots");
 
+    // Act
     await toast().getByRole("button", { name: "Save" }).click();
 
+    // Assert
     await expect
       .element(page.getByText(`Couldn't upload manual.pdf. ${notAnImage}`))
       .not.toBeInTheDocument();
   });
 
   it("shows why the images couldn't be saved beside them, once per reason", async () => {
+    // Arrange
     const invalid = "The selected image is invalid.";
     vi.spyOn(http, "getClient").mockReturnValue({
       request: async () =>
@@ -773,8 +862,10 @@ describe("images", () => {
     });
     await nameInput().fill("Rain boots");
 
+    // Act
     await toast().getByRole("button", { name: "Save" }).click();
 
+    // Assert
     // Strict, so it also fails when the reason shows twice.
     await expect.element(page.getByText(invalid)).toBeVisible();
     expect(imageGrid().element().parentElement?.nextElementSibling).toHaveTextContent(invalid);
@@ -785,13 +876,16 @@ describe("images", () => {
   });
 
   it("adds images to a new product, the first as its thumbnail", async () => {
+    // Arrange
     fakeUploads([201, { image: image(8, "green") }], [201, { image: image(9, "yellow") }]);
     await renderForm();
     await expect.element(addImages()).toBeVisible();
     expect(formData().getAll("images[]")).toEqual([]);
 
+    // Act
     await userEvent.upload(addImages(), [png("side.png"), png("back.png")]);
 
+    // Assert
     await expect.poll(() => formData().getAll("images[]")).toEqual(["8", "9"]);
     await expect.element(imageGrid().getByRole("listitem").first()).toHaveTextContent("Thumbnail");
   });
@@ -806,10 +900,13 @@ describe("images", () => {
       `/admin/products?dialog=product-image-lightbox&image-id=${id}`;
 
     it("opens and closes with the URL, which names the image", async () => {
+      // Arrange
       await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] });
 
+      // Act
       await openImage(2).click();
 
+      // Assert
       await expect.element(lightbox("blue.png")).toBeVisible();
       expect(query()).toEqual({ dialog: "product-image-lightbox", "image-id": "3" });
 
@@ -820,12 +917,14 @@ describe("images", () => {
     });
 
     it("opens the image the URL names when the page loads", async () => {
+      // Act
       await renderForm(
         { ...boots, images: [image(7, "red"), image(3, "blue")] },
         [],
         lightboxUrl(3),
       );
 
+      // Assert
       await expect.element(lightbox("blue.png")).toBeVisible();
     });
 
@@ -838,24 +937,30 @@ describe("images", () => {
         { dialog: "other", "image-id": "3" },
       ],
     ])("stays closed when the URL names %s", async (_, url, remaining) => {
+      // Act
       await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] }, [], url);
 
+      // Assert
       await expect.element(imageGrid()).toBeVisible();
       await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
       await expect.poll(query).toEqual(remaining);
     });
 
     it("says why a stale link didn't open the image", async () => {
+      // Act
       await renderForm({ ...boots, images: [image(7, "red")] }, [], lightboxUrl(99));
 
+      // Assert
       await expect.element(page.getByText("Image not found")).toBeVisible();
     });
 
     // Going back to an entry remounts the page, which would drop the form's changes.
     it("adds no history entry to go back to", async () => {
+      // Arrange
       await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] });
       const entries = window.history.length;
 
+      // Act & Assert
       await openImage(2).click();
       await expect.element(lightbox("blue.png")).toBeVisible();
       await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
@@ -866,14 +971,17 @@ describe("images", () => {
 
     // The unsaved changes toast stops visits, which a server round trip would be.
     it("opens and closes with unsaved changes, and keeps them", async () => {
+      // Arrange
       await renderForm({ ...boots, images: [image(7, "red"), image(3, "blue")] });
       await userEvent.type(nameInput(), " for rain");
       await expect.element(toast()).toBeVisible();
 
+      // Act
       await openImage(2).click();
       await userEvent.type(altText("blue.png"), "Side");
       await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
 
+      // Assert
       await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
       expect(query()).toEqual({});
       expect(submitted()).toMatchObject({ name: "Boots for rain", "image_alts[3]": "Side" });
@@ -881,13 +989,16 @@ describe("images", () => {
     });
 
     it("opens the clicked image without unsaved changes", async () => {
+      // Arrange
       await renderForm({
         ...boots,
         images: [image(7, "red", "Boots from the front"), image(3, "blue")],
       });
 
+      // Act
       await openImage(2).click();
 
+      // Assert
       await expect.element(lightbox("blue.png")).toBeVisible();
       await expect.element(altText("blue.png")).toHaveValue("");
       await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
@@ -897,15 +1008,18 @@ describe("images", () => {
     });
 
     it("submits the changed alt text with the image's id, and puts it back on cancel", async () => {
+      // Arrange
       await renderForm({
         ...boots,
         images: [image(7, "red", "Boots from the front"), image(3, "blue")],
       });
       await openImage(2).click();
 
+      // Act
       await userEvent.type(altText("blue.png"), "Boots from the side");
       await lightbox("blue.png").getByRole("button", { name: "Close" }).click();
 
+      // Assert
       await expect.element(toast()).toBeVisible();
       expect(submitted()).toMatchObject({
         "image_alts[7]": "Boots from the front",

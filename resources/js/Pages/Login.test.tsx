@@ -23,15 +23,19 @@ function renderLogin(devLoginUrl: string | null) {
 }
 
 it("hides the dev login button without a dev login URL", async () => {
+  // Act
   await renderLogin(null);
 
+  // Assert
   await expect.element(page.getByRole("button", { name: "Sign in" })).toBeVisible();
   expect(page.getByRole("link", { name: /log in as/i }).elements()).toHaveLength(0);
 });
 
 it("links the dev login button to the dev login URL", async () => {
+  // Act
   await renderLogin("/admin/__dev/login");
 
+  // Assert
   await expect
     .element(page.getByRole("link", { name: /log in as/i }))
     .toHaveAttribute("href", "/admin/__dev/login");

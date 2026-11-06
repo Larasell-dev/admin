@@ -13,10 +13,12 @@ use Larasell\Admin\Tests\Fixtures\Tables\Books;
 use Larasell\Admin\Tests\Fixtures\Tables\Library\AudioBookTable;
 
 it('registers a table route and its top-level navigation item in one call', function () {
+    // Act
     $this->bootingWith(function () {
         Navigation::index('Books', 'shop/books', Books::class, Icon::Book)->position(1500);
     });
 
+    // Assert
     $route = Route::getRoutes()->getByName('larasell.admin.shop.books.index');
 
     expect($route)->not->toBeNull()
@@ -38,12 +40,14 @@ it('registers a table route and its top-level navigation item in one call', func
 });
 
 it('registers the table route once inside the admin routes, as in routes/admin.php', function () {
+    // Act
     $this->bootingWith(function () {
         AdminPanel::resolve()->routes(function (): void {
             Navigation::index('Books', 'shop/books', Books::class, Icon::Book);
         });
     });
 
+    // Assert
     $route = Route::getRoutes()->getByName('larasell.admin.shop.books.index');
 
     expect($route)->not->toBeNull()
@@ -52,6 +56,7 @@ it('registers the table route once inside the admin routes, as in routes/admin.p
 });
 
 it('registers a table route and its nested navigation item in one call', function () {
+    // Act
     $this->bootingWith(function () {
         Navigation::index('Books', 'shop/books', Books::class, Icon::Book)
             ->children(function (NavigationGroup $books): void {
@@ -59,6 +64,7 @@ it('registers a table route and its nested navigation item in one call', functio
             });
     });
 
+    // Assert
     $route = Route::getRoutes()->getByName('larasell.admin.shop.audio-books.index');
 
     expect($route)->not->toBeNull()

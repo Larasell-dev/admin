@@ -27,6 +27,7 @@ function fakePwnedPasswords(array $leakedPasswords = []): void
 }
 
 it('creates an admin', function () {
+    // Act
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
@@ -35,6 +36,7 @@ it('creates an admin', function () {
         ->expectsOutputToContain('Admin user [admin@example.com] created.')
         ->assertSuccessful();
 
+    // Assert
     $admin = Admin::query()->sole();
 
     expect($admin->name)->toBe('New Admin')
@@ -43,12 +45,14 @@ it('creates an admin', function () {
 });
 
 it('fails with a clear message when an admin with the email already exists', function () {
+    // Arrange
     Admin::create([
         'name' => 'Existing Admin',
         'email' => 'admin@example.com',
         'password' => 'password',
     ]);
 
+    // Act
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
@@ -57,10 +61,12 @@ it('fails with a clear message when an admin with the email already exists', fun
         ->expectsOutputToContain('An admin with the email [admin@example.com] already exists.')
         ->assertFailed();
 
+    // Assert
     expect(Admin::query()->sole()->name)->toBe('Existing Admin');
 });
 
 it('rejects weak passwords', function (string $password, string $error) {
+    // Act
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
@@ -69,6 +75,7 @@ it('rejects weak passwords', function (string $password, string $error) {
         ->expectsOutputToContain($error)
         ->assertFailed();
 
+    // Assert
     expect(Admin::query()->exists())->toBeFalse();
 })->with([
     'too short' => ['Short-7-Pwd', 'The password field must be at least 12 characters.'],
@@ -79,9 +86,11 @@ it('rejects weak passwords', function (string $password, string $error) {
 ]);
 
 it('rejects compromised passwords in production', function () {
+    // Arrange
     $this->app->detectEnvironment(fn () => 'production');
     fakePwnedPasswords(['Correct-Horse-7-Battery']);
 
+    // Act
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
@@ -90,32 +99,39 @@ it('rejects compromised passwords in production', function () {
         ->expectsOutputToContain('The given password has appeared in a data leak.')
         ->assertFailed();
 
+    // Assert
     expect(Admin::query()->exists())->toBeFalse();
 });
 
 it('accepts uncompromised passwords in production', function () {
+    // Arrange
     $this->app->detectEnvironment(fn () => 'production');
     fakePwnedPasswords();
 
+    // Act
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
         '--password' => 'Correct-Horse-7-Battery',
     ])->assertSuccessful();
 
+    // Assert
     Http::assertSentCount(1);
     expect(Admin::query()->exists())->toBeTrue();
 });
 
 it('does not check for compromised passwords outside production', function () {
+    // Arrange
     fakePwnedPasswords(['Correct-Horse-7-Battery']);
 
+    // Act
     $this->artisan('larasell:create-admin', [
         '--name' => 'New Admin',
         '--email' => 'admin@example.com',
         '--password' => 'Correct-Horse-7-Battery',
     ])->assertSuccessful();
 
+    // Assert
     Http::assertNothingSent();
     expect(Admin::query()->exists())->toBeTrue();
 });

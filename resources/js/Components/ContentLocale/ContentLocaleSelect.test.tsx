@@ -44,12 +44,15 @@ const select = () => page.getByRole("combobox", { name: "Content language" });
 const name = () => page.getByRole("textbox", { name: "Name" });
 
 it("doesn't switch the language while a form on the page has unsaved changes, even outside it", async () => {
+  // Arrange
   await renderPage();
 
   await expect.element(select()).toBeEnabled();
 
+  // Act
   await name().fill("Footwear");
 
+  // Assert
   await expect.element(select()).toBeDisabled();
 
   await name().fill("Shoes");

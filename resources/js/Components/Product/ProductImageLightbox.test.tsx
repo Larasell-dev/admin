@@ -34,8 +34,10 @@ const lightbox = () => page.getByRole("dialog", { name: "front.png" });
 const altText = () => lightbox().getByRole("textbox", { name: "Alt text" });
 
 it("shows the image over the whole viewport", async () => {
+  // Act
   await render(<Opened image={front} />);
 
+  // Assert
   await expect.element(lightbox()).toBeVisible();
   await expect.element(lightbox().getByRole("img", { name: "Boots from the front" })).toBeVisible();
   const { width, height } = lightbox().element().getBoundingClientRect();
@@ -43,6 +45,7 @@ it("shows the image over the whole viewport", async () => {
 });
 
 it("opens the file in a new tab from its name in the header", async () => {
+  // Arrange
   await render(<Opened image={front} />);
 
   const file = lightbox().getByRole("link", { name: "front.png" });
@@ -50,8 +53,10 @@ it("opens the file in a new tab from its name in the header", async () => {
   await expect.element(file).toHaveAttribute("target", "_blank");
   await expect.element(page.getByText("Open in a new tab")).not.toBeInTheDocument();
 
+  // Act
   await file.hover();
 
+  // Assert
   await expect.element(page.getByText("Open in a new tab")).toBeVisible();
 });
 
@@ -59,22 +64,28 @@ it.each([
   ["its close button", () => lightbox().getByRole("button", { name: "Close" }).click()],
   ["Escape", () => userEvent.keyboard("{Escape}")],
 ])("closes with %s", async (_, close) => {
+  // Arrange
   await render(<Opened image={front} />);
   await expect.element(lightbox()).toBeVisible();
 
+  // Act
   await close();
 
+  // Assert
   await expect.element(lightbox()).not.toBeInTheDocument();
 });
 
 it("reports each change to the alt text", async () => {
+  // Arrange
   const onAltChange = vi.fn<(alt: string) => void>();
   await render(<Opened image={front} onAltChange={onAltChange} />);
   await expect.element(altText()).toHaveValue("Boots from the front");
 
+  // Act
   await userEvent.clear(altText());
   await userEvent.type(altText(), "Red");
 
+  // Assert
   await expect.element(altText()).toHaveValue("Red");
   expect(onAltChange).toHaveBeenLastCalledWith("Red");
   // The image is described by what was typed.
@@ -82,7 +93,9 @@ it("reports each change to the alt text", async () => {
 });
 
 it("starts with an empty alt text for an image without one", async () => {
+  // Act
   await render(<Opened image={{ ...front, alt: null }} />);
 
+  // Assert
   await expect.element(altText()).toHaveValue("");
 });

@@ -85,23 +85,29 @@ it.each([
   ],
   ["the server fails", 500, "The picture couldn't be uploaded. Try again."],
 ])("says so when %s", async (_, status, message) => {
+  // Arrange
   fakeUpload(status, { message: "Error" });
   await renderProfile();
 
+  // Act
   await userEvent.upload(pictureInput(), png);
 
+  // Assert
   await expect.element(page.getByText(message)).toBeVisible();
 });
 
 it("doesn't save while the picture uploads", async () => {
+  // Arrange
   let respond!: (body: unknown) => void;
   fakeUpload(201, new Promise((resolve) => (respond = resolve)));
   await renderProfile();
   await name().fill("Ada King");
   await expect.element(toast()).toBeVisible();
 
+  // Act
   await userEvent.upload(pictureInput(), png);
 
+  // Assert
   await expect.element(toast().getByRole("button", { name: "Save" })).toBeDisabled();
 
   respond({ path: "avatars/me.png", url: "/storage/avatars/me.png" });
@@ -111,6 +117,7 @@ it("doesn't save while the picture uploads", async () => {
 });
 
 it("stops the upload when the changes are cancelled, and keeps the picture", async () => {
+  // Arrange
   let respond!: (body: unknown) => void;
   const signals = fakeUpload(201, new Promise((resolve) => (respond = resolve)));
   await renderProfile();
@@ -118,8 +125,10 @@ it("stops the upload when the changes are cancelled, and keeps the picture", asy
   await userEvent.upload(pictureInput(), png);
   await expect.poll(() => signals).toHaveLength(1);
 
+  // Act
   await toast().getByRole("button", { name: "Cancel" }).click();
 
+  // Assert
   await expect.element(toast()).not.toBeInTheDocument();
   expect(signals[0]?.aborted).toBe(true);
 
@@ -131,25 +140,31 @@ it("stops the upload when the changes are cancelled, and keeps the picture", asy
 });
 
 it("stops the upload when the page goes away", async () => {
+  // Arrange
   const signals = fakeUpload(201, new Promise(() => {}));
   const screen = await renderProfile();
   await userEvent.upload(pictureInput(), png);
   await expect.poll(() => signals).toHaveLength(1);
 
+  // Act
   await screen.unmount();
 
+  // Assert
   expect(signals[0]?.aborted).toBe(true);
 });
 
 it("forgets why a picture was rejected once the profile is saved", async () => {
+  // Arrange
   fakeUpload(422, { message: "Invalid", errors: { avatar: ["The avatar must be square."] } });
   await renderProfile();
   await userEvent.upload(pictureInput(), png);
   await expect.element(page.getByText("The avatar must be square.")).toBeVisible();
   await name().fill("Ada King");
 
+  // Act
   await toast().getByRole("button", { name: "Save" }).click();
 
+  // Assert
   await expect.element(page.getByText("The avatar must be square.")).not.toBeInTheDocument();
 });
 
@@ -157,6 +172,7 @@ describe("interface language", () => {
   const select = () => page.getByRole("combobox", { name: "Language" });
 
   it("switches the panel's language on the server", async () => {
+    // Arrange
     const requests: { method: string; url: string; data: unknown }[] = [];
     vi.spyOn(http, "getClient").mockReturnValue({
       async request({ method, url, data }) {
@@ -168,8 +184,10 @@ describe("interface language", () => {
     await renderProfile();
     await expect.element(select()).toHaveValue("en-US");
 
+    // Act
     await select().selectOptions("Deutsch");
 
+    // Assert
     await expect.poll(() => requests).toHaveLength(1);
     expect(requests[0]).toMatchObject({
       method: "put",
@@ -179,10 +197,13 @@ describe("interface language", () => {
   });
 
   it("can't switch while the profile has unsaved changes, which the reload would drop", async () => {
+    // Arrange
     await renderProfile();
 
+    // Act
     await name().fill("Ada King");
 
+    // Assert
     await expect.element(select()).toBeDisabled();
     await expect.element(page.getByText("Save or discard your changes first")).toBeVisible();
   });

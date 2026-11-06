@@ -70,22 +70,26 @@ describe.each([
   });
 
   it("links a row through its primary value, named after it", async () => {
+    // Act
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1")])} />,
     );
 
+    // Assert
     const link = screen.getByRole("link", { name: "Dune" });
     await expect.element(link).toHaveAttribute("href", "/admin/books/1");
     expect(screen.getByRole("link").elements()).toHaveLength(1);
   });
 
   it("renders no link for rows whose link is null", async () => {
+    // Act
     const screen = await render(
       <ResourceTable
         resource={resource([row(1, "Dune", "/admin/books/1"), row(2, "Beowulf", null)])}
       />,
     );
 
+    // Assert
     await expect.element(screen.getByRole(role).getByText("Beowulf")).toBeVisible();
     expect(
       screen
@@ -96,6 +100,7 @@ describe.each([
   });
 
   it("shows a badge column's value as its text, not its variant", async () => {
+    // Act
     const screen = await render(
       <ResourceTable
         resource={{
@@ -111,6 +116,7 @@ describe.each([
       />,
     );
 
+    // Assert
     const list = screen.getByRole(role);
     await expect.element(list.getByText("Paid", { exact: true })).toBeVisible();
     // The variant only colours the badge; it is never shown as text.
@@ -118,18 +124,22 @@ describe.each([
   });
 
   it("visits same-site links with Inertia when clicking anywhere in the row", async () => {
+    // Arrange
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1")])} />,
     );
 
+    // Act
     // The link stretches over the row, so it receives the click on another field.
     await screen.getByRole(role).getByText("Author 1").click({ force: true });
 
+    // Assert
     expect(visit).toHaveBeenCalledOnce();
     expect(visit.mock.calls[0][0]).toContain("/admin/books/1");
   });
 
   it("follows links to other sites as plain anchors", async () => {
+    // Arrange
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", "https://books.test/1")])} />,
     );
@@ -137,12 +147,14 @@ describe.each([
     const stayOnPage = (event: Event) => event.preventDefault();
     window.addEventListener("click", stayOnPage);
 
+    // Act
     try {
       await screen.getByRole("link", { name: "Dune" }).click();
     } finally {
       window.removeEventListener("click", stayOnPage);
     }
 
+    // Assert
     await expect
       .element(screen.getByRole("link", { name: "Dune" }))
       .toHaveAttribute("href", "https://books.test/1");
@@ -150,12 +162,14 @@ describe.each([
   });
 
   it("keeps the row's actions outside the link, after it in the tab order", async () => {
+    // Arrange
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1", [archive])])} />,
     );
     const link = screen.getByRole("link", { name: "Dune" });
     const trigger = screen.getByRole("button", { name: "Actions for Dune" });
 
+    // Act & Assert
     expect(trigger.element().closest("a")).toBeNull();
 
     await userEvent.tab();
@@ -165,12 +179,14 @@ describe.each([
   });
 
   it("leaves out the actions menu on rows without actions", async () => {
+    // Act
     const screen = await render(
       <ResourceTable
         resource={resource([row(1, "Dune", null, [archive]), row(2, "Emma", null)])}
       />,
     );
 
+    // Assert
     await expect.element(screen.getByRole("button", { name: "Actions for Dune" })).toBeVisible();
     await expect
       .element(screen.getByRole("button", { name: "Actions for Emma" }))
@@ -178,26 +194,33 @@ describe.each([
   });
 
   it("opens a row's actions from the keyboard", async () => {
+    // Arrange
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", null, [archive])])} />,
     );
 
+    // Act
     await userEvent.tab();
+
+    // Assert
     await expect.element(screen.getByRole("button", { name: "Actions for Dune" })).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await expect.element(page.getByRole("menuitem", { name: "Archive" })).toHaveFocus();
   });
 
   it("shows an action's icon before its label, hidden from assistive tech", async () => {
+    // Arrange
     const remove = { ...archive, name: "delete", label: "Delete", icon: "DeleteBin" };
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", null, [remove, archive])])} />,
     );
 
+    // Act
     await screen.getByRole("button", { name: "Actions for Dune" }).click();
     const withIcon = page.getByRole("menuitem", { name: "Delete" });
     const withoutIcon = page.getByRole("menuitem", { name: "Archive" });
 
+    // Assert
     await expect.element(withIcon).toBeVisible();
     const icon = withIcon.element().querySelector("svg");
     expect(icon).not.toBeNull();
@@ -207,29 +230,35 @@ describe.each([
   });
 
   it("runs a row action from its menu without following the row link", async () => {
+    // Arrange
     const screen = await render(
       <ResourceTable resource={resource([row(1, "Dune", "/admin/books/1", [archive])])} />,
     );
 
+    // Act
     await screen.getByRole("button", { name: "Actions for Dune" }).click();
     await page.getByRole("menuitem", { name: "Archive" }).click();
 
+    // Assert
     expect(post).toHaveBeenCalledWith(archive.url, {}, expect.anything());
     expect(visit).not.toHaveBeenCalled();
   });
 
   it("shows which page of how many is on screen", async () => {
+    // Act
     const screen = await render(
       <ResourceTable
         resource={resource([row(26, "Dune", null)], { page: 2, pageSize: 25, total: 60 })}
       />,
     );
 
+    // Assert
     const pagination = screen.getByRole("navigation", { name: "Pagination" });
     await expect.element(pagination.getByText("Page 2 of 3")).toBeVisible();
   });
 
   it("requests the next page, keeping the page size and scroll position", async () => {
+    // Arrange
     await withQuery("", async () => {
       const screen = await render(
         <ResourceTable
@@ -237,8 +266,10 @@ describe.each([
         />,
       );
 
+      // Act
       await screen.getByRole("button", { name: "Next page" }).click();
 
+      // Assert
       expect(get).toHaveBeenCalledOnce();
       expect(get.mock.calls[0][0]).toBe(window.location.pathname);
       expect(get.mock.calls[0][1]).toEqual({ page: 3, per_page: 50 });
@@ -247,6 +278,7 @@ describe.each([
   });
 
   it("keeps the page's other query parameters, such as filters, when paging", async () => {
+    // Arrange
     await withQuery("?event=api_token.created&page=2&per_page=50", async () => {
       const screen = await render(
         <ResourceTable
@@ -254,8 +286,10 @@ describe.each([
         />,
       );
 
+      // Act
       await screen.getByRole("button", { name: "Next page" }).click();
 
+      // Assert
       expect(get.mock.calls[0][1]).toEqual({ event: "api_token.created", page: 3, per_page: 50 });
     });
   });

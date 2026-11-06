@@ -38,8 +38,10 @@ const emptyTable: TableResource = {
 const createLink = () => page.getByRole("link", { name: "Create product" });
 
 it("links to creating a product while a new category has none", async () => {
+  // Act
   await renderTable({ mode: "create", createProductUrl: "/admin/products/create" });
 
+  // Assert
   await expect.element(page.getByText("No products yet")).toBeVisible();
   await expect.element(createLink()).toHaveAttribute("href", "/admin/products/create");
 });
@@ -53,27 +55,34 @@ const editProps = {
 const addButton = () => page.getByRole("button", { name: "Add product" });
 
 it("only offers to create a product while the store has none to add", async () => {
+  // Act
   await renderTable({ ...editProps, createProductUrl: "/admin/products/create" });
 
+  // Assert
   await expect.element(createLink()).toHaveAttribute("href", "/admin/products/create");
   await expect.element(addButton()).not.toBeInTheDocument();
 });
 
 it("only offers to add a product once the store has some", async () => {
+  // Act
   await renderTable({ ...editProps, createProductUrl: null });
 
+  // Assert
   await expect.element(addButton()).toBeVisible();
   await expect.element(createLink()).not.toBeInTheDocument();
 });
 
 it("leaves out the link when the products are turned off", async () => {
+  // Act
   await renderTable({ mode: "create", createProductUrl: null });
 
+  // Assert
   await expect.element(page.getByText("No products yet")).toBeVisible();
   await expect.element(createLink()).not.toBeInTheDocument();
 });
 
 it("leaves out the actions menu on rows without actions", async () => {
+  // Arrange
   const remove = {
     name: "remove",
     label: "Remove",
@@ -97,8 +106,10 @@ it("leaves out the actions menu on rows without actions", async () => {
     pagination: { page: 1, pageSize: 25, total: 2 },
   };
 
+  // Act
   await renderTable({ ...editProps, table, createProductUrl: null });
 
+  // Assert
   await expect.element(page.getByRole("button", { name: "Actions for Shoes" })).toBeVisible();
   await expect
     .element(page.getByRole("button", { name: "Actions for Socks" }))
@@ -106,6 +117,7 @@ it("leaves out the actions menu on rows without actions", async () => {
 });
 
 it("links each row with a link through its name, keeping its actions menu clickable", async () => {
+  // Arrange
   const view = {
     name: "view",
     label: "View",
@@ -129,8 +141,10 @@ it("links each row with a link through its name, keeping its actions menu clicka
     pagination: { page: 1, pageSize: 25, total: 2 },
   };
 
+  // Act
   await renderTable({ ...editProps, table, createProductUrl: null });
 
+  // Assert
   await expect
     .element(page.getByRole("link", { name: "Shoes" }))
     .toHaveAttribute("href", "/admin/products/1/edit");

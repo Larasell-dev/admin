@@ -76,6 +76,7 @@ afterEach(() => {
 });
 
 it("keeps the mobile tree's open categories when the dialog closes and opens again", async () => {
+  // Arrange
   await renderIndex();
   const dialog = page.getByRole("dialog", { name: "Categories" });
   const item = (name: string) => dialog.getByRole("treeitem", { name, exact: true });
@@ -84,11 +85,13 @@ it("keeps the mobile tree's open categories when the dialog closes and opens aga
   await dialog.getByRole("button", { name: "Open Clothing", exact: true }).click();
   await expect.element(item("Shirts")).toBeVisible();
 
+  // Act
   await userEvent.keyboard("{Escape}");
   // Closed, whether it is removed or only hidden.
   await expect.poll(() => dialog.query()?.checkVisibility() ?? false).toBe(false);
   await page.getByRole("button", { name: "Open categories" }).click();
 
+  // Assert
   await expect.element(item("Clothing")).toHaveAttribute("aria-expanded", "true");
   await expect.element(item("Shirts")).toBeVisible();
 });
@@ -114,22 +117,30 @@ async function openCategories() {
 }
 
 it("puts the navigation drawer above the open category dialog", async () => {
+  // Arrange
   const { actions } = await openCategories();
   const openMenu = page.getByLabelText("Open menu").element();
 
+  // Act
   await userEvent.click(openMenu);
+
+  // Assert
   await expect.element(page.getByRole("dialog", { name: "Navigation" })).toBeVisible();
 
   await expect.poll(() => isClickable(actions)).toBe(false);
 });
 
 it("puts the delete dialog above the category dialog it was opened from", async () => {
+  // Arrange
   const { actions } = await openCategories();
   const openMenu = page.getByLabelText("Open menu").element();
 
+  // Act
   await userEvent.click(actions);
   await page.getByRole("menuitem", { name: "Delete" }).click();
   const confirm = page.getByRole("alertdialog", { name: "Delete category" });
+
+  // Assert
   await expect.element(confirm).toBeVisible();
 
   await expect.poll(() => isClickable(actions)).toBe(false);
@@ -140,6 +151,7 @@ it("puts the delete dialog above the category dialog it was opened from", async 
 });
 
 it("lets the delete dialog animate out after deleting the last category", async () => {
+  // Arrange
   await page.viewport(1280, 720);
   // Stands in for the server: the deletion leaves no categories, then reports success.
   vi.spyOn(router, "delete").mockImplementation((_url, options) =>
@@ -148,6 +160,7 @@ it("lets the delete dialog animate out after deleting the last category", async 
   await renderIndex();
   const tree = page.getByRole("region", { name: "Categories" });
 
+  // Act
   await tree.getByRole("button", { name: "Actions for Toys" }).click();
   await page.getByRole("menuitem", { name: "Delete" }).click();
   const confirm = page.getByRole("alertdialog", { name: "Delete category" });
@@ -155,6 +168,7 @@ it("lets the delete dialog animate out after deleting the last category", async 
   const dialog = confirm.element();
   await confirm.getByRole("button", { name: "Delete" }).click();
 
+  // Assert
   await expect.poll(() => tree.query()).toBeNull();
   // Still the same dialog, closing, rather than removed along with the tree.
   expect(dialog.isConnected).toBe(true);

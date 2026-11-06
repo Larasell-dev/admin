@@ -6,27 +6,32 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 
 it('logs an admin in with valid credentials', function () {
+    // Arrange
     Admin::create([
         'name' => 'Test Admin',
         'email' => 'admin@example.com',
         'password' => 'password',
     ]);
 
+    // Act
     $this->post(route('larasell.admin.login.store'), [
         'email' => 'admin@example.com',
         'password' => 'password',
     ])->assertRedirect(route('larasell.admin.home'));
 
+    // Assert
     expect(auth('larasell-admin')->check())->toBeTrue();
 });
 
 it('signs an admin back in without a redirect for the session expired dialog', function () {
+    // Arrange
     Admin::create([
         'name' => 'Test Admin',
         'email' => 'admin@example.com',
         'password' => 'password',
     ]);
 
+    // Act & Assert
     $this->postJson(route('larasell.admin.login.store'), [
         'email' => 'admin@example.com',
         'password' => 'wrong-password',
@@ -43,12 +48,14 @@ it('signs an admin back in without a redirect for the session expired dialog', f
 });
 
 it('fails to log an admin in with invalid credentials', function () {
+    // Arrange
     Admin::create([
         'name' => 'Test Admin',
         'email' => 'admin@example.com',
         'password' => 'password',
     ]);
 
+    // Act
     $this->from(route('larasell.admin.login'))
         ->post(route('larasell.admin.login.store'), [
             'email' => 'admin@example.com',
@@ -57,6 +64,7 @@ it('fails to log an admin in with invalid credentials', function () {
         ->assertRedirect(route('larasell.admin.login'))
         ->assertSessionHasErrors('email');
 
+    // Assert
     expect(auth('larasell-admin')->check())->toBeFalse();
 
     $this->get(route('larasell.admin.login'))->assertInertia(fn (Assert $page) => $page
@@ -66,15 +74,18 @@ it('fails to log an admin in with invalid credentials', function () {
 });
 
 it('logs an admin out', function () {
+    // Arrange
     $admin = Admin::create([
         'name' => 'Test Admin',
         'email' => 'admin@example.com',
         'password' => 'password',
     ]);
 
+    // Act
     $this->actingAs($admin, 'larasell-admin')
         ->post(route('larasell.admin.logout'))
         ->assertRedirect(route('larasell.admin.login'));
 
+    // Assert
     expect(auth('larasell-admin')->check())->toBeFalse();
 });

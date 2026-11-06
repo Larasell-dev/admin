@@ -18,6 +18,7 @@ afterEach(function () {
 });
 
 it('loads extension assets after the panel\'s script and before the panel boots', function () {
+    // Arrange
     file_put_contents($this->panelHot, 'http://localhost:5173');
     file_put_contents("{$this->extensionPublic}/hot", 'http://localhost:5199');
     $public = $this->extensionPublic;
@@ -27,8 +28,10 @@ it('loads extension assets after the panel\'s script and before the panel boots'
     ]));
     $this->withVite();
 
+    // Act
     $html = $this->get(route('larasell.admin.login'))->assertOk()->getContent();
 
+    // Assert
     $panel = strpos($html, 'src="http://localhost:5173/resources/js/app.tsx"');
     $script = strpos($html, 'src="http://localhost:5199/resources/js/admin.ts"');
     $style = strpos($html, 'href="http://localhost:5199/resources/css/admin.css"');
@@ -41,32 +44,40 @@ it('loads extension assets after the panel\'s script and before the panel boots'
 });
 
 it('sets up React Refresh for an extension\'s dev server', function () {
+    // Arrange
     file_put_contents($this->panelHot, 'http://localhost:5173');
     file_put_contents("{$this->extensionPublic}/hot", 'http://localhost:5199');
     $public = $this->extensionPublic;
     $this->bootingWith(fn () => AdminPanel::resolve()->vite('acme-wishlists', $public, ['resources/js/admin.ts']));
     $this->withVite();
 
+    // Act
     $html = $this->get(route('larasell.admin.login'))->assertOk()->getContent();
 
+    // Assert
     expect($html)->toContain('import RefreshRuntime from \'http://localhost:5199/@react-refresh\'');
 });
 
 it('links extension builds into the app\'s public directory', function () {
+    // Arrange
     mkdir("{$this->extensionPublic}/vendor/acme-wishlists", recursive: true);
     file_put_contents("{$this->extensionPublic}/vendor/acme-wishlists/manifest.json", '{}');
     AdminPanel::resolve()->vite('acme-wishlists', $this->extensionPublic, ['resources/js/admin.ts']);
 
+    // Act
     $this->artisan('larasell:link')
         ->expectsOutputToContain('Assets of [acme-wishlists] linked.')
         ->assertSuccessful();
 
+    // Assert
     expect(public_path('vendor/acme-wishlists/manifest.json'))->toBeReadableFile();
 });
 
 it('fails when an extension is not built', function () {
+    // Arrange
     AdminPanel::resolve()->vite('acme-wishlists', $this->extensionPublic, ['resources/js/admin.ts']);
 
+    // Act & Assert
     $this->artisan('larasell:link')
         ->expectsOutputToContain('Assets of [acme-wishlists] are not built.')
         ->assertFailed();
