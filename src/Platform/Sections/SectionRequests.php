@@ -3,8 +3,10 @@
 namespace Larasell\Admin\Platform\Sections;
 
 use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Validator;
 use Larasell\Admin\Platform\Sections\Exceptions\InvalidSection;
+use Larasell\Admin\Platform\Support\Assert;
 
 /**
  * The requests of a page's sections while the page is saved. The page's own request prepares
@@ -18,12 +20,26 @@ final class SectionRequests
     public function __construct(private readonly array $requests) {}
 
     /**
-     * Runs each section's prepareForValidation(); call it from the page request's own.
+     * Runs each section's prepareForValidation(); call it from the page request's own, with that
+     * request.
      */
-    public function prepare(): void
+    public function prepare(Request $page): void
     {
-        foreach ($this->requests as $request) {
+        foreach ($this->requests as $key => $request) {
+            $others = fn (): array => array_diff_key((array) $page->input('sections', []), [$key => true]);
+            $before = $others();
+
             $request->prepare();
+
+            // SectionRequest::merge() promises to change only the section's own input, which the
+            // other sections' validation relies on.
+            foreach (array_keys($before + $others()) as $other) {
+                if (! Assert::that(($before[$other] ?? null) === ($others()[$other] ?? null), fn () => InvalidSection::changedOtherInput($key, (string) $other))) {
+                    $page->merge(['sections' => [...(array) $page->input('sections', []), ...$before]]);
+
+                    break;
+                }
+            }
         }
     }
 

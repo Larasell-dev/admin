@@ -9,12 +9,14 @@ use Inertia\Response;
 use Larasell\Admin\Category\Data\CategoryOptionData;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
-use Larasell\Admin\Platform\Sections\SectionPage;
+use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Product\Data\CreateProductPageData;
 use Larasell\Admin\Product\Data\EditProductPageData;
 use Larasell\Admin\Product\Data\ProductDetailData;
 use Larasell\Admin\Product\Events\ProductSaved;
+use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Category;
@@ -39,7 +41,7 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            sections: $this->sections->data(SectionPage::Product, null, new SectionContext($locale)),
+            sections: $this->sections->data(SectionForm::Product, null, new SectionContext($locale)),
         ));
     }
 
@@ -85,7 +87,7 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            sections: $this->sections->data(SectionPage::Product, $product, new SectionContext($locale)),
+            sections: $this->sections->data(SectionForm::Product, $product, new SectionContext($locale)),
         ));
     }
 
@@ -124,6 +126,9 @@ class ProductController
      */
     protected function saved(ProductRequest $request, Product $product, bool $created, Locale $locale): void
     {
+        // The promise ProductSaved documents, and asserts again: its listeners run in the save's transaction.
+        Assert::that(DB::transactionLevel() > 0, ProductNotSavedAtomically::outsideTransaction(...));
+
         event(new ProductSaved($product, $created, new SectionContext($locale), $request->sections()));
     }
 

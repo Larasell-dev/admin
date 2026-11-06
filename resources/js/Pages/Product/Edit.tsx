@@ -1,7 +1,6 @@
 import { Form } from "@inertiajs/react";
 import { fbs } from "fbtee";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
-import ExtensionSections from "../../Components/ExtensionSections";
 import { Page } from "../../Components/Page";
 import ProductForm from "../../Components/Product/ProductForm";
 import UnsavedChangesToast from "../../Components/UnsavedChangesToast";
@@ -50,9 +49,8 @@ export default function Edit({
           categories={categories}
           createCategoryUrl={createCategoryUrl}
           uploadImagesUrl={uploadImagesUrl}
-        >
-          <ExtensionSections sections={sections} />
-        </ProductForm>
+          sections={sections}
+        />
         <UnsavedChangesToast />
       </Page.Body>
     </Form>

@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Platform\Sections\Facades\Section;
-use Larasell\Admin\Platform\Sections\SectionPage;
+use Larasell\Admin\Platform\Sections\SectionForm;
+use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Product\Events\ProductSaved;
 
 /**
@@ -22,7 +23,8 @@ class ProductNotesServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(dirname(__DIR__, 2).'/database/migrations');
 
         // The section's data, and the request that validates its fields.
-        Section::add(SectionPage::Product, self::SECTION)
+        Section::add(SectionForm::Product, self::SECTION)
+            ->after(ProductSection::General)
             ->props(ProductNotesProps::class)
             ->request(ProductNotesRequest::class);
 

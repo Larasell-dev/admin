@@ -22,6 +22,7 @@ it("shares the panel's own extension API", () => {
     "Larasell",
     "Page",
     "ResourceTable",
+    "SectionForm",
     "SidebarLayout",
     "defineCommand",
     "matchRanges",

@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia;
@@ -13,10 +15,14 @@ use Larasell\Admin\Platform\Sections\Exceptions\SectionRequestNotReady;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionDefinition;
-use Larasell\Admin\Platform\Sections\SectionPage;
+use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\SectionRequest;
+use Larasell\Admin\Platform\Sections\SectionRequests;
+use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Product\Events\ProductSaved;
+use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Tests\Fixtures\Sections\GiftWrapRequest;
+use Larasell\Admin\Tests\Fixtures\Sections\MeddlingRequest;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesPayload;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesProps;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesRequest;
@@ -36,10 +42,10 @@ beforeEach(function () {
 
     // As plugins' service providers would, in the opposite order of their keys: one with a Props
     // class, one with a closure.
-    Section::add(SectionPage::Product, 'notes')
+    Section::add(SectionForm::Product, 'notes')
         ->props(NotesProps::class)
         ->request(NotesRequest::class);
-    Section::add(SectionPage::Product, 'gift-wrap')
+    Section::add(SectionForm::Product, 'gift-wrap')
         ->props(fn (?Model $product, SectionContext $context): array => ['locale' => $context->locale->value])
         ->request(GiftWrapRequest::class);
 });
@@ -52,19 +58,54 @@ function saveBoots(array $sections = [], string $name = 'Rain Boots'): TestRespo
     return test()->put(route('larasell.admin.products.update', test()->boots), ['name' => $name, 'slug' => 'boots', 'status' => 'visible', 'sections' => $sections]);
 }
 
-it('gives the product page its sections in the order they were added, with props for the product in the content locale', function () {
+it('gives the product page its sections, with props for the product in the content locale', function () {
     $this->put(route('larasell.admin.content-locale.update'), ['locale' => 'de'])->assertSessionHasNoErrors();
 
     $this->get(route('larasell.admin.products.edit', $this->boots))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('sections', [
-            ['page' => 'product', 'key' => 'notes', 'props' => ['name' => 'Stiefel', 'app' => 'Acme']],
-            ['page' => 'product', 'key' => 'gift-wrap', 'props' => ['locale' => 'de']],
+            ['form' => 'product', 'key' => 'gift-wrap', 'props' => ['locale' => 'de'], 'before' => null, 'after' => null],
+            ['form' => 'product', 'key' => 'notes', 'props' => ['name' => 'Stiefel', 'app' => 'Acme'], 'before' => null, 'after' => null],
         ]));
 
     $this->get(route('larasell.admin.products.create'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('sections.0.props', ['name' => null, 'app' => 'Acme'])
+            ->where('sections.1.props', ['name' => null, 'app' => 'Acme'])
             ->count('sections', 2));
+});
+
+it('places sections before or after the product form\'s own sections, ordered by position, then by key', function () {
+    // Registered against the order they end up in, so neither the order of registration nor
+    // that of the calls on a section decides it.
+    Section::add(SectionForm::Product, 'zeta')->after(ProductSection::Stock);
+    Section::add(SectionForm::Product, 'alpha')->after(ProductSection::Stock);
+    Section::add(SectionForm::Product, 'late')->position(10)->after(ProductSection::Stock);
+    Section::add(SectionForm::Product, 'early')->after(ProductSection::Stock)->position(-5);
+    Section::add(SectionForm::Product, 'moved')->after(ProductSection::Stock)->before(ProductSection::General);
+
+    $this->get(route('larasell.admin.products.edit', $this->boots))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where(
+            'sections',
+            fn (Collection $sections) => $sections->map(fn (array $section): array => [$section['key'], $section['before'], $section['after']])->all() === [
+                ['early', null, 'stock'],
+                ['alpha', null, 'stock'],
+                ['gift-wrap', null, null],
+                ['moved', 'general', null],
+                ['notes', null, null],
+                ['zeta', null, 'stock'],
+                ['late', null, 'stock'],
+            ],
+        ));
+});
+
+it('refuses to place a section next to something that isn\'t one of the product form\'s own sections', function () {
+    Section::add(SectionForm::Product, 'misplaced')->after(Locale::GERMAN);
+
+    $this->withoutExceptionHandling();
+
+    expect(fn () => $this->get(route('larasell.admin.products.edit', $this->boots)))
+        ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe('larasell-admin.section.unknown-anchor')
+            ->and($exception->getMessage())->toContain('Locale::GERMAN')
+            ->and($exception->errorFix())->toContain(ProductSection::class));
 });
 
 it('hands listeners each section\'s prepared, validated input and its typed payload', function () {
@@ -135,7 +176,7 @@ it('keeps the sections\' payloads for queued listeners, without the HTTP request
 });
 
 it('refuses a section key that is taken or would nest its fields', function (string $key, string $code) {
-    expect(fn () => Section::add(SectionPage::Product, $key))
+    expect(fn () => Section::add(SectionForm::Product, $key))
         ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe($code));
 })->with([
     ['notes', 'larasell-admin.section.duplicate-key'],
@@ -145,7 +186,7 @@ it('refuses a section key that is taken or would nest its fields', function (str
 ]);
 
 it('refuses a section request or props class of the wrong kind', function (Closure $configure, string $code) {
-    expect(fn () => $configure(Section::add(SectionPage::Product, 'other')))
+    expect(fn () => $configure(Section::add(SectionForm::Product, 'other')))
         ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe($code));
 })->with([
     'request' => [fn (SectionDefinition $section) => $section->request(Product::class), 'larasell-admin.section.invalid-request'],
@@ -167,3 +208,47 @@ it('says a section request isn\'t validated yet when its input is read too early
 });
 
 class ProductNotesRequestStub extends SectionRequest {}
+
+it('leaves a wrongly set up section off the form in production, and keeps the form working', function () {
+    $this->app['env'] = 'production';
+    config(['app.debug' => false]);
+    Exceptions::fake();
+
+    Section::add(SectionForm::Product, 'notes'); // taken: the first one keeps the key
+    Section::add(SectionForm::Product, 'acme.notes');
+    Section::add(SectionForm::Product, 'bad-props')->props(Product::class);
+    Section::add(SectionForm::Product, 'misplaced')->after(Locale::GERMAN);
+
+    $this->get(route('larasell.admin.products.edit', $this->boots))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->where(
+            'sections',
+            fn (Collection $sections) => $sections->map(fn (array $section): array => [$section['key'], $section['after']])->all() === [
+                ['gift-wrap', null],
+                // Placed after the form's own sections instead.
+                ['misplaced', null],
+                ['notes', null],
+            ],
+        ));
+
+    saveBoots(['notes' => ['note' => 'Ships in March']])->assertSessionHasNoErrors();
+
+    foreach (['duplicate-key', 'invalid-key', 'invalid-props', 'unknown-anchor'] as $code) {
+        Exceptions::assertReported(fn (InvalidSection $exception) => $exception->errorCode() === "larasell-admin.section.{$code}");
+    }
+});
+
+it('refuses to tell listeners a product was saved outside the save\'s transaction', function () {
+    expect(fn () => new ProductSaved($this->boots, false, new SectionContext(Locale::ENGLISH), new SectionRequests([])))
+        ->toThrow(fn (ProductNotSavedAtomically $exception) => expect($exception->errorCode())->toBe('larasell-admin.product.saved-outside-transaction'));
+});
+
+it('catches a section that changes another section\'s input while preparing', function () {
+    Section::add(SectionForm::Product, 'meddler')->request(MeddlingRequest::class);
+
+    $this->withoutExceptionHandling();
+
+    expect(fn () => saveBoots(['notes' => ['note' => 'Ships in March']]))
+        ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe('larasell-admin.section.changed-other-input')
+            ->and($exception->getMessage())->toContain('[meddler]'));
+});

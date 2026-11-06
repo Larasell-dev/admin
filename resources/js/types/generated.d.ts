@@ -229,11 +229,16 @@ declare namespace Larasell.Admin.Platform.Search.Data {
     match: Larasell.Admin.Platform.Search.Data.SearchMatchData | null;
   };
 }
+declare namespace Larasell.Admin.Platform.Sections {
+  export type SectionForm = "product";
+}
 declare namespace Larasell.Admin.Platform.Sections.Data {
   export type SectionData = {
-    page: string;
+    form: string;
     key: string;
     props: any;
+    before: string | null;
+    after: string | null;
   };
 }
 declare namespace Larasell.Admin.Product.Data {
@@ -288,6 +293,15 @@ declare namespace Larasell.Admin.Product.Data {
     amount: string;
     unit: string;
   };
+}
+declare namespace Larasell.Admin.Product.Enums {
+  export type ProductSection =
+    | "general"
+    | "images"
+    | "categories"
+    | "stock"
+    | "weight-and-dimensions"
+    | "identifiers";
 }
 declare namespace Larasell.Admin.Team.Data {
   export type AdminData = {

@@ -24,6 +24,7 @@ import { isSortable, useSortable } from "@dnd-kit/react/sortable";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import {
   type ChangeEventHandler,
+  Fragment,
   type ReactNode,
   type Ref,
   type RefObject,
@@ -39,6 +40,7 @@ import { truncate } from "../../utils/truncate";
 import { useCoupledField } from "../../utils/useCoupledField";
 import { useMergedRef } from "../../utils/useMergedRef";
 import CategoryCheckboxTree from "../Category/CategoryCheckboxTree";
+import ExtensionSections from "../ExtensionSections";
 import FormCheckbox from "../FormCheckbox";
 import { useFrozen } from "../Freeze";
 import ProductImageLightbox from "./ProductImageLightbox";
@@ -49,6 +51,9 @@ type Product = Omit<Larasell.Admin.Product.Data.ProductDetailData, "id">;
 type Category = Larasell.Admin.Category.Data.CategoryOptionData;
 type Image = Larasell.Admin.Product.Data.ProductImageData;
 type Errors = Record<string, string | undefined>;
+type ExtensionSection = Larasell.Admin.Platform.Sections.Data.SectionData;
+/** The product form's own sections, generated from the ProductSection enum. */
+type Anchor = Larasell.Admin.Product.Enums.ProductSection;
 
 /**
  * The sections of a product's fields. It must sit inside an Inertia `<Form>`, which submits them
@@ -59,7 +64,7 @@ export default function ProductForm({
   categories,
   createCategoryUrl,
   uploadImagesUrl,
-  children,
+  sections = [],
 }: {
   product?: Product;
   /** The store's categories to pick the product's from. */
@@ -69,13 +74,14 @@ export default function ProductForm({
   createCategoryUrl: string | null;
   /** Where images are uploaded before saving the product links them. */
   uploadImagesUrl: string;
-  /** More sections after the product's own, e.g. those that extensions add. */
-  children?: ReactNode;
+  /** The sections that modules and plugins add, placed around the product's own. */
+  sections?: ExtensionSection[];
 }) {
   const errors: Errors = useFormContext()?.errors ?? {};
-
-  return (
-    <SectionStack>
+  // Every one of ProductSection's anchors, in the order they show: a new one fails to compile here
+  // until the form renders it, so no section placed at it goes missing.
+  const own = {
+    general: (
       <Section.Root>
         <Section.Header
           title={fbs(
@@ -89,6 +95,8 @@ export default function ProductForm({
         />
         <GeneralFields product={product} errors={errors} />
       </Section.Root>
+    ),
+    images: (
       <Section.Root>
         <Section.Header
           title={fbs("Images", "Product form: heading of the section with the product's images")}
@@ -99,6 +107,8 @@ export default function ProductForm({
         />
         <ImageGrid images={product?.images ?? []} uploadUrl={uploadImagesUrl} saveErrors={errors} />
       </Section.Root>
+    ),
+    categories: (
       <Section.Root>
         <Section.Header
           title={fbs(
@@ -116,6 +126,8 @@ export default function ProductForm({
           createUrl={createCategoryUrl}
         />
       </Section.Root>
+    ),
+    stock: (
       <Section.Root>
         <Section.Header
           title={fbs(
@@ -129,6 +141,8 @@ export default function ProductForm({
         />
         <StockFields product={product} errors={errors} />
       </Section.Root>
+    ),
+    "weight-and-dimensions": (
       <Section.Root>
         <Section.Header
           title={fbs(
@@ -142,6 +156,8 @@ export default function ProductForm({
         />
         <WeightAndDimensionsFields product={product} errors={errors} />
       </Section.Root>
+    ),
+    identifiers: (
       <Section.Root>
         <Section.Header
           title={fbs(
@@ -155,7 +171,19 @@ export default function ProductForm({
         />
         <IdentifierFields product={product} errors={errors} />
       </Section.Root>
-      {children}
+    ),
+  } satisfies Record<Anchor, ReactNode>;
+
+  return (
+    <SectionStack>
+      {Object.entries(own).map(([anchor, section]) => (
+        <Fragment key={anchor}>
+          <ExtensionSections sections={sections} before={anchor} />
+          {section}
+          <ExtensionSections sections={sections} after={anchor} />
+        </Fragment>
+      ))}
+      <ExtensionSections sections={sections} anchors={Object.keys(own)} />
     </SectionStack>
   );
 }
