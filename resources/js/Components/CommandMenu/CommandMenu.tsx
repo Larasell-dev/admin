@@ -24,6 +24,7 @@ import {
   commands,
   textOf,
 } from "./commands";
+import { Highlight, matchRanges } from "./Highlight";
 
 /**
  * A level of the menu: the ids leading to its nested view, none for the root, and its own search
@@ -309,6 +310,21 @@ function bestRows([own, ...nested]: Row[], search: string): Row[] {
   return own ? [own, ...best] : best;
 }
 
+/**
+ * Where the search matched each of the texts, read as one line like the filter reads them, e.g.
+ * a crumb and the label. A range outside a text is left for Highlight to skip.
+ */
+function rangesOf(texts: string[], search: string) {
+  const ranges = matchRanges(texts.join(" "), search);
+  let start = 0;
+
+  return texts.map((text) => {
+    const offset = start;
+    start += text.length + 1;
+    return ranges.map(([from, to]) => [from - offset, to - offset] as const);
+  });
+}
+
 /** The items to the path, and below them, while searching, the items of their nested views. */
 function rows(items: CommandItem[], path: string[], crumbs: string[], deep: boolean): Row[] {
   return items.flatMap((item) => {
@@ -361,6 +377,7 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
 
   return (atRoot && searching ? bestRows(all, view.search) : all).map((row) => {
     const { item, path, crumbs } = row;
+    const marks = rangesOf([...crumbs, textOf(item)], view.search);
 
     return (
       <Command.Item
@@ -381,16 +398,20 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
           {item.icon && <Icon icon={item.icon} size={4} />}
         </span>
         <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-          {crumbs.map((crumb) => (
+          {crumbs.map((crumb, index) => (
             <Fragment key={crumb}>
-              <span className="shrink-0 text-mauve-500">{crumb}</span>
+              <span className="shrink-0 text-mauve-500">
+                <Highlight text={crumb} ranges={marks[index] ?? []} />
+              </span>
               <span aria-hidden className="flex shrink-0 text-mauve-400">
                 <Icon icon={ArrowRightSLine} />
               </span>
             </Fragment>
           ))}
           {typeof item.label === "string" ? (
-            <span>{item.label}</span>
+            <span>
+              <Highlight text={item.label} ranges={marks[crumbs.length] ?? []} />
+            </span>
           ) : (
             <>
               {/* Named by its text value, which says what the rendered label shows. */}
