@@ -296,7 +296,7 @@ const keywordsOf = ({ item, crumbs }: Row) => [...crumbs, textOf(item), ...(item
  * How many of a command's nested items a search at the root shows at most. A command with many,
  * e.g. every content language, would otherwise render hundreds of rows on each key.
  */
-const nestedMatchesAtRoot = 20;
+const NESTED_MATCHES_AT_ROOT = 20;
 
 /** The command's own row, then the best matches among the rows of its nested views. */
 function bestRows([own, ...nested]: Row[], search: string): Row[] {
@@ -304,7 +304,7 @@ function bestRows([own, ...nested]: Row[], search: string): Row[] {
     .map((row) => ({ row, score: filter("", search, keywordsOf(row)) }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, nestedMatchesAtRoot)
+    .slice(0, NESTED_MATCHES_AT_ROOT)
     .map(({ row }) => row);
 
   return own ? [own, ...best] : best;
