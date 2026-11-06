@@ -6,6 +6,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Platform\Sections\SectionContext;
+use Larasell\Admin\Platform\Sections\SectionRequests;
+use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Platform\Support\Rules\Slug;
 use Larasell\Admin\Product\Rules\Barcode;
 use Larasell\Larasell\Barcode as LarasellBarcode;
@@ -23,6 +26,8 @@ class ProductRequest extends FormRequest
 {
     /** A non-negative decimal with a dot, the only amounts the library's measurements take. */
     private const string AMOUNT = 'regex:/^\\d+(\\.\\d+)?$/';
+
+    private ?SectionRequests $sections = null;
 
     /**
      * @return array<string, array<int, mixed>>
@@ -80,6 +85,8 @@ class ProductRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $this->sections()->prepare();
+
         $barcode = $this->input('barcode');
 
         try {
@@ -89,6 +96,30 @@ class ProductRequest extends FormRequest
         } catch (InvalidArgumentException) {
             // Left as entered for the Barcode rule to explain.
         }
+    }
+
+    /**
+     * Validates the sections that modules and plugins add to the page, each on its own fields
+     * under sections[{key}], so the product only saves when they're valid too.
+     *
+     * @return list<callable>
+     */
+    public function after(): array
+    {
+        return [$this->sections()->validate()];
+    }
+
+    /**
+     * The requests of the page's sections, which the product's saved event hands to them.
+     */
+    public function sections(): SectionRequests
+    {
+        return $this->sections ??= app()->call(fn (Sections $sections, #[CurrentContentLocale] Locale $locale): SectionRequests => $sections->requests(
+            'product',
+            $this,
+            $this->route('product') instanceof Product ? $this->route('product') : null,
+            new SectionContext($locale),
+        ));
     }
 
     /**

@@ -24,6 +24,7 @@ yarn-error.log
 /.vscode
 /.zed
 /public/vendor/larasell-admin
+/workbench/public
 /.vitest
 /.fbtee
 /resources/js/translations

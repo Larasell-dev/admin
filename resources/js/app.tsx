@@ -18,6 +18,22 @@ type PageModule = { default: ResolvedComponent };
 
 const pages = import.meta.glob<PageModule>("./Pages/**/*.tsx");
 
+async function resolvePage(name: string): Promise<ResolvedComponent> {
+  const page = await extensions.resolve(name);
+
+  if (page) {
+    return page;
+  }
+
+  const loader = pages[`./Pages/${name}.tsx`];
+
+  if (!loader) {
+    throw new Error(`Admin page [${name}] not found.`);
+  }
+
+  return (await loader()).default;
+}
+
 declare global {
   interface Window {
     /** Internal: the admin Vite plugin's stand-in modules read the shared modules from here. */
@@ -45,20 +61,15 @@ window.LarasellAdmin = {
     void setUpInterfaceLocale().then(() =>
       createInertiaApp({
         serverHead: true,
-        resolve: async (name) => {
-          const page = await extensions.resolve(name);
+        resolve: async (name, page) => {
+          // Alongside the page, so the sections' fields are there when its form mounts.
+          const sections = Array.isArray(page?.props.sections) ? page.props.sections : [];
+          const [component] = await Promise.all([
+            resolvePage(name),
+            extensions.loadSections(sections),
+          ]);
 
-          if (page) {
-            return page;
-          }
-
-          const loader = pages[`./Pages/${name}.tsx`];
-
-          if (!loader) {
-            throw new Error(`Admin page [${name}] not found.`);
-          }
-
-          return (await loader()).default;
+          return component;
         },
         progress: {
           color: "var(--color-progress)",

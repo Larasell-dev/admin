@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createExtensions, type PageLoader } from "./extensions";
+import { createExtensions, type PageLoader, type SectionLoader } from "./extensions";
 
 const Show = () => null;
 
@@ -37,6 +37,32 @@ describe("extensions", () => {
 
     expect(loader).not.toHaveBeenCalled();
     await expect(extensions.resolve("acme-wishlists::Wishlist/Show")).resolves.toBe(Show);
+    expect(loader).toHaveBeenCalledOnce();
+  });
+
+  it("loads a page's section components only once a page with them is shown", async () => {
+    const extensions = createExtensions();
+    const Notes = () => null;
+    const loader = vi.fn<SectionLoader>(async () => ({ default: Notes }));
+    extensions.Larasell.booting(({ sections }) => {
+      sections.register("product", "notes", loader);
+    });
+    extensions.boot();
+
+    expect(loader).not.toHaveBeenCalled();
+    expect(extensions.section("product", "notes")).toBeUndefined();
+
+    // Another page's section of the same key, and one no extension registered, load nothing.
+    await extensions.loadSections([
+      { page: "category", key: "notes" },
+      { page: "product", key: "unknown" },
+    ]);
+    expect(loader).not.toHaveBeenCalled();
+
+    await extensions.loadSections([{ page: "product", key: "notes" }]);
+    await extensions.loadSections([{ page: "product", key: "notes" }]);
+
+    expect(extensions.section("product", "notes")).toBe(Notes);
     expect(loader).toHaveBeenCalledOnce();
   });
 

@@ -3,13 +3,17 @@
 namespace Larasell\Admin\Product\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Category\Data\CategoryOptionData;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Platform\Sections\SectionContext;
+use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Product\Data\CreateProductPageData;
 use Larasell\Admin\Product\Data\EditProductPageData;
 use Larasell\Admin\Product\Data\ProductDetailData;
+use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Category;
@@ -24,6 +28,8 @@ use Laravel\Head\Facades\Head;
  */
 class ProductController
 {
+    public function __construct(private readonly Sections $sections) {}
+
     public function create(#[CurrentContentLocale] Locale $locale): Response
     {
         return Inertia::render('Product/Create', new CreateProductPageData(
@@ -32,6 +38,7 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
+            sections: $this->sections->data('product', null, new SectionContext($locale)),
         ));
     }
 
@@ -41,21 +48,27 @@ class ProductController
      */
     public function store(ProductRequest $request, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
-        $product = Product::create([
-            'name' => Translatable::fromString($request->validated('name'), $locale->value),
-            'slug' => Translatable::fromString($request->validated('slug'), $locale->value),
-            'status' => $request->validated('status'),
-            'weight' => $request->weight(),
-            'dimensions' => $request->dimensions(),
-            'sku' => $request->validated('sku'),
-            'barcode' => $request->validated('barcode'),
-            ...$request->stock(),
-            'price' => Price::of(0),
-        ]);
+        // With the sections' own fields, so a section that fails leaves no product behind.
+        $product = DB::transaction(function () use ($request, $locale): Product {
+            $product = Product::create([
+                'name' => Translatable::fromString($request->validated('name'), $locale->value),
+                'slug' => Translatable::fromString($request->validated('slug'), $locale->value),
+                'status' => $request->validated('status'),
+                'weight' => $request->weight(),
+                'dimensions' => $request->dimensions(),
+                'sku' => $request->validated('sku'),
+                'barcode' => $request->validated('barcode'),
+                ...$request->stock(),
+                'price' => Price::of(0),
+            ]);
 
-        $product->categories()->attach($request->categoryIds());
-        $product->images()->attach($request->images());
-        $this->saveImageAlts($request);
+            $product->categories()->attach($request->categoryIds());
+            $product->images()->attach($request->images());
+            $this->saveImageAlts($request);
+            $this->saved($request, $product, true, $locale);
+
+            return $product;
+        });
 
         return redirect()->route('larasell.admin.products.edit', $product);
     }
@@ -71,6 +84,7 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
+            sections: $this->sections->data('product', $product, new SectionContext($locale)),
         ));
     }
 
@@ -79,25 +93,37 @@ class ProductController
      */
     public function update(ProductRequest $request, Product $product, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
-        // The product checks each quantity limit against the other one it already has, so
-        // clearing both first lets a new range lie wholly above or below the old one.
-        $product->fill(['min_quantity' => null, 'max_quantity' => null])->update([
-            'name' => $product->name->with($locale->value, $request->validated('name')),
-            'slug' => $product->slug->with($locale->value, $request->validated('slug')),
-            'status' => $request->validated('status'),
-            'weight' => $request->weight(),
-            'dimensions' => $request->dimensions(),
-            'sku' => $request->validated('sku'),
-            'barcode' => $request->validated('barcode'),
-            ...$request->stock(),
-        ]);
+        // With the sections' own fields, so a section that fails leaves the product unchanged.
+        DB::transaction(function () use ($request, $product, $locale): void {
+            // The product checks each quantity limit against the other one it already has, so
+            // clearing both first lets a new range lie wholly above or below the old one.
+            $product->fill(['min_quantity' => null, 'max_quantity' => null])->update([
+                'name' => $product->name->with($locale->value, $request->validated('name')),
+                'slug' => $product->slug->with($locale->value, $request->validated('slug')),
+                'status' => $request->validated('status'),
+                'weight' => $request->weight(),
+                'dimensions' => $request->dimensions(),
+                'sku' => $request->validated('sku'),
+                'barcode' => $request->validated('barcode'),
+                ...$request->stock(),
+            ]);
 
-        $product->categories()->sync($request->categoryIds());
-        // Also moves the images the product keeps to their new positions.
-        $product->images()->sync($request->images());
-        $this->saveImageAlts($request);
+            $product->categories()->sync($request->categoryIds());
+            // Also moves the images the product keeps to their new positions.
+            $product->images()->sync($request->images());
+            $this->saveImageAlts($request);
+            $this->saved($request, $product, false, $locale);
+        });
 
         return redirect()->route('larasell.admin.products.edit', $product);
+    }
+
+    /**
+     * Lets the page's sections save their own fields, in the same transaction.
+     */
+    protected function saved(ProductRequest $request, Product $product, bool $created, Locale $locale): void
+    {
+        event(new ProductSaved($product, $created, new SectionContext($locale), $request->sections()));
     }
 
     /**

@@ -10,6 +10,20 @@ declare module "@larasell-dev/admin" {
 
   export type PageLoader = () => Promise<{ default: ComponentType<any> }>;
 
+  /** What the panel gives a section's component. */
+  export type SectionComponentProps<Props = unknown> = {
+    /** What the section's server side returned from props(), e.g. what it saved before. */
+    props: Props;
+    /** The name of one of the section's fields: name("note") is "sections[acme-notes][note]". */
+    name: (field: string) => string;
+    /** The error of one of the section's fields, e.g. error("note"), from its rules or listener. */
+    error: (field: string) => string | undefined;
+  };
+
+  export type SectionLoader = () => Promise<{
+    default: ComponentType<SectionComponentProps<any>>;
+  }>;
+
   export type BootingContext = {
     pages: {
       /**
@@ -18,6 +32,15 @@ declare module "@larasell-dev/admin" {
        * The loader runs when the page is first opened: () => import("./Pages/Wishlist/Show").
        */
       register(name: string, loader: PageLoader): void;
+    };
+    sections: {
+      /**
+       * Adds the component of a section that the server added to a page with
+       * Sections::add($page, $key). It renders inside the page's form, after the page's own
+       * sections, so its fields are saved with the page; name its fields with `name()`. The
+       * loader runs when a page with the section is first opened.
+       */
+      register(page: string, key: string, loader: SectionLoader): void;
     };
     commands: {
       /**
