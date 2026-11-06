@@ -28,7 +28,7 @@ export default function Show({ order, indexUrl, customerUrl }: Props) {
       />
       <Page.Body width="wide">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-2 type-body-md text-mauve-600 dark:text-mauve-400">
+          <div className="flex items-center gap-2 type-body-md text-base-secondary">
             <Badge variant={order.status.variant}>{order.status.label}</Badge>
             <span>{order.placedAt}</span>
           </div>
@@ -105,19 +105,17 @@ function Items({ order }: { order: Order }) {
             />
           </div>
         ) : (
-          <ul className="divide-y divide-border">
+          <ul className="divide-y divide-base-subtle">
             {order.items.map((item, index) => (
               <li key={index}>
                 <Inset>
                   <div className="flex items-start justify-between gap-4 type-body-md">
                     <div className="min-w-0">
-                      <div className="text-mauve-950 dark:text-mauve-50">{item.name}</div>
+                      <div className="text-base-primary">{item.name}</div>
                       {item.variant && <Muted>{item.variant}</Muted>}
                     </div>
                     <div className="shrink-0 text-right">
-                      <div className="text-mauve-950 tabular-nums dark:text-mauve-50">
-                        {item.total}
-                      </div>
+                      <div className="text-base-primary tabular-nums">{item.total}</div>
                       <Muted>
                         {item.quantity} × {item.unitPrice}
                       </Muted>
@@ -304,8 +302,8 @@ function Fields({ columns = false, children }: { columns?: boolean; children: Re
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
-      <dt className="type-label-sm text-mauve-600 dark:text-mauve-400">{label}</dt>
-      <dd className="text-mauve-950 dark:text-mauve-50">{children}</dd>
+      <dt className="type-label-sm text-base-secondary">{label}</dt>
+      <dd className="text-base-primary">{children}</dd>
     </div>
   );
 }
@@ -329,7 +327,7 @@ function Payments({ order }: { order: Order }) {
           {order.payments.map((payment, index) => (
             <li key={index} className="flex flex-col gap-1 type-body-md">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-mauve-950 dark:text-mauve-50">{payment.method}</span>
+                <span className="text-base-primary">{payment.method}</span>
                 <Badge variant={payment.status.variant}>{payment.status.label}</Badge>
               </div>
               <div className="flex justify-between gap-2">
@@ -344,9 +342,7 @@ function Payments({ order }: { order: Order }) {
                     </fbt>
                   )}
                 </Muted>
-                <span className="text-mauve-950 tabular-nums dark:text-mauve-50">
-                  {payment.amount}
-                </span>
+                <span className="text-base-primary tabular-nums">{payment.amount}</span>
               </div>
             </li>
           ))}
@@ -396,18 +392,18 @@ function Row({
   return (
     <div
       className={cn(
-        "flex justify-between gap-4 text-mauve-950 dark:text-mauve-50",
-        strong ? "border-t border-border pt-3 type-body-md-strong" : "type-body-md",
+        "flex justify-between gap-4 text-base-primary",
+        strong ? "border-t border-base-subtle pt-3 type-body-md-strong" : "type-body-md",
       )}
     >
-      <dt className={strong ? undefined : "text-mauve-600 dark:text-mauve-400"}>{label}</dt>
+      <dt className={strong ? undefined : "text-base-secondary"}>{label}</dt>
       <dd className="tabular-nums">{children}</dd>
     </div>
   );
 }
 
 function Muted({ children }: { children: ReactNode }) {
-  return <div className="type-body-md text-mauve-600 dark:text-mauve-400">{children}</div>;
+  return <div className="type-body-md text-base-secondary">{children}</div>;
 }
 
 Show.layout = [SidebarLayout];

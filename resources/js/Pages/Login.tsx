@@ -10,17 +10,17 @@ export default function Login({
   const [devLoginLoading, setDevLoginLoading] = useState(false);
 
   return (
-    <main className="flex min-h-dvh items-center bg-white dark:bg-mauve-950">
+    <main className="flex min-h-dvh items-center bg-base-canvas">
       <Container>
         <div className="mx-auto w-full max-w-sm">
           <Stack spacing={8}>
             <Stack spacing={2}>
-              <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">
+              <h1 className="type-headline-lg text-base-primary">
                 <fbt desc="Login page: main heading of the form where an admin signs in to the panel">
                   Sign in
                 </fbt>
               </h1>
-              <p className="type-body-md text-mauve-600 dark:text-mauve-400">
+              <p className="type-body-md text-base-secondary">
                 <fbt desc="Login page: text below the 'Sign in' heading that asks the admin for their email and password">
                   Enter your credentials to access the admin panel.
                 </fbt>

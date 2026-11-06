@@ -29,7 +29,7 @@ export default function Profile({ admin, updateUrl }: ProfilePageProps) {
     <Container>
       <div className="max-w-lg py-10">
         <Stack spacing={8}>
-          <h1 className="type-headline-lg text-mauve-950 dark:text-mauve-50">
+          <h1 className="type-headline-lg text-base-primary">
             <fbt desc="Profile page: heading of the page where the admin edits their own account">
               Profile
             </fbt>
@@ -189,7 +189,7 @@ function AvatarInput({ error }: { error?: string }) {
       <input type="hidden" name="remove_avatar" value={change.type === "removed" ? "1" : "0"} />
 
       <div className="flex items-center gap-4" aria-busy={upload.processing}>
-        <Avatar.Root className="inline-flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 type-body-md text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
+        <Avatar.Root className="inline-flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-base-muted type-body-md text-base-secondary">
           {currentUrl && (
             <Avatar.Image src={currentUrl} alt="" className="size-full object-cover" />
           )}
@@ -256,9 +256,9 @@ function PreferenceSection() {
             className="group flex cursor-pointer flex-col gap-2 outline-none select-none"
           >
             <ThemePreview theme={value} />
-            <span className="flex items-center gap-2 type-label-md text-mauve-950 dark:text-mauve-50">
-              <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border bg-white group-data-checked:border-mauve-950 group-data-checked:bg-mauve-950 dark:bg-mauve-900 dark:group-data-checked:border-mauve-100 dark:group-data-checked:bg-mauve-100">
-                <Radio.Indicator className="size-1.5 rounded-full bg-white dark:bg-mauve-950" />
+            <span className="flex items-center gap-2 type-label-md text-base-primary">
+              <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-base-strong bg-base-surface group-data-checked:border-action-neutral-primary-default group-data-checked:bg-action-neutral-primary-default">
+                <Radio.Indicator className="size-1.5 rounded-full bg-base-surface" />
               </span>
               {themeLabel(value)}
             </span>
@@ -320,6 +320,9 @@ function InterfaceLocaleField() {
   );
 }
 
+// The preview shows each theme whatever the current one is, so it uses the palette, not the
+// semantic tokens, which follow the current theme. Keep it in step with theme.css.
+/* oxlint-disable larasell/color-tokens */
 const previewColors = {
   [Theme.Light]: {
     background: "var(--color-white)",
@@ -327,6 +330,7 @@ const previewColors = {
     line: "var(--color-mauve-300)",
     card: "var(--color-mauve-50)",
     border: "var(--color-mauve-200)",
+    accent: "var(--color-primary-500)",
   },
   [Theme.Dark]: {
     background: "var(--color-mauve-950)",
@@ -334,8 +338,10 @@ const previewColors = {
     line: "var(--color-mauve-700)",
     card: "var(--color-mauve-900)",
     border: "var(--color-mauve-800)",
+    accent: "var(--color-primary-500)",
   },
 };
+/* oxlint-enable larasell/color-tokens */
 
 /** A small sketch of the admin panel in the theme's colors; system shows light and dark halves. */
 function ThemePreview({ theme }: { theme: Theme }) {
@@ -371,7 +377,7 @@ function PreviewUi({ colors }: { colors: (typeof previewColors)[keyof typeof pre
     <>
       <rect width="120" height="80" fill={colors.background} />
       <rect width="30" height="80" fill={colors.sidebar} />
-      <rect x="6" y="8" width="10" height="4" fill="var(--color-primary-500)" />
+      <rect x="6" y="8" width="10" height="4" fill={colors.accent} />
       <rect x="6" y="20" width="18" height="3" fill={colors.line} />
       <rect x="6" y="28" width="14" height="3" fill={colors.line} />
       <rect x="6" y="36" width="16" height="3" fill={colors.line} />
@@ -380,7 +386,7 @@ function PreviewUi({ colors }: { colors: (typeof previewColors)[keyof typeof pre
       <rect x="44" y="28" width="36" height="3" fill={colors.line} />
       <rect x="44" y="36" width="56" height="3" fill={colors.line} />
       <rect x="44" y="44" width="48" height="3" fill={colors.line} />
-      <rect x="44" y="58" width="16" height="6" fill="var(--color-primary-500)" />
+      <rect x="44" y="58" width="16" height="6" fill={colors.accent} />
     </>
   );
 }

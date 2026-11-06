@@ -47,7 +47,7 @@ export default function Logo({
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="Larasell"
-      className={className ?? "h-8 w-auto text-mauve-950 dark:text-white"}
+      className={className ?? "h-8 w-auto text-base-primary"}
       {...props}
     >
       <rect x="75" width="50" height="75" fill="#D34E70" />

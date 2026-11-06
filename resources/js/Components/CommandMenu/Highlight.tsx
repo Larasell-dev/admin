@@ -24,7 +24,7 @@ export function Highlight({
       <mark
         key={from}
         // Color only, no weight or padding, so marking a match never moves the text around it.
-        className="rounded-xs bg-primary-500/15 text-primary-700 dark:bg-primary-400/20 dark:text-primary-300"
+        className="rounded-xs bg-intent-accent-subtle text-intent-accent"
       >
         {text.slice(from, to)}
       </mark>,

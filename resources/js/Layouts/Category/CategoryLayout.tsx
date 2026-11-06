@@ -40,7 +40,7 @@ export default function CategoryLayout({ children }: { children: ReactNode }) {
             categories={categories}
             createUrl={createUrl}
             currentId={category?.id}
-            className="hidden border-r border-border lg:flex"
+            className="hidden border-r border-base-subtle lg:flex"
           />
         )}
         {/* Below lg the tree moves into a dialog, opened by CategoryTreeTrigger in the page header.
@@ -103,7 +103,7 @@ function TreeDialog(
         {/* Both start below the mobile nav, which stays visible above the dialog. */}
         {/* Gives way to the backdrop of a confirmation opened on top, such as deleting a
             category, which covers the page as well, so the page isn't dimmed twice. */}
-        <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
+        <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-base-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
         <Dialog.Popup
           aria-label={fbs(
             "Categories",
@@ -111,7 +111,7 @@ function TreeDialog(
           )}
           className={cn(
             // Panel
-            "fixed top-(--mobile-nav-height) bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-border bg-white outline-none lg:hidden dark:bg-mauve-950",
+            "fixed top-(--mobile-nav-height) bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-base-subtle bg-base-canvas outline-none lg:hidden",
             // Slides in from the left
             "transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
           )}
@@ -152,8 +152,8 @@ function TreePanel({
       aria-labelledby={headingId}
       className={cn("min-h-0 w-full max-w-80 shrink-0 flex-col", className)}
     >
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-6">
-        <h1 id={headingId} className="type-body-md text-mauve-950 dark:text-mauve-50">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-base-subtle pr-1.5 pl-6">
+        <h1 id={headingId} className="type-body-md text-base-primary">
           <fbt desc="Category pages: heading above the tree that lists all categories of the store">
             Categories
           </fbt>

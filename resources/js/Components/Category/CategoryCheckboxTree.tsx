@@ -218,7 +218,7 @@ function CategoryRow({
           if (event.key === " ") onToggle();
         }}
         className={cn(
-          "type-body-md flex cursor-pointer items-center gap-2 py-2 pl-[calc(0.5rem+var(--tree-level)*1.5rem)] text-mauve-950 outline-none select-none group-hover/row:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 dark:text-mauve-50 dark:group-hover/row:bg-mauve-900",
+          "type-body-md flex cursor-pointer items-center gap-2 py-2 pl-[calc(0.5rem+var(--tree-level)*1.5rem)] text-base-primary outline-none select-none group-hover/row:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2",
           expanded === undefined ? "pr-10" : "pr-28",
         )}
       >
@@ -231,15 +231,10 @@ function CategoryRow({
           data-testid="category-checkbox"
           DANGEROUS_className="pointer-events-none"
         />
-        <span className="flex shrink-0 text-mauve-500 dark:text-mauve-400">
+        <span className="flex shrink-0 text-base-tertiary">
           <Icon icon={expanded ? FolderOpenLine : FolderLine} size={4} />
         </span>
-        <span
-          className={cn(
-            "min-w-0 flex-1 truncate",
-            !category.visible && "text-mauve-500 dark:text-mauve-400",
-          )}
-        >
+        <span className={cn("min-w-0 flex-1 truncate", !category.visible && "text-base-tertiary")}>
           {category.name}
         </span>
       </TreeItem>
@@ -247,7 +242,7 @@ function CategoryRow({
       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
         {expanded !== undefined && (
           <>
-            <span className="type-body-md pr-1 text-mauve-500 tabular-nums dark:text-mauve-400">
+            <span className="type-body-md pr-1 text-base-tertiary tabular-nums">
               ({category.children.length})
             </span>
             {/* Out of the tab order: the row itself opens and closes with the arrow keys. */}

@@ -6,11 +6,10 @@
     /* The height of the nav bar above the page below lg. Pages and overlays start below it. */
     --mobile-nav-height: 3.5rem;
     color-scheme: light;
-    background-color: var(--color-white);
+    background-color: var(--background-color-base-canvas);
   }
 
   :root.dark {
     color-scheme: dark;
-    background-color: var(--color-mauve-950);
   }
 }

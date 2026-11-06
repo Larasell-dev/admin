@@ -400,7 +400,7 @@ function ImageGrid({
             <li
               // The same file can be chosen twice, so its name isn't unique.
               key={index}
-              className="border-border flex aspect-square items-center justify-center border bg-mauve-50 text-mauve-600 dark:bg-mauve-900 dark:text-mauve-300"
+              className="border-base-subtle flex aspect-square items-center justify-center border bg-base-section text-base-secondary"
             >
               <Spinner
                 aria-label={fbs(
@@ -418,11 +418,11 @@ function ImageGrid({
                 // A square with the icon in its middle. Relative keeps the hidden file input inside
                 // it; otherwise focusing the input scrolls the whole page to where it would be.
                 "relative flex aspect-square items-center justify-center",
-                "border border-dashed border-mauve-300 dark:border-mauve-600",
-                "text-mauve-600 dark:text-mauve-300",
+                "border border-dashed border-base-medium",
+                "text-base-secondary",
                 // Clickable while no upload is running, dimmed while one is
                 "cursor-pointer has-disabled:cursor-default has-disabled:opacity-50",
-                "not-has-disabled:hover:bg-mauve-50 dark:not-has-disabled:hover:bg-mauve-800",
+                "not-has-disabled:hover:bg-state-hover",
                 // Focus is on the hidden file input inside
                 "has-focus-visible:focus-ring",
               )}
@@ -490,7 +490,7 @@ function ImageCard({
       ref={useMergedRef(ref, handleRef)}
       data-dragging={isDragging || undefined}
       className={cn(
-        "border-border relative aspect-square cursor-grab overflow-hidden border bg-mauve-50 select-none dark:bg-mauve-900",
+        "border-base-subtle relative aspect-square cursor-grab overflow-hidden border bg-base-section select-none",
         "data-dragging:cursor-grabbing data-dragging:opacity-60",
         // On the card rather than its button, whose ring the card's overflow would clip.
         "has-[>button:focus-visible]:focus-ring",
@@ -881,12 +881,12 @@ function UnitSelect({
 }) {
   return (
     // The wrapper takes the suffix's place; the select fills it so the whole area opens it.
-    <div className="border-border relative -mr-3.5 flex self-stretch border-l">
+    <div className="border-base-subtle relative -mr-3.5 flex self-stretch border-l">
       <select
         {...props}
         ref={ref}
         aria-label={label}
-        className="type-input-md cursor-pointer appearance-none bg-transparent pr-9 pl-3.5 text-mauve-950 select-none hover:bg-mauve-100 focus-visible:focus-ring focus-visible:outline-offset-0 dark:text-mauve-100 dark:hover:bg-mauve-800"
+        className="type-input-md cursor-pointer appearance-none bg-transparent pr-9 pl-3.5 text-base-primary select-none hover:bg-action-neutral-ghost-hover focus-visible:focus-ring focus-visible:outline-offset-0"
       >
         {units.map((unit) => (
           <option key={unit} value={unit}>
@@ -895,7 +895,7 @@ function UnitSelect({
         ))}
       </select>
       {/* Clicks pass through to the select underneath. */}
-      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-mauve-950 dark:text-mauve-100">
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-base-primary">
         <Icon icon={ArrowDownSLine} />
       </span>
     </div>

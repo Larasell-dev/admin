@@ -9,7 +9,7 @@ import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-white lg:flex-row dark:bg-mauve-950">
+    <div className="flex min-h-dvh flex-col bg-base-canvas lg:flex-row">
       <SkipLink />
       <div className="sticky top-0 z-10 lg:hidden">
         <MobileNav />
