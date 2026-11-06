@@ -196,9 +196,17 @@ export function UnsavedChangesToastHost() {
         {toast?.dirty && (
           <motion.div
             ref={(element: HTMLDivElement) => {
-              const observer = new ResizeObserver(() => setHeight(element.offsetHeight));
+              const observer = new ResizeObserver(([entry]) => {
+                setHeight(element.offsetHeight);
+                // The other toasts take this one's width, so their borders line up with it.
+                const width = entry?.borderBoxSize[0]?.inlineSize ?? element.offsetWidth;
+                document.body.style.setProperty("--toast-width", `${width}px`);
+              });
               observer.observe(element);
-              return () => observer.disconnect();
+              return () => {
+                observer.disconnect();
+                document.body.style.removeProperty("--toast-width");
+              };
             }}
             role="region"
             aria-label={fbs(
@@ -250,18 +258,20 @@ function ToastContent({ toast }: { toast: ToastState }) {
 
   return (
     // The wobble moves this inner box, since the outer one's x centers the toast.
-    // As wide as the other toasts, so their borders line up.
+    // At least as wide as the toasts, and wider when its text needs it, e.g. in German; the host
+    // gives the others its width. On phones it spans the viewport, and its buttons wrap below the
+    // message when they don't fit beside it.
     <div
       ref={scope}
       inert={!present}
-      className="flex w-(--toast-width) max-w-[calc(100vw-2rem)] items-center justify-between gap-6 border border-base-subtle bg-base-elevated bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-elevated"
+      className="flex w-max max-w-[calc(100vw-2rem)] min-w-(--toast-min-width) flex-wrap items-center justify-between gap-x-6 border border-base-subtle bg-base-elevated bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-elevated max-sm:w-[calc(100vw-2rem)] max-sm:min-w-0"
     >
-      <p className="type-body-md whitespace-nowrap text-base-primary">
+      <p className="type-body-md py-2 text-base-primary">
         <fbt desc="Unsaved changes toast: message in the bar at the bottom of a form that has changes not saved yet">
           Unsaved changes
         </fbt>
       </p>
-      <div className="flex gap-1">
+      <div className="flex grow justify-end gap-1">
         <Button type="button" variant="tertiary" disabled={toast.processing} onClick={toast.cancel}>
           <fbt desc="Unsaved changes toast: button that discards the form's unsaved changes">
             Cancel
