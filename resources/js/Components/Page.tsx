@@ -17,7 +17,7 @@ type HeaderProps = {
 /** The bar at the top of a page with its title. */
 function Header({ title, backLink, actions }: HeaderProps) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border px-6">
+    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-base-subtle px-6">
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {backLink && (
           <IconButton
@@ -30,7 +30,7 @@ function Header({ title, backLink, actions }: HeaderProps) {
             <Icon icon={ArrowLeftLine} />
           </IconButton>
         )}
-        <h1 className="truncate type-body-md text-mauve-950 dark:text-mauve-50">{title}</h1>
+        <h1 className="truncate type-body-md text-base-primary">{title}</h1>
       </div>
       {actions}
     </header>

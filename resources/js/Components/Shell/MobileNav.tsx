@@ -19,7 +19,7 @@ export default function MobileNav() {
 
   return (
     <Drawer.Root open={open} onOpenChange={setOpen} swipeDirection="left">
-      <header className="box-border h-(--mobile-nav-height) border-b border-border bg-white dark:bg-mauve-950">
+      <header className="box-border h-(--mobile-nav-height) border-b border-base-subtle bg-base-canvas">
         <div className="flex h-full items-center justify-between px-6">
           <Link
             href={home.url}
@@ -29,7 +29,7 @@ export default function MobileNav() {
             )}
             className="inline-block outline-none focus-visible:focus-ring"
           >
-            <Logo variant="wordmark" className="h-6 w-auto text-mauve-950 dark:text-white" />
+            <Logo variant="wordmark" className="h-6 w-auto text-base-primary" />
           </Link>
           <Drawer.Trigger
             render={
@@ -49,7 +49,7 @@ export default function MobileNav() {
       </header>
 
       <Drawer.Portal>
-        <Drawer.Backdrop className="fixed inset-0 z-40 bg-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+        <Drawer.Backdrop className="fixed inset-0 z-40 bg-base-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Drawer.Viewport className="fixed inset-0 z-50 pointer-events-none">
           {/* The sidebar extends a screen width to the left, so dragging the panel right keeps its background, border and highlight. */}
           <Drawer.Popup

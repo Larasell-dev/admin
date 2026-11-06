@@ -143,13 +143,13 @@ export default function CommandMenu() {
       onOpenChangeComplete={(isOpen) => !isOpen && setViews([rootView])}
     >
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-overlay backdrop-blur-overlay" />
+        <Dialog.Backdrop className="fixed inset-0 z-40 bg-base-overlay backdrop-blur-overlay" />
         <Dialog.Popup
           aria-label={fbs(
             "Command menu",
             "Accessible name of the command menu dialog, opened with Cmd+K",
           )}
-          className="fixed top-[15vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 border border-border bg-elevated bg-clip-padding shadow-elevated outline-none"
+          className="fixed top-[15vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 border border-base-subtle bg-base-elevated bg-clip-padding shadow-elevated outline-none"
         >
           {/* Suspends the page's hotkeys while open, like other overlays. */}
           <HotkeysProvider scope="command-menu" exclusive={overlayExclusive} enabled={open}>
@@ -174,7 +174,10 @@ export default function CommandMenu() {
               }}
             >
               <div
-                className={cn("flex items-center gap-3 px-4.5", !bare && "border-b border-border")}
+                className={cn(
+                  "flex items-center gap-3 px-4.5",
+                  !bare && "border-b border-base-subtle",
+                )}
               >
                 {nested ? (
                   <button
@@ -195,14 +198,14 @@ export default function CommandMenu() {
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") event.stopPropagation();
                     }}
-                    className="-m-1 flex shrink-0 p-1 text-mauve-500 hover:text-mauve-950 focus-visible:focus-ring dark:hover:text-mauve-50"
+                    className="-m-1 flex shrink-0 p-1 text-base-tertiary hover:text-base-primary focus-visible:focus-ring"
                   >
                     <span className="flex translate-y-px">
                       <Icon icon={ArrowLeftSLine} size={4} />
                     </span>
                   </button>
                 ) : (
-                  <span aria-hidden className="flex shrink-0 text-mauve-500">
+                  <span aria-hidden className="flex shrink-0 text-base-tertiary">
                     <Icon icon={SearchLine} size={4} />
                   </span>
                 )}
@@ -226,7 +229,7 @@ export default function CommandMenu() {
                           "Command menu: search field placeholder in the list of commands",
                         )
                   }
-                  className="h-11 min-w-0 flex-1 bg-transparent type-body-md text-mauve-950 outline-none placeholder:text-mauve-500 dark:text-mauve-50"
+                  className="h-11 min-w-0 flex-1 bg-transparent type-body-md text-base-primary outline-none placeholder:text-base-tertiary"
                 />
               </div>
               <Command.List
@@ -234,7 +237,7 @@ export default function CommandMenu() {
                 hidden={bare}
                 className="max-h-80 scroll-py-1.5 overflow-y-auto p-1.5"
               >
-                <Command.Empty className="px-3 py-6 text-center type-body-md text-mauve-500">
+                <Command.Empty className="px-3 py-6 text-center type-body-md text-base-tertiary">
                   {nested && shown?.loading
                     ? fbs(
                         "Searching…",
@@ -388,9 +391,9 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
         onSelect={() => (item.items ? actions.openView(path, item) : actions.run(item.run))}
         className={cn(
           "flex min-h-9 cursor-default items-center gap-3 px-3 py-1.5 select-none",
-          "type-body-md text-mauve-950 dark:text-mauve-50",
-          "data-[disabled=true]:text-mauve-400 dark:data-[disabled=true]:text-mauve-500",
-          "data-[selected=true]:bg-mauve-100 dark:data-[selected=true]:bg-mauve-800",
+          "type-body-md text-base-primary",
+          "data-[disabled=true]:text-base-disabled",
+          "data-[selected=true]:bg-action-neutral-ghost-hover",
         )}
       >
         {/* An item without an icon keeps its place, so every label starts in the same column. */}
@@ -400,10 +403,10 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
         <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
           {crumbs.map((crumb, index) => (
             <Fragment key={crumb}>
-              <span className="shrink-0 text-mauve-500">
+              <span className="shrink-0 text-base-tertiary">
                 <Highlight text={crumb} ranges={marks[index] ?? []} />
               </span>
-              <span aria-hidden className="flex shrink-0 text-mauve-400">
+              <span aria-hidden className="flex shrink-0 text-base-tertiary">
                 <Icon icon={ArrowRightSLine} />
               </span>
             </Fragment>
@@ -423,7 +426,7 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
           )}
         </span>
         {item.disabled ? (
-          <span className="shrink-0 type-body-sm text-mauve-500">{item.disabled}</span>
+          <span className="shrink-0 type-body-sm text-base-tertiary">{item.disabled}</span>
         ) : (
           item.checked && (
             <>

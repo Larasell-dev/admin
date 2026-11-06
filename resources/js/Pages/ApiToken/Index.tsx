@@ -86,9 +86,7 @@ function CreatedTokenDialog() {
           <Stack spacing={5}>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-4">
-                <div className="min-w-0 flex-1 font-medium text-mauve-950 dark:text-mauve-50">
-                  {token.name}
-                </div>
+                <div className="min-w-0 flex-1 font-medium text-base-primary">{token.name}</div>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -107,7 +105,7 @@ function CreatedTokenDialog() {
                 </Button>
               </div>
               {/* Wraps rather than scrolls, so the whole token is visible to check a paste against. */}
-              <code className="block border border-border bg-white p-3 type-mono-md break-all text-mauve-950 select-all dark:bg-mauve-950 dark:text-mauve-50">
+              <code className="block border border-base-subtle bg-base-canvas p-3 type-mono-md break-all text-base-primary select-all">
                 {token.plainTextToken}
               </code>
             </div>

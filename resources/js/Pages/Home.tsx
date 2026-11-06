@@ -97,15 +97,15 @@ type OnboardingLinkProps = {
 
 function OnboardingLink({ href, icon, title, description, external }: OnboardingLinkProps) {
   const className =
-    "flex flex-1 items-start gap-4 p-5 outline-none hover:bg-mauve-50 focus-visible:focus-ring dark:hover:bg-mauve-900";
+    "flex flex-1 items-start gap-4 p-5 outline-none hover:bg-state-hover focus-visible:focus-ring";
   const content = (
     <>
-      <span className="flex shrink-0 text-mauve-600 dark:text-mauve-300">
+      <span className="flex shrink-0 text-base-secondary">
         <Icon icon={icon} size={8} />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="type-body-md-strong text-mauve-950 dark:text-mauve-50">{title}</span>
-        <span className="type-body-md text-mauve-600 dark:text-mauve-400">{description}</span>
+        <span className="type-body-md-strong text-base-primary">{title}</span>
+        <span className="type-body-md text-base-secondary">{description}</span>
       </span>
     </>
   );

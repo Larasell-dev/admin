@@ -33,7 +33,7 @@ function ThemeChangedToast() {
   return (
     <Inset>
       {/* Not a flex row, which would drop the spaces around the theme, wherever a language puts it. */}
-      <p className="type-body-md whitespace-nowrap text-mauve-950 dark:text-mauve-50">
+      <p className="type-body-md whitespace-nowrap text-base-primary">
         <fbt desc="Toast after the color theme changed, e.g. 'Changed theme to Dark'">
           Changed theme to{" "}
           <fbt:param name="theme">

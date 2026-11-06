@@ -50,13 +50,13 @@ export default function ProductImageLightbox({
           // tooltip on every open.
           initialFocus={altInput}
           className={cn(
-            "fixed inset-0 z-50 flex flex-col bg-white outline-none dark:bg-mauve-950",
+            "fixed inset-0 z-50 flex flex-col bg-base-canvas outline-none",
             "transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0",
             "motion-reduce:transition-none",
           )}
         >
           <HotkeysProvider scope="image-lightbox" exclusive={overlayExclusive} enabled={open}>
-            <header className="border-border flex items-center justify-between gap-4 border-b px-4 py-3">
+            <header className="border-base-subtle flex items-center justify-between gap-4 border-b px-4 py-3">
               {/* The title names the dialog after the file. */}
               <Dialog.Title className="type-body-md min-w-0">
                 <Tooltip.Root>
@@ -66,7 +66,7 @@ export default function ProductImageLightbox({
                         href={image.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-2 text-mauve-950 hover:underline focus-visible:focus-ring dark:text-mauve-100"
+                        className="flex items-center gap-2 text-base-primary hover:underline focus-visible:focus-ring"
                       >
                         <Icon icon={FileImageLine} />
                         <span className="truncate">{image.filename}</span>
@@ -103,10 +103,9 @@ export default function ProductImageLightbox({
                     <div
                       data-checkerboard={checkerboard || undefined}
                       className={cn(
-                        "flex min-h-0 flex-1 cursor-grab bg-mauve-50 active:cursor-grabbing dark:bg-mauve-900",
+                        "flex min-h-0 flex-1 cursor-grab bg-base-section active:cursor-grabbing",
                         // Squares of two colors, like image editors show behind transparency.
-                        "data-checkerboard:bg-white data-checkerboard:bg-[repeating-conic-gradient(var(--color-mauve-300)_0_25%,transparent_0_50%)] data-checkerboard:bg-size-[16px_16px]",
-                        "dark:data-checkerboard:bg-mauve-900 dark:data-checkerboard:bg-[repeating-conic-gradient(var(--color-mauve-700)_0_25%,transparent_0_50%)]",
+                        "data-checkerboard:bg-base-surface data-checkerboard:bg-[repeating-conic-gradient(var(--border-color-base-medium)_0_25%,transparent_0_50%)] data-checkerboard:bg-size-[16px_16px]",
                       )}
                     >
                       {/* Both fill the area, which the library sizes to their content otherwise,
@@ -179,7 +178,7 @@ export default function ProductImageLightbox({
                   </div>
                 )}
               </TransformWrapper>
-              <aside className="border-border border-t p-4 md:w-80 md:border-t-0 md:border-l">
+              <aside className="border-base-subtle border-t p-4 md:w-80 md:border-t-0 md:border-l">
                 <Field
                   label={fbs(
                     "Alt text",

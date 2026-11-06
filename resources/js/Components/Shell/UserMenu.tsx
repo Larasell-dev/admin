@@ -16,22 +16,18 @@ export default function UserMenu() {
 
   return (
     <Menu.Root>
-      <Menu.Trigger className="flex w-full border-t border-border cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-mauve-50 focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-mauve-50 dark:hover:bg-mauve-900 dark:data-popup-open:bg-mauve-900">
-        <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mauve-100 type-body-md text-mauve-700 dark:bg-mauve-800 dark:text-mauve-200">
+      <Menu.Trigger className="flex w-full border-t border-base-subtle cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-state-hover">
+        <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-base-muted type-body-md text-base-secondary">
           {admin.avatarUrl && (
             <Avatar.Image src={admin.avatarUrl} alt="" className="size-full object-cover" />
           )}
           <Avatar.Fallback>{initials(admin.name)}</Avatar.Fallback>
         </Avatar.Root>
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate type-body-md-strong text-mauve-950 dark:text-mauve-50">
-            {admin.name}
-          </span>
-          <span className="truncate type-body-sm text-mauve-500 dark:text-mauve-400">
-            {admin.email}
-          </span>
+          <span className="truncate type-body-md-strong text-base-primary">{admin.name}</span>
+          <span className="truncate type-body-sm text-base-tertiary">{admin.email}</span>
         </span>
-        <span className="flex shrink-0 text-mauve-500 dark:text-mauve-400">
+        <span className="flex shrink-0 text-base-tertiary">
           <Icon icon={ExpandUpDownLine} size={4} />
         </span>
       </Menu.Trigger>
@@ -44,7 +40,7 @@ export default function UserMenu() {
           alignOffset={12}
           className="z-50 w-58"
         >
-          <Menu.Popup className="origin-(--transform-origin) border border-border bg-elevated bg-clip-padding shadow-popover outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0">
+          <Menu.Popup className="origin-(--transform-origin) border border-base-subtle bg-base-elevated bg-clip-padding shadow-popover outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0">
             <HotkeysProvider scope="user-menu" exclusive={overlayExclusive}>
               <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
                 <fbt desc="User menu: goes to the page where the admin edits their own name, avatar and password">
@@ -70,9 +66,9 @@ function UserMenuItem({
   return (
     <Menu.Item
       {...props}
-      className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-mauve-950 outline-none select-none hover:bg-mauve-50 data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:hover:bg-mauve-700 dark:data-highlighted:bg-mauve-800"
+      className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-base-primary outline-none select-none hover:bg-state-hover data-highlighted:bg-action-neutral-ghost-hover"
     >
-      <span className="flex text-mauve-500 dark:text-mauve-400">
+      <span className="flex text-base-tertiary">
         <Icon icon={icon} size={4} />
       </span>
       {children}

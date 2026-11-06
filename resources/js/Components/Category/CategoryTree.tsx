@@ -322,7 +322,7 @@ function RootDropZone({
     <div
       ref={ref}
       data-drop-target={isDropTarget || undefined}
-      className="min-h-full data-drop-target:bg-mauve-50 dark:data-drop-target:bg-mauve-900"
+      className="min-h-full data-drop-target:bg-state-hover"
     >
       {children}
     </div>
@@ -366,7 +366,7 @@ function CategoryRow({
       data-drop-target={(isDropTarget && dropZone === "inside") || undefined}
       // As wide as the panel, unless a deeply nested row needs more to keep its name's minimum
       // width; that row then pushes its controls out of line, and the panel scrolls sideways.
-      className="group/row relative w-fit min-w-full data-drop-target:outline-1 data-drop-target:-outline-offset-1 data-drop-target:outline-primary-500"
+      className="group/row relative w-fit min-w-full data-drop-target:outline-1 data-drop-target:-outline-offset-1 data-drop-target:outline-state-selected-accent"
     >
       <TreeItem
         // A native link drag would take over the pointer before ours starts. While dragging,
@@ -378,32 +378,28 @@ function CategoryRow({
         data-dragging={isDragging || undefined}
         className={cn(
           // Row
-          "type-body-md flex cursor-pointer items-center gap-1.5 py-2 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-mauve-950 outline-none select-none dark:text-mauve-50",
+          "type-body-md flex cursor-pointer items-center gap-1.5 py-2 pl-[calc(1.5rem+var(--tree-level)*1.25rem)] text-base-primary outline-none select-none",
           // Room for the controls on the right
           expanded === undefined ? "pr-10" : "pr-28",
-          "group-hover/row:bg-mauve-50 dark:group-hover/row:bg-mauve-900",
+          "group-hover/row:bg-state-hover",
           "focus-visible:focus-ring focus-visible:-outline-offset-2",
-          "aria-[current=page]:bg-mauve-100 dark:aria-[current=page]:bg-mauve-900",
+          "aria-[current=page]:bg-state-selected-neutral-default",
           // The row being dragged
-          "data-dragging:bg-white data-dragging:opacity-60 dark:data-dragging:bg-mauve-950",
+          "data-dragging:bg-base-canvas data-dragging:opacity-60",
           // The row dropped onto
-          "group-data-drop-target/row:bg-primary-50! dark:group-data-drop-target/row:bg-primary-950/40!",
+          "group-data-drop-target/row:bg-state-selected-accent-default!",
           // The striped placeholder in the dragged row's old place
           "data-dnd-placeholder:visible! data-dnd-placeholder:opacity-100! data-dnd-placeholder:*:invisible",
-          "data-dnd-placeholder:outline-1 data-dnd-placeholder:-outline-offset-1 data-dnd-placeholder:outline-dashed data-dnd-placeholder:outline-mauve-300 dark:data-dnd-placeholder:outline-mauve-600",
-          "data-dnd-placeholder:bg-mauve-50! data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,color-mix(in_oklab,var(--color-mauve-200)_60%,transparent)_0_1px,transparent_1px_6px)]",
-          "dark:data-dnd-placeholder:bg-mauve-900! dark:data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,var(--color-mauve-800)_0_1px,transparent_1px_6px)]",
+          "data-dnd-placeholder:outline-1 data-dnd-placeholder:-outline-offset-1 data-dnd-placeholder:outline-dashed data-dnd-placeholder:outline-base-medium",
+          "data-dnd-placeholder:bg-base-section! data-dnd-placeholder:bg-[image:repeating-linear-gradient(-45deg,var(--border-color-base-subtle)_0_1px,transparent_1px_6px)]",
         )}
       >
-        <span className="flex shrink-0 text-mauve-500 dark:text-mauve-400">
+        <span className="flex shrink-0 text-base-secondary">
           <Icon icon={expanded ? FolderOpenLine : FolderLine} size={4} />
         </span>
         <span
           // Zero width, so only the minimum, not the whole name, widens the row.
-          className={cn(
-            "w-0 min-w-32 flex-1 truncate",
-            !category.visible && "text-mauve-500 dark:text-mauve-400",
-          )}
+          className={cn("w-0 min-w-32 flex-1 truncate", !category.visible && "text-base-secondary")}
         >
           {category.name}
         </span>
@@ -417,7 +413,7 @@ function CategoryRow({
       >
         {expanded !== undefined && (
           <>
-            <span className="type-body-md pointer-events-none pr-1 text-mauve-500 tabular-nums dark:text-mauve-400">
+            <span className="type-body-md pointer-events-none pr-1 text-base-secondary tabular-nums">
               ({category.children.length})
             </span>
             {/* Out of the tab order: the row itself opens and closes with the arrow keys. */}
@@ -456,7 +452,7 @@ function CategoryRow({
         <span
           aria-hidden
           className={cn(
-            "pointer-events-none absolute right-0 h-0.5 -translate-y-1/2 bg-primary-500",
+            "pointer-events-none absolute right-0 h-0.5 -translate-y-1/2 bg-intent-accent-strong",
             dropZone === "before" ? "top-0" : "top-full",
           )}
           // Starts at the dragged category's new level, under the icon of its row.

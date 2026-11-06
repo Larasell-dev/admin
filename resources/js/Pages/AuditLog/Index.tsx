@@ -101,7 +101,7 @@ function FilterBar({
         "Filter the audit log",
         "Audit log page: accessible name of the bar of fields that filter the recorded changes",
       )}
-      className="flex shrink-0 flex-wrap items-start gap-3 border-b border-border px-6 py-4"
+      className="flex shrink-0 flex-wrap items-start gap-3 border-b border-base-subtle px-6 py-4"
     >
       <Filter>
         <Field

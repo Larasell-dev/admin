@@ -173,12 +173,12 @@ export default function ProductsTable(props: Props) {
           {rows.length > 0 && (
             <table aria-label={table!.title} className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-base-subtle">
                   {table!.columns.map((column) => (
                     <th
                       key={column.name}
                       scope="col"
-                      className="px-(--inset) py-2.5 type-label-sm text-mauve-600 dark:text-mauve-400"
+                      className="px-(--inset) py-2.5 type-label-sm text-base-secondary"
                     >
                       {column.label}
                     </th>
@@ -200,15 +200,15 @@ export default function ProductsTable(props: Props) {
                     key={row.id}
                     // `relative` contains the row link, which stretches over the whole row.
                     className={cn(
-                      "relative border-b border-border last:border-b-0",
+                      "relative border-b border-base-subtle last:border-b-0",
                       row._link &&
-                        "hover:bg-mauve-50 has-[a:focus-visible]:bg-mauve-50 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-primary-500 dark:hover:bg-mauve-800/50 dark:has-[a:focus-visible]:bg-mauve-800/50",
+                        "hover:bg-state-hover has-[a:focus-visible]:bg-state-hover has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-focus-default",
                     )}
                   >
                     {table!.columns.map((column, index) => (
                       <td
                         key={column.name}
-                        className="px-(--inset) py-1.5 type-body-md text-mauve-950 dark:text-mauve-50"
+                        className="px-(--inset) py-1.5 type-body-md text-base-primary"
                       >
                         {index === 0 && row._link ? (
                           <Table.Link
@@ -289,7 +289,7 @@ export default function ProductsTable(props: Props) {
             </table>
           )}
           {table && table.pagination.total > table.pagination.pageSize && (
-            <div className="border-t border-border px-(--inset) py-3">
+            <div className="border-t border-base-subtle px-(--inset) py-3">
               <Pagination
                 {...table.pagination}
                 pageSizeOptions={[25, 50, 100]}
@@ -385,7 +385,7 @@ function AddProductBar({
   }
 
   return (
-    <div className="@container border-b border-border p-3 last:border-b-0">
+    <div className="@container border-b border-base-subtle p-3 last:border-b-0">
       <div className="flex flex-col gap-1.5 @md:flex-row @md:items-start">
         {/* Without a name: the field only shows the error, it submits nothing. */}
         <Field.Root invalid={error !== undefined} className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -416,9 +416,9 @@ function AddProductBar({
             />
             <Combobox.Portal>
               <Combobox.Positioner sideOffset={4} align="start" className="z-50 w-(--anchor-width)">
-                <Combobox.Popup className="max-h-72 overflow-y-auto border border-border bg-elevated bg-clip-padding py-1 shadow-popover">
+                <Combobox.Popup className="max-h-72 overflow-y-auto border border-base-subtle bg-base-elevated bg-clip-padding py-1 shadow-popover">
                   <HotkeysProvider scope="product-search" exclusive={overlayExclusive}>
-                    <Combobox.Empty className="px-3.5 py-2 type-body-md text-mauve-600 empty:hidden dark:text-mauve-400">
+                    <Combobox.Empty className="px-3.5 py-2 type-body-md text-base-secondary empty:hidden">
                       {searching
                         ? fbs(
                             "Searching…",
@@ -434,7 +434,7 @@ function AddProductBar({
                         <Combobox.Item
                           key={product.id}
                           value={product}
-                          className="cursor-pointer px-3.5 py-2 type-body-md text-mauve-950 outline-none select-none data-highlighted:bg-mauve-100 dark:text-mauve-100 dark:data-highlighted:bg-mauve-800"
+                          className="cursor-pointer px-3.5 py-2 type-body-md text-base-primary outline-none select-none data-highlighted:bg-action-neutral-ghost-hover"
                         >
                           {product.name}
                         </Combobox.Item>

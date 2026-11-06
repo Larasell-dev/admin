@@ -107,7 +107,7 @@ function resultItem(result: Result): CommandItem {
           <Highlight text={result.label} ranges={match ? [] : matchRanges(result.label, search)} />
         </span>
         {match && (
-          <span className="type-body-sm text-mauve-500">
+          <span className="type-body-sm text-base-tertiary">
             <fbt desc="Command menu, search results: line below a result's name with the other field the search matched and its value, e.g. 'SKU: OX-123'">
               <fbt:param name="matchedField">{match.label}</fbt:param>:{" "}
               <fbt:param name="matchedValue">
