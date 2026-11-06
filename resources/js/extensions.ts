@@ -19,6 +19,9 @@ export type SectionModule = { default: ComponentType<SectionComponentProps<any>>
 
 export type SectionLoader = () => Promise<SectionModule>;
 
+/** The pages sections can be added to, the values of the server's SectionPage enum. */
+export type SectionPage = "product";
+
 export type BootingContext = {
   pages: {
     /**
@@ -30,11 +33,11 @@ export type BootingContext = {
   };
   sections: {
     /**
-     * Adds the component of a section that the server added to a page with Sections::add($page,
+     * Adds the component of a section that the server added to a page with Section::add($page,
      * $key). It renders inside the page's form, after the page's own sections, so its fields
      * are saved with the page. The loader runs when a page with the section is first opened.
      */
-    register(page: string, key: string, loader: SectionLoader): void;
+    register(page: SectionPage, key: string, loader: SectionLoader): void;
   };
   commands: {
     /**

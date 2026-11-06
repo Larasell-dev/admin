@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
+use Larasell\Admin\Platform\Sections\SectionPage;
 use Larasell\Admin\Platform\Sections\SectionRequests;
 use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Platform\Support\Rules\Slug;
@@ -115,7 +116,7 @@ class ProductRequest extends FormRequest
     public function sections(): SectionRequests
     {
         return $this->sections ??= app()->call(fn (Sections $sections, #[CurrentContentLocale] Locale $locale): SectionRequests => $sections->requests(
-            'product',
+            SectionPage::Product,
             $this,
             $this->route('product') instanceof Product ? $this->route('product') : null,
             new SectionContext($locale),

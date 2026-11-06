@@ -13,7 +13,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 class SectionData extends Data
 {
     public function __construct(
-        /** The page it extends, e.g. "product". */
+        /** The page it extends, a SectionPage value, e.g. "product". */
         public string $page,
         public string $key,
         public mixed $props,

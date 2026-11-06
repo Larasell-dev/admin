@@ -2,13 +2,12 @@
 
 namespace Workbench\App\ProductNotes;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
-use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Admin\Platform\Sections\Facades\Section;
+use Larasell\Admin\Platform\Sections\SectionPage;
 use Larasell\Admin\Product\Events\ProductSaved;
-use Larasell\Larasell\Models\Product;
 
 /**
  * An example plugin for the playground: a note for the team on each product, which the product
@@ -23,10 +22,8 @@ class ProductNotesServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(dirname(__DIR__, 2).'/database/migrations');
 
         // The section's data, and the request that validates its fields.
-        $this->app->make(Sections::class)->add('product', self::SECTION)
-            ->props(fn (?Product $product): array => [
-                'note' => $product === null ? null : DB::table('workbench_product_notes')->where('product_id', $product->id)->value('note'),
-            ])
+        Section::add(SectionPage::Product, self::SECTION)
+            ->props(ProductNotesProps::class)
             ->request(ProductNotesRequest::class);
 
         // Its business logic. Listening right away saves the note in the product's transaction.
