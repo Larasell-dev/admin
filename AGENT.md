@@ -89,6 +89,15 @@ frontend's files and the server's alike.
   `npm run translations:compile` for the frontend and at runtime for the server. Pick one to spot
   hard-coded text, which stays plain English, and layouts that break.
 
+## Arrange, act, assert
+
+Every test, Pest and Vitest alike, marks what it sets up, what it exercises and what it checks
+with `// Arrange`, `// Act` and `// Assert` comments, each on its own line above its section, in
+that order. Leave out `// Arrange` when a test sets nothing up. Sections that can't be split share
+one comment, such as `// Act & Assert` for a request with its assertions chained on, or for
+`expect(fn () => …)->toThrow()`. `lint/PHPStan/ArrangeActAssertRule.php` (in `composer phpstan`)
+and `lint/eslint/larasell-admin.mjs` (in `npm run lint`) enforce it.
+
 ## Best-before markers
 
 A comment like `BEST-BEFORE YYYY-MM-DD: what to revisit` is a to-do with a deadline, in any
