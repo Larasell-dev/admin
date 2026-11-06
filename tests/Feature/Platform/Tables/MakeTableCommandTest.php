@@ -9,8 +9,10 @@ afterEach(function () {
 });
 
 it('scaffolds a table that names the singular model of a plural table name', function () {
+    // Act
     $this->artisan('make:larasell-table', ['name' => 'ProductReviews'])->assertSuccessful();
 
+    // Assert
     $contents = File::get(app_path('Tables/ProductReviews.php'));
 
     expect($contents)
@@ -23,8 +25,10 @@ it('scaffolds a table that names the singular model of a plural table name', fun
 });
 
 it('scaffolds a table that infers its model when named after it', function (string $name) {
+    // Act
     $this->artisan('make:larasell-table', ['name' => $name])->assertSuccessful();
 
+    // Assert
     expect(File::get(app_path("Tables/{$name}.php")))
         ->toContain("class {$name} extends Table")
         ->not->toContain('UseModel')
@@ -32,8 +36,10 @@ it('scaffolds a table that infers its model when named after it', function (stri
 })->with(['ProductReview', 'ProductReviewTable']);
 
 it('uses the given model', function () {
+    // Act
     $this->artisan('make:larasell-table', ['name' => 'Books', '--model' => 'Larasell\Admin\Tests\Fixtures\Book'])->assertSuccessful();
 
+    // Assert
     expect(File::get(app_path('Tables/Books.php')))
         ->toContain('use Larasell\Admin\Tests\Fixtures\Book;')
         ->toContain('use Larasell\Admin\Platform\Tables\Attributes\UseModel;')
@@ -41,16 +47,20 @@ it('uses the given model', function () {
 });
 
 it('leaves out a given model the table would infer anyway', function () {
+    // Act
     $this->artisan('make:larasell-table', ['name' => 'Shop/ProductReview', '--model' => 'Shop/ProductReview'])->assertSuccessful();
 
+    // Assert
     expect(File::get(app_path('Tables/Shop/ProductReview.php')))
         ->toContain('namespace App\Tables\Shop;')
         ->not->toContain('UseModel');
 });
 
 it('names a given model the table would not infer', function () {
+    // Act
     $this->artisan('make:larasell-table', ['name' => 'Shop/ProductReviews', '--model' => 'ProductReview'])->assertSuccessful();
 
+    // Assert
     expect(File::get(app_path('Tables/Shop/ProductReviews.php')))
         ->toContain('use App\Models\ProductReview;')
         ->toContain('#[UseModel(ProductReview::class)]');

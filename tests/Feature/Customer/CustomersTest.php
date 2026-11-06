@@ -13,6 +13,7 @@ use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
 
 it('lists customers with their order count, newest first', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
     $older = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace', 'created_at' => now()->subDays(2)]);
@@ -34,6 +35,7 @@ it('lists customers with their order count, newest first', function () {
         ]);
     }
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.index'))
         ->assertOk()
@@ -54,9 +56,11 @@ it('lists customers with their order count, newest first', function () {
 });
 
 it('links each customer to their edit page and offers to add one', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -66,8 +70,10 @@ it('links each customer to their edit page and offers to add one', function () {
 });
 
 it('offers to add the first customer when there are none', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -78,8 +84,10 @@ it('offers to add the first customer when there are none', function () {
 });
 
 it('opens the new customer page', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.create'))
         ->assertOk()
@@ -90,11 +98,14 @@ it('opens the new customer page', function () {
 });
 
 it('adds a customer and opens their page', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
+    // Act
     $response = $this->actingAs($admin, 'larasell-admin')
         ->post(route('larasell.admin.customers.store'), ['first_name' => 'Grace', 'last_name' => 'Hopper']);
 
+    // Assert
     $grace = Customer::query()->sole();
     $response->assertRedirect(route('larasell.admin.customers.edit', $grace));
     expect($grace->first_name)->toBe('Grace')
@@ -102,13 +113,16 @@ it('adds a customer and opens their page', function () {
 });
 
 it('rejects a customer without a first or last name', function (string $method, Closure $url) {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
 
+    // Act
     $this->actingAs($admin, 'larasell-admin')
         ->{$method}($url($ada), ['first_name' => '', 'last_name' => str_repeat('a', 256)])
         ->assertSessionHasErrors(['first_name', 'last_name']);
 
+    // Assert
     expect(Customer::query()->sole()->only(['first_name', 'last_name']))
         ->toBe(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
 })->with([
@@ -117,10 +131,12 @@ it('rejects a customer without a first or last name', function (string $method, 
 ]);
 
 it('opens a customer to edit', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
     $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.edit', $alan))
         ->assertOk()
@@ -132,22 +148,27 @@ it('opens a customer to edit', function () {
 });
 
 it('updates only the edited customer', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
     $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
 
+    // Act
     $this->actingAs($admin, 'larasell-admin')
         ->put(route('larasell.admin.customers.update', $alan), ['first_name' => 'Alan M.', 'last_name' => 'Turing-Smith'])
         ->assertRedirect(route('larasell.admin.customers.edit', $alan));
 
+    // Assert
     expect($alan->refresh()->fullName())->toBe('Alan M. Turing-Smith')
         ->and($ada->refresh()->fullName())->toBe('Ada Lovelace');
 });
 
 it('offers to delete each customer', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -159,6 +180,7 @@ it('offers to delete each customer', function () {
 });
 
 it('deletes a customer and keeps the others', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace', 'created_at' => now()->subDay()]);
     Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
@@ -167,12 +189,15 @@ it('deletes a customer and keeps the others', function () {
     // The newest customer comes first, so this is Alan's delete action.
     $delete = $this->get(route('larasell.admin.customers.index'))->inertiaProps('table.rows.0._actions.0.url');
 
+    // Act
     $this->from(route('larasell.admin.customers.index'))->post($delete)->assertRedirect(route('larasell.admin.customers.index'));
 
+    // Assert
     expect(Customer::query()->pluck('last_name')->all())->toBe(['Lovelace']);
 });
 
 it('keeps the orders of a deleted customer, no longer linked to them', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
     DB::table('larasell_orders')->insert([
@@ -191,13 +216,17 @@ it('keeps the orders of a deleted customer, no longer linked to them', function 
     $this->actingAs($admin, 'larasell-admin');
 
     $delete = $this->get(route('larasell.admin.customers.index'))->inertiaProps('table.rows.0._actions.0.url');
+
+    // Act
     $this->post($delete);
 
+    // Assert
     expect(DB::table('larasell_orders')->get(['customer_id', 'customer_name'])->map(fn ($order) => (array) $order)->all())
         ->toBe([['customer_id' => null, 'customer_name' => 'Alan Turing']]);
 });
 
 it('unlinks the user accounts of a deleted customer and keeps the others', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace', 'created_at' => now()->subDay()]);
     $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
@@ -206,25 +235,32 @@ it('unlinks the user accounts of a deleted customer and keeps the others', funct
 
     // The newest customer comes first, so this is Alan's delete action.
     $delete = $this->get(route('larasell.admin.customers.index'))->inertiaProps('table.rows.0._actions.0.url');
+
+    // Act
     $this->post($delete);
 
+    // Assert
     expect(DB::table('larasell_customer_user')->pluck('user_id')->all())->toBe([7]);
 });
 
 it('shows a missing customer as not found', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.edit', 999))
         ->assertNotFound();
 });
 
 it('turns the customers off when disabled in the config', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.customers.enabled' => false]));
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
     $this->actingAs($admin, 'larasell-admin');
 
+    // Act & Assert
     expect(Route::has('larasell.admin.customers.index'))->toBeFalse();
 
     // The routes aren't registered, so there are no route names to use.
@@ -255,6 +291,7 @@ function customerOrder(string $number, ?Customer $customer, array $attributes = 
 }
 
 it('lists the customer\'s own orders on their page, newest first', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
     $alan = Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
@@ -263,6 +300,7 @@ it('lists the customer\'s own orders on their page, newest first', function () {
     customerOrder('1002', $alan);
     customerOrder('1004', null);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.edit', $ada))
         ->assertOk()
@@ -288,11 +326,13 @@ it('lists the customer\'s own orders on their page, newest first', function () {
 });
 
 it('does not link the customer\'s orders while the orders are turned off', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.orders.enabled' => false]));
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
     customerOrder('1001', $ada);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.customers.edit', $ada))
         ->assertInertia(fn (AssertableInertia $page) => $page

@@ -68,8 +68,10 @@ it.each([
   // Settings' own children sit under it, but they don't stop it from matching its other pages.
   ["/admin/settings/42", "Settings"],
 ])("marks the item for %s as the current page", async (url, label) => {
+  // Act
   await renderAt(url);
 
+  // Assert
   expect(current()).toEqual([label]);
 });
 
@@ -79,8 +81,10 @@ it.each([
   // A prefix only counts at a path segment boundary.
   "/admin/categories-archive",
 ])("marks no item as the current page for %s", async (url) => {
+  // Act
   await renderAt(url);
 
+  // Assert
   expect(current()).toEqual([]);
 });
 
@@ -89,14 +93,18 @@ it.each([
   ["/admin/settings", ["Home", "Categories", "Customers", "Settings", "Taxes", "Shipping"]],
   ["/admin/settings/taxes", ["Home", "Categories", "Customers", "Settings", "Taxes", "Shipping"]],
 ])("shows a group's children only inside that group, at %s", async (url, labels) => {
+  // Act
   await renderAt(url);
 
+  // Assert
   expect(visible()).toEqual(labels);
 });
 
 it("lists children in a group named after their parent", async () => {
+  // Act
   await renderAt("/admin/settings/taxes");
 
+  // Assert
   const group = page.getByRole("list", { name: "Settings" });
   expect(
     group
@@ -112,12 +120,14 @@ it.each([
   ["/admin/categories/archive", "Archive"],
   ["/admin/categories/archive/3", "Archive"],
 ])("only lets items in the same group shadow an item, at %s", async (url, label) => {
+  // Act
   await renderAt(url, [
     item("Home", "/admin"),
     item("Categories", "/admin/categories"),
     item("Settings", "/admin/settings", [item("Archive", "/admin/categories/archive")]),
   ]);
 
+  // Assert
   expect(current()).toEqual([label]);
 });
 
@@ -136,8 +146,10 @@ describe("expanding a group", () => {
   });
 
   it("shows a toggle only for items with children", async () => {
+    // Act
     await renderAt("/admin");
 
+    // Assert
     expect(
       page
         .getByRole("navigation")
@@ -148,9 +160,13 @@ describe("expanding a group", () => {
   });
 
   it("opens and closes a closed group with its toggle", async () => {
+    // Arrange
     await renderAt("/admin");
 
+    // Act
     await toggle("Open Settings").click();
+
+    // Assert
     await expect.element(toggle("Close Settings")).toHaveAttribute("aria-expanded", "true");
     expect(visible()).toEqual(["Home", "Categories", "Customers", "Settings", "Taxes", "Shipping"]);
 
@@ -160,27 +176,35 @@ describe("expanding a group", () => {
   });
 
   it("closes the group of the current page", async () => {
+    // Arrange
     await renderAt("/admin/settings/taxes");
 
+    // Act
     await toggle("Close Settings").click();
 
+    // Assert
     await expect.element(toggle("Open Settings")).toHaveAttribute("aria-expanded", "false");
     expect(visible()).toEqual(["Home", "Categories", "Customers", "Settings"]);
   });
 
   it("points the toggle at the group it controls", async () => {
+    // Act
     await renderAt("/admin/settings");
 
+    // Assert
     const group = page.getByRole("list", { name: "Settings" }).element();
     await expect.element(toggle("Close Settings")).toHaveAttribute("aria-controls", group.id);
   });
 
   it("keeps the user on the current page when toggling", async () => {
+    // Arrange
     await renderAt("/admin/customers");
 
+    // Act
     await toggle("Open Settings").click();
     await toggle("Close Settings").click();
 
+    // Assert
     expect(visit).not.toHaveBeenCalled();
     expect(current()).toEqual(["Customers"]);
 

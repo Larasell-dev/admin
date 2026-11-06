@@ -48,12 +48,15 @@ function signedInAdmin(): void
 }
 
 it('titles the login page', function () {
+    // Act & Assert
     expect(pageTitle($this->get(route('larasell.admin.login'))))->toBe('Sign in - Admin');
 });
 
 it('titles the signed-in pages', function (string $uri, string $title) {
+    // Arrange
     signedInAdmin();
 
+    // Act & Assert
     expect(pageTitle($this->get($uri)))->toBe($title);
 })->with([
     'dashboard' => ['/admin', 'Dashboard - Admin'],
@@ -70,28 +73,35 @@ it('titles the signed-in pages', function (string $uri, string $title) {
 ]);
 
 it('titles an admin\'s page with their name', function () {
+    // Arrange
     signedInAdmin();
 
+    // Act & Assert
     expect(pageTitle($this->get(route('larasell.admin.settings.team.edit', 1))))->toBe('Ada Lovelace - Admin');
 });
 
 it('titles a customer\'s page with their name', function () {
+    // Arrange
     signedInAdmin();
 
     $customer = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
 
+    // Act & Assert
     expect(pageTitle($this->get(route('larasell.admin.customers.edit', $customer))))->toBe('Ada Lovelace - Admin');
 });
 
 it('titles an order\'s page with its number', function () {
+    // Arrange
     signedInAdmin();
 
     $order = Order::create(['number' => '2026-000123', 'customer_email' => 'ada@example.com', 'customer_name' => 'Ada Lovelace', 'currency' => 'EUR', 'subtotal' => Price::of(0), 'total' => Price::of(0)]);
 
+    // Act & Assert
     expect(pageTitle($this->get(route('larasell.admin.orders.show', $order))))->toBe('Order #2026-000123 - Admin');
 });
 
 it('titles category pages with the category name', function (string $uri, string $title) {
+    // Arrange
     signedInAdmin();
 
     Category::create([
@@ -99,6 +109,7 @@ it('titles category pages with the category name', function (string $uri, string
         'slug' => Translatable::fromString('shoes-boots'),
     ]);
 
+    // Act & Assert
     expect(pageTitle($this->get($uri)))->toBe($title);
 })->with([
     'category' => ['/admin/categories/1', 'Shoes & Boots - Admin'],
@@ -106,6 +117,7 @@ it('titles category pages with the category name', function (string $uri, string
 ]);
 
 it('titles app routes with their own title, their table, or Admin', function (string $uri, string $title) {
+    // Arrange
     Book::createTable();
     signedInAdmin();
 
@@ -115,6 +127,7 @@ it('titles app routes with their own title, their table, or Admin', function (st
         Route::get('titled', fn () => Inertia::render('Home'))->withHead(title: 'Reports');
     });
 
+    // Act & Assert
     expect(pageTitle($this->get($uri)))->toBe($title);
 })->with([
     'table' => ['/admin/reading-list', 'Reading list - Admin'],
@@ -123,8 +136,10 @@ it('titles app routes with their own title, their table, or Admin', function (st
 ]);
 
 it('shares the title with Inertia visits', function () {
+    // Arrange
     signedInAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.customers.index'), ['X-Inertia' => 'true'])
         ->assertJsonPath('props.head', ['<title data-inertia="title">Customers - Admin</title>']);
 });

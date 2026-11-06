@@ -56,16 +56,19 @@ beforeEach(function () {
 });
 
 it('has no empty state unless the table defines one', function () {
+    // Act & Assert
     expect(emptyStateOf(PlainShelfTable::make()))->toBeNull();
 });
 
 it('describes the empty state with an Icon case', function () {
+    // Arrange
     ShelfTable::$emptyState = [
         'title' => 'No books yet',
         'description' => 'Books appear here once you add them.',
         'icon' => Icon::Book,
     ];
 
+    // Act & Assert
     expect(emptyStateOf(ShelfTable::make()))->toBe([
         'title' => 'No books yet',
         'description' => 'Books appear here once you add them.',
@@ -75,14 +78,18 @@ it('describes the empty state with an Icon case', function () {
 });
 
 it('accepts the icon as a Remix icon name', function () {
+    // Arrange
     ShelfTable::$emptyState = ['title' => 'No books yet', 'icon' => 'file-list-3'];
 
+    // Act & Assert
     expect(emptyStateOf(ShelfTable::make())['icon'])->toBe('FileList3');
 });
 
 it('only needs a title', function () {
+    // Arrange
     ShelfTable::$emptyState = ['title' => 'No books yet'];
 
+    // Act & Assert
     expect(emptyStateOf(ShelfTable::make()))->toBe([
         'title' => 'No books yet',
         'description' => null,
@@ -92,22 +99,27 @@ it('only needs a title', function () {
 });
 
 it('offers actions that resolve the empty state', function () {
+    // Arrange
     ShelfTable::$emptyState = [
         'title' => 'No books yet',
         'actions' => [TableAction::make('Add book')->to('/admin/books/create')->icon(Icon::Add)],
     ];
 
+    // Act & Assert
     expect(emptyStateOf(ShelfTable::make())['actions'])->toBe([
         ['label' => 'Add book', 'method' => 'get', 'url' => '/admin/books/create', 'icon' => 'Add'],
     ]);
 });
 
 it('rejects an invalid empty state', function (array $emptyState, string $code) {
+    // Arrange
     ShelfTable::$emptyState = $emptyState;
 
+    // Act
     try {
         json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR);
     } catch (InvalidTableEmptyState $exception) {
+        // Assert
         expect($exception->errorCode())->toBe($code)
             ->and($exception->getMessage())->toContain('ShelfTable');
 
@@ -129,8 +141,10 @@ it('rejects an invalid empty state', function (array $emptyState, string $code) 
 ]);
 
 it('says which rule invalid empty state actions break', function (mixed $actions, string $expected) {
+    // Arrange
     ShelfTable::$emptyState = ['title' => 'No books yet', 'actions' => value($actions)];
 
+    // Act & Assert
     expect(fn () => json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR))
         ->toThrow(function (InvalidTableAction $exception) use ($expected) {
             expect($exception->errorCode())->toBe('larasell-admin.table.action.invalid-list')
@@ -143,8 +157,10 @@ it('says which rule invalid empty state actions break', function (mixed $actions
 ]);
 
 it('rejects empty state actions without a link or with the same label', function (Closure $actions, string $message) {
+    // Arrange
     ShelfTable::$emptyState = ['title' => 'No books yet', 'actions' => $actions()];
 
+    // Act & Assert
     expect(fn () => json_encode(ShelfTable::make(), JSON_THROW_ON_ERROR))
         ->toThrow(InvalidTableAction::class, $message);
 })->with([
@@ -156,6 +172,7 @@ it('rejects empty state actions without a link or with the same label', function
 ]);
 
 it('sends the empty state to the table page', function () {
+    // Arrange
     ShelfTable::$emptyState = ['title' => 'No books yet', 'icon' => Icon::Book];
     AdminPanel::resolve()->routes(function () {
         Route::index('shelf', ShelfTable::class);
@@ -163,6 +180,7 @@ it('sends the empty state to the table page', function () {
     Route::getRoutes()->refreshNameLookups();
     $admin = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.shelf.index'))
         ->assertOk()

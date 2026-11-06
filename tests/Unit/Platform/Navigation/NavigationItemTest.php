@@ -12,16 +12,20 @@ beforeEach(function () {
 });
 
 it('constructs a navigation item', function () {
+    // Act
     $item = new NavigationItem('Home', 'larasell.admin.home', Icon::Dashboard);
 
+    // Assert
     expect($item->label)->toBe('Home')
         ->and($item->route)->toBe('larasell.admin.home')
         ->and($item->icon)->toBe(Icon::Dashboard);
 });
 
 it('resolves an icon passed as its Remix name', function (string $name, string $case) {
+    // Act
     $item = new NavigationItem('Home', 'larasell.admin.home', $name);
 
+    // Assert
     expect($item->icon)->toBe(constant(Icon::class.'::'.$case));
 })->with([
     'single word' => ['dashboard', 'Dashboard'],
@@ -31,8 +35,10 @@ it('resolves an icon passed as its Remix name', function (string $name, string $
 ]);
 
 it('converts a navigation item to an array with the resolved url and icon', function () {
+    // Act
     $item = new NavigationItem('Home', 'larasell.admin.home', '24-hours');
 
+    // Assert
     expect($item->toData()->toArray())->toBe([
         'id' => 'larasell.admin.home',
         'label' => 'Home',
@@ -43,38 +49,48 @@ it('converts a navigation item to an array with the resolved url and icon', func
 });
 
 it('throws when the icon is empty', function (string $icon) {
+    // Act & Assert
     new NavigationItem('Home', 'larasell.admin.home', $icon);
 })->with(['', ' '])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] icon cannot be empty.');
 
 it('throws when the icon names a style variant', function (string $icon) {
+    // Act & Assert
     new NavigationItem('Home', 'larasell.admin.home', $icon);
 })->with(['home-line', 'home-fill'])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] icon must not end in -line or -fill.');
 
 it('throws when the icon is not a Remix icon', function (string $icon) {
+    // Act & Assert
     new NavigationItem('Home', 'larasell.admin.home', $icon);
 })->with(['not-an-icon', 'Home', 'HomeFill'])->throws(InvalidNavigationItem::class, 'is not a Remix icon');
 
 it('throws an exception when the label is empty', function () {
+    // Act & Assert
     new NavigationItem('  ', 'larasell.admin.home', 'home');
 })->throws(InvalidNavigationItem::class, 'Navigation item label cannot be empty.');
 
 it('throws an exception when the route is empty', function () {
+    // Act & Assert
     new NavigationItem('Home', '', 'home');
 })->throws(InvalidNavigationItem::class, 'Navigation item [Home] route cannot be empty.');
 
 it('accepts positions at both limits', function (int $position) {
+    // Act
     $item = (new NavigationItem('Home', 'larasell.admin.home', 'home'))->position($position);
 
+    // Assert
     expect($item->fixedPosition())->toBe($position);
 })->with([0, 1_000_000]);
 
 it('throws when the position is out of range', function (int $position) {
+    // Act & Assert
     (new NavigationItem('Home', 'larasell.admin.home', 'home'))->position($position);
 })->with([-1, 1_000_001])->throws(InvalidNavigationItem::class, 'must be between 0 and 1000000');
 
 it('throws when an item is placed twice', function (Closure $first, Closure $second) {
+    // Arrange
     $item = new NavigationItem('Home', 'larasell.admin.home', 'home');
 
+    // Act & Assert
     $first($item);
     $second($item);
 })->with([
@@ -85,12 +101,15 @@ it('throws when an item is placed twice', function (Closure $first, Closure $sec
 ])->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] is already placed.');
 
 it('throws when an item targets itself', function () {
+    // Act & Assert
     (new NavigationItem('Home', 'larasell.admin.home', 'home'))->before('larasell.admin.home');
 })->throws(InvalidNavigationItem::class, 'Navigation item [larasell.admin.home] cannot be placed relative to itself.');
 
 it('keeps its state out of reach of outside writes', function (Closure $write) {
+    // Arrange
     $item = new NavigationItem('Home', 'larasell.admin.home', 'home');
 
+    // Act & Assert
     expect(fn () => $write($item))->toThrow(Error::class);
 })->with([
     'label' => [fn ($item) => $item->label = 'Start'],

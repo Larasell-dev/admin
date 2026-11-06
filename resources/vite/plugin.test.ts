@@ -31,6 +31,7 @@ async function builtAssets(name: string) {
 
 describe("larasell()", () => {
   it("builds an extension against the panel's copies of shared modules", async () => {
+    // Arrange
     await fixture({
       "resources/js/admin.ts": `
         import { Larasell } from "@larasell-dev/admin";
@@ -47,12 +48,14 @@ describe("larasell()", () => {
       `,
     });
 
+    // Act
     await build({
       root,
       logLevel: "silent",
       plugins: [larasell({ name: "acme-wishlists", input: ["resources/js/admin.ts"] })],
     });
 
+    // Assert
     const assets = await builtAssets("acme-wishlists");
     const code = assets.map(({ contents }) => contents).join("\n");
 
@@ -66,11 +69,13 @@ describe("larasell()", () => {
   }, 30_000);
 
   it("gives extension stylesheets the panel's theme without its base styles", async () => {
+    // Arrange
     await fixture({
       "resources/css/admin.css": `@import "@larasell-dev/admin/extension.css";\n@source "../js";\n`,
       "resources/js/admin.ts": `document.body.className = "flex-col text-muted";`,
     });
 
+    // Act
     await build({
       root,
       logLevel: "silent",
@@ -82,6 +87,7 @@ describe("larasell()", () => {
       ],
     });
 
+    // Assert
     const css = (await builtAssets("acme-wishlists")).find(({ file }) => file.endsWith(".css"));
 
     expect(css?.contents).toContain("@layer components");
@@ -109,14 +115,17 @@ describe("admin()", () => {
   }
 
   it("lets pages from a dev server render in the panel's production build, which has no jsxDEV", async () => {
+    // Arrange
     const jsx = (type: string, props: object, key?: string) => ({ jsx: [type, props, key] });
     const jsxs = (type: string, props: object, key?: string) => ({ jsxs: [type, props, key] });
 
+    // Act
     const { jsxDEV } = await standIn("react/jsx-dev-runtime", {
       "react/jsx-dev-runtime": { Fragment: "fragment", jsxDEV: undefined },
       "react/jsx-runtime": { Fragment: "fragment", jsx, jsxs },
     });
 
+    // Assert
     expect(jsxDEV("p", { children: "a" }, "key", false)).toEqual({
       jsx: ["p", { children: "a" }, "key"],
     });
@@ -126,11 +135,13 @@ describe("admin()", () => {
   });
 
   it("points imports in an app's admin pages at the panel", () => {
+    // Act & Assert
     expect(plugin.resolveId("react", "/app/resources/js/admin/pages/Report.tsx")).toBeTruthy();
     expect(plugin.resolveId("@larasell-dev/admin", "/app/resources/js/admin/app.tsx")).toBeTruthy();
   });
 
   it("leaves the rest of the app's frontend alone", () => {
+    // Act & Assert
     expect(plugin.resolveId("react", "/app/resources/js/app.tsx")).toBeNull();
   });
 });

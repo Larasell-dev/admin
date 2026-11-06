@@ -9,8 +9,10 @@ afterEach(function () {
 });
 
 it('publishes the config files to config/larasell/admin', function () {
+    // Act
     $this->artisan('vendor:publish', ['--tag' => 'larasell-admin-config'])->assertSuccessful();
 
+    // Assert
     foreach (['panel.php', 'products.php', 'categories.php', 'customers.php', 'orders.php', 'api_tokens.php', 'audit.php'] as $file) {
         expect(config_path("larasell/admin/{$file}"))->toBeFile()
             ->and(File::get(config_path("larasell/admin/{$file}")))

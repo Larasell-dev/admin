@@ -59,6 +59,7 @@ function failedResources(mixed $page): array
 }
 
 it('sends guests to the login page', function () {
+    // Act
     $page = visit(adminUrl())
         ->assertPathIs(adminPath('login'))
         ->assertTitle('Sign in - Admin')
@@ -66,12 +67,14 @@ it('sends guests to the login page', function () {
         ->assertVisible('button[type="submit"]')
         ->assertNoSmoke();
 
+    // Assert
     expect(failedResources($page))->toBe([]);
 
     visit(adminUrl('customers'))->assertPathIs(adminPath('login'));
 });
 
 it('signs an admin in and renders the panel', function () {
+    // Act
     $page = signIn()
         ->assertTitle('Dashboard - Admin')
         ->assertSee('Dashboard')
@@ -84,6 +87,7 @@ it('signs an admin in and renders the panel', function () {
         ->assertScript("typeof window.LarasellAdmin === 'object'")
         ->assertNoSmoke();
 
+    // Assert
     expect(failedResources($page))->toBe([]);
 
     // The panel's own JavaScript and CSS, which larasell:link links into public/vendor/larasell-admin.
@@ -98,6 +102,7 @@ it('signs an admin in and renders the panel', function () {
 });
 
 it('opens Categories and Customers from the sidebar, Profile from the user menu and the dashboard from the logo, without errors or failed requests', function () {
+    // Act
     $page = signIn()
         ->click('aside > nav a[href$="/categories"]')
         ->assertPathIs(adminPath('categories'))
@@ -116,5 +121,6 @@ it('opens Categories and Customers from the sidebar, Profile from the user menu 
         ->assertTitle('Dashboard - Admin')
         ->assertNoSmoke();
 
+    // Assert
     expect(failedResources($page))->toBe([]);
 });

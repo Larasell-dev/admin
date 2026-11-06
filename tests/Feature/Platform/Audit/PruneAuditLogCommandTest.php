@@ -54,10 +54,13 @@ function pruneRecord(): array
 }
 
 it('keeps every record by default', function () {
+    // Arrange
     $old = storedRecord('security', 5000);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
+    // Assert
     expect(remainingRecords())->toBe([$old])
         ->and(pruneRecord()['properties'])->toBe([
             'legal_hold' => false,
@@ -67,30 +70,37 @@ it('keeps every record by default', function () {
 });
 
 it('deletes records older than the default retention period', function () {
+    // Arrange
     config(['larasell.admin.audit.retention.default_days' => 30]);
 
     storedRecord('security', 31);
     $kept = storedRecord('security', 29);
     storedRecord('audit_access', 400);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
+    // Assert
     expect(remainingRecords())->toBe([$kept])
         ->and(pruneRecord()['properties']['deleted'])->toBe(['security' => 1, 'business_critical' => 0, 'audit_access' => 1]);
 });
 
 it('keeps a record until it is older than the retention period, to the second', function () {
+    // Arrange
     config(['larasell.admin.audit.retention.default_days' => 30]);
 
     $exactly = storedRecord('security', 30);
     storedRecord('security', 30, andSeconds: 1);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
+    // Assert
     expect(remainingRecords())->toBe([$exactly]);
 });
 
 it('keeps each category for its own period, falling back to the default', function () {
+    // Arrange
     config(['larasell.admin.audit.retention' => [
         'default_days' => 30,
         'categories' => ['security' => 730, 'audit_access' => null],
@@ -101,8 +111,10 @@ it('keeps each category for its own period, falling back to the default', functi
     storedRecord('business_critical', 31);
     $auditAccess = storedRecord('audit_access', 5000);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
+    // Assert
     expect(remainingRecords())->toEqualCanonicalizing([$security, $auditAccess])
         ->and(pruneRecord()['properties'])->toBe([
             'legal_hold' => false,
@@ -112,25 +124,31 @@ it('keeps each category for its own period, falling back to the default', functi
 });
 
 it('reads periods set as strings, as env() returns them', function () {
+    // Arrange
     config(['larasell.admin.audit.retention.default_days' => '30']);
 
     storedRecord('security', 31);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
+    // Assert
     expect(remainingRecords())->toBe([])
         ->and(pruneRecord()['properties']['retention_days']['security'])->toBe(30);
 });
 
 it('deletes nothing under a legal hold, and records that it was held', function () {
+    // Arrange
     config(['larasell.admin.audit.retention.default_days' => 30, 'larasell.admin.audit.legal_hold' => true]);
 
     $old = storedRecord('security', 400);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')
         ->expectsOutputToContain('legal hold')
         ->assertSuccessful();
 
+    // Assert
     expect(remainingRecords())->toBe([$old])
         ->and(pruneRecord()['properties'])->toMatchArray([
             'legal_hold' => true,
@@ -139,10 +157,13 @@ it('deletes nothing under a legal hold, and records that it was held', function 
 });
 
 it('records each run as the command, so the retention settings it applied are in the log', function () {
+    // Arrange
     config(['larasell.admin.audit.retention.default_days' => 30]);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
+    // Assert
     expect(pruneRecord())->toMatchArray([
         'category' => 'audit_access',
         'actor_type' => 'system',
@@ -153,12 +174,15 @@ it('records each run as the command, so the retention settings it applied are in
 });
 
 it('refuses invalid retention settings without deleting anything', function (array $retention) {
+    // Arrange
     config(['larasell.admin.audit.retention' => $retention]);
 
     $old = storedRecord('security', 400);
 
+    // Act
     $this->artisan('larasell:prune-audit-log')->assertFailed();
 
+    // Assert
     expect(remainingRecords())->toBe([$old])
         ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.pruned')->exists())->toBeFalse();
 })->with([

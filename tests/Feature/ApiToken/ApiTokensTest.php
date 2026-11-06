@@ -60,9 +60,11 @@ function callApi(?string $token): TestResponse
 }
 
 it('lists the API tokens in the settings', function () {
+    // Arrange
     createApiToken();
     createApiToken(['name' => 'Analytics', 'description' => null, 'expires_in' => '1_month']);
 
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->assertOk()
@@ -89,12 +91,14 @@ it('lists the API tokens in the settings', function () {
 });
 
 it('marks expired tokens as expired in the list', function () {
+    // Arrange
     createApiToken(['name' => 'Old sync', 'expires_in' => '1_week']);
     createApiToken(['name' => 'ERP sync', 'expires_in' => '1_month']);
 
     // A second after the week ends: the first token has just expired, the second hasn't.
     $this->travelTo(Carbon::parse('2026-11-07 00:00:01'));
 
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -106,6 +110,7 @@ it('marks expired tokens as expired in the list', function () {
 });
 
 it('ends tokens at the end of the day in the app\'s time zone, and says which', function () {
+    // Arrange
     // A Berlin shop: the token must not stop at midnight UTC, an hour into the next Berlin day.
     config(['app.timezone' => 'Europe/Berlin']);
     date_default_timezone_set('Europe/Berlin');
@@ -114,6 +119,7 @@ it('ends tokens at the end of the day in the app\'s time zone, and says which', 
         $this->travelTo(Carbon::parse('2026-10-30 09:00:00'));
         $plainTextToken = createApiToken(['expires_in' => '1_month']);
 
+        // Act & Assert
         $this->actingAs($this->ada, 'larasell-admin')
             ->get(route('larasell.admin.settings.api-tokens.index'))
             ->assertInertia(fn (AssertableInertia $page) => $page
@@ -133,6 +139,7 @@ it('ends tokens at the end of the day in the app\'s time zone, and says which', 
 });
 
 it('adds API tokens to the settings navigation', function () {
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -141,6 +148,7 @@ it('adds API tokens to the settings navigation', function () {
 });
 
 it('opens the new API token page with a choice of expiry periods, 3 months by default', function () {
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.create'))
         ->assertOk()
@@ -159,8 +167,10 @@ it('opens the new API token page with a choice of expiry periods, 3 months by de
 });
 
 it('creates a token that authenticates API requests as the API token', function () {
+    // Act
     $plainTextToken = createApiToken();
 
+    // Assert
     $apiToken = ApiToken::query()->sole();
 
     expect($apiToken->name)->toBe('ERP sync')
@@ -174,24 +184,30 @@ it('creates a token that authenticates API requests as the API token', function 
 });
 
 it('shows the plaintext token only once', function () {
+    // Arrange
     createApiToken();
 
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->missingFlash('apiToken'));
 });
 
 it('stores only a hash of the token', function () {
+    // Act
     $plainTextToken = createApiToken();
 
+    // Assert
     expect(DB::table('larasell_api_tokens')->sole()->token_hash)
         ->toBe(hash('sha256', $plainTextToken));
 });
 
 it('accepts a token until the end of the day its period ends', function (string $today, string $expiresIn, string $lastDay) {
+    // Arrange
     $this->travelTo(Carbon::parse($today.' 09:00:00'));
     $plainTextToken = createApiToken(['expires_in' => $expiresIn]);
 
+    // Act & Assert
     $this->travelTo(Carbon::parse($lastDay.' 23:59:00'));
     callApi($plainTextToken)->assertOk();
 
@@ -207,19 +223,24 @@ it('accepts a token until the end of the day its period ends', function (string 
 ]);
 
 it('records when a token was last used', function () {
+    // Arrange
     $plainTextToken = createApiToken();
 
+    // Act
     $this->travelTo(Carbon::parse('2026-11-02 08:00:00'));
     callApi($plainTextToken)->assertOk();
 
+    // Assert
     expect(ApiToken::query()->sole()->last_used_at->toDateTimeString())->toBe('2026-11-02 08:00:00');
 });
 
 it('records the last use at most once a minute', function () {
+    // Arrange
     // A polling integration shouldn't turn every read into a write.
     $plainTextToken = createApiToken();
     $lastUsedAt = fn (): string => ApiToken::query()->sole()->last_used_at->toDateTimeString();
 
+    // Act & Assert
     $this->travelTo(Carbon::parse('2026-11-02 08:00:00'));
     callApi($plainTextToken)->assertOk();
 
@@ -233,12 +254,14 @@ it('records the last use at most once a minute', function () {
 });
 
 it('stops answering an address after 30 failed attempts in a minute', function () {
+    // Arrange
     $plainTextToken = createApiToken();
     $from = fn (string $ip, ?string $token) => test()->withServerVariables(['REMOTE_ADDR' => $ip])->getJson(
         'api/whoami',
         $token === null ? [] : ['Authorization' => 'Bearer '.$token],
     );
 
+    // Act & Assert
     foreach (range(1, 30) as $attempt) {
         $from('203.0.113.7', 'larasell_wrong')->assertUnauthorized();
     }
@@ -256,6 +279,7 @@ it('stops answering an address after 30 failed attempts in a minute', function (
 });
 
 it('rejects a new token without a name or with an unknown expiry', function (array $input, array $errors) {
+    // Act
     $this->actingAs($this->ada, 'larasell-admin')
         ->from(route('larasell.admin.settings.api-tokens.create'))
         ->post(route('larasell.admin.settings.api-tokens.store'), [
@@ -266,6 +290,7 @@ it('rejects a new token without a name or with an unknown expiry', function (arr
         ->assertRedirect(route('larasell.admin.settings.api-tokens.create'))
         ->assertSessionHasErrors($errors);
 
+    // Assert
     expect(ApiToken::query()->count())->toBe(0);
 })->with([
     'no name' => [['name' => ''], ['name']],
@@ -275,12 +300,15 @@ it('rejects a new token without a name or with an unknown expiry', function (arr
 ]);
 
 it('revokes a token after its name is typed to confirm', function () {
+    // Arrange
     $plainTextToken = createApiToken();
 
+    // Act
     $revoke = $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->inertiaProps('apiTokens.rows.0._actions.0');
 
+    // Assert
     expect($revoke)->toMatchArray(['label' => 'Revoke', 'destructive' => true])
         ->and($revoke['confirm']['confirmationText'])->toBe('ERP sync');
 
@@ -294,7 +322,10 @@ it('revokes a token after its name is typed to confirm', function () {
 });
 
 it('audits creating a token as the admin who did, without its secret', function () {
+    // Act
     $plainTextToken = createApiToken();
+
+    // Assert
     $apiToken = ApiToken::query()->sole();
 
     $record = DB::table('larasell_audit_log')->sole();
@@ -317,14 +348,17 @@ it('audits creating a token as the admin who did, without its secret', function 
 });
 
 it('audits revoking a token, keeping its name once the token is gone', function () {
+    // Arrange
     createApiToken();
     $apiToken = ApiToken::query()->sole();
 
+    // Act
     $revoke = $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->inertiaProps('apiTokens.rows.0._actions.0');
     $this->post($revoke['url'], ['confirmation' => 'ERP sync'])->assertRedirect();
 
+    // Assert
     $record = DB::table('larasell_audit_log')->where('event', 'api_token.revoked')->sole();
 
     expect($record)->toMatchArray([
@@ -341,41 +375,51 @@ it('audits revoking a token, keeping its name once the token is gone', function 
 });
 
 it('creates no token when its audit record can\'t be stored', function () {
+    // Arrange
     Schema::drop('larasell_audit_log');
 
+    // Act
     $this->actingAs($this->ada, 'larasell-admin')
         ->post(route('larasell.admin.settings.api-tokens.store'), ['name' => 'ERP sync', 'expires_in' => '3_months'])
         ->assertServerError();
 
+    // Assert
     expect(ApiToken::query()->count())->toBe(0);
 });
 
 it('keeps a token working when its revocation can\'t be audited', function () {
+    // Arrange
     $plainTextToken = createApiToken();
     $revoke = $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->inertiaProps('apiTokens.rows.0._actions.0');
 
+    // Act
     Schema::drop('larasell_audit_log');
     $this->post($revoke['url'], ['confirmation' => 'ERP sync'])->assertServerError();
 
+    // Assert
     $this->flushSession();
     app('auth')->forgetGuards();
     callApi($plainTextToken)->assertOk();
 });
 
 it('keeps tokens when the admin who created them is deleted', function () {
+    // Arrange
     $plainTextToken = createApiToken();
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
 
+    // Act
     $this->ada->delete();
 
+    // Assert
     expect(ApiToken::query()->sole()->created_by)->toBeNull();
     callApi($plainTextToken)->assertOk();
     expect($alan->exists)->toBeTrue();
 });
 
 it('rejects API requests without a valid token', function (?string $token) {
+    // Act & Assert
     callApi($token)->assertUnauthorized();
 })->with([
     'no token' => [null],
@@ -384,25 +428,31 @@ it('rejects API requests without a valid token', function (?string $token) {
 ]);
 
 it('rejects a token with a tampered secret', function () {
+    // Arrange
     $plainTextToken = createApiToken();
     $tampered = substr($plainTextToken, 0, -1).(str_ends_with($plainTextToken, 'a') ? 'b' : 'a');
 
+    // Act & Assert
     callApi($tampered)->assertUnauthorized();
 });
 
 it('keeps out of the app\'s own personal access tokens', function () {
+    // Act & Assert
     // An app may use Sanctum for its own users; API tokens neither share nor create its table.
     expect(Schema::hasTable('personal_access_tokens'))->toBeFalse();
 });
 
 it('ignores a signed-in session on API requests', function () {
+    // Arrange
     // auth:sanctum would accept this session user before looking at any token.
     $this->actingAs($this->ada, 'larasell-admin');
 
+    // Act & Assert
     callApi(null)->assertUnauthorized();
 });
 
 it('answers a request without a valid token with a 401, never a redirect', function () {
+    // Act & Assert
     // A plain request, unlike callApi()'s, doesn't ask for JSON.
     $this->get('api/whoami')
         ->assertUnauthorized()
@@ -410,22 +460,27 @@ it('answers a request without a valid token with a 401, never a redirect', funct
 });
 
 it('lets an extension render its own 401', function () {
+    // Arrange
     $this->bootingWith(fn () => app(ExceptionHandler::class)->renderable(
         fn (AuthenticationException $e) => response()->json(['errors' => [['status' => '401']]], 401),
     ));
     Route::middleware(['api', 'larasell.api'])->get('api/whoami', fn () => 'never');
 
+    // Act & Assert
     callApi(null)->assertUnauthorized()->assertExactJson(['errors' => [['status' => '401']]]);
 });
 
 it('authenticates before route model binding, so a request without a token can\'t tell which records exist', function () {
+    // Arrange
     Route::middleware(['api', 'larasell.api'])->get('api/admins/{admin}', fn (Admin $admin) => $admin->name);
 
+    // Act & Assert
     $this->getJson('api/admins/999')->assertUnauthorized();
     $this->getJson('api/admins/'.$this->ada->id)->assertUnauthorized();
 });
 
 it('authenticates before rate limiting, so a limiter can count per token', function () {
+    // Arrange
     $plainTextToken = createApiToken();
     RateLimiter::for('per-token', function (Request $request) {
         test()->limitedAs = $request->user();
@@ -434,16 +489,20 @@ it('authenticates before rate limiting, so a limiter can count per token', funct
     });
     Route::middleware(['api', 'larasell.api', 'throttle:per-token'])->get('api/limited', fn () => 'reached');
 
+    // Act
     $this->getJson('api/limited', ['Authorization' => 'Bearer '.$plainTextToken])->assertOk();
 
+    // Assert
     expect($this->limitedAs)->toBeInstanceOf(ApiToken::class)
         ->and($this->limitedAs->is(ApiToken::query()->sole()))->toBeTrue();
 });
 
 it('only authenticates API tokens through the larasell.api middleware', function () {
+    // Arrange
     // Its guard is an implementation detail: on its own it never has a user.
     Route::middleware(['api', 'auth:larasell-api-token'])->get('api/guard-only', fn () => 'reached');
 
+    // Act & Assert
     $this->getJson('api/guard-only', ['Authorization' => 'Bearer '.createApiToken()])->assertUnauthorized();
 });
 
@@ -456,9 +515,11 @@ function disableApiTokens(): void
 }
 
 it('leaves out the API tokens settings pages when disabled', function () {
+    // Arrange
     disableApiTokens();
     $this->actingAs($this->ada, 'larasell-admin');
 
+    // Act & Assert
     expect(Route::has('larasell.admin.settings.api-tokens.index'))->toBeFalse();
 
     // The routes aren't registered, so there are no route names to use.
@@ -470,27 +531,33 @@ it('leaves out the API tokens settings pages when disabled', function () {
 });
 
 it('leaves out the API tokens navigation item when disabled', function () {
+    // Arrange
     disableApiTokens();
     $this->actingAs($this->ada, 'larasell-admin');
 
+    // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Team', 'Audit log']));
 });
 
 it('rejects every token on larasell.api routes when disabled, rather than failing', function () {
+    // Arrange
     disableApiTokens();
     // What an extension's API does, registered again since rebooting dropped the routes.
     Route::middleware(['api', 'larasell.api'])->get('api/whoami', fn () => 'reached');
     // A token issued while the module was on.
     ApiToken::query()->create(['name' => 'ERP sync', 'token_hash' => hash('sha256', 'larasell_issued-before'), 'expires_at' => now()->addMonth()]);
 
+    // Act & Assert
     callApi('larasell_issued-before')->assertUnauthorized();
 });
 
 it('keeps API tokens out of reach for guests', function () {
+    // Act
     $this->get(route('larasell.admin.settings.api-tokens.index'))->assertRedirect(route('larasell.admin.login'));
     $this->post(route('larasell.admin.settings.api-tokens.store'), ['name' => 'x', 'expires_in' => '3_months'])->assertRedirect(route('larasell.admin.login'));
 
+    // Assert
     expect(ApiToken::query()->count())->toBe(0);
 });

@@ -105,14 +105,17 @@ const select = () => page.getByRole("combobox", { name: "Content language" });
 const nameField = () => page.getByRole("textbox", { name: "Name" });
 
 it("switches the product's content to the picked language", async () => {
+  // Arrange
   const requests = fakeServer(props("Stiefel", { current: "de" }));
   await renderEdit(props("Boots"));
 
   await expect.element(select()).toHaveDisplayValue("English");
   await expect.element(nameField()).toHaveValue("Boots");
 
+  // Act
   await select().selectOptions("German");
 
+  // Assert
   await expect.element(nameField()).toHaveValue("Stiefel");
   await expect.element(select()).toHaveDisplayValue("German");
   expect(requests).toEqual([
@@ -126,17 +129,22 @@ it("switches the product's content to the picked language", async () => {
 });
 
 it("leaves out the select while the store has only one language", async () => {
+  // Act
   await renderEdit(props("Boots", { options: [english] }));
 
+  // Assert
   await expect.element(nameField()).toHaveValue("Boots");
   await expect.element(select()).not.toBeInTheDocument();
 });
 
 it("doesn't switch the language while the product has unsaved changes", async () => {
+  // Arrange
   await renderEdit(props("Boots"));
 
+  // Act
   await nameField().fill("Rain Boots");
 
+  // Assert
   await expect.element(select()).toBeDisabled();
 
   // Without the layout the page is taller than the viewport, which leaves the toast out of view;
@@ -147,8 +155,10 @@ it("doesn't switch the language while the product has unsaved changes", async ()
 });
 
 it("leaves an untranslated name empty and shows what the store shows instead", async () => {
+  // Act
   await renderEdit(props(null, { current: "de" }));
 
+  // Assert
   await expect.element(nameField()).toHaveValue("");
   await expect.element(nameField()).toHaveAttribute("placeholder", "Boots");
   await expect
@@ -171,6 +181,7 @@ function NotesSection({ props, name, error }: SectionComponentProps<{ note: stri
 }
 
 it("renders the sections extensions add inside the form, so they count as unsaved changes", async () => {
+  // Arrange
   Larasell.booting(({ sections }) => {
     sections.register("product", "notes", async () => ({ default: NotesSection }));
   });
@@ -190,6 +201,7 @@ it("renders the sections extensions add inside the form, so they count as unsave
   const note = page.getByRole("textbox", { name: "Internal note" });
   await expect.element(note).toHaveValue("Ships in March");
 
+  // Act & Assert
   await note.fill("Ships in April");
   await expect.element(select()).toBeDisabled();
 
@@ -212,6 +224,7 @@ function TitleSection({ props }: SectionComponentProps<{ title: string }>) {
 }
 
 it("places sections before or after the product's own sections, or after all of them", async () => {
+  // Arrange
   Larasell.booting(({ sections }) => {
     for (const key of ["first", "middle", "last"]) {
       sections.register(SectionForm.Product, key, async () => ({ default: TitleSection }));
@@ -233,8 +246,10 @@ it("places sections before or after the product's own sections, or after all of 
   ];
   await extensions.loadSections(sections);
 
+  // Act
   await renderEdit({ ...props("Boots"), sections });
 
+  // Assert
   await expect.element(page.getByRole("heading", { name: "Last" })).toBeVisible();
   expect([...document.querySelectorAll("h3")].map((heading) => heading.textContent)).toEqual([
     "Before general",
@@ -250,6 +265,7 @@ it("places sections before or after the product's own sections, or after all of 
 });
 
 it("leaves out a section that can't show in production, and says why, while the form keeps working", async () => {
+  // Arrange
   // In development, the same sections throw while rendering.
   vi.stubEnv("DEV", false);
   const logged = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -261,11 +277,13 @@ it("leaves out a section that can't show in production, and says why, while the 
     after,
   });
 
+  // Act
   await renderEdit({
     ...props("Boots"),
     sections: [section("unregistered", null), section("misplaced", "pricing")],
   });
 
+  // Assert
   await expect.element(page.getByRole("heading", { name: "SKU and barcode" })).toBeVisible();
   expect(logged).toHaveBeenCalledWith(
     expect.stringContaining(

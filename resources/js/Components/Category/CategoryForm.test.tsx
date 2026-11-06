@@ -55,11 +55,15 @@ const formData = () => new FormData(page.getByTestId("form").element() as HTMLFo
 const submitted = () => formData().get("status");
 
 it("counts toggling the visibility as an unsaved change", async () => {
+  // Arrange
   await renderPage(shoes);
   await expect.element(visible()).toBeChecked();
   expect(submitted()).toBe("visible");
 
+  // Act
   await page.getByText("Visible in the store").click();
+
+  // Assert
   await expect.element(visible()).not.toBeChecked();
   expect(submitted()).toBe("hidden");
   await expect.element(toast()).toBeVisible();
@@ -69,12 +73,15 @@ it("counts toggling the visibility as an unsaved change", async () => {
 });
 
 it("shows the visibility it was reset to on cancel", async () => {
+  // Arrange
   await renderPage(shoes);
   await page.getByText("Visible in the store").click();
   await expect.element(visible()).not.toBeChecked();
 
+  // Act
   await toast().getByRole("button", { name: "Cancel" }).click();
 
+  // Assert
   await expect.element(visible()).toBeChecked();
   expect(submitted()).toBe("visible");
   await expect.element(toast()).not.toBeInTheDocument();
@@ -82,10 +89,13 @@ it("shows the visibility it was reset to on cancel", async () => {
 
 describe("slug", () => {
   it("follows the name of a new category as a slug", async () => {
+    // Arrange
     await renderPage();
 
+    // Act
     await nameInput().fill("Men's Running Shoes");
 
+    // Assert
     await expect.element(slugInput()).toHaveValue("mens-running-shoes");
     expect(formData().get("slug")).toBe("mens-running-shoes");
 
@@ -94,9 +104,13 @@ describe("slug", () => {
   });
 
   it("doesn't count a slug that follows the name back to empty as a change", async () => {
+    // Arrange
     await renderPage();
 
+    // Act
     await nameInput().fill("Shoes");
+
+    // Assert
     await expect.element(slugInput()).toHaveValue("shoes");
     await expect.element(toast()).toBeVisible();
 
@@ -106,32 +120,42 @@ describe("slug", () => {
   });
 
   it("cuts the slug to the 255 characters the server allows", async () => {
+    // Arrange
     await renderPage();
 
+    // Act
     // Each "ß" becomes "ss", so the cut would end on the dash before "shoes".
     await nameInput().fill(`${"ß".repeat(127)} Shoes`);
 
+    // Assert
     await expect.element(slugInput()).toHaveValue("s".repeat(254));
   });
 
   it("stops following the name once the slug is edited", async () => {
+    // Arrange
     await renderPage();
     await nameInput().fill("Shoes");
     await expect.element(slugInput()).toHaveValue("shoes");
 
+    // Act
     await slugInput().fill("footwear");
     await nameInput().fill("Running Shoes");
 
+    // Assert
     await expect.element(nameInput()).toHaveValue("Running Shoes");
     await expect.element(slugInput()).toHaveValue("footwear");
   });
 
   it("follows the name again once the edited slug is cleared", async () => {
+    // Arrange
     await renderPage();
     await nameInput().fill("Shoes");
     await slugInput().fill("footwear");
 
+    // Act
     await slugInput().clear();
+
+    // Assert
     await expect.element(slugInput()).toHaveValue("");
     await nameInput().fill("Boots");
 
@@ -139,13 +163,17 @@ describe("slug", () => {
   });
 
   it("follows the name again after cancelling the changes", async () => {
+    // Arrange
     await renderPage();
     await nameInput().fill("Shoes");
     await slugInput().fill("footwear");
     await nameInput().fill("Boots");
     await expect.element(slugInput()).toHaveValue("footwear");
 
+    // Act
     await toast().getByRole("button", { name: "Cancel" }).click();
+
+    // Assert
     await expect.element(slugInput()).toHaveValue("");
 
     await nameInput().fill("Sneakers");
@@ -153,9 +181,13 @@ describe("slug", () => {
   });
 
   it("leaves the slug of an existing category alone", async () => {
+    // Arrange
     await renderPage(shoes);
 
+    // Act
     await nameInput().fill("Sneakers");
+
+    // Assert
     await expect.element(nameInput()).toHaveValue("Sneakers");
     await expect.element(slugInput()).toHaveValue("shoes");
 
@@ -170,8 +202,10 @@ describe("translation", () => {
   const untranslated = { ...shoes, name: null, slug: null };
 
   it("leaves an untranslated name and slug empty and shows what the store shows instead", async () => {
+    // Act
     await renderPage(untranslated);
 
+    // Assert
     await expect.element(nameInput()).toHaveValue("");
     await expect.element(nameInput()).toHaveAttribute("placeholder", "Shoes");
     await expect.element(slugInput()).toHaveValue("");
@@ -179,10 +213,13 @@ describe("translation", () => {
   });
 
   it("fills in an untranslated slug from the name", async () => {
+    // Arrange
     await renderPage(untranslated);
 
+    // Act
     await nameInput().fill("Schuhe");
 
+    // Assert
     await expect.element(slugInput()).toHaveValue("schuhe");
   });
 });

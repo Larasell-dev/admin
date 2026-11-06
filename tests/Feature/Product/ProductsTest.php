@@ -29,11 +29,13 @@ function signInAdmin(): Admin
 }
 
 it('lists the products by name, stock, and a visibility badge', function () {
+    // Arrange
     signInAdmin();
 
     Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Visible]);
     Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500), 'stock' => 12, 'status' => Visibility::Hidden]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -56,17 +58,21 @@ it('lists the products by name, stock, and a visibility badge', function () {
 });
 
 it('shows a stock of zero as 0, not as untracked', function () {
+    // Arrange
     signInAdmin();
 
     Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'stock' => 0]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.rows.0.stock', '0'));
 });
 
 it('says there are no products yet when the store has none', function () {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('table.pagination.total', 0)
@@ -81,8 +87,10 @@ it('says there are no products yet when the store has none', function () {
 });
 
 it('links to adding a product from the header', function () {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.headerActions', [
             ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create'), 'icon' => 'Add'],
@@ -90,17 +98,21 @@ it('links to adding a product from the header', function () {
 });
 
 it('links each product to its edit page', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.rows.0._link', route('larasell.admin.products.edit', $boots)));
 });
 
 it('shows the page for adding a product', function () {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -111,10 +123,13 @@ it('shows the page for adding a product', function () {
 });
 
 it('creates a product and opens it', function (Visibility $status) {
+    // Arrange
     signInAdmin();
 
+    // Act
     $response = $this->post(route('larasell.admin.products.store'), ['name' => 'Linen Shirt', 'slug' => 'linen-shirt', 'status' => $status->value]);
 
+    // Assert
     $product = Product::query()->sole();
 
     $response->assertSessionHasNoErrors()
@@ -131,10 +146,12 @@ it('creates a product and opens it', function (Visibility $status) {
 ]);
 
 it('shows the product\'s values to edit on its page', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Hidden]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -163,6 +180,7 @@ it('shows the product\'s values to edit on its page', function () {
 });
 
 it('shows the product\'s weight and dimensions in the units they were saved in', function () {
+    // Arrange
     signInAdmin();
 
     $poster = Product::create([
@@ -173,6 +191,7 @@ it('shows the product\'s weight and dimensions in the units they were saved in',
         'dimensions' => Dimensions::of('50', '35.5', '0', 'in'),
     ]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', $poster))
         ->assertInertia(fn (AssertableInertia $page) => $page
             // Strings, so decimals reach the form exactly as they were saved.
@@ -181,8 +200,10 @@ it('shows the product\'s weight and dimensions in the units they were saved in',
 });
 
 it('saves the weight and dimensions as entered, without converting them', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Poster',
         'slug' => 'poster',
@@ -191,6 +212,7 @@ it('saves the weight and dimensions as entered, without converting them', functi
         'dimensions' => ['length' => '50', 'width' => '35.5', 'height' => '0.2', 'unit' => 'mm'],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $poster = Product::query()->sole();
 
     expect($poster->weight?->amount())->toBe('1500')
@@ -202,8 +224,10 @@ it('saves the weight and dimensions as entered, without converting them', functi
 });
 
 it('accepts a weight and dimensions of zero', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'E-book',
         'slug' => 'e-book',
@@ -212,6 +236,7 @@ it('accepts a weight and dimensions of zero', function () {
         'dimensions' => ['length' => '0', 'width' => '0', 'height' => '0', 'unit' => 'cm'],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $book = Product::query()->sole();
 
     expect($book->weight?->amount())->toBe('0')
@@ -219,8 +244,10 @@ it('accepts a weight and dimensions of zero', function () {
 });
 
 it('saves no weight or dimensions when their amounts are left empty, whatever the unit', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'E-book',
         'slug' => 'e-book',
@@ -229,6 +256,7 @@ it('saves no weight or dimensions when their amounts are left empty, whatever th
         'dimensions' => ['length' => '', 'width' => '', 'height' => '', 'unit' => 'cm'],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $book = Product::query()->sole();
 
     expect($book->weight)->toBeNull()
@@ -236,6 +264,7 @@ it('saves no weight or dimensions when their amounts are left empty, whatever th
 });
 
 it('removes the weight and dimensions when they are cleared', function () {
+    // Arrange
     signInAdmin();
 
     $poster = Product::create([
@@ -246,6 +275,7 @@ it('removes the weight and dimensions when they are cleared', function () {
         'dimensions' => Dimensions::of('50', '35', '5', 'cm'),
     ]);
 
+    // Act
     $this->put(route('larasell.admin.products.update', $poster), [
         'name' => 'Poster',
         'slug' => 'poster',
@@ -254,6 +284,7 @@ it('removes the weight and dimensions when they are cleared', function () {
         'dimensions' => ['length' => '', 'width' => '', 'height' => '', 'unit' => 'cm'],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $poster->refresh();
 
     expect($poster->weight)->toBeNull()
@@ -261,8 +292,10 @@ it('removes the weight and dimensions when they are cleared', function () {
 });
 
 it('rejects an invalid weight or dimensions', function (array $input, string $error) {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Poster',
         'slug' => 'poster',
@@ -272,6 +305,7 @@ it('rejects an invalid weight or dimensions', function (array $input, string $er
         ...$input,
     ])->assertSessionHasErrors($error);
 
+    // Assert
     expect(Product::query()->count())->toBe(0);
 })->with([
     'negative weight' => [['weight' => ['amount' => '-1', 'unit' => 'kg']], 'weight.amount'],
@@ -290,8 +324,10 @@ it('rejects an invalid weight or dimensions', function (array $input, string $er
 ]);
 
 it('explains invalid weights and dimensions in words, not field paths', function () {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Poster',
         'slug' => 'poster',
@@ -306,10 +342,12 @@ it('explains invalid weights and dimensions in words, not field paths', function
 });
 
 it('shows the product\'s SKU and barcode on its page', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.sku', 'BOOT-42')
@@ -317,8 +355,10 @@ it('shows the product\'s SKU and barcode on its page', function () {
 });
 
 it('saves the SKU as entered and the barcode as its digits', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
         'slug' => 'boots',
@@ -327,6 +367,7 @@ it('saves the SKU as entered and the barcode as its digits', function () {
         'barcode' => '400-6381 333931',
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $boots = Product::query()->sole();
 
     expect($boots->sku)->toBe('Boot/42-black')
@@ -334,11 +375,14 @@ it('saves the SKU as entered and the barcode as its digits', function () {
 });
 
 it('saves no SKU or barcode when they are left empty', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'sku' => '', 'barcode' => ''])
         ->assertSessionHasNoErrors();
 
+    // Assert
     $boots = Product::query()->sole();
 
     expect($boots->sku)->toBeNull()
@@ -346,11 +390,13 @@ it('saves no SKU or barcode when they are left empty', function () {
 });
 
 it('changes and removes the SKU and barcode, and keeps them when they are unchanged', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
     $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', ...$input]);
 
+    // Act & Assert
     // Its own SKU and barcode aren't taken by another product.
     $update(['sku' => 'BOOT-42', 'barcode' => '4006381333931'])->assertSessionHasNoErrors();
     $update(['sku' => 'BOOT-43', 'barcode' => '012345678905'])->assertSessionHasNoErrors();
@@ -363,13 +409,16 @@ it('changes and removes the SKU and barcode, and keeps them when they are unchan
 });
 
 it('rejects an invalid or taken SKU or barcode', function (array $input, string $error) {
+    // Arrange
     signInAdmin();
 
     Product::create(['slug' => 'shirt', 'name' => 'Shirt', 'price' => Price::of(1000), 'sku' => 'SHIRT-1', 'barcode' => '4006381333931']);
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', ...$input])
         ->assertSessionHasErrors($error);
 
+    // Assert
     expect(Product::query()->count())->toBe(1);
 })->with([
     'SKU of another product' => [['sku' => 'SHIRT-1'], 'sku'],
@@ -382,8 +431,10 @@ it('rejects an invalid or taken SKU or barcode', function (array $input, string 
 ]);
 
 it('explains why a barcode is invalid', function (string $barcode, string $message) {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'barcode' => $barcode])
         ->assertSessionHasErrors(['barcode' => $message]);
 })->with([
@@ -393,6 +444,7 @@ it('explains why a barcode is invalid', function (string $barcode, string $messa
 ]);
 
 it('shows the product\'s stock, backorders and quantity limits on its page', function () {
+    // Arrange
     signInAdmin();
 
     $socks = Product::create([
@@ -405,6 +457,7 @@ it('shows the product\'s stock, backorders and quantity limits on its page', fun
         'max_quantity' => 24,
     ]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', $socks))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.stock', 500)
@@ -414,8 +467,10 @@ it('shows the product\'s stock, backorders and quantity limits on its page', fun
 });
 
 it('saves the stock, backorders and quantity limits', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Socks',
         'slug' => 'socks',
@@ -426,6 +481,7 @@ it('saves the stock, backorders and quantity limits', function () {
         'max_quantity' => '6',
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $socks = Product::query()->sole();
     $variant = $socks->defaultVariant();
 
@@ -438,8 +494,10 @@ it('saves the stock, backorders and quantity limits', function () {
 });
 
 it('leaves the stock untracked and the quantity unlimited when they are left empty', function () {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'E-book',
         'slug' => 'e-book',
@@ -450,6 +508,7 @@ it('leaves the stock untracked and the quantity unlimited when they are left emp
         'max_quantity' => '',
     ])->assertSessionHasNoErrors();
 
+    // Assert
     $book = Product::query()->sole();
 
     expect($book->stock)->toBeNull()
@@ -459,11 +518,14 @@ it('leaves the stock untracked and the quantity unlimited when they are left emp
 });
 
 it('accepts a stock of zero and below, which backorders lead to', function (string $stock, int $saved) {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', 'stock' => $stock])
         ->assertSessionHasNoErrors();
 
+    // Assert
     expect(Product::query()->sole()->stock)->toBe($saved);
 })->with([
     'zero' => ['0', 0],
@@ -471,6 +533,7 @@ it('accepts a stock of zero and below, which backorders lead to', function (stri
 ]);
 
 it('changes the stock, backorders and quantity limits of a product', function () {
+    // Arrange
     signInAdmin();
 
     $socks = Product::create([
@@ -484,6 +547,7 @@ it('changes the stock, backorders and quantity limits of a product', function ()
     ]);
     $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $socks), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', ...$input]);
 
+    // Act & Assert
     // A new minimum above the old maximum, then a new maximum below the old minimum.
     $update(['stock' => '12', 'allow_backorders' => '1', 'min_quantity' => '20', 'max_quantity' => '30'])->assertSessionHasNoErrors();
     expect($socks->refresh()->only(['stock', 'allow_backorders', 'min_quantity', 'max_quantity']))
@@ -498,11 +562,14 @@ it('changes the stock, backorders and quantity limits of a product', function ()
 });
 
 it('rejects an invalid stock, backorders or quantity limit', function (array $input, string $error) {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', ...$input])
         ->assertSessionHasErrors($error);
 
+    // Assert
     expect(Product::query()->count())->toBe(0);
 })->with([
     'stock with decimals' => [['stock' => '1.5'], 'stock'],
@@ -515,6 +582,7 @@ it('rejects an invalid stock, backorders or quantity limit', function (array $in
 ]);
 
 it('offers the store\'s categories as a tree when adding or editing a product', function () {
+    // Arrange
     signInAdmin();
 
     $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
@@ -530,21 +598,25 @@ it('offers the store\'s categories as a tree when adding or editing a product', 
         ->where('categories.0.children.0.name', 'Shirts')
         ->where('categories.1.id', $shoes->id);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.create'))->assertInertia($tree);
     $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($tree);
 });
 
 it('links to creating a category from adding or editing a product', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
     $link = fn (AssertableInertia $page) => $page->where('createCategoryUrl', route('larasell.admin.categories.create'));
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.create'))->assertInertia($link);
     $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($link);
 });
 
 it('still puts products into categories while the categories are turned off', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.categories.enabled' => false]));
     signInAdmin();
 
@@ -561,6 +633,7 @@ it('still puts products into categories while the categories are turned off', fu
         ->where('categories.0.children.0.id', $shirts->id)
         ->where('categories.0.children.0.url', null);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.create'))->assertInertia($form);
     $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($form);
 
@@ -571,6 +644,7 @@ it('still puts products into categories while the categories are turned off', fu
 });
 
 it('shows the categories a product is in on its page', function () {
+    // Arrange
     signInAdmin();
 
     $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
@@ -579,18 +653,21 @@ it('shows the categories a product is in on its page', function () {
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
     $boots->categories()->attach([$shoes->id, $clothing->id]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.categoryIds', [$clothing->id, $shoes->id]));
 });
 
 it('adds a new product to the selected categories', function () {
+    // Arrange
     signInAdmin();
 
     $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
     $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
     Category::create(['name' => 'Socks', 'slug' => 'socks']);
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
         'slug' => 'boots',
@@ -598,11 +675,13 @@ it('adds a new product to the selected categories', function () {
         'categories' => [(string) $clothing->id, (string) $shoes->id],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     expect(Product::query()->sole()->categories->modelKeys())
         ->toBe([$clothing->id, $shoes->id]);
 });
 
 it('moves a product into the selected categories, and out of all when none are selected', function () {
+    // Arrange
     signInAdmin();
 
     $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
@@ -611,9 +690,11 @@ it('moves a product into the selected categories, and out of all when none are s
     $boots->categories()->attach($clothing);
     $valid = ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'];
 
+    // Act
     $this->put(route('larasell.admin.products.update', $boots), [...$valid, 'categories' => [(string) $shoes->id]])
         ->assertSessionHasNoErrors();
 
+    // Assert
     expect($boots->categories()->get()->modelKeys())->toBe([$shoes->id]);
 
     // The form leaves the field out when no category is selected.
@@ -624,11 +705,14 @@ it('moves a product into the selected categories, and out of all when none are s
 });
 
 it('rejects categories that do not exist', function (mixed $categories, string $error) {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'categories' => $categories])
         ->assertSessionHasErrors($error);
 
+    // Assert
     expect(Product::query()->exists())->toBeFalse();
 })->with([
     'not a list' => ['shoes', 'categories'],
@@ -637,6 +721,7 @@ it('rejects categories that do not exist', function (mixed $categories, string $
 ]);
 
 it('shows the product\'s images on its page in their order, whatever order they were added in', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
@@ -646,6 +731,7 @@ it('shows the product\'s images on its page in their order, whatever order they 
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png'), 'alt' => 'Boots from the front']);
     $boots->images()->attach([$side->id => ['position' => 1], $front->id => ['position' => 0]]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.images', [
@@ -656,14 +742,17 @@ it('shows the product\'s images on its page in their order, whatever order they 
 });
 
 it('uploads an image without linking it to a product', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
+    // Act
     $response = $this->postJson(route('larasell.admin.products.images.store'), [
         'image' => UploadedFile::fake()->image('back.webp'),
     ])->assertCreated();
 
+    // Assert
     $image = ProductImage::query()->sole();
 
     // The file is stored under a new name, but keeps its type.
@@ -676,6 +765,7 @@ it('uploads an image without linking it to a product', function () {
 });
 
 it('links the submitted images to a product in their order, the first as its thumbnail', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
@@ -686,10 +776,12 @@ it('links the submitted images to a product in their order, the first as its thu
     $boots->images()->attach($front, ['position' => 0]);
     $valid = ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'];
 
+    // Act
     // Out of id order, and the existing image moves from first to second.
     $this->put(route('larasell.admin.products.update', $boots), [...$valid, 'images' => [(string) $back->id, (string) $front->id, (string) $side->id]])
         ->assertSessionHasNoErrors();
 
+    // Assert
     expect($boots->images()->get()->modelKeys())->toBe([$back->id, $front->id, $side->id])
         ->and($boots->fresh()?->thumbnail?->id)->toBe($back->id);
 
@@ -703,6 +795,7 @@ it('links the submitted images to a product in their order, the first as its thu
 });
 
 it('links the submitted images to a new product in their order', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
@@ -710,13 +803,16 @@ it('links the submitted images to a new product in their order', function () {
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
     $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => [(string) $side->id, (string) $front->id]])
         ->assertSessionHasNoErrors();
 
+    // Assert
     expect(Product::query()->sole()->images->modelKeys())->toBe([$side->id, $front->id]);
 });
 
 it('saves the alt text of the product\'s images', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
@@ -725,6 +821,7 @@ it('saves the alt text of the product\'s images', function () {
         ->map(fn (string $name) => ProductImage::create(['file' => UploadedFile::fake()->image($name), 'alt' => "Old {$name}"]));
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act
     $this->put(route('larasell.admin.products.update', $boots), [
         'name' => 'Boots',
         'slug' => 'boots',
@@ -734,18 +831,21 @@ it('saves the alt text of the product\'s images', function () {
         'image_alts' => [$front->id => 'Boots from the front', $side->id => '', $other->id => 'Hijacked'],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     expect($front->fresh()?->alt)->toBe('Boots from the front')
         ->and($side->fresh()?->alt)->toBeNull()
         ->and($other->fresh()?->alt)->toBe('Old other.png');
 });
 
 it('saves the alt text of a new product\'s images', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
         'slug' => 'boots',
@@ -754,16 +854,19 @@ it('saves the alt text of a new product\'s images', function () {
         'image_alts' => [$front->id => 'Boots from the front'],
     ])->assertSessionHasNoErrors();
 
+    // Assert
     expect($front->fresh()?->alt)->toBe('Boots from the front');
 });
 
 it('rejects alt text longer than the column holds', function () {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
 
+    // Act & Assert
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
         'slug' => 'boots',
@@ -775,11 +878,14 @@ it('rejects alt text longer than the column holds', function () {
 
 // The form shows these beside the images, so they name an image rather than its key.
 it('rejects images that do not exist', function (mixed $images, string $error, string $message) {
+    // Arrange
     signInAdmin();
 
+    // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => $images])
         ->assertSessionHasErrors([$error => $message]);
 
+    // Assert
     expect(Product::query()->exists())->toBeFalse();
 })->with([
     'not a list' => ['front', 'images', 'The images field must be an array.'],
@@ -788,14 +894,17 @@ it('rejects images that do not exist', function (mixed $images, string $error, s
 ]);
 
 it('rejects uploads that are not one image', function (Closure $image) {
+    // Arrange
     Storage::fake('public');
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
+    // Act
     $this->postJson(route('larasell.admin.products.images.store'), ['image' => $image()])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('image');
 
+    // Assert
     expect(ProductImage::query()->count())->toBe(0)
         ->and(Storage::disk('public')->allFiles())->toBe([]);
 })->with([
@@ -809,29 +918,36 @@ it('rejects uploads that are not one image', function (Closure $image) {
 
 // PHP drops files over its upload_max_filesize, which defaults to 2 MB, before the size rule runs.
 it('explains images that PHP could not receive', function () {
+    // Arrange
     signInAdmin();
     $file = new UploadedFile(UploadedFile::fake()->image('huge.png')->getPathname(), 'huge.png', 'image/png', UPLOAD_ERR_INI_SIZE, true);
 
+    // Act & Assert
     $this->postJson(route('larasell.admin.products.images.store'), ['image' => $file])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['image' => 'The image may be larger than the server accepts.']);
 });
 
 it('returns 404 for editing a product that does not exist', function () {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.edit', 999))->assertNotFound();
 });
 
 it('updates a product and stays on its page, keeping its price', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'slug' => 'rain-boots', 'status' => 'hidden'])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('larasell.admin.products.edit', $boots));
 
+    // Assert
     $boots->refresh();
 
     expect($boots->name->get())->toBe('Rain Boots')
@@ -841,6 +957,7 @@ it('updates a product and stays on its page, keeping its price', function () {
 });
 
 it('only changes the current locale\'s product name and slug', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create([
@@ -849,9 +966,11 @@ it('only changes the current locale\'s product name and slug', function () {
         'price' => Price::of(1000),
     ]);
 
+    // Act
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'slug' => 'rain-boots', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
+    // Assert
     $boots->refresh();
 
     expect($boots->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel'])
@@ -859,13 +978,16 @@ it('only changes the current locale\'s product name and slug', function () {
 });
 
 it('rejects an invalid product', function (array $input, string $error) {
+    // Arrange
     signInAdmin();
 
     Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act
     $this->post(route('larasell.admin.products.store'), [...['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'], ...$input])
         ->assertSessionHasErrors($error);
 
+    // Assert
     expect(Product::query()->count())->toBe(1);
 })->with([
     'missing name' => [['name' => ''], 'name'],
@@ -879,11 +1001,13 @@ it('rejects an invalid product', function (array $input, string $error) {
 ]);
 
 it('lets a product keep its own slug, but not take another one\'s', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
     Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500)]);
 
+    // Act & Assert
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'socks', 'status' => 'visible'])
@@ -891,23 +1015,28 @@ it('lets a product keep its own slug, but not take another one\'s', function () 
 });
 
 it('does not let guests create or edit products', function () {
+    // Arrange
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act
     $this->get(route('larasell.admin.products.create'))->assertRedirect(route('larasell.admin.login'));
     $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
     $this->get(route('larasell.admin.products.edit', $boots))->assertRedirect(route('larasell.admin.login'));
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
     $this->post(route('larasell.admin.products.images.store'), ['image' => UploadedFile::fake()->image('front.png')])->assertRedirect(route('larasell.admin.login'));
 
+    // Assert
     expect(Product::query()->sole()->name->get())->toBe('Boots')
         ->and(ProductImage::query()->count())->toBe(0);
 });
 
 it('offers to delete each product', function () {
+    // Arrange
     signInAdmin();
 
     Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('table.rows.0._actions.0.label', 'Delete')
@@ -918,6 +1047,7 @@ it('offers to delete each product', function () {
 });
 
 it('deletes a product with its variants and keeps the others', function () {
+    // Arrange
     signInAdmin();
 
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
@@ -925,13 +1055,16 @@ it('deletes a product with its variants and keeps the others', function () {
 
     $delete = $this->get(route('larasell.admin.products.index'))->inertiaProps('table.rows.0._actions.0.url');
 
+    // Act
     $this->from(route('larasell.admin.products.index'))->post($delete)->assertRedirect(route('larasell.admin.products.index'));
 
+    // Assert
     expect(Product::query()->pluck('slug')->map->get()->all())->toBe(['socks'])
         ->and(DB::table('larasell_product_variants')->where('product_id', $boots->id)->exists())->toBeFalse();
 });
 
 it('removes a deleted product from its categories and keeps the categories', function () {
+    // Arrange
     signInAdmin();
 
     $shoes = Category::create(['name' => Translatable::fromString('Shoes'), 'slug' => Translatable::fromString('shoes')]);
@@ -942,28 +1075,35 @@ it('removes a deleted product from its categories and keeps the categories', fun
 
     $delete = $this->get(route('larasell.admin.products.index'))->inertiaProps('table.rows.0._actions.0.url');
 
+    // Act
     $this->from(route('larasell.admin.products.index'))->post($delete)->assertRedirect(route('larasell.admin.products.index'));
 
+    // Assert
     expect(DB::table('larasell_category_product')->where('product_id', $boots->id)->exists())->toBeFalse()
         ->and($shoes->fresh()?->products()->pluck('larasell_products.id')->all())->toBe([$socks->id]);
 });
 
 it('redirects guests away from the products', function () {
+    // Act & Assert
     $this->get(route('larasell.admin.products.index'))->assertRedirect(route('larasell.admin.login'));
 });
 
 it('shows Products in the navigation between Home and Categories', function () {
+    // Arrange
     signInAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Customers', 'Settings']));
 });
 
 it('turns the products off when disabled in the config', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.products.enabled' => false]));
     signInAdmin();
 
+    // Act & Assert
     expect(Route::has('larasell.admin.products.index'))->toBeFalse();
 
     // The routes aren't registered, so there are no route names to use.

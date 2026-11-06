@@ -73,11 +73,13 @@ function switchSearchContentLocale(string $locale): void
 }
 
 it('finds products by their name in any locale and shows the name in the content locale', function () {
+    // Arrange
     signInSearchAdmin();
     $boots = searchableProduct(['en' => 'Chelsea Boots', 'de' => 'Chelsea-Stiefel']);
     $raincoat = searchableProduct(['en' => 'Raincoat', 'de' => 'Regenmantel mit Stiefeltasche']);
     searchableProduct(['en' => 'Scarf', 'de' => 'Schal']);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.products', ['q' => 'stiefel']))
         ->assertOk()
         ->assertExactJson(['results' => [
@@ -107,10 +109,12 @@ it('finds products by their name in any locale and shows the name in the content
 });
 
 it('ranks products whose name matches in the content locale first', function () {
+    // Arrange
     signInSearchAdmin();
     $coat = searchableProduct(['en' => 'Raincoat', 'de' => 'Regenmantel']);
     $clock = searchableProduct(['en' => 'Mantel clock', 'de' => 'Kaminuhr']);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.products', ['q' => 'mantel']))
         ->assertJsonPath('results.*.id', [$clock->id, $coat->id]);
 
@@ -121,9 +125,11 @@ it('ranks products whose name matches in the content locale first', function () 
 });
 
 it('says nothing more when the name in the content locale matched', function () {
+    // Arrange
     signInSearchAdmin();
     $shirt = searchableProduct(['en' => 'Oxford Shirt', 'de' => 'Oxford-Hemd']);
 
+    // Act & Assert
     // Case and spaces don't matter, like in the menu's own search.
     $this->getJson(route('larasell.admin.search.products', ['q' => 'OXFORDSHIRT']))
         ->assertExactJson(['results' => [[
@@ -135,11 +141,13 @@ it('says nothing more when the name in the content locale matched', function () 
 });
 
 it('finds products by their SKU, barcode and the SKUs of their variants', function () {
+    // Arrange
     signInSearchAdmin();
     $boots = searchableProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['sku' => 'BT-100', 'barcode' => '4006381333931']);
     $scarf = searchableProduct(['en' => 'Scarf', 'de' => 'Schal'], ['sku' => 'SC-200']);
     $scarf->variants()->create(['sku' => 'SC-200-BT', 'combination_key' => 'red', 'position' => 1, 'is_default' => false]);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.products', ['q' => 'bt-100']))
         ->assertJsonPath('results', [[
             'id' => $boots->id,
@@ -161,10 +169,12 @@ it('finds products by their SKU, barcode and the SKUs of their variants', functi
 });
 
 it('takes the search literally and returns at most ten products', function () {
+    // Arrange
     signInSearchAdmin();
     searchableProduct(['en' => 'Socks', 'de' => 'Socken']);
     $sale = searchableProduct(['en' => '50% off socks', 'de' => '50% Socken']);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.products', ['q' => '%']))
         ->assertJsonPath('results.*.id', [$sale->id]);
 
@@ -177,10 +187,12 @@ it('takes the search literally and returns at most ten products', function () {
 });
 
 it('finds orders by their number and their customer\'s name and email', function () {
+    // Arrange
     signInSearchAdmin();
     $grace = searchableOrder('1042');
     $alan = searchableOrder('2001', ['customer_name' => 'Alan Turing', 'customer_email' => 'alan@bletchley.example']);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.orders', ['q' => '104']))
         ->assertExactJson(['results' => [[
             'id' => $grace->id,
@@ -202,10 +214,12 @@ it('finds orders by their number and their customer\'s name and email', function
 });
 
 it('finds customers by their full name', function () {
+    // Arrange
     signInSearchAdmin();
     $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
     Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.customers', ['q' => 'a lovel']))
         ->assertExactJson(['results' => [[
             'id' => $ada->id,
@@ -216,10 +230,12 @@ it('finds customers by their full name', function () {
 });
 
 it('finds categories by their name in any locale and shows the name in the content locale', function () {
+    // Arrange
     signInSearchAdmin();
     $shoes = searchableCategory(['en' => 'Shoes', 'de' => 'Schuhe']);
     searchableCategory(['en' => 'Hats', 'de' => 'Hüte']);
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.categories', ['q' => 'schu']))
         ->assertExactJson(['results' => [[
             'id' => $shoes->id,
@@ -230,8 +246,10 @@ it('finds categories by their name in any locale and shows the name in the conte
 });
 
 it('needs a search of at most 200 characters', function (string $route) {
+    // Arrange
     signInSearchAdmin();
 
+    // Act & Assert
     $this->getJson(route($route))->assertUnprocessable()->assertJsonValidationErrors('q');
     $this->getJson(route($route, ['q' => str_repeat('a', 201)]))->assertJsonValidationErrors('q');
 })->with([
@@ -242,8 +260,10 @@ it('needs a search of at most 200 characters', function (string $route) {
 ]);
 
 it('searches only for signed-in admins', function (string $route) {
+    // Arrange
     searchableProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
+    // Act & Assert
     $this->getJson(route($route, ['q' => 'boots']))->assertRedirect(route('larasell.admin.login'));
 })->with([
     'larasell.admin.search.products',
@@ -253,6 +273,7 @@ it('searches only for signed-in admins', function (string $route) {
 ]);
 
 it('searches with the product search bound in the container', function () {
+    // Arrange
     signInSearchAdmin();
     $boots = searchableProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
@@ -266,11 +287,13 @@ it('searches with the product search bound in the container', function () {
         }
     });
 
+    // Act & Assert
     $this->getJson(route('larasell.admin.search.products', ['q' => 'anything']))
         ->assertJsonPath('results.*.id', [$boots->id]);
 });
 
 it('shares the searches of the enabled modules with signed-in admins', function () {
+    // Act & Assert
     $this->get(route('larasell.admin.login'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu', null));
 
@@ -292,6 +315,7 @@ it('shares the searches of the enabled modules with signed-in admins', function 
 });
 
 it('lets a plugin add its own search to the command menu', function () {
+    // Arrange
     $this->bootingWith(fn () => app()->booted(fn () => app(Searches::class)->add(
         'gift-cards',
         label: 'Search gift cards',
@@ -301,6 +325,7 @@ it('lets a plugin add its own search to the command menu', function () {
     )));
     signInSearchAdmin();
 
+    // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.4', [
             'id' => 'gift-cards',

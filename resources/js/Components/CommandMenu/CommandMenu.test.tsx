@@ -94,11 +94,14 @@ async function choose(name: string | RegExp) {
 }
 
 it("opens with Mod+K and filters the commands as you type", async () => {
+  // Arrange
   register(orders, switchTheme);
   await renderMenu();
 
+  // Act
   await openMenu();
 
+  // Assert
   await expect.element(search()).toHaveFocus();
   expect(options()).toEqual(["Go to orders", "Switch theme"]);
 
@@ -109,26 +112,33 @@ it("opens with Mod+K and filters the commands as you type", async () => {
 });
 
 it("moves the highlight with the arrow keys while the search keeps focus", async () => {
+  // Arrange
   register(orders, switchTheme);
   await renderMenu();
   await openMenu();
 
   await expect.element(option("Go to orders")).toHaveAttribute("aria-selected", "true");
+
+  // Act
   await userEvent.keyboard("{ArrowDown}");
 
+  // Assert
   await expect.element(option("Switch theme")).toHaveAttribute("aria-selected", "true");
   await expect.element(option("Go to orders")).toHaveAttribute("aria-selected", "false");
   await expect.element(search()).toHaveFocus();
 });
 
 it("opens a nested view on the current item, and Escape clears, goes back, clears and closes", async () => {
+  // Arrange
   register(orders, switchTheme);
   await renderMenu();
   await openMenu();
   await search().fill("swi");
 
+  // Act
   await userEvent.keyboard("{Enter}");
 
+  // Assert
   // The nested view starts empty, on the checked item.
   await expect.element(search()).toHaveValue("");
   expect(options()).toEqual(["Light", "Dark, current", "System"]);
@@ -153,14 +163,17 @@ it("opens a nested view on the current item, and Escape clears, goes back, clear
 });
 
 it("goes back with Backspace in an empty nested search, or with the back button", async () => {
+  // Arrange
   register(switchTheme);
   await renderMenu();
   await openMenu();
   await userEvent.keyboard("{Enter}");
   await expect.element(option("Light")).toBeVisible();
 
+  // Act
   await userEvent.keyboard("{Backspace}");
 
+  // Assert
   await expect.element(option("Switch theme")).toBeVisible();
   await expect.element(option("Light")).not.toBeInTheDocument();
   await expect.element(page.getByRole("button", { name: /^Back/ })).not.toBeInTheDocument();
@@ -178,6 +191,7 @@ it("goes back with Backspace in an empty nested search, or with the back button"
 });
 
 it("runs an item and closes, and opens again empty at the root", async () => {
+  // Arrange & Act
   register(orders, switchTheme);
   await renderMenu();
   await openMenu();
@@ -185,6 +199,7 @@ it("runs an item and closes, and opens again empty at the root", async () => {
   await userEvent.keyboard("{Enter}");
   await choose("System");
 
+  // Assert
   expect(run).toHaveBeenCalledExactlyOnceWith("system");
   await expect.element(menu()).not.toBeInTheDocument();
 
@@ -195,12 +210,15 @@ it("runs an item and closes, and opens again empty at the root", async () => {
 });
 
 it("finds nested items from the root and runs them there", async () => {
+  // Arrange
   register(orders, switchTheme);
   await renderMenu();
   await openMenu();
 
+  // Act
   await search().fill("dark");
 
+  // Assert
   await expect.element(option(/Switch theme.*Dark/)).toBeVisible();
   await userEvent.keyboard("{Enter}");
 
@@ -209,6 +227,7 @@ it("finds nested items from the root and runs them there", async () => {
 });
 
 it("marks what the search matched in the crumbs and the label", async () => {
+  // Arrange
   register(orders, switchTheme);
   await renderMenu();
   await openMenu();
@@ -216,6 +235,7 @@ it("marks what the search matched in the crumbs and the label", async () => {
   const marked = (name: RegExp) =>
     [...option(name).element().querySelectorAll("mark")].map((mark) => mark.textContent);
 
+  // Act & Assert
   await search().fill("themedark");
   await expect.element(option(/Switch theme.*Dark/)).toBeVisible();
   expect(marked(/Switch theme.*Dark/)).toEqual(["theme", "Dark"]);
@@ -226,6 +246,7 @@ it("marks what the search matched in the crumbs and the label", async () => {
 });
 
 it("finds at most 20 of a command's nested items from the root, the best matches", async () => {
+  // Arrange
   register({
     id: "languages",
     label: "Change language",
@@ -238,6 +259,7 @@ it("finds at most 20 of a command's nested items from the root, the best matches
   await renderMenu();
   await openMenu();
 
+  // Act & Assert
   await search().fill("language");
   await expect
     .element(page.getByRole("option", { name: "Change language", exact: true }))
@@ -249,6 +271,7 @@ it("finds at most 20 of a command's nested items from the root, the best matches
 });
 
 it("leaves the items of a command searched only in its own view out of the root search", async () => {
+  // Arrange
   register(switchTheme, {
     id: "products",
     label: "Search products",
@@ -258,6 +281,7 @@ it("leaves the items of a command searched only in its own view out of the root 
   await renderMenu();
   await openMenu();
 
+  // Act & Assert
   await search().fill("s");
   expect(options()).not.toContain("Search productsBoots");
   await expect.element(option("Search products")).toBeVisible();
@@ -272,10 +296,12 @@ it("leaves the items of a command searched only in its own view out of the root 
 });
 
 it("shows why a command is disabled, and neither opens it nor finds its items", async () => {
+  // Arrange & Act
   register(orders, { ...switchTheme, disabled: "Not right now" });
   await renderMenu();
   await openMenu();
 
+  // Assert
   await expect.element(option(/Switch theme/)).toHaveAttribute("aria-disabled", "true");
   expect(option(/Switch theme/).element().textContent).toContain("Not right now");
 
@@ -297,6 +323,7 @@ describe("rendered labels", () => {
   };
 
   it("renders the label with the search and whether it is highlighted, and finds and names it by its text value", async () => {
+    // Arrange
     register(orders, boots);
     await renderMenu();
     await openMenu();
@@ -304,8 +331,10 @@ describe("rendered labels", () => {
     await expect.element(page.getByText('not highlighted for ""')).toBeVisible();
     await expect.element(option(/^Boots, SKU BT-100$/)).toBeVisible();
 
+    // Act
     await search().fill("BT-100");
 
+    // Assert
     await expect.element(page.getByText('highlighted for "BT-100"')).toBeVisible();
     expect(options()).toHaveLength(1);
     await userEvent.keyboard("{Enter}");
@@ -314,6 +343,7 @@ describe("rendered labels", () => {
   });
 
   it("names a nested command with a rendered label by its text value in crumbs and the back button", async () => {
+    // Arrange
     register({
       id: "density",
       label: () => <strong>Density</strong>,
@@ -323,6 +353,7 @@ describe("rendered labels", () => {
     await renderMenu();
     await openMenu();
 
+    // Act & Assert
     await search().fill("compact");
     await expect.element(option(/Change density.*Compact/)).toBeVisible();
 
@@ -335,13 +366,16 @@ describe("rendered labels", () => {
   });
 
   it("needs a text value for a rendered label", () => {
+    // Act
     // @ts-expect-error Search, crumbs and screen readers need the text of a rendered label.
     const definition: CommandDefinition = { id: "x", label: () => null, run: () => {} };
 
+    // Assert
     expect(definition.id).toBe("x");
   });
 
   it("finds the ranges a search matched the way the menu finds items, gaps and case included", () => {
+    // Act & Assert
     expect(matchRanges("Oxford Shirt", "oxfordshirt")).toEqual([
       [0, 6],
       [7, 12],
@@ -354,6 +388,7 @@ describe("rendered labels", () => {
   });
 
   it("marks the ranges of a text, in any order", async () => {
+    // Act
     const screen = await render(
       <Highlight
         text="BT-100-RED"
@@ -364,6 +399,7 @@ describe("rendered labels", () => {
       />,
     );
 
+    // Assert
     expect([...screen.container.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual([
       "BT",
       "RED",
@@ -374,12 +410,15 @@ describe("rendered labels", () => {
 
 describe("registering", () => {
   it("throws for a command id that is already registered", () => {
+    // Arrange
     register(orders);
 
+    // Act & Assert
     expect(() => commands.register({ ...orders, label: "Orders again" })).toThrow(/orders/);
   });
 
   it("offers a useCommand command only while its component is mounted, as it was last rendered", async () => {
+    // Arrange
     function Page() {
       const [count, setCount] = useState(0);
       const [shown, setShown] = useState(true);
@@ -403,6 +442,8 @@ describe("registering", () => {
     }
 
     await renderMenu(Page);
+
+    // Act & Assert
     await page.getByRole("button", { name: "More" }).click();
     await openMenu();
     await choose("Count 1");
@@ -415,6 +456,7 @@ describe("registering", () => {
   });
 
   it("goes back to the root once the command of the open nested view goes away", async () => {
+    // Arrange
     let hide!: () => void;
 
     function Page() {
@@ -436,8 +478,10 @@ describe("registering", () => {
     await choose("Switch theme");
     await expect.element(option("Light")).toBeVisible();
 
+    // Act
     hide();
 
+    // Assert
     await expect.element(option("Go to orders")).toBeVisible();
     await expect.element(option("Light")).not.toBeInTheDocument();
   });
@@ -447,6 +491,7 @@ describe("theme", () => {
   afterEach(() => setTheme(Theme.System));
 
   it("switches the theme from a nested list that marks the current one", async () => {
+    // Arrange
     register(themeCommand);
     await renderMenu();
     await openMenu();
@@ -454,8 +499,10 @@ describe("theme", () => {
 
     expect(options()).toEqual(["Light", "Dark", "System, current"]);
 
+    // Act
     await choose("Dark");
 
+    // Assert
     expect(storedTheme()).toBe(Theme.Dark);
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     await expect.element(menu()).not.toBeInTheDocument();
@@ -464,6 +511,7 @@ describe("theme", () => {
 
 describe("views that search on their own", () => {
   it("gives a command's hook the search of its open view, and null while it isn't open", async () => {
+    // Arrange
     const searches: Array<string | null> = [];
     register({
       id: "lookup",
@@ -477,13 +525,16 @@ describe("views that search on their own", () => {
     await search().fill("look");
     expect(searches.at(-1)).toBeNull();
 
+    // Act
     await userEvent.keyboard("{Enter}");
     await search().fill("abc");
 
+    // Assert
     await expect.poll(() => searches.at(-1)).toBe("abc");
   });
 
   it("shows the items of a view that filters them itself as they are, in their order", async () => {
+    // Arrange
     register({
       id: "lookup",
       label: "Look up",
@@ -497,12 +548,15 @@ describe("views that search on their own", () => {
     await openMenu();
     await choose("Look up");
 
+    // Act
     await search().fill("xyz");
 
+    // Assert
     expect(options()).toEqual(["Zebra", "Aardvark"]);
   });
 
   it("says it's searching while a view's items load, and nothing before a search", async () => {
+    // Arrange
     let loading = true;
     register({
       id: "lookup",
@@ -512,6 +566,7 @@ describe("views that search on their own", () => {
     await openMenu();
     await choose("Look up");
 
+    // Act & Assert
     // Nothing below the search until there is one.
     await expect.element(page.getByRole("listbox")).not.toBeInTheDocument();
     await search().fill("a");
@@ -545,6 +600,7 @@ describe("searching on the server", () => {
   }
 
   it("searches products once typing pauses, says what matched, and opens the one picked", async () => {
+    // Arrange
     const fetch = respondWith([
       {
         id: 1,
@@ -558,6 +614,7 @@ describe("searching on the server", () => {
     await renderMenu(SearchCommands, { commandMenu: { searches } });
     await openMenu();
 
+    // Act & Assert
     // Searching the root doesn't search the server.
     await search().fill("products");
     await expect.element(option("Search products")).toBeVisible();
@@ -580,12 +637,14 @@ describe("searching on the server", () => {
   });
 
   it("offers a command for each search the server shares, at its own url", async () => {
+    // Arrange
     const fetch = respondWith([]);
     await renderMenu(SearchCommands, { commandMenu: { searches } });
     await openMenu();
 
     expect(options()).toEqual(["Search products", "Search categories", "Search gift cards"]);
 
+    // Act & Assert
     await choose("Search gift cards");
     await expect.element(search()).toHaveAttribute("placeholder", "Search gift-cards");
     await search().fill("ada");
@@ -594,9 +653,11 @@ describe("searching on the server", () => {
   });
 
   it("offers no searches to guests", async () => {
+    // Arrange & Act
     await renderMenu(SearchCommands, { commandMenu: null });
     await openMenu();
 
+    // Assert
     await expect.element(page.getByText("No results")).toBeVisible();
   });
 });
@@ -621,6 +682,7 @@ describe("navigating", () => {
   };
 
   it("goes to the pages of the navigation, those under settings included", async () => {
+    // Arrange
     const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
     register(goToCommand);
     await renderMenu(undefined, props);
@@ -629,17 +691,21 @@ describe("navigating", () => {
 
     expect(options()).toEqual(["Home", "Products", "Team", "Audit log", "Profile"]);
 
+    // Act
     await choose("Audit log");
 
+    // Assert
     expect(visit).toHaveBeenCalledWith("/admin/settings/audit-log");
     await expect.element(menu()).not.toBeInTheDocument();
   });
 
   it("finds the pages from the root, and the home page as the dashboard", async () => {
+    // Arrange
     register(goToCommand);
     await renderMenu(undefined, props);
     await openMenu();
 
+    // Act & Assert
     await search().fill("audit");
     await expect.element(option(/Go to.*Audit log/)).toBeVisible();
 
@@ -648,14 +714,17 @@ describe("navigating", () => {
   });
 
   it("goes to the profile", async () => {
+    // Arrange
     const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
     register(goToCommand);
     await renderMenu(undefined, props);
     await openMenu();
     await choose("Go to");
 
+    // Act
     await choose("Profile");
 
+    // Assert
     expect(visit).toHaveBeenCalledWith("/admin/profile");
   });
 });
@@ -671,6 +740,7 @@ describe("content language", () => {
   };
 
   it("switches the content language of the page", async () => {
+    // Arrange
     const requests: { method: string; url: string; data: unknown }[] = [];
     vi.spyOn(http, "getClient").mockReturnValue({
       async request({ method, url, data }) {
@@ -686,8 +756,10 @@ describe("content language", () => {
 
     expect(options()).toEqual(["English, current", "German"]);
 
+    // Act
     await choose("German");
 
+    // Assert
     await expect.poll(() => requests).toHaveLength(1);
     expect(requests[0]).toMatchObject({
       method: "put",
@@ -698,12 +770,14 @@ describe("content language", () => {
   });
 
   it("is left out on pages without a content language, or with only one", async () => {
+    // Arrange & Act
     register(orders, contentLocaleCommand);
     await renderMenu(() => null, {
       contentLocale: { ...contentLocale, options: [contentLocale.options[0]] },
     });
     await openMenu();
 
+    // Assert
     expect(options()).toEqual(["Go to orders"]);
   });
 });
@@ -719,6 +793,7 @@ describe("interface language", () => {
   };
 
   it("switches the interface language on the server", async () => {
+    // Arrange
     const requests: { method: string; url: string; data: unknown }[] = [];
     vi.spyOn(http, "getClient").mockReturnValue({
       async request({ method, url, data }) {
@@ -734,8 +809,10 @@ describe("interface language", () => {
 
     expect(options()).toEqual(["English, current", "Deutsch"]);
 
+    // Act
     await choose("Deutsch");
 
+    // Assert
     await expect.poll(() => requests).toHaveLength(1);
     expect(requests[0]).toMatchObject({
       method: "put",
@@ -745,20 +822,25 @@ describe("interface language", () => {
   });
 
   it("finds a language by its name in the interface language too", async () => {
+    // Arrange
     register(interfaceLocaleCommand);
     await renderMenu(() => null, { interfaceLocale });
     await openMenu();
 
+    // Act
     await search().fill("german");
 
+    // Assert
     await expect.element(option(/Deutsch/)).toBeVisible();
   });
 
   it("is left out for guests", async () => {
+    // Arrange & Act
     register(orders, interfaceLocaleCommand);
     await renderMenu(() => null, { interfaceLocale: null });
     await openMenu();
 
+    // Assert
     expect(options()).toEqual(["Go to orders"]);
   });
 });

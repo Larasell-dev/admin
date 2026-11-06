@@ -96,13 +96,17 @@ function listedEvents(array $filters = []): array
 }
 
 it('lists audit records newest first, with who did what to what', function () {
+    // Arrange
     $apiToken = ApiToken::query()->create(['name' => 'ERP sync', 'token_hash' => hash('sha256', 'larasell_erp'), 'expires_at' => now()->addMonth()]);
     recordAt('2026-10-29 09:00:00', 'api_token.created', $this->ada, new Subject('api_token', $apiToken->id), ['name' => 'ERP sync']);
     recordAt('2026-10-29 10:00:00', 'product_review.deleted', $apiToken, new Subject('product_review', 7), ['rating' => 4, 'status' => ['from' => 'pending', 'to' => 'approved']]);
     recordAt('2026-10-29 11:00:00', 'inventory.reconciled', new SystemActor('inventory-reconciliation'));
     recordAt('2026-10-29 12:00:00', 'order.imported', new UnknownActor('Imported from the previous shop system.'));
 
+    // Act
     $page = auditLogPage()->toArray()['props'];
+
+    // Assert
     $rows = array_slice($page['auditLog']['rows'], 1);
 
     expect($page['auditLog']['columns'])->toBe([
@@ -123,29 +127,35 @@ it('lists audit records newest first, with who did what to what', function () {
 });
 
 it('names actors that were deleted by their ID', function () {
+    // Arrange
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
     recordAt('2026-10-29 09:00:00', 'api_token.created', $alan);
     $alan->delete();
 
+    // Act & Assert
     expect(auditLogPage()->toArray()['props']['auditLog']['rows'][1]['actor'])->toBe('Admin #'.$alan->id);
 });
 
 it('shows times in the app\'s time zone, and says which', function () {
+    // Arrange
     config(['app.timezone' => 'Europe/Berlin']);
     recordAt('2026-10-29 09:00:00', 'api_token.created', $this->ada);
 
+    // Act & Assert
     auditLogPage()
         ->where('auditLog.columns.0.label', 'Time (Europe/Berlin)')
         ->where('auditLog.rows.1.occurred_at', 'Oct 29, 2026 10:00:00');
 });
 
 it('filters by event, actor, subject and day', function (array $filters, array $events) {
+    // Arrange
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
     recordAt('2026-10-27 23:30:00', 'api_token.created', $this->ada, new Subject('api_token', 1));
     recordAt('2026-10-28 08:00:00', 'api_token.revoked', $this->ada, new Subject('api_token', 1));
     recordAt('2026-10-28 23:59:59', 'api_token.created', $alan, new Subject('api_token', 2));
     recordAt('2026-10-29 00:00:00', 'product_review.approved', new SystemActor('spam-filter'), new Subject('product_review', 1));
 
+    // Act & Assert
     expect(listedEvents($filters))->toBe($events);
 })->with([
     'an event' => [['event' => 'api_token.created'], ['api_token.created', 'api_token.created']],
@@ -160,18 +170,22 @@ it('filters by event, actor, subject and day', function (array $filters, array $
 ]);
 
 it('filters by days in the app\'s time zone', function () {
+    // Arrange
     config(['app.timezone' => 'Europe/Berlin']);
     // 23:30 UTC on Oct 27 is already Oct 28 in Berlin.
     recordAt('2026-10-27 23:30:00', 'api_token.created', $this->ada);
 
+    // Act & Assert
     expect(listedEvents(['from' => '2026-10-28', 'until' => '2026-10-28']))->toBe(['api_token.created'])
         ->and(listedEvents(['until' => '2026-10-27']))->toBe([]);
 });
 
 it('offers the events, actor types and subject types the log has', function () {
+    // Arrange
     recordAt('2026-10-28 08:00:00', 'api_token.revoked', $this->ada, new Subject('api_token', 1));
     recordAt('2026-10-28 09:00:00', 'product_review.approved', new SystemActor('spam-filter'), new Subject('product_review', 1));
 
+    // Act & Assert
     auditLogPage(['event' => 'api_token.revoked'])
         ->where('filters', ['event' => 'api_token.revoked', 'actor_type' => null, 'actor_id' => null, 'subject_type' => null, 'subject_id' => null, 'from' => null, 'until' => null])
         // Its own access records are events of the log too.
@@ -181,6 +195,7 @@ it('offers the events, actor types and subject types the log has', function () {
 });
 
 it('rejects filters it can\'t apply', function (array $filters, string $error) {
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->from(route('larasell.admin.home'))
         ->get(route('larasell.admin.settings.audit-log.index', $filters))
@@ -194,19 +209,23 @@ it('rejects filters it can\'t apply', function (array $filters, string $error) {
 ]);
 
 it('keeps the filters when paging', function () {
+    // Arrange
     foreach (range(1, 30) as $minute) {
         recordAt('2026-10-29 09:'.str_pad((string) $minute, 2, '0', STR_PAD_LEFT).':00', 'api_token.created', $this->ada);
     }
     recordAt('2026-10-29 10:00:00', 'api_token.revoked', $this->ada);
 
+    // Act & Assert
     auditLogPage(['event' => 'api_token.created', 'page' => '2'])
         ->where('auditLog.pagination', ['page' => 2, 'pageSize' => 25, 'total' => 30])
         ->where('auditLog.rows.0.occurred_at', 'Oct 29, 2026 09:05:00');
 });
 
 it('audits viewing the log, as the admin who did', function () {
+    // Act
     auditLogPage();
 
+    // Assert
     $record = DB::table('larasell_audit_log')->sole();
 
     expect($record)->toMatchArray([
@@ -221,8 +240,10 @@ it('audits viewing the log, as the admin who did', function () {
 });
 
 it('audits searching the log with the filters used', function () {
+    // Act
     auditLogPage(['event' => 'api_token.created', 'actor_type' => 'admin', 'actor_id' => '3', 'from' => '2026-10-01', 'page' => '2']);
 
+    // Assert
     $record = DB::table('larasell_audit_log')->sole();
 
     expect($record->event)->toBe('audit_log.searched')
@@ -234,14 +255,17 @@ it('audits searching the log with the filters used', function () {
 });
 
 it('shows nothing when its access can\'t be audited', function () {
+    // Arrange
     Schema::drop('larasell_audit_log');
 
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings.audit-log.index'))
         ->assertServerError();
 });
 
 it('adds the audit log to the settings navigation, after API tokens', function () {
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -249,9 +273,11 @@ it('adds the audit log to the settings navigation, after API tokens', function (
 });
 
 it('puts the audit log after Team when API tokens are turned off', function () {
+    // Arrange
     $this->bootingWith(fn () => config(['larasell.admin.api_tokens.enabled' => false]));
     $this->ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
 
+    // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -259,17 +285,22 @@ it('puts the audit log after Team when API tokens are turned off', function () {
 });
 
 it('lets the larasell.admin.view-audit-log gate decide who may see the log', function () {
+    // Arrange
     $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
     Gate::define('larasell.admin.view-audit-log', fn (Admin $admin): bool => $admin->is($this->ada));
 
+    // Act & Assert
     $this->actingAs($alan, 'larasell-admin')->get(route('larasell.admin.settings.audit-log.index'))->assertForbidden();
     $this->actingAs($this->ada, 'larasell-admin')->get(route('larasell.admin.settings.audit-log.index'))->assertOk();
 });
 
 it('lets the larasell.admin.search-audit-log gate decide who may filter the log', function () {
+    // Arrange
     Gate::define('larasell.admin.search-audit-log', fn (): bool => false);
 
     $this->actingAs($this->ada, 'larasell-admin');
+
+    // Act & Assert
     $this->get(route('larasell.admin.settings.audit-log.index', ['event' => 'api_token.created']))->assertForbidden();
 
     auditLogPage()->where('canSearch', false);
@@ -278,11 +309,13 @@ it('lets the larasell.admin.search-audit-log gate decide who may filter the log'
 });
 
 it('hides the filters and ignores them while the audit-log-filters feature is inactive', function () {
+    // Arrange
     recordAt('2026-10-28 08:00:00', 'api_token.created', $this->ada);
     recordAt('2026-10-28 09:00:00', 'api_token.revoked', $this->ada);
     // A new admin, so the feature's default decides.
     $this->ada = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
 
+    // Act & Assert
     // Even filters it would reject.
     auditLogPage(['event' => 'api_token.created', 'from' => 'yesterday'])
         ->where('canSearch', false)
@@ -298,7 +331,9 @@ it('hides the filters and ignores them while the audit-log-filters feature is in
 });
 
 it('keeps the audit log out of reach for guests', function () {
+    // Act
     $this->get(route('larasell.admin.settings.audit-log.index'))->assertRedirect(route('larasell.admin.login'));
 
+    // Assert
     expect(DB::table('larasell_audit_log')->count())->toBe(0);
 });

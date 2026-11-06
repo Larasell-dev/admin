@@ -35,8 +35,10 @@ function pickCategoryContentLocale(string $locale): void
 }
 
 it('offers the store\'s locales on the category page and when adding a category', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
 
+    // Act & Assert
     $this->get(route('larasell.admin.categories.show', $shoes))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -55,10 +57,12 @@ it('offers the store\'s locales on the category page and when adding a category'
 });
 
 it('shows the category in the picked locale', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
 
     pickCategoryContentLocale('de');
 
+    // Act & Assert
     $this->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('category.name', 'Schuhe')
@@ -67,13 +71,16 @@ it('shows the category in the picked locale', function () {
 });
 
 it('saves the category\'s name and slug in the picked locale and keeps the other translations', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
 
     pickCategoryContentLocale('de');
 
+    // Act
     $this->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Schuhwerk', 'slug' => 'schuhwerk', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
+    // Assert
     $shoes->refresh();
 
     expect($shoes->name->all())->toBe(['en' => 'Shoes', 'de' => 'Schuhwerk'])
@@ -81,11 +88,13 @@ it('saves the category\'s name and slug in the picked locale and keeps the other
 });
 
 it('checks the category slug against the other categories\' slugs in the picked locale', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
     translatedCategory(['en' => 'Bags', 'de' => 'Taschen'], ['en' => 'bags', 'de' => 'taschen']);
 
     pickCategoryContentLocale('de');
 
+    // Act & Assert
     // Another category's English slug is free in German, but not its German one.
     $this->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Schuhe', 'slug' => 'bags', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
@@ -94,11 +103,14 @@ it('checks the category slug against the other categories\' slugs in the picked 
 });
 
 it('creates a category in the picked locale', function () {
+    // Arrange
     pickCategoryContentLocale('de');
 
+    // Act
     $this->post(route('larasell.admin.categories.store'), ['name' => 'Taschen', 'slug' => 'taschen', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
+    // Assert
     $category = Category::query()->sole();
 
     expect($category->name->all())->toBe(['de' => 'Taschen'])
@@ -106,10 +118,12 @@ it('creates a category in the picked locale', function () {
 });
 
 it('leaves an untranslated category name and slug empty, with what the store shows instead', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes'], ['en' => 'shoes']);
 
     pickCategoryContentLocale('de');
 
+    // Act & Assert
     $this->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('category.name', null)
@@ -119,9 +133,11 @@ it('leaves an untranslated category name and slug empty, with what the store sho
 });
 
 it('only edits categories in the default locale without content translations', function () {
+    // Arrange
     Entitlement::fake(Plan::Free);
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
 
+    // Act & Assert
     $this->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('category.name', 'Shoes')
@@ -129,6 +145,7 @@ it('only edits categories in the default locale without content translations', f
 });
 
 it('lists the category\'s products by their name in the picked locale', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
     $boots = Product::create(['name' => ['en' => 'Boots', 'de' => 'Stiefel'], 'slug' => ['en' => 'boots', 'de' => 'stiefel'], 'price' => Price::of(1000)]);
     $socks = Product::create(['name' => ['en' => 'Socks'], 'slug' => ['en' => 'socks'], 'price' => Price::of(500)]);
@@ -136,6 +153,7 @@ it('lists the category\'s products by their name in the picked locale', function
 
     pickCategoryContentLocale('de');
 
+    // Act & Assert
     $this->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('products.rows.0.name', 'Stiefel')
@@ -144,6 +162,7 @@ it('lists the category\'s products by their name in the picked locale', function
 });
 
 it('finds products to add by the name the picked locale shows', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
     Product::create(['name' => ['en' => 'Boots', 'de' => 'Stiefel'], 'slug' => ['en' => 'boots', 'de' => 'stiefel'], 'price' => Price::of(1000)]);
     Product::create(['name' => ['en' => 'Socks'], 'slug' => ['en' => 'socks'], 'price' => Price::of(500)]);
@@ -153,6 +172,7 @@ it('finds products to add by the name the picked locale shows', function () {
     $search = fn (string $term) => $this->getJson(route('larasell.admin.categories.available-products.index', [$shoes, 'search' => $term]))
         ->json('products.*.name');
 
+    // Act & Assert
     expect($search(''))->toBe(['Stiefel', 'Socks'])
         ->and($search('stief'))->toBe(['Stiefel'])
         // Shown as Stiefel, so its English name doesn't find it.
@@ -162,6 +182,7 @@ it('finds products to add by the name the picked locale shows', function () {
 });
 
 it('names the categories in the sidebar tree in the picked locale', function () {
+    // Arrange
     $shoes = translatedCategory(['en' => 'Shoes', 'de' => 'Schuhe'], ['en' => 'shoes', 'de' => 'schuhe']);
     translatedCategory(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel'], $shoes);
     translatedCategory(['en' => 'Bags'], ['en' => 'bags']);
@@ -174,6 +195,7 @@ it('names the categories in the sidebar tree in the picked locale', function () 
         // Untranslated, it shows what the store shows.
         ->where('categories.1.name', 'Bags');
 
+    // Act & Assert
     $this->get(route('larasell.admin.categories.show', $shoes))->assertInertia($tree);
     $this->get(route('larasell.admin.categories.create'))->assertInertia($tree);
     $this->get(route('larasell.admin.categories.show', 999))->assertNotFound()->assertInertia($tree);

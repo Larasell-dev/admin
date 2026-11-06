@@ -12,26 +12,32 @@ function brokenPromise(string $code = 'larasell-admin.test.broken'): StructuredL
 }
 
 it('passes without building the exception', function () {
+    // Act & Assert
     expect(Assert::that(true, fn () => throw new LogicException('Built although the check passed.')))->toBeTrue();
 });
 
 it('throws the exception in the testing environment, so tests see the bug', function () {
+    // Act & Assert
     expect(fn () => Assert::that(false, brokenPromise(...)))
         ->toThrow(StructuredLogicException::class, 'A promise was broken.');
 });
 
 it('throws in debug mode, whatever the environment', function () {
+    // Arrange
     $this->app['env'] = 'production';
     config(['app.debug' => true]);
 
+    // Act & Assert
     expect(fn () => Assert::that(false, brokenPromise()))->toThrow(StructuredLogicException::class);
 });
 
 it('reports a failed check once per error code in production, and lets the caller fall back', function () {
+    // Arrange
     $this->app['env'] = 'production';
     config(['app.debug' => false]);
     Exceptions::fake();
 
+    // Act & Assert
     expect(Assert::that(false, brokenPromise()))->toBeFalse()
         ->and(Assert::that(false, brokenPromise()))->toBeFalse()
         ->and(Assert::that(false, brokenPromise('larasell-admin.test.other')))->toBeFalse();

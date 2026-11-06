@@ -16,8 +16,10 @@ function signInForInterfaceLocale(): void
 }
 
 it('remembers the picked language in a cookie and reloads the page it was picked on', function () {
+    // Arrange
     signInForInterfaceLocale();
 
+    // Act & Assert
     $this->from(route('larasell.admin.settings'))
         ->put(route('larasell.admin.interface-locale.update'), ['locale' => 'de-DE'])
         ->assertRedirect(route('larasell.admin.settings'))
@@ -32,8 +34,10 @@ it('remembers the picked language in a cookie and reloads the page it was picked
 });
 
 it('shows the panel in the picked language, its server text and <html lang> included', function () {
+    // Arrange
     signInForInterfaceLocale();
 
+    // Act & Assert
     $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'de-DE')
         ->get(route('larasell.admin.home'))
         ->assertSee('<html lang="de-DE" dir="ltr">', false)
@@ -47,23 +51,28 @@ it('shows the panel in the picked language, its server text and <html lang> incl
 });
 
 it('translates the page title a route set while the app booted', function () {
+    // Arrange
     signInForInterfaceLocale();
     app('translator')->addLines(['*.Dashboard' => 'Übersicht', '*. - Admin' => ' - Verwaltung'], 'de-DE');
 
+    // Act & Assert
     $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'de-DE')
         ->get(route('larasell.admin.home'))
         ->assertSee('<title data-inertia="title">Übersicht - Verwaltung</title>', false);
 });
 
 it('names a table action in English, so a page loaded before switching the language still runs it', function () {
+    // Arrange
     signInForInterfaceLocale();
     app('translator')->addLines(['*.Delete' => 'Löschen'], 'de-DE');
     $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
 
+    // Act
     $action = $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'de-DE')
         ->get(route('larasell.admin.products.index'))
         ->inertiaProps('table.rows.0._actions.0');
 
+    // Assert
     expect($action['label'])->toBe('Löschen')
         ->and($action['url'])->toEndWith("/{$boots->id}/actions/delete");
 
@@ -75,10 +84,12 @@ it('names a table action in English, so a page loaded before switching the langu
 });
 
 it('shows the panel in English without a pick, or with one it does not offer', function (?string $picked) {
+    // Arrange
     signInForInterfaceLocale();
 
     $request = $picked === null ? $this : $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, $picked);
 
+    // Act & Assert
     $request->get(route('larasell.admin.home'))
         ->assertSee('<html lang="en-US" dir="ltr">', false)
         ->assertInertia(fn (Assert $page) => $page
@@ -92,16 +103,20 @@ it('shows the panel in English without a pick, or with one it does not offer', f
 ]);
 
 it('reads the app\'s lang files of the picked language, e.g. lang/de for de-DE', function () {
+    // Arrange
     app('translator')->addLines(['auth.failed' => 'Diese Zugangsdaten sind falsch.'], 'de');
 
+    // Act & Assert
     $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'de-DE')
         ->post(route('larasell.admin.login.store'), ['email' => 'nobody@example.com', 'password' => 'wrong'])
         ->assertSessionHasErrors(['email' => 'Diese Zugangsdaten sind falsch.']);
 });
 
 it('rejects a language it does not offer', function (string $locale) {
+    // Arrange
     signInForInterfaceLocale();
 
+    // Act & Assert
     $this->put(route('larasell.admin.interface-locale.update'), ['locale' => $locale])
         ->assertSessionHasErrors('locale')
         ->assertCookieMissing(CookieInterfaceLocaleResolver::COOKIE);
@@ -119,6 +134,7 @@ describe('pseudo-languages', function () {
     });
 
     it('offers them locally, named in English', function () {
+        // Act & Assert
         $this->get(route('larasell.admin.home'))->assertInertia(fn (Assert $page) => $page
             ->where('interfaceLocale.options.2', ['value' => 'en-XA', 'label' => 'English (Pseudo-Accents)'])
             ->where('interfaceLocale.options.3', ['value' => 'ar-XB', 'label' => 'Arabic (Pseudo-Bidi)'])
@@ -126,8 +142,10 @@ describe('pseudo-languages', function () {
     });
 
     it('accents and lengthens the server text, placeholders and Laravel\'s own lines included', function () {
+        // Arrange
         app('translator')->addLines(['auth.throttle' => 'Try again in :seconds seconds.'], 'en');
 
+        // Act
         $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'en-XA')
             ->get(route('larasell.admin.home'))
             ->assertInertia(fn (Assert $page) => $page
@@ -135,11 +153,13 @@ describe('pseudo-languages', function () {
                 ->where('commandMenu.searches.0.label', '[Šéåŕçĥ þŕöðûçţš ~~~~~~]')
             );
 
+        // Assert
         // "Try again in  seconds." without the placeholder has 22 characters, so 9 tildes.
         expect(__('auth.throttle', ['seconds' => 30]))->toBe('[Ţŕý åĝåîñ îñ 30 šéçöñðš. ~~~~~~~~~]');
     });
 
     it('runs the text right to left in ar-XB', function () {
+        // Act & Assert
         $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'ar-XB')
             ->get(route('larasell.admin.home'))
             ->assertSee('<html lang="ar-XB" dir="rtl">', false)
@@ -148,8 +168,10 @@ describe('pseudo-languages', function () {
 });
 
 it('has translation files for every language it ships, for the frontend and the server', function () {
+    // Arrange
     $translated = array_diff(PanelInterfaceLocales::TRANSLATED, [InterfaceLocale::SOURCE]);
 
+    // Act & Assert
     foreach ($translated as $code) {
         expect(__DIR__."/../../../../resources/translations/{$code}.json")->toBeFile()
             ->and(__DIR__."/../../../../lang/{$code}.json")->toBeFile();

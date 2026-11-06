@@ -6,7 +6,10 @@ afterEach(() => {
 });
 
 it("reads a cookie by its exact name, not one that starts with it", () => {
+  // Arrange
   document.cookie = "XSRF-TOKEN-OLD=old; path=/";
+
+  // Act & Assert
   expect(documentCookies.get("XSRF-TOKEN")).toBeUndefined();
 
   document.cookie = "XSRF-TOKEN=new; path=/";
@@ -15,13 +18,19 @@ it("reads a cookie by its exact name, not one that starts with it", () => {
 });
 
 it("decodes values the server encoded, including ones with = in them", () => {
+  // Arrange
   // Laravel's XSRF-TOKEN is URL-encoded base64, which ends in =.
   document.cookie = "XSRF-TOKEN=eyJpdiI6IjEifQ%3D%3D; path=/";
+
+  // Act & Assert
   expect(documentCookies.get("XSRF-TOKEN")).toBe("eyJpdiI6IjEifQ==");
 });
 
 it("writes values that read back the same, and deletes them", () => {
+  // Act
   documentCookies.set("token", "a=b; c");
+
+  // Assert
   expect(documentCookies.get("token")).toBe("a=b; c");
 
   documentCookies.delete("token");

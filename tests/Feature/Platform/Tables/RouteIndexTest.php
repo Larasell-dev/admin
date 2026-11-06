@@ -31,11 +31,13 @@ beforeEach(function () {
 });
 
 it('renders the table page for an index route', function () {
+    // Arrange
     $admin = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
     $book = Book::create(['title' => 'Dune', 'author_name' => 'Frank Herbert']);
 
     expect(route('larasell.admin.shop.library.index', absolute: false))->toBe('/admin/shop/library');
 
+    // Act & Assert
     $this->actingAs($admin, 'larasell-admin')
         ->get(route('larasell.admin.shop.library.index'))
         ->assertOk()
@@ -47,5 +49,6 @@ it('renders the table page for an index route', function () {
 });
 
 it('requires a signed-in admin', function () {
+    // Act & Assert
     $this->get(route('larasell.admin.shop.library.index'))->assertRedirect(route('larasell.admin.login'));
 });

@@ -12,6 +12,7 @@ it.each([
   `${origin}/admin/books/1`,
   `//${host}/admin/books/1`,
 ])("treats %s as the same site", (url) => {
+  // Act & Assert
   expect(isSameSite(url)).toBe(true);
 });
 
@@ -22,5 +23,6 @@ it.each([
   `${protocol}//${window.location.hostname}:1/admin`,
   "mailto:admin@example.com",
 ])("treats %s as another site", (url) => {
+  // Act & Assert
   expect(isSameSite(url)).toBe(false);
 });

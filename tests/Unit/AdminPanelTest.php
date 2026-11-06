@@ -5,31 +5,39 @@ declare(strict_types=1);
 use Larasell\Admin\AdminPanel;
 
 it('resolves the singleton instance from the container', function () {
+    // Act & Assert
     expect(AdminPanel::resolve())->toBe(app(AdminPanel::class))
         ->toBeInstanceOf(AdminPanel::class);
 });
 
 it('registers scripts and page paths', function () {
+    // Arrange
     $panel = new AdminPanel;
 
+    // Act
     $panel->script('resources/js/admin/app.tsx');
     $panel->pagePath('/path/to/pages');
 
+    // Assert
     expect($panel->scripts())->toBe(['resources/js/admin/app.tsx'])
         ->and($panel->pagePaths())->toBe(['/path/to/pages']);
 });
 
 it('registers extension assets by name', function () {
+    // Arrange
     $panel = new AdminPanel;
 
+    // Act
     $panel->vite('acme-wishlists', '/path/to/acme/public/', ['resources/js/admin.ts', 'resources/css/admin.css']);
 
+    // Assert
     expect($panel->extensions())->toBe([
         'acme-wishlists' => ['publicPath' => '/path/to/acme/public', 'entries' => ['resources/js/admin.ts', 'resources/css/admin.css']],
     ]);
 });
 
 it('serves extension assets from the extension\'s own dev server', function () {
+    // Arrange
     $this->withVite();
     $public = sys_get_temp_dir().'/'.uniqid('acme-public-');
     mkdir($public);
@@ -38,6 +46,7 @@ it('serves extension assets from the extension\'s own dev server', function () {
     $panel = new AdminPanel;
     $panel->vite('acme-wishlists', $public, ['resources/js/admin.ts']);
 
+    // Act & Assert
     expect((string) $panel->extensionVite('acme-wishlists')('resources/js/admin.ts'))
         ->toContain('src="http://localhost:5199/resources/js/admin.ts"');
 
@@ -46,6 +55,7 @@ it('serves extension assets from the extension\'s own dev server', function () {
 });
 
 it('serves extension assets from their build linked into vendor/{name}', function () {
+    // Arrange
     $this->withVite();
     $build = public_path('vendor/acme-wishlists');
     mkdir($build, recursive: true);
@@ -57,6 +67,7 @@ it('serves extension assets from their build linked into vendor/{name}', functio
     $panel = new AdminPanel;
     $panel->vite('acme-wishlists', '/path/to/acme/public', ['resources/js/admin.ts', 'resources/css/admin.css']);
 
+    // Act & Assert
     expect((string) $panel->extensionVite('acme-wishlists')(['resources/js/admin.ts', 'resources/css/admin.css']))
         ->toContain('/vendor/acme-wishlists/assets/admin-abc123.js')
         ->toContain('/vendor/acme-wishlists/assets/admin-def456.css');
@@ -66,5 +77,6 @@ it('serves extension assets from their build linked into vendor/{name}', functio
 });
 
 it('refuses to serve assets of an extension that is not registered', function () {
+    // Act & Assert
     (new AdminPanel)->extensionVite('acme-wishlists');
 })->throws(InvalidArgumentException::class, 'acme-wishlists');
