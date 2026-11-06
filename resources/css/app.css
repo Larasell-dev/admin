@@ -16,3 +16,77 @@
     color-scheme: dark;
   }
 }
+
+/* Signing in and out: authTransition.ts sets data-auth-transition on <html> while the page
+   changes. Signing in zooms through the login page into the panel; signing out plays it backwards. */
+@keyframes auth-zoom-through {
+  to {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(6px);
+  }
+}
+
+@keyframes auth-zoom-up {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes auth-zoom-away {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes auth-zoom-back {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(6px);
+  }
+}
+
+:root[data-auth-transition="sign-in"] {
+  &::view-transition-old(root) {
+    animation: 350ms cubic-bezier(0.4, 0, 1, 1) both auth-zoom-through;
+  }
+
+  &::view-transition-new(root) {
+    animation: 550ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both auth-zoom-up;
+  }
+}
+
+:root[data-auth-transition="sign-out"] {
+  &::view-transition-old(root) {
+    animation: 350ms cubic-bezier(0.4, 0, 1, 1) both auth-zoom-away;
+  }
+
+  &::view-transition-new(root) {
+    animation: 550ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both auth-zoom-back;
+  }
+}
+
+/* Without this, the new page zooms in with the finished, full-width progress bar on it.
+   Its own name takes the bar out of the zoom: it fades out on the old page and is hidden on the new one. */
+:root[data-auth-transition] {
+  #nprogress .bar {
+    view-transition-name: auth-progress;
+  }
+
+  &::view-transition-old(auth-progress) {
+    animation: 150ms ease-out both auth-fade-out;
+  }
+
+  &::view-transition-new(auth-progress) {
+    display: none;
+  }
+}
+
+@keyframes auth-fade-out {
+  to {
+    opacity: 0;
+  }
+}

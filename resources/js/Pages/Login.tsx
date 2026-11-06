@@ -2,6 +2,7 @@ import { Form, Link } from "@inertiajs/react";
 import { Button, Container, Field, Input, PasswordInput, Stack } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import { useState } from "react";
+import { signInTransition } from "../utils/authTransition";
 
 export default function Login({
   loginUrl,
@@ -27,7 +28,12 @@ export default function Login({
               </p>
             </Stack>
 
-            <Form action={loginUrl} method="post" resetOnSuccess={["password"]}>
+            <Form
+              action={loginUrl}
+              method="post"
+              resetOnSuccess={["password"]}
+              options={{ viewTransition: signInTransition() }}
+            >
               {({ errors, processing }) => (
                 <Stack spacing={6}>
                   <Stack spacing={5}>
@@ -68,6 +74,7 @@ export default function Login({
                       render={
                         <Link
                           href={devLoginUrl}
+                          viewTransition={signInTransition()}
                           onStart={() => setDevLoginLoading(true)}
                           onFinish={() => setDevLoginLoading(false)}
                         />

@@ -7,6 +7,7 @@ import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import type { ComponentProps } from "react";
 import { assertPresent } from "ts-extras";
 import type { Page } from "../../types";
+import { signOutTransition } from "../../utils/authTransition";
 import { overlayExclusive } from "../../utils/hotkeys";
 import { initials } from "../../utils/initials";
 
@@ -47,7 +48,10 @@ export default function UserMenu() {
                   Profile
                 </fbt>
               </UserMenuItem>
-              <UserMenuItem icon={LogoutBoxRLine} onClick={() => router.post(logoutUrl)}>
+              <UserMenuItem
+                icon={LogoutBoxRLine}
+                onClick={() => router.post(logoutUrl, {}, { viewTransition: signOutTransition() })}
+              >
                 <fbt desc="User menu: signs the admin out of the panel">Log out</fbt>
               </UserMenuItem>
             </HotkeysProvider>
