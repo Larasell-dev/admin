@@ -53,11 +53,11 @@ function ThemeWord() {
 
   // The slot keeps the width of the word it shows and springs to the next word's, so the text
   // after it, wherever a language puts it, slides along instead of jumping.
-  const slot = useRef<HTMLSpanElement>(null);
+  // The ref moves to each new word as it mounts, while the old one is still on its way out.
+  const word = useRef<HTMLSpanElement>(null);
   const [width, setWidth] = useState<number | "auto">("auto");
   useLayoutEffect(() => {
-    const word = slot.current?.querySelector(`[data-change="${shown.change}"]`);
-    if (word) setWidth(word.getBoundingClientRect().width);
+    if (word.current) setWidth(word.current.getBoundingClientRect().width);
   }, [shown.change]);
 
   const transition = reduceMotion
@@ -66,7 +66,6 @@ function ThemeWord() {
 
   return (
     <motion.span
-      ref={slot}
       className="relative inline-flex overflow-y-clip align-bottom"
       initial={false}
       animate={{ width }}
@@ -75,7 +74,7 @@ function ThemeWord() {
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={shown.change}
-          data-change={shown.change}
+          ref={word}
           className="shrink-0"
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
