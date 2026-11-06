@@ -7,6 +7,7 @@
     "dev": "vite",
     "prebuild": "npm run translations:compile",
     "build": "vite build",
+    "build:workbench": "vite build --config workbench/vite.config.ts",
     "typecheck": "tsc --noEmit",
     "format": "oxfmt",
     "format:check": "oxfmt --check",

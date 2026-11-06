@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Product\Data;
 
 use Larasell\Admin\Category\Data\CategoryOptionData;
+use Larasell\Admin\Platform\Sections\Data\SectionData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -16,5 +17,7 @@ class CreateProductPageData extends Data
         public array $categories,
         public ?string $createCategoryUrl,
         public string $uploadImagesUrl,
+        /** @var array<int, SectionData> */
+        public array $sections,
     ) {}
 }

@@ -4,6 +4,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import { UnsavedChangesToastHost } from "../../Components/UnsavedChangesToast";
+import { extensions, Larasell, type SectionComponentProps } from "../../extensions";
 import Edit from "./Edit";
 
 type Props = Parameters<typeof Edit>[0];
@@ -41,6 +42,7 @@ function props(
     categories: [],
     createCategoryUrl: null,
     uploadImagesUrl: "/admin/products/images",
+    sections: [],
     contentLocale: {
       current: "en",
       options: [english, german],
@@ -77,7 +79,7 @@ function renderEdit(initial: Props) {
  * Answers every request with the page in `next`, as the server does when the locale switch
  * redirects back, and records each request.
  */
-function fakeServer(next: Props) {
+function fakeServer(next: Props, errors: Record<string, string> = {}) {
   const requests: { method: string; url: string; data: unknown }[] = [];
   vi.spyOn(http, "getClient").mockReturnValue({
     async request({ method, url, data }) {
@@ -86,7 +88,7 @@ function fakeServer(next: Props) {
         component: "Product/Edit",
         url: "/admin/products/1/edit",
         version: null,
-        props: { errors: {}, ...next },
+        props: { errors, ...next },
       };
       return { status: 200, data: JSON.stringify(page), headers: { "x-inertia": "true" } };
     },
@@ -150,4 +152,52 @@ it("leaves an untranslated name empty and shows what the store shows instead", a
     .element(page.getByRole("textbox", { name: "Slug" }))
     .toHaveAttribute("placeholder", "boots");
   await expect.element(page.getByRole("heading", { name: "Boots" })).toBeVisible();
+});
+
+// A plugin's section, as its admin script would register it.
+function NotesSection({ props, name, error }: SectionComponentProps<{ note: string }>) {
+  return (
+    <section>
+      <label>
+        Internal note
+        <input name={name("note")} defaultValue={props.note} />
+      </label>
+      <p>{error("note")}</p>
+    </section>
+  );
+}
+
+it("renders the sections extensions add inside the form, so they count as unsaved changes", async () => {
+  Larasell.booting(({ sections }) => {
+    sections.register("product", "notes", async () => ({ default: NotesSection }));
+  });
+  extensions.boot();
+  const sections = [{ page: "product", key: "notes", props: { note: "Ships in March" } }];
+  // As the panel does before it renders a page.
+  await extensions.loadSections(sections);
+
+  const requests = fakeServer(
+    { ...props("Boots"), sections },
+    { "sections.notes.note": "Too long." },
+  );
+  await renderEdit({ ...props("Boots"), sections });
+
+  const note = page.getByRole("textbox", { name: "Internal note" });
+  await expect.element(note).toHaveValue("Ships in March");
+
+  await note.fill("Ships in April");
+  await expect.element(select()).toBeDisabled();
+
+  await note.fill("Ships in March");
+  await expect.element(select()).toBeEnabled();
+
+  // Saved with the product, under the section's key; the error comes back on its field.
+  await note.fill("Ships in April, maybe May");
+  document.querySelector("form")?.requestSubmit();
+
+  await expect.element(page.getByText("Too long.")).toBeVisible();
+  expect(requests.at(-1)).toMatchObject({
+    method: "put",
+    data: { name: "Boots", sections: { notes: { note: "Ships in April, maybe May" } } },
+  });
 });

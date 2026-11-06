@@ -24,6 +24,7 @@ import { isSortable, useSortable } from "@dnd-kit/react/sortable";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import {
   type ChangeEventHandler,
+  type ReactNode,
   type Ref,
   type RefObject,
   useEffect,
@@ -58,6 +59,7 @@ export default function ProductForm({
   categories,
   createCategoryUrl,
   uploadImagesUrl,
+  children,
 }: {
   product?: Product;
   /** The store's categories to pick the product's from. */
@@ -67,6 +69,8 @@ export default function ProductForm({
   createCategoryUrl: string | null;
   /** Where images are uploaded before saving the product links them. */
   uploadImagesUrl: string;
+  /** More sections after the product's own, e.g. those that extensions add. */
+  children?: ReactNode;
 }) {
   const errors: Errors = useFormContext()?.errors ?? {};
 
@@ -151,6 +155,7 @@ export default function ProductForm({
         />
         <IdentifierFields product={product} errors={errors} />
       </Section.Root>
+      {children}
     </SectionStack>
   );
 }

@@ -229,6 +229,13 @@ declare namespace Larasell.Admin.Platform.Search.Data {
     match: Larasell.Admin.Platform.Search.Data.SearchMatchData | null;
   };
 }
+declare namespace Larasell.Admin.Platform.Sections.Data {
+  export type SectionData = {
+    page: string;
+    key: string;
+    props: any;
+  };
+}
 declare namespace Larasell.Admin.Product.Data {
   export type CreateProductPageData = {
     storeUrl: string;
@@ -236,6 +243,7 @@ declare namespace Larasell.Admin.Product.Data {
     categories: Array<Larasell.Admin.Category.Data.CategoryOptionData>;
     createCategoryUrl: string | null;
     uploadImagesUrl: string;
+    sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
   };
   export type DimensionsData = {
     length: string;
@@ -250,6 +258,7 @@ declare namespace Larasell.Admin.Product.Data {
     categories: Array<Larasell.Admin.Category.Data.CategoryOptionData>;
     createCategoryUrl: string | null;
     uploadImagesUrl: string;
+    sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
   };
   export type ProductDetailData = {
     id: number;
