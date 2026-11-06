@@ -288,6 +288,27 @@ function HookEntry({
 
 type Row = { item: CommandItem; path: string[]; crumbs: string[] };
 
+/** The words a row is found by: its crumbs, its label and its keywords. */
+const keywordsOf = ({ item, crumbs }: Row) => [...crumbs, textOf(item), ...(item.keywords ?? [])];
+
+/**
+ * How many of a command's nested items a search at the root shows at most. A command with many,
+ * e.g. every content language, would otherwise render hundreds of rows on each key.
+ */
+const nestedMatchesAtRoot = 20;
+
+/** The command's own row, then the best matches among the rows of its nested views. */
+function bestRows([own, ...nested]: Row[], search: string): Row[] {
+  const best = nested
+    .map((row) => ({ row, score: filter("", search, keywordsOf(row)) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, nestedMatchesAtRoot)
+    .map(({ row }) => row);
+
+  return own ? [own, ...best] : best;
+}
+
 /** The items to the path, and below them, while searching, the items of their nested views. */
 function rows(items: CommandItem[], path: string[], crumbs: string[], deep: boolean): Row[] {
   return items.flatMap((item) => {
@@ -335,63 +356,70 @@ function Rows({ command, actions }: { command: CommandItem; actions: Actions }) 
   const items = node?.items ?? [command];
   const basePath = node ? view.path : [];
 
-  return rows(items, basePath, [], view.search !== "").map(({ item, path, crumbs }) => (
-    <Command.Item
-      key={valueOf(path)}
-      value={valueOf(path)}
-      keywords={[...crumbs, textOf(item), ...(item.keywords ?? [])]}
-      disabled={!!item.disabled}
-      onSelect={() => (item.items ? actions.openView(path, item) : actions.run(item.run))}
-      className={cn(
-        "flex min-h-9 cursor-default items-center gap-3 px-3 py-1.5 select-none",
-        "type-body-md text-mauve-950 dark:text-mauve-50",
-        "data-[disabled=true]:text-mauve-400 dark:data-[disabled=true]:text-mauve-500",
-        "data-[selected=true]:bg-mauve-100 dark:data-[selected=true]:bg-mauve-800",
-      )}
-    >
-      {/* An item without an icon keeps its place, so every label starts in the same column. */}
-      <span aria-hidden className="flex size-4 shrink-0">
-        {item.icon && <Icon icon={item.icon} size={4} />}
-      </span>
-      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-        {crumbs.map((crumb) => (
-          <Fragment key={crumb}>
-            <span className="shrink-0 text-mauve-500">{crumb}</span>
-            <span aria-hidden className="flex shrink-0 text-mauve-400">
-              <Icon icon={ArrowRightSLine} />
-            </span>
-          </Fragment>
-        ))}
-        {typeof item.label === "string" ? (
-          <span>{item.label}</span>
-        ) : (
-          <>
-            {/* Named by its text value, which says what the rendered label shows. */}
-            <span aria-hidden className="min-w-0">
-              <RenderedLabel label={item.label} value={valueOf(path)} />
-            </span>
-            <span className="sr-only">{item.textValue}</span>
-          </>
+  const searching = view.search !== "";
+  const all = rows(items, basePath, [], searching);
+
+  return (atRoot && searching ? bestRows(all, view.search) : all).map((row) => {
+    const { item, path, crumbs } = row;
+
+    return (
+      <Command.Item
+        key={valueOf(path)}
+        value={valueOf(path)}
+        keywords={keywordsOf(row)}
+        disabled={!!item.disabled}
+        onSelect={() => (item.items ? actions.openView(path, item) : actions.run(item.run))}
+        className={cn(
+          "flex min-h-9 cursor-default items-center gap-3 px-3 py-1.5 select-none",
+          "type-body-md text-mauve-950 dark:text-mauve-50",
+          "data-[disabled=true]:text-mauve-400 dark:data-[disabled=true]:text-mauve-500",
+          "data-[selected=true]:bg-mauve-100 dark:data-[selected=true]:bg-mauve-800",
         )}
-      </span>
-      {item.disabled ? (
-        <span className="shrink-0 type-body-sm text-mauve-500">{item.disabled}</span>
-      ) : (
-        item.checked && (
-          <>
-            <span aria-hidden className="flex shrink-0">
-              <Icon icon={CheckLine} />
-            </span>
-            <span className="sr-only">
-              <fbt desc="Command menu: read by screen readers after the checked item of a list, e.g. 'Dark, current' for the theme in use">
-                , current
-              </fbt>
-            </span>
-          </>
-        )
-      )}
-    </Command.Item>
-  ));
+      >
+        {/* An item without an icon keeps its place, so every label starts in the same column. */}
+        <span aria-hidden className="flex size-4 shrink-0">
+          {item.icon && <Icon icon={item.icon} size={4} />}
+        </span>
+        <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+          {crumbs.map((crumb) => (
+            <Fragment key={crumb}>
+              <span className="shrink-0 text-mauve-500">{crumb}</span>
+              <span aria-hidden className="flex shrink-0 text-mauve-400">
+                <Icon icon={ArrowRightSLine} />
+              </span>
+            </Fragment>
+          ))}
+          {typeof item.label === "string" ? (
+            <span>{item.label}</span>
+          ) : (
+            <>
+              {/* Named by its text value, which says what the rendered label shows. */}
+              <span aria-hidden className="min-w-0">
+                <RenderedLabel label={item.label} value={valueOf(path)} />
+              </span>
+              <span className="sr-only">{item.textValue}</span>
+            </>
+          )}
+        </span>
+        {item.disabled ? (
+          <span className="shrink-0 type-body-sm text-mauve-500">{item.disabled}</span>
+        ) : (
+          item.checked && (
+            <>
+              <span aria-hidden className="flex shrink-0">
+                <Icon icon={CheckLine} />
+              </span>
+              <span className="sr-only">
+                <fbt desc="Command menu: read by screen readers after the checked item of a list, e.g. 'Dark, current' for the theme in use">
+                  , current
+                </fbt>
+              </span>
+            </>
+          )
+        )}
+      </Command.Item>
+    );
+  });
 }
 
 /**
