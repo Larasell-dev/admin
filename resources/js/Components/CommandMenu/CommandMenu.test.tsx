@@ -209,6 +209,23 @@ it("finds nested items from the root and runs them there", async () => {
   await expect.element(menu()).not.toBeInTheDocument();
 });
 
+it("marks what the search matched in the crumbs and the label", async () => {
+  register(orders, switchTheme);
+  await renderMenu();
+  await openMenu();
+
+  const marked = (name: RegExp) =>
+    [...option(name).element().querySelectorAll("mark")].map((mark) => mark.textContent);
+
+  await search().fill("themedark");
+  await expect.element(option(/Switch theme.*Dark/)).toBeVisible();
+  expect(marked(/Switch theme.*Dark/)).toEqual(["theme", "Dark"]);
+
+  await search().fill("ord");
+  await expect.element(option("Go to orders")).toBeVisible();
+  expect(marked(/Go to orders/)).toEqual(["ord"]);
+});
+
 it("finds at most 20 of a command's nested items from the root, the best matches", async () => {
   register({
     id: "languages",
