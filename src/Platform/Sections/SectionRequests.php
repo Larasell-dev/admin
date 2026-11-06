@@ -4,7 +4,7 @@ namespace Larasell\Admin\Platform\Sections;
 
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\Validator;
-use InvalidArgumentException;
+use Larasell\Admin\Platform\Sections\Exceptions\InvalidSection;
 
 /**
  * The requests of a page's sections while the page is saved. The page's own request prepares
@@ -78,6 +78,6 @@ final class SectionRequests
             }
         }
 
-        throw new InvalidArgumentException("No section of this page is validated by [{$class}].");
+        throw InvalidSection::unknownRequest($class);
     }
 }

@@ -8,15 +8,19 @@ use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Sections\Exceptions\InvalidSection;
+use Larasell\Admin\Platform\Sections\Exceptions\SectionRequestNotReady;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionDefinition;
 use Larasell\Admin\Platform\Sections\SectionPage;
+use Larasell\Admin\Platform\Sections\SectionRequest;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Tests\Fixtures\Sections\GiftWrapRequest;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesPayload;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesProps;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesRequest;
+use Larasell\Admin\Tests\Fixtures\Sections\UnusedRequest;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
@@ -130,13 +134,36 @@ it('keeps the sections\' payloads for queued listeners, without the HTTP request
         ->and($queued->section(NotesRequest::class)->input())->toBe([]);
 });
 
-it('refuses a section key that is taken or would nest its fields', function (string $key) {
-    Section::add(SectionPage::Product, $key);
-})->with(['notes', 'acme.notes', 'acme[notes]', ''])->throws(InvalidArgumentException::class);
-
-it('refuses a section request or props class of the wrong kind', function (Closure $configure) {
-    $configure(Section::add(SectionPage::Product, 'other'));
+it('refuses a section key that is taken or would nest its fields', function (string $key, string $code) {
+    expect(fn () => Section::add(SectionPage::Product, $key))
+        ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe($code));
 })->with([
-    'request' => [fn (SectionDefinition $section) => $section->request(Product::class)],
-    'props' => [fn (SectionDefinition $section) => $section->props(Product::class)],
-])->throws(InvalidArgumentException::class);
+    ['notes', 'larasell-admin.section.duplicate-key'],
+    ['acme.notes', 'larasell-admin.section.invalid-key'],
+    ['acme[notes]', 'larasell-admin.section.invalid-key'],
+    ['', 'larasell-admin.section.invalid-key'],
+]);
+
+it('refuses a section request or props class of the wrong kind', function (Closure $configure, string $code) {
+    expect(fn () => $configure(Section::add(SectionPage::Product, 'other')))
+        ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe($code));
+})->with([
+    'request' => [fn (SectionDefinition $section) => $section->request(Product::class), 'larasell-admin.section.invalid-request'],
+    'props' => [fn (SectionDefinition $section) => $section->props(Product::class), 'larasell-admin.section.invalid-props'],
+]);
+
+it('says which request a listener asked for when the page has no section validated by it', function () {
+    Event::listen(ProductSaved::class, fn (ProductSaved $event) => $event->section(UnusedRequest::class));
+
+    $this->withoutExceptionHandling();
+
+    expect(fn () => saveBoots())
+        ->toThrow(fn (InvalidSection $exception) => expect($exception->errorCode())->toBe('larasell-admin.section.unknown-request'));
+});
+
+it('says a section request isn\'t validated yet when its input is read too early', function () {
+    expect(fn () => (new NotesRequest)->validated())
+        ->toThrow(fn (SectionRequestNotReady $exception) => expect($exception->errorCode())->toBe('larasell-admin.section.request-not-validated'));
+});
+
+class ProductNotesRequestStub extends SectionRequest {}

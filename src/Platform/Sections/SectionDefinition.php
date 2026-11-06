@@ -4,7 +4,7 @@ namespace Larasell\Admin\Platform\Sections;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use InvalidArgumentException;
+use Larasell\Admin\Platform\Sections\Exceptions\InvalidSection;
 
 /**
  * A section that a module or plugin adds to a resource page, e.g. a product's. Its component
@@ -32,7 +32,7 @@ final class SectionDefinition
     public function props(Closure|string $props): self
     {
         if (is_string($props) && ! is_subclass_of($props, Props::class)) {
-            throw new InvalidArgumentException("The props of the [{$this->key}] section must implement [".Props::class."], [{$props}] doesn't.");
+            throw InvalidSection::invalidProps($this->key, $props);
         }
 
         $this->props = $props;
@@ -49,7 +49,7 @@ final class SectionDefinition
     public function request(string $request): self
     {
         if (! is_subclass_of($request, SectionRequest::class)) {
-            throw new InvalidArgumentException("The request of the [{$this->key}] section must extend [".SectionRequest::class."], [{$request}] doesn't.");
+            throw InvalidSection::invalidRequest($this->key, $request);
         }
 
         $this->request = $request;
