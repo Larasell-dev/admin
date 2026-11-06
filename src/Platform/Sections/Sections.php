@@ -4,8 +4,8 @@ namespace Larasell\Admin\Platform\Sections;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 use Larasell\Admin\Platform\Sections\Data\SectionData;
+use Larasell\Admin\Platform\Sections\Exceptions\InvalidSection;
 
 /**
  * The sections that modules and plugins add to resource pages, by SectionPage. A page
@@ -29,11 +29,11 @@ class Sections
     {
         // The key becomes part of field names and error keys, where dots and brackets nest.
         if (preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*$/', $key) !== 1) {
-            throw new InvalidArgumentException("The section key [{$key}] may only contain letters, numbers, dashes and underscores.");
+            throw InvalidSection::invalidKey($key);
         }
 
         if (isset($this->sections[$page->value][$key])) {
-            throw new InvalidArgumentException("The [{$page->value}] page already has a section [{$key}].");
+            throw InvalidSection::duplicateKey($page->value, $key);
         }
 
         return $this->sections[$page->value][$key] = new SectionDefinition($key);

@@ -5,7 +5,7 @@ namespace Larasell\Admin\Platform\Sections;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
-use LogicException;
+use Larasell\Admin\Platform\Sections\Exceptions\SectionRequestNotReady;
 
 /**
  * Validates a section's fields when its page is saved, the way a FormRequest validates a page,
@@ -79,7 +79,7 @@ abstract class SectionRequest
      */
     public function merge(array $input): void
     {
-        $request = $this->request ?? throw new LogicException('The ['.static::class.'] section has no request to change.');
+        $request = $this->request ?? throw SectionRequestNotReady::withoutRequest(static::class);
 
         $request->merge(['sections' => [
             ...(array) $request->input('sections', []),
@@ -92,7 +92,7 @@ abstract class SectionRequest
      */
     public function validated(?string $key = null, mixed $default = null): mixed
     {
-        $validated = $this->validated ?? throw new LogicException('The ['.static::class.'] section has not been validated yet.');
+        $validated = $this->validated ?? throw SectionRequestNotReady::notValidated(static::class);
 
         return $key === null ? $validated : data_get($validated, $key, $default);
     }
