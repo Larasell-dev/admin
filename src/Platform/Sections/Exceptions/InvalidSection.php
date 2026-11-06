@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Platform\Sections\Exceptions;
 
+use BackedEnum;
 use InvalidArgumentException;
 use Larasell\Admin\Platform\Sections\Props;
 use Larasell\Admin\Platform\Sections\SectionRequest;
@@ -9,7 +10,7 @@ use Larasell\Chronicle\Exceptions\HasStructuredException;
 use Larasell\Chronicle\Exceptions\StructuredException;
 
 /**
- * A section was added or asked for in a way the page can't use.
+ * A section was added or asked for in a way its form can't use.
  */
 final class InvalidSection extends InvalidArgumentException implements StructuredException
 {
@@ -25,13 +26,42 @@ final class InvalidSection extends InvalidArgumentException implements Structure
         );
     }
 
-    public static function duplicateKey(string $page, string $key): self
+    public static function duplicateKey(string $form, string $key): self
     {
         return self::structured(
             errorCode: 'larasell-admin.section.duplicate-key',
-            message: "The [{$page}] page already has a section [{$key}].",
+            message: "The [{$form}] form already has a section [{$key}].",
             why: 'Two sections with the same key would post their fields under the same name, so each would overwrite the other.',
             fix: 'Give each section its own key, prefixed with your plugin\'s name.',
+        );
+    }
+
+    /**
+     * @param  class-string<BackedEnum>|null  $anchors
+     */
+    public static function unknownAnchor(string $form, string $key, BackedEnum $anchor, ?string $anchors): self
+    {
+        $given = $anchor::class.'::'.$anchor->name;
+
+        return self::structured(
+            errorCode: 'larasell-admin.section.unknown-anchor',
+            message: "The [{$key}] section is placed next to [{$given}], which isn't one of the [{$form}] form's own sections.",
+            why: $anchors === null
+                ? "The [{$form}] form has no own sections registered to place sections next to."
+                : "The [{$form}] form's own sections are the cases of [{$anchors}], so it has no place for the section.",
+            fix: $anchors === null
+                ? 'Leave out before() and after(), so the section goes after the form\'s own sections.'
+                : "Pass a case of {$anchors} to before() or after().",
+        );
+    }
+
+    public static function changedOtherInput(string $key, string $other): self
+    {
+        return self::structured(
+            errorCode: 'larasell-admin.section.changed-other-input',
+            message: "Preparing the [{$key}] section changed the input of the [{$other}] section.",
+            why: "A section request only sees and changes its own input under sections[{$key}], so sections can't interfere with each other.",
+            fix: 'Change only the section\'s own input, with merge() in prepareForValidation().',
         );
     }
 
@@ -59,9 +89,9 @@ final class InvalidSection extends InvalidArgumentException implements Structure
     {
         return self::structured(
             errorCode: 'larasell-admin.section.unknown-request',
-            message: "No section of this page is validated by [{$request}].",
-            why: 'The saved event only has the requests of the sections added to its page with Section::add().',
-            fix: "Add the section to this page with ->request({$request}::class), or ask for the request class of a section the page has.",
+            message: "No section of this form is validated by [{$request}].",
+            why: 'The saved event only has the requests of the sections added to its form with Section::add().',
+            fix: "Add the section to the form with ->request({$request}::class), or ask for the request class of a section the form has.",
         );
     }
 }

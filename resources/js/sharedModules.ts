@@ -8,7 +8,7 @@ import { defineCommand, useCommand } from "./Components/CommandMenu/commands";
 import { Highlight, matchRanges } from "./Components/CommandMenu/Highlight";
 import { Page } from "./Components/Page";
 import ResourceTable from "./Components/ResourceTable";
-import { Larasell } from "./extensions";
+import { Larasell, SectionForm } from "./extensions";
 import SidebarLayout from "./Layouts/SidebarLayout";
 
 /**
@@ -27,6 +27,7 @@ export const sharedModules = {
     Larasell,
     Page,
     ResourceTable,
+    SectionForm,
     SidebarLayout,
     Highlight,
     defineCommand,

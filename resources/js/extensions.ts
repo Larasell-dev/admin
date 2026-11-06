@@ -19,8 +19,17 @@ export type SectionModule = { default: ComponentType<SectionComponentProps<any>>
 
 export type SectionLoader = () => Promise<SectionModule>;
 
-/** The pages sections can be added to, the values of the server's SectionPage enum. */
-export type SectionPage = "product";
+/** The forms sections can be added to, generated from the server's SectionForm enum. */
+export type SectionForm = Larasell.Admin.Platform.Sections.SectionForm;
+
+/**
+ * The forms sections can be added to by the server's case names: SectionForm.Product is
+ * "product". Generated types have no values, so the cases are listed here; extensions.test.ts
+ * fails when they differ from the enum's.
+ */
+export const SectionForm = {
+  Product: "product",
+} as const satisfies Record<string, SectionForm>;
 
 export type BootingContext = {
   pages: {
@@ -33,11 +42,13 @@ export type BootingContext = {
   };
   sections: {
     /**
-     * Adds the component of a section that the server added to a page with Section::add($page,
-     * $key). It renders inside the page's form, after the page's own sections, so its fields
-     * are saved with the page. The loader runs when a page with the section is first opened.
+     * Adds the component of a section that the server added to a form with Section::add($form,
+     * $key). Pass the form as SectionForm.Product, or its value; any other string is accepted
+     * too, so an extension still builds against a panel with forms it doesn't know. It renders
+     * inside the form, where the server placed it, so its fields are saved with the form. The
+     * loader runs when a page with the section is first opened.
      */
-    register(page: SectionPage, key: string, loader: SectionLoader): void;
+    register(form: SectionForm | (string & {}), key: string, loader: SectionLoader): void;
   };
   commands: {
     /**
@@ -57,7 +68,7 @@ export function createExtensions() {
   const pages: Record<string, PageLoader> = {};
   const sectionLoaders: Record<string, SectionLoader> = {};
   const sectionComponents: Record<string, ComponentType<SectionComponentProps>> = {};
-  const sectionId = (page: string, key: string) => `${page}/${key}`;
+  const sectionId = (form: string, key: string) => `${form}/${key}`;
   const callbacks: Array<(context: BootingContext) => void> = [];
   const context: BootingContext = {
     pages: {
@@ -66,8 +77,8 @@ export function createExtensions() {
       },
     },
     sections: {
-      register(page, key, loader) {
-        sectionLoaders[sectionId(page, key)] = loader;
+      register(form, key, loader) {
+        sectionLoaders[sectionId(form, key)] = loader;
       },
     },
     commands: {
@@ -101,10 +112,10 @@ export function createExtensions() {
      * Loads the components of a page's sections before the page renders, since its form takes
      * the fields it starts with as its unchanged values when it mounts.
      */
-    async loadSections(sections: ReadonlyArray<{ page: string; key: string }>): Promise<void> {
+    async loadSections(sections: ReadonlyArray<{ form: string; key: string }>): Promise<void> {
       await Promise.all(
-        sections.map(async ({ page, key }) => {
-          const id = sectionId(page, key);
+        sections.map(async ({ form, key }) => {
+          const id = sectionId(form, key);
           const loader = sectionLoaders[id];
 
           if (loader && !sectionComponents[id]) {
@@ -114,8 +125,8 @@ export function createExtensions() {
       );
     },
     /** A section's component once loadSections() loaded it; none when no extension registered it. */
-    section(page: string, key: string): ComponentType<SectionComponentProps> | undefined {
-      return sectionComponents[sectionId(page, key)];
+    section(form: string, key: string): ComponentType<SectionComponentProps> | undefined {
+      return sectionComponents[sectionId(form, key)];
     },
   };
 }

@@ -10,6 +10,9 @@ use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Search\Searches;
+use Larasell\Admin\Platform\Sections\Facades\Section;
+use Larasell\Admin\Platform\Sections\SectionForm;
+use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
 use Larasell\Admin\Product\Http\Controllers\ProductImageController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
@@ -35,6 +38,9 @@ class ProductServiceProvider extends ServiceProvider
         if (! config('larasell.admin.products.enabled')) {
             return;
         }
+
+        // Sections that modules and plugins add to the product form go before or after these.
+        Section::anchors(SectionForm::Product, ProductSection::class);
 
         Navigation::index(NavItem::Products->label(), 'products', Products::class, icon: Icon::ShoppingBag)->position(NavItem::Products->position());
 

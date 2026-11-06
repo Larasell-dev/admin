@@ -3,9 +3,12 @@
 namespace Larasell\Admin\Product\Events;
 
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionRequest;
 use Larasell\Admin\Platform\Sections\SectionRequests;
+use Larasell\Admin\Platform\Support\Assert;
+use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Larasell\Models\Product;
 
 /**
@@ -34,7 +37,11 @@ final class ProductSaved
         public readonly bool $created,
         public readonly SectionContext $context,
         private readonly SectionRequests $sections,
-    ) {}
+    ) {
+        // The listeners' half of the contract ProductController asserts before dispatching: a
+        // sync listener that throws rolls the product back.
+        Assert::that(DB::transactionLevel() > 0, ProductNotSavedAtomically::outsideTransaction(...));
+    }
 
     /**
      * A section's validated request, by its class: its validated() input and its payload().

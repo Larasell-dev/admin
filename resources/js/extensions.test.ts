@@ -1,7 +1,15 @@
-import { describe, expect, it, vi } from "vitest";
-import { createExtensions, type PageLoader, type SectionLoader } from "./extensions";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { createExtensions, type PageLoader, SectionForm, type SectionLoader } from "./extensions";
 
 const Show = () => null;
+
+describe("SectionForm", () => {
+  it("has a case for every value of the server's enum, and no others", () => {
+    expectTypeOf<
+      (typeof SectionForm)[keyof typeof SectionForm]
+    >().toEqualTypeOf<Larasell.Admin.Platform.Sections.SectionForm>();
+  });
+});
 
 describe("extensions", () => {
   it("runs booting callbacks when the panel boots, not before", () => {
@@ -45,7 +53,7 @@ describe("extensions", () => {
     const Notes = () => null;
     const loader = vi.fn<SectionLoader>(async () => ({ default: Notes }));
     extensions.Larasell.booting(({ sections }) => {
-      sections.register("product", "notes", loader);
+      sections.register(SectionForm.Product, "notes", loader);
     });
     extensions.boot();
 
@@ -54,13 +62,13 @@ describe("extensions", () => {
 
     // Another page's section of the same key, and one no extension registered, load nothing.
     await extensions.loadSections([
-      { page: "category", key: "notes" },
-      { page: "product", key: "unknown" },
+      { form: "category", key: "notes" },
+      { form: "product", key: "unknown" },
     ]);
     expect(loader).not.toHaveBeenCalled();
 
-    await extensions.loadSections([{ page: "product", key: "notes" }]);
-    await extensions.loadSections([{ page: "product", key: "notes" }]);
+    await extensions.loadSections([{ form: "product", key: "notes" }]);
+    await extensions.loadSections([{ form: "product", key: "notes" }]);
 
     expect(extensions.section("product", "notes")).toBe(Notes);
     expect(loader).toHaveBeenCalledOnce();

@@ -4,7 +4,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import { UnsavedChangesToastHost } from "../../Components/UnsavedChangesToast";
-import { extensions, Larasell, type SectionComponentProps } from "../../extensions";
+import { extensions, Larasell, SectionForm, type SectionComponentProps } from "../../extensions";
 import Edit from "./Edit";
 
 type Props = Parameters<typeof Edit>[0];
@@ -96,7 +96,10 @@ function fakeServer(next: Props, errors: Record<string, string> = {}) {
   return requests;
 }
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+});
 
 const select = () => page.getByRole("combobox", { name: "Content language" });
 const nameField = () => page.getByRole("textbox", { name: "Name" });
@@ -172,7 +175,9 @@ it("renders the sections extensions add inside the form, so they count as unsave
     sections.register("product", "notes", async () => ({ default: NotesSection }));
   });
   extensions.boot();
-  const sections = [{ page: "product", key: "notes", props: { note: "Ships in March" } }];
+  const sections = [
+    { form: "product", key: "notes", props: { note: "Ships in March" }, before: null, after: null },
+  ];
   // As the panel does before it renders a page.
   await extensions.loadSections(sections);
 
@@ -200,4 +205,74 @@ it("renders the sections extensions add inside the form, so they count as unsave
     method: "put",
     data: { name: "Boots", sections: { notes: { note: "Ships in April, maybe May" } } },
   });
+});
+
+function TitleSection({ props }: SectionComponentProps<{ title: string }>) {
+  return <h3>{props.title}</h3>;
+}
+
+it("places sections before or after the product's own sections, or after all of them", async () => {
+  Larasell.booting(({ sections }) => {
+    for (const key of ["first", "middle", "last"]) {
+      sections.register(SectionForm.Product, key, async () => ({ default: TitleSection }));
+    }
+  });
+  extensions.boot();
+  const section = (key: string, title: string, before: string | null, after: string | null) => ({
+    form: "product",
+    key,
+    props: { title },
+    before,
+    after,
+  });
+  // In the server's order, which sorted them by position and key.
+  const sections = [
+    section("last", "Last", null, null),
+    section("middle", "After stock", null, "stock"),
+    section("first", "Before general", "general", null),
+  ];
+  await extensions.loadSections(sections);
+
+  await renderEdit({ ...props("Boots"), sections });
+
+  await expect.element(page.getByRole("heading", { name: "Last" })).toBeVisible();
+  expect([...document.querySelectorAll("h3")].map((heading) => heading.textContent)).toEqual([
+    "Before general",
+    "General",
+    "Images",
+    "Categories",
+    "Stock",
+    "After stock",
+    "Weight and dimensions",
+    "SKU and barcode",
+    "Last",
+  ]);
+});
+
+it("leaves out a section that can't show in production, and says why, while the form keeps working", async () => {
+  // In development, the same sections throw while rendering.
+  vi.stubEnv("DEV", false);
+  const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+  const section = (key: string, after: string | null) => ({
+    form: "product",
+    key,
+    props: {},
+    before: null,
+    after,
+  });
+
+  await renderEdit({
+    ...props("Boots"),
+    sections: [section("unregistered", null), section("misplaced", "pricing")],
+  });
+
+  await expect.element(page.getByRole("heading", { name: "SKU and barcode" })).toBeVisible();
+  expect(logged).toHaveBeenCalledWith(
+    expect.stringContaining(
+      "No extension registered a component for the section [product/unregistered]",
+    ),
+  );
+  expect(logged).toHaveBeenCalledWith(
+    expect.stringContaining("The section [product/misplaced] is placed at [pricing]"),
+  );
 });

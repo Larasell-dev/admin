@@ -7,22 +7,26 @@ use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
+use Spatie\TypeScriptTransformer\Transformers\EnumTransformer;
 use Spatie\TypeScriptTransformer\Writers\TypeDefinitionWriter;
 use Workbench\App\TypeScript\ConcreteDataCollector;
+use Workbench\App\TypeScript\TypeScriptEnumCollector;
 
 class WorkbenchServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         // `composer types` runs typescript:transform against the package source;
-        // classes marked #[TypeScript] land in resources/js/types/generated.d.ts.
+        // Data classes and backed enums marked #[TypeScript] land in resources/js/types/generated.d.ts.
         config(['typescript-transformer' => [
             'auto_discover_types' => [dirname(__DIR__, 3).'/src'],
             'collectors' => [
                 ConcreteDataCollector::class,
+                TypeScriptEnumCollector::class,
             ],
             'transformers' => [
                 DataTypeScriptTransformer::class,
+                EnumTransformer::class,
             ],
             'default_type_replacements' => [
                 DateTimeInterface::class => 'string',

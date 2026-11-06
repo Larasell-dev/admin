@@ -2,14 +2,19 @@
 
 namespace Larasell\Admin\Platform\Sections;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Larasell\Admin\Platform\Sections\Exceptions\InvalidSection;
+use Larasell\Admin\Platform\Support\Assert;
 
 /**
- * A section that a module or plugin adds to a resource page, e.g. a product's. Its component
- * renders inside the page's form, so its fields are saved with the page; they post under
- * "sections[{key}]" and its request sees only them, so sections never clash.
+ * A section that a module or plugin adds to a form, e.g. the product form. Its component renders
+ * inside the form, so its fields are saved with it; they post under "sections[{key}]" and its
+ * request sees only them, so sections never clash.
+ *
+ * Without before() or after() it goes after the form's own sections. Sections in the same place
+ * are sorted by position(), then alphabetically by key.
  *
  * @public Plugins add sections with Section::add(), the facade of Sections.
  */
@@ -21,6 +26,15 @@ final class SectionDefinition
     /** @var class-string<SectionRequest>|null */
     private ?string $request = null;
 
+    private ?BackedEnum $before = null;
+
+    private ?BackedEnum $after = null;
+
+    private int $position = 0;
+
+    /** Whether it was set up wrongly, so in production its form leaves it out. */
+    private bool $broken = false;
+
     public function __construct(public readonly string $key) {}
 
     /**
@@ -31,8 +45,10 @@ final class SectionDefinition
      */
     public function props(Closure|string $props): self
     {
-        if (is_string($props) && ! is_subclass_of($props, Props::class)) {
-            throw InvalidSection::invalidProps($this->key, $props);
+        if (! Assert::that(! is_string($props) || is_subclass_of($props, Props::class), fn () => InvalidSection::invalidProps($this->key, is_string($props) ? $props : Closure::class))) {
+            $this->broken = true;
+
+            return $this;
         }
 
         $this->props = $props;
@@ -48,13 +64,63 @@ final class SectionDefinition
      */
     public function request(string $request): self
     {
-        if (! is_subclass_of($request, SectionRequest::class)) {
-            throw InvalidSection::invalidRequest($this->key, $request);
+        if (! Assert::that(is_subclass_of($request, SectionRequest::class), fn () => InvalidSection::invalidRequest($this->key, $request))) {
+            $this->broken = true;
+
+            return $this;
         }
 
         $this->request = $request;
 
         return $this;
+    }
+
+    /**
+     * Places the section right before one of the form's own sections, e.g. ProductSection::General.
+     */
+    public function before(BackedEnum $section): self
+    {
+        [$this->before, $this->after] = [$section, null];
+
+        return $this;
+    }
+
+    /**
+     * Places the section right after one of the form's own sections, e.g. ProductSection::Stock.
+     */
+    public function after(BackedEnum $section): self
+    {
+        [$this->before, $this->after] = [null, $section];
+
+        return $this;
+    }
+
+    /**
+     * Orders the section among others in the same place: lower first, 0 by default. Sections with
+     * the same position are sorted alphabetically by key, so the order doesn't depend on which
+     * plugin booted first.
+     */
+    public function position(int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     *
+     * @return array{before: ?BackedEnum, after: ?BackedEnum, position: int}
+     */
+    public function placement(): array
+    {
+        return ['before' => $this->before, 'after' => $this->after, 'position' => $this->position];
+    }
+
+    /** @internal */
+    public function isBroken(): bool
+    {
+        return $this->broken;
     }
 
     /** @internal */
