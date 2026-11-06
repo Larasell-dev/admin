@@ -20,6 +20,9 @@ declare module "@larasell-dev/admin" {
     error: (field: string) => string | undefined;
   };
 
+  /** The pages sections can be added to, the values of the server's SectionPage enum. */
+  export type SectionPage = "product";
+
   export type SectionLoader = () => Promise<{
     default: ComponentType<SectionComponentProps<any>>;
   }>;
@@ -36,11 +39,11 @@ declare module "@larasell-dev/admin" {
     sections: {
       /**
        * Adds the component of a section that the server added to a page with
-       * Sections::add($page, $key). It renders inside the page's form, after the page's own
+       * Section::add($page, $key). It renders inside the page's form, after the page's own
        * sections, so its fields are saved with the page; name its fields with `name()`. The
        * loader runs when a page with the section is first opened.
        */
-      register(page: string, key: string, loader: SectionLoader): void;
+      register(page: SectionPage, key: string, loader: SectionLoader): void;
     };
     commands: {
       /**

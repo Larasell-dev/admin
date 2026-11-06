@@ -8,11 +8,14 @@ use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionContext;
-use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Admin\Platform\Sections\SectionDefinition;
+use Larasell\Admin\Platform\Sections\SectionPage;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Tests\Fixtures\Sections\GiftWrapRequest;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesPayload;
+use Larasell\Admin\Tests\Fixtures\Sections\NotesProps;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesRequest;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Product;
@@ -25,14 +28,16 @@ beforeEach(function () {
 
     $this->boots = Product::create(['name' => ['en' => 'Boots', 'de' => 'Stiefel'], 'slug' => ['en' => 'boots', 'de' => 'stiefel'], 'price' => Price::of(1000)]);
 
-    // As plugins' service providers would, in the opposite order of their keys.
-    $sections = app(Sections::class);
-    $sections->add('product', 'notes')
-        ->props(fn (?Model $product, SectionContext $context): array => ['name' => $product?->name->get($context->locale->value)])
+    config(['app.name' => 'Acme']);
+
+    // As plugins' service providers would, in the opposite order of their keys: one with a Props
+    // class, one with a closure.
+    Section::add(SectionPage::Product, 'notes')
+        ->props(NotesProps::class)
         ->request(NotesRequest::class);
-    $sections->add('product', 'gift-wrap')->request(GiftWrapRequest::class);
-    // Another page's section, which the product page leaves out.
-    $sections->add('category', 'banner');
+    Section::add(SectionPage::Product, 'gift-wrap')
+        ->props(fn (?Model $product, SectionContext $context): array => ['locale' => $context->locale->value])
+        ->request(GiftWrapRequest::class);
 });
 
 /**
@@ -48,13 +53,13 @@ it('gives the product page its sections in the order they were added, with props
 
     $this->get(route('larasell.admin.products.edit', $this->boots))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('sections', [
-            ['page' => 'product', 'key' => 'notes', 'props' => ['name' => 'Stiefel']],
-            ['page' => 'product', 'key' => 'gift-wrap', 'props' => null],
+            ['page' => 'product', 'key' => 'notes', 'props' => ['name' => 'Stiefel', 'app' => 'Acme']],
+            ['page' => 'product', 'key' => 'gift-wrap', 'props' => ['locale' => 'de']],
         ]));
 
     $this->get(route('larasell.admin.products.create'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('sections.0.props', ['name' => null])
+            ->where('sections.0.props', ['name' => null, 'app' => 'Acme'])
             ->count('sections', 2));
 });
 
@@ -126,9 +131,12 @@ it('keeps the sections\' payloads for queued listeners, without the HTTP request
 });
 
 it('refuses a section key that is taken or would nest its fields', function (string $key) {
-    app(Sections::class)->add('product', $key);
+    Section::add(SectionPage::Product, $key);
 })->with(['notes', 'acme.notes', 'acme[notes]', ''])->throws(InvalidArgumentException::class);
 
-it('refuses a section request that isn\'t a SectionRequest', function () {
-    app(Sections::class)->add('product', 'other')->request(Product::class);
-})->throws(InvalidArgumentException::class);
+it('refuses a section request or props class of the wrong kind', function (Closure $configure) {
+    $configure(Section::add(SectionPage::Product, 'other'));
+})->with([
+    'request' => [fn (SectionDefinition $section) => $section->request(Product::class)],
+    'props' => [fn (SectionDefinition $section) => $section->props(Product::class)],
+])->throws(InvalidArgumentException::class);

@@ -9,6 +9,7 @@ use Inertia\Response;
 use Larasell\Admin\Category\Data\CategoryOptionData;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
+use Larasell\Admin\Platform\Sections\SectionPage;
 use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Product\Data\CreateProductPageData;
 use Larasell\Admin\Product\Data\EditProductPageData;
@@ -38,7 +39,7 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            sections: $this->sections->data('product', null, new SectionContext($locale)),
+            sections: $this->sections->data(SectionPage::Product, null, new SectionContext($locale)),
         ));
     }
 
@@ -84,7 +85,7 @@ class ProductController
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             uploadImagesUrl: route('larasell.admin.products.images.store'),
-            sections: $this->sections->data('product', $product, new SectionContext($locale)),
+            sections: $this->sections->data(SectionPage::Product, $product, new SectionContext($locale)),
         ));
     }
 
