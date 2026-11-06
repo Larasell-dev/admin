@@ -209,6 +209,29 @@ it("finds nested items from the root and runs them there", async () => {
   await expect.element(menu()).not.toBeInTheDocument();
 });
 
+it("finds at most 20 of a command's nested items from the root, the best matches", async () => {
+  register({
+    id: "languages",
+    label: "Change language",
+    items: Array.from({ length: 30 }, (_, index) => ({
+      id: `language-${index + 1}`,
+      label: `Language ${index + 1}`,
+      run: () => run(index + 1),
+    })),
+  });
+  await renderMenu();
+  await openMenu();
+
+  await search().fill("language");
+  await expect
+    .element(page.getByRole("option", { name: "Change language", exact: true }))
+    .toBeVisible();
+  expect(options()).toHaveLength(1 + 20);
+
+  await search().fill("language 30");
+  await expect.element(option(/Language 30$/)).toBeVisible();
+});
+
 it("leaves the items of a command searched only in its own view out of the root search", async () => {
   register(switchTheme, {
     id: "products",
