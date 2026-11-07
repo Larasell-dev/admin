@@ -1,11 +1,14 @@
 // Serves the playground and Reverb from one origin, so a single portal (or tunnel) carries both
-// the panel and the websocket live updates use: `node workbench/live-proxy.mjs <port>`.
-// Reverb's websocket (/app/…) goes to 127.0.0.1:8080, everything else to the panel on 8000.
+// the panel and the websocket live updates use:
+// `node workbench/live-proxy.mjs <port> <panel port> <reverb port>`.
+// Reverb's websocket (/app/…) goes to the Reverb port, everything else to the panel.
 import http from "node:http";
 import net from "node:net";
 
-const port = Number(process.argv[2] ?? process.env.PORT ?? 8001);
-const target = (url) => (url.startsWith("/app/") ? 8080 : 8000);
+const [port, panelPort, reverbPort] = [8000, 8002, 8080].map((fallback, index) =>
+  Number(process.argv[index + 2] ?? fallback),
+);
+const target = (url) => (url.startsWith("/app/") ? reverbPort : panelPort);
 
 const server = http.createServer((request, response) => {
   const upstream = http.request(

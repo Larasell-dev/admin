@@ -64,12 +64,9 @@ Inertia's live props: `Inertia::once(...)->live(on: SomeEvent::class)`. The even
 and the module allows admins on it with `Broadcast::channel(..., ['guards' => ['larasell-admin']])`.
 Echo authorizes at `/admin/broadcasting/auth`. The browser connects only when the app broadcasts
 with Reverb or Pusher (`Platform/Panel/LiveUpdates`); otherwise pages update on the next visit.
-See `SalesChannel` for the sidebar's channel list. The workbench needs the `reverb` service in
-`.amp/services.yaml` running next to `admin`. To try it through one portal, run
-`node workbench/live-proxy.mjs 8001` (the panel and Reverb on one origin), expose port 8001, and
-set `LARASELL_ADMIN_LIVE_HOST=<portal host>`, `LARASELL_ADMIN_LIVE_PORT=443` and
-`LARASELL_ADMIN_LIVE_SCHEME=https` in `vendor/orchestra/testbench-core/laravel/.env`, since
-`testbench serve` passes few environment variables on.
+See `SalesChannel` for the sidebar's channel list. In the workbench, `.amp/services.yaml` runs the panel (`admin-server`) and Reverb behind
+`workbench/live-proxy.mjs` on port 8000 (`admin`), one origin, so live updates work inside the orb
+and through the portal alike.
 
 ## Interface language (i18n)
 

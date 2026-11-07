@@ -1,9 +1,14 @@
 services:
+  # The panel and Reverb behind one origin (workbench/live-proxy.mjs), so live updates also
+  # work through the portal.
   admin:
-    command: vendor/bin/testbench serve --host=127.0.0.1 --port=8000
+    command: node workbench/live-proxy.mjs 8000 8002 8080
     port: 8000
     portal:
       title: Larasell Admin
+  admin-server:
+    command: vendor/bin/testbench serve --host=127.0.0.1 --port=8002
+    port: 8002
   reverb:
     command: vendor/bin/testbench reverb:start --host=127.0.0.1 --port=8080
     port: 8080
