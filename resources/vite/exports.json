@@ -75,12 +75,14 @@
     "resetLayoutProps",
     "router",
     "setLayoutProps",
+    "socketId",
     "useForm",
     "useFormContext",
     "useHttp",
     "usePage",
     "usePoll",
     "usePrefetch",
+    "useProp",
     "useRemember"
   ],
   "@larasell-dev/ui": [

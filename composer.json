@@ -11,7 +11,7 @@
   ],
   "require": {
     "php": "^8.4",
-    "inertiajs/inertia-laravel": "^3.0",
+    "inertiajs/inertia-laravel": "^3.7",
     "larasell-dev/chronicle": "^0.4",
     "larasell-dev/larasell": "^1.24.1",
     "laravel/framework": "^13.23",
@@ -53,6 +53,7 @@
     "larasell-dev/phpstan-rules": "^0.1",
     "larastan/larastan": "^3.0",
     "laravel/pint": "^1.32",
+    "laravel/reverb": "^1.12",
     "orchestra/testbench": "^11.0",
     "pestphp/pest": "^4.7",
     "pestphp/pest-plugin-laravel": "^4.1",
