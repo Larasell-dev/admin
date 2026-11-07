@@ -10,7 +10,7 @@ apps plug into lives under `src/Platform/`: `Panel`, `Auth`, `Navigation`, `Tabl
 Every module has the same layout, with only the folders it needs:
 `<Module>ServiceProvider.php` (config, bindings, routes, navigation, searches),
 `Actions/` (with their payloads), `AuditRecords/`, `Console/`, `Data/` (page props
-and their parts), `Enums/`, `Exceptions/`, `Http/{Controllers,Middleware,Requests}/`,
+and their parts), `Enums/`, `Events/` (what it broadcasts), `Exceptions/`, `Http/{Controllers,Middleware,Requests}/`,
 `Models/`, `Rules/`, `Search/` and `Tables/`. The frontend follows the same names:
 `resources/js/Components/<Module>/`, and tests in `tests/Feature/<Module>/` or
 `tests/Feature/Platform/<Area>/`.
@@ -55,6 +55,17 @@ In `agent-browser`, open `/admin/__dev/login?redirect=/admin/profile` to land on
 a page as a signed-in admin. Hit `/admin/__dev` to discover any newly added
 shortcuts. When adding a new dev shortcut, put it in the `__dev` group in
 `routes/web.php` so it is listed automatically and inherits the local-only guard.
+
+## Live updates
+
+Props can reload in every signed-in admin's browser when the server says they changed, with
+Inertia's live props: `Inertia::once(...)->live(on: SomeEvent::class)`. The event implements
+`ShouldBroadcast` (and `ShouldDispatchAfterCommit` when it follows a write) on a `PrivateChannel`,
+and the module allows admins on it with `Broadcast::channel(..., ['guards' => ['larasell-admin']])`.
+Echo authorizes at `/admin/broadcasting/auth`. The browser connects only when the app broadcasts
+with Reverb or Pusher (`Platform/Panel/LiveUpdates`); otherwise pages update on the next visit.
+See `SalesChannel` for the sidebar's channel list. The workbench needs the `reverb` service in
+`.amp/services.yaml` running next to `admin`.
 
 ## Interface language (i18n)
 

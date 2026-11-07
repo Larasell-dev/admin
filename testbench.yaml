@@ -6,6 +6,7 @@ providers:
   - Workbench\App\ProductNotes\ProductNotesServiceProvider
   - Workbench\App\Storefront\StorefrontServiceProvider
   - Inertia\ServiceProvider
+  - Laravel\Reverb\ReverbServiceProvider
   - Spatie\LaravelData\LaravelDataServiceProvider
 
 env:
@@ -18,6 +19,14 @@ env:
   - CACHE_STORE=file
   # No queue worker runs in the playground, e.g. for the SEO URLs a new product gets.
   - QUEUE_CONNECTION=sync
+  # Live props, e.g. the sidebar's sales channels, over the `reverb` service; development-only credentials.
+  - BROADCAST_CONNECTION=reverb
+  - REVERB_APP_ID=larasell-admin
+  - REVERB_APP_KEY=larasell-admin-key
+  - REVERB_APP_SECRET=larasell-admin-secret
+  - REVERB_HOST=localhost
+  - REVERB_PORT=8080
+  - REVERB_SCHEME=http
 
 workbench:
   install: false

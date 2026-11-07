@@ -2,14 +2,21 @@
 
 namespace Larasell\Admin\SalesChannel;
 
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Inertia\OnceProp;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\SalesChannel\Data\SalesChannelNavigationData;
+use Larasell\Admin\SalesChannel\Events\SalesChannelsChanged;
 use Larasell\Admin\SalesChannel\Http\Controllers\EntryPointController;
 use Larasell\Admin\SalesChannel\Http\Controllers\SalesChannelController;
+use Larasell\Larasell\SalesChannels\Events\SalesChannelCreated;
+use Larasell\Larasell\SalesChannels\Events\SalesChannelDeleted;
+use Larasell\Larasell\SalesChannels\Events\SalesChannelUpdated;
 
 /**
  * The sales channels module: the sidebar section that lists the channels, and the pages to add,
@@ -21,6 +28,15 @@ class SalesChannelServiceProvider extends ServiceProvider
     {
         // A closure, so the session is read per request; guests on the sign-in page get none.
         AdminPanel::resolve()->share('salesChannels', fn (): ?OnceProp => auth('larasell-admin')->check() ? SalesChannelNavigationData::prop() : null);
+
+        // Only what the sidebar shows: a channel's name, and whether it exists.
+        Event::listen([SalesChannelCreated::class, SalesChannelDeleted::class], fn () => SalesChannelsChanged::dispatch());
+        Event::listen(SalesChannelUpdated::class, function (SalesChannelUpdated $event): void {
+            if (in_array('name', $event->changed, true)) {
+                SalesChannelsChanged::dispatch();
+            }
+        });
+        Broadcast::channel(SalesChannelsChanged::CHANNEL, fn (mixed $user): bool => $user instanceof Admin, ['guards' => ['larasell-admin']]);
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('sales-channels/create', [SalesChannelController::class, 'create'])->name('sales-channels.create')->withHead(title: Translate::later('New sales channel'));

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Broadcasting\BroadcastController;
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\Platform\Auth\Http\Controllers\LoginController;
 use Larasell\Admin\Platform\Auth\Http\Controllers\LogoutController;
@@ -29,6 +30,8 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::put('content-locale', SwitchContentLocaleController::class)->name('content-locale.update');
     Route::put('interface-locale', SwitchInterfaceLocaleController::class)->name('interface-locale.update');
     Route::post('logout', LogoutController::class)->name('logout');
+    // Where Echo asks to listen on a private channel; each module allows it with Broadcast::channel().
+    Route::match(['get', 'post'], 'broadcasting/auth', [BroadcastController::class, 'authenticate'])->name('broadcasting.auth');
 });
 
 Route::any('{fallbackPlaceholder}', fn () => abort(404))->where('fallbackPlaceholder', '.*')->fallback()->name('not-found');
