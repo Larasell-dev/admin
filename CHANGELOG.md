@@ -1,5 +1,644 @@
 # Changelog
 
+## [0.7.0](https://github.com/Larasell-dev/admin/compare/v0.6.0...v0.7.0) (2026-11-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* group the frontend by module like the PHP code
+* save custom URLs through the core's CustomUrls attachment
+* save categories through the core's payload actions
+* import the core's exceptions from their Exceptions namespaces
+* remove the unused Slug validation rule
+* save products and categories through the core's actions
+* translate the panel and let admins pick its language
+* restructure the admin into modules and rename Admins to Team ([#236](https://github.com/Larasell-dev/admin/issues/236))
+* edit products in a content locale picked on the page
+
+### Features
+
+* add a command menu on Mod+K ([ee873fa](https://github.com/Larasell-dev/admin/commit/ee873fa3e9636a6f51666cc531808958b6b877f1))
+* add the Section facade, Props classes and the SectionPage enum ([c291335](https://github.com/Larasell-dev/admin/commit/c2913356c4a9cbc7a6cfe97a7cb134908a560d69))
+* change the content language from the command menu ([#235](https://github.com/Larasell-dev/admin/issues/235)) ([7f49769](https://github.com/Larasell-dev/admin/commit/7f49769ad7c6681db3f10e8acf67f3a3a7fb2aae))
+* edit a category's URL in each sales channel ([2d5bf19](https://github.com/Larasell-dev/admin/commit/2d5bf19584180df51c78d145a19be52d00fc40db))
+* edit a product's URL in each sales channel ([78dc139](https://github.com/Larasell-dev/admin/commit/78dc139a21fc1ead173cafc08bab080d26402985))
+* edit categories in the content locale and name products and categories in it ([13a6f0b](https://github.com/Larasell-dev/admin/commit/13a6f0b5e50e5d381d62539621722b40f4838a67))
+* edit products in a content locale picked on the page ([f1b7172](https://github.com/Larasell-dev/admin/commit/f1b7172ebe18d38592c2abfb6ba45666f5d1fb56))
+* error page for 403/404/500/503 and frontend error boundaries ([44cbe0a](https://github.com/Larasell-dev/admin/commit/44cbe0a03a9095198f8debba100b0d97c2e3fafb))
+* find the ranges a search matched like the menu's filter ([016d34b](https://github.com/Larasell-dev/admin/commit/016d34b3c628eb11a3c3e3cb82a044fbc989c33f))
+* go to pages, the profile and log out from the command menu ([9d277a1](https://github.com/Larasell-dev/admin/commit/9d277a147fd6ac08a6be7d5ea9ca76b29ad1bca3))
+* highlight search matches in the primary color without moving text ([a41d024](https://github.com/Larasell-dev/admin/commit/a41d024fdd73bd672645e9a32e834d219192fd91))
+* let a command's items be searched only in its own view ([0c482f4](https://github.com/Larasell-dev/admin/commit/0c482f4eeef08c8fe36f6da0ba1503fbb84171dc))
+* let browsers reach the broadcaster at their own address ([83fe914](https://github.com/Larasell-dev/admin/commit/83fe914fb3ecd6100bda4117cf51d220be754b21))
+* let modules and extensions share props with every admin page ([42dfc17](https://github.com/Larasell-dev/admin/commit/42dfc1754446b26a69e6a47bc8c2a7d68acb0069))
+* let modules and plugins add sections to the product page ([e930fa3](https://github.com/Larasell-dev/admin/commit/e930fa30d5d6e3c60358acd38eff5f186d77f3db))
+* list, restore and remove a page's old URLs ([2a4f244](https://github.com/Larasell-dev/admin/commit/2a4f244ae3faa1e7a5e195645b5436bf6befbd0b))
+* log the content locale on the request's wide event ([05f7bb1](https://github.com/Larasell-dev/admin/commit/05f7bb1df2c7b75061200d693d53587e39e4a736))
+* log the licensing plan on admin requests ([b9d520a](https://github.com/Larasell-dev/admin/commit/b9d520aa9506353fe1a704f6092b6ee306f19cb3))
+* make content translations a Pro entitlement ([33e7e3e](https://github.com/Larasell-dev/admin/commit/33e7e3e6f3de220423975325e89d224e50e29784))
+* manage sales channels and their domains ([aac4994](https://github.com/Larasell-dev/admin/commit/aac49945ea328938cf00a82bcdb315582b75b2b1))
+* mark what the search matched in the command menu's crumbs and labels ([ba28c12](https://github.com/Larasell-dev/admin/commit/ba28c126ff6e607100f00ca1cdd16058848eb39a))
+* pick the content language with the searchable Select ([17c4078](https://github.com/Larasell-dev/admin/commit/17c407844f1dfbfb6746c76e185cc01bfd0073d9))
+* place sections around the product form's own and assert their promises ([4beb47f](https://github.com/Larasell-dev/admin/commit/4beb47fcf14f28c4ec8895ea568ae599f0660d8f))
+* register the command menu's searches in their modules ([3527220](https://github.com/Larasell-dev/admin/commit/3527220fd43413ab48dff11a77f0a43173a227ae))
+* render command labels and highlight search matches ([24f49fa](https://github.com/Larasell-dev/admin/commit/24f49fa4d1d4422422c2a7ff49544c82699d64d3))
+* save products and categories through the core's actions ([6b10344](https://github.com/Larasell-dev/admin/commit/6b10344cb9b64c32ead544ddb024a75fa1ef80db))
+* search products, orders, customers and categories from the command menu ([2c6bf14](https://github.com/Larasell-dev/admin/commit/2c6bf141b52fb4c48de424ec6c11d785500df955))
+* search products, orders, customers and categories on the server ([40950e9](https://github.com/Larasell-dev/admin/commit/40950e967e49ac0a88734e0604fe3770b52856af))
+* search sales channels from the command menu ([db8d7dc](https://github.com/Larasell-dev/admin/commit/db8d7dcf34e211d5d5c1dc98c658f8cf130b6977))
+* share the content locale with every admin page ([77843b9](https://github.com/Larasell-dev/admin/commit/77843b9bff3b7014e894e272a3aca74216f4d7d7))
+* show a category's URLs below its products ([5a6cdc0](https://github.com/Larasell-dev/admin/commit/5a6cdc0dbba6528800c8c3619edd8a3c266285fe))
+* show nothing below the search of a searching view before a search ([1ecd293](https://github.com/Larasell-dev/admin/commit/1ecd293b020e7e88a931446f9f5b946ed8ac9cb5))
+* switch the theme from the command menu ([ece0276](https://github.com/Larasell-dev/admin/commit/ece02768faea9ef0625db99dc837ff0473831851))
+* translate the panel and let admins pick its language ([817a183](https://github.com/Larasell-dev/admin/commit/817a18320a87a959da6c20afefee97917a5d013d))
+* update every admin's sales channel sidebar live ([345efac](https://github.com/Larasell-dev/admin/commit/345efac44c260cc428b3e966e17ab52397671350))
+* use the semantic color tokens of @larasell-dev/ui 0.3.0 ([c962c77](https://github.com/Larasell-dev/admin/commit/c962c77d409bb1f2ef97f912f2167f14db1f532f))
+* zoom between the login page and the panel when signing in and out ([3188d4b](https://github.com/Larasell-dev/admin/commit/3188d4b4650c6f24b52149030b38ad04d7314c65))
+
+
+### Bug Fixes
+
+* animate the theme word in the theme toast again ([dfeaae7](https://github.com/Larasell-dev/admin/commit/dfeaae7cb700f1fd50145627c7e47fa95c0bebd6))
+* fit the unsaved changes toast to longer text, such as German ([4ce1e6c](https://github.com/Larasell-dev/admin/commit/4ce1e6cfa96d0a96ae62cd8223a17260afd75947))
+* restructure the admin into modules and rename Admins to Team ([#236](https://github.com/Larasell-dev/admin/issues/236)) ([94339b3](https://github.com/Larasell-dev/admin/commit/94339b37faab7e6639b0a0044d572dfcf6a084c8))
+* take product URL paths of any length ([b4c8e3a](https://github.com/Larasell-dev/admin/commit/b4c8e3a2200d1c28d63399909604904d8e84af53))
+
+
+### Performance Improvements
+
+* render only the best 20 nested matches per command at the root ([ac2ce9b](https://github.com/Larasell-dev/admin/commit/ac2ce9b4c14e3ce50be873b10d5310b4e66f008c))
+
+
+### Miscellaneous Chores
+
+* add a mini storefront to the workbench playground ([3e07ec1](https://github.com/Larasell-dev/admin/commit/3e07ec1500eee87809a2240102f4b311c429f299))
+* carry live updates through the playground's portal ([9804f51](https://github.com/Larasell-dev/admin/commit/9804f514a01cb2685a0eb036d0d180d2c37ef469))
+* install PHP 8.4 in orb setup ([3a20ea7](https://github.com/Larasell-dev/admin/commit/3a20ea7f1cf3a2ece84a95d58973a6065bac697b))
+* lint that tests mark arrange, act and assert ([24a4fc7](https://github.com/Larasell-dev/admin/commit/24a4fc79e19b5406d18bec3f4d6f23855e3ecd54))
+* list the storefront's redirects in the workbench playground ([9899389](https://github.com/Larasell-dev/admin/commit/9899389d48965b92acf609b479f644b82f9378a4))
+* start Reverb in a fresh playground ([d47a02b](https://github.com/Larasell-dev/admin/commit/d47a02b800e3814e877d54dbc4dbaf545912cbb2))
+
+
+### Code Refactoring
+
+* group the frontend by module like the PHP code ([b5ffc73](https://github.com/Larasell-dev/admin/commit/b5ffc73ffe7af442501f8ba9c71ca4f4db26e4c2))
+* import the core's exceptions from their Exceptions namespaces ([37d7a1d](https://github.com/Larasell-dev/admin/commit/37d7a1d4e5fdf392e3bf9060e1c8846a84149711))
+* remove the unused Slug validation rule ([29c1732](https://github.com/Larasell-dev/admin/commit/29c1732731f466b035d97efe62ee8237ed78b02d))
+* save categories through the core's payload actions ([ecfdab8](https://github.com/Larasell-dev/admin/commit/ecfdab8cb9130b05cd375a0189ddb3b2febb6639))
+* save custom URLs through the core's CustomUrls attachment ([60f1232](https://github.com/Larasell-dev/admin/commit/60f1232332f80c47c4a66e84f0a2155884e1b302))
+
+### Upgrade guide
+
+#### Admin requests use the interface language, not `app.locale`
+
+The panel's own text is now translated. Each admin picks the language it is shown in, the interface
+language, from the command menu or their profile, and it is kept in a cookie in their browser. For
+every admin request, `SetInterfaceLocale` sets the app locale to that language, as a full code such
+as `en-US` or `de-DE`. Before, admin requests kept the app's `app.locale`. Admins who pick no
+language see `en-US`.
+
+The interface language is separate from the content locale that products and categories are edited
+in, which doesn't change.
+
+##### Who is affected
+
+- Apps whose `app.locale` isn't English. Admin requests now run in `en-US` until an admin picks
+  another language, so `App::currentLocale()`, `__()` and Laravel's validation messages in the panel
+  follow the admin's pick instead of `app.locale`. Prices, country names and content-locale names
+  on admin pages, which were formatted in `app.locale`, are now formatted in the interface language
+  too.
+- Apps that set the locale of admin requests themselves, e.g. with a middleware that calls
+  `App::setLocale()`. Since `SetInterfaceLocale` runs in the admin route group, it decides first.
+- Apps that set their own `Translator::determineLocalesUsing()` callback. Admin requests replace it,
+  so that `de-DE` also reads the app's `lang/de/` files before the fallback locale.
+- Code that read `app()->getLocale()` as `en` in admin requests, e.g. in tests. It is now `en-US`.
+
+Apps with an English `app.locale` that don't switch the locale of admin requests are not affected.
+
+##### How to upgrade
+
+Usually nothing is needed: admins pick their language themselves. The panel reads the app's
+`lang/<language>/` files for the picked language, so Laravel's own messages, such as validation
+errors, appear in German when the app has `lang/de/validation.php`.
+
+To keep showing the panel in the app's locale, bind your own `InterfaceLocaleResolver`:
+
+```php
+use Illuminate\Http\Request;
+use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
+use Larasell\Admin\Platform\InterfaceLocale\Resolvers\InterfaceLocaleResolver;
+
+class AppLocaleResolver implements InterfaceLocaleResolver
+{
+    public function resolve(Request $request): InterfaceLocale
+    {
+        return new InterfaceLocale(config('app.locale'));
+    }
+
+    // The app's locale decides, so the command menu and profile have nothing to remember.
+    public function remember(Request $request, InterfaceLocale $locale): void {}
+}
+
+// AppServiceProvider::register()
+$this->app->bind(InterfaceLocaleResolver::class, AppLocaleResolver::class);
+```
+
+#### The Admins settings page is now Team
+
+The settings page that lists the people who can sign in to the panel is called **Team** now. It
+used to be **Admins**, which named the role rather than the people who run the store with you. Its
+address, route names and Inertia page names changed with it, and in its copy the people on the
+page are "members". The page moved into a `Team` module, which also
+registers it and the profile pages.
+
+The account itself is still an admin: the `Admin` model, the `larasell-admin` guard, the
+`CreateAdmin`, `UpdateAdmin` and `DeleteAdmin` actions, the admin commands and the `admin.*` audit
+events keep their names.
+
+##### Who is affected
+
+- Apps that link to the page by route name or address, e.g. `route('larasell.admin.settings.admins.index')`
+  or `/admin/settings/admins`.
+- Apps that place a navigation item next to it, e.g. `->after('larasell.admin.settings.admins.index')`.
+- Apps that override the `Admin/Index`, `Admin/Create` or `Admin/Edit` pages, or read their props.
+- Apps that use the renamed classes in the table below.
+
+Apps that only sign in and use the panel are not affected. Old bookmarks to `/admin/settings/admins`
+now show the 404 page.
+
+##### How to upgrade
+
+Use the new route names and addresses:
+
+| Before                                                                 | After                                                              |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `larasell.admin.settings.admins.index` (`settings/admins`)             | `larasell.admin.settings.team.index` (`settings/team`)             |
+| `larasell.admin.settings.admins.create` (`settings/admins/create`)     | `larasell.admin.settings.team.create` (`settings/team/create`)     |
+| `larasell.admin.settings.admins.store`                                 | `larasell.admin.settings.team.store`                               |
+| `larasell.admin.settings.admins.edit` (`settings/admins/{admin}/edit`) | `larasell.admin.settings.team.edit` (`settings/team/{admin}/edit`) |
+| `larasell.admin.settings.admins.update`                                | `larasell.admin.settings.team.update`                              |
+
+```php
+// Before
+Navigation::add('Roles', 'roles.index', Icon::Shield)
+    ->under(NavItem::Settings)
+    ->after('larasell.admin.settings.admins.index');
+
+// After
+Navigation::add('Roles', 'roles.index', Icon::Shield)
+    ->under(NavItem::Settings)
+    ->after('larasell.admin.settings.team.index');
+```
+
+Pages that override the panel's own move from `resources/js/admin/pages/Admin/` to
+`resources/js/admin/pages/Team/`. Their props changed:
+
+| Page         | Before        | After     |
+| ------------ | ------------- | --------- |
+| `Team/Index` | `admins`      | `members` |
+| `Team/Edit`  | `editedAdmin` | `member`  |
+
+The dashboard's `inviteAdminUrl` prop is now `inviteMemberUrl`.
+
+The renamed classes, all in `Larasell\Admin\Team`:
+
+| Before                             | After                             |
+| ---------------------------------- | --------------------------------- |
+| `Http\Controllers\AdminController` | `Http\Controllers\TeamController` |
+| `Http\Requests\AdminRequest`       | `Http\Requests\MemberRequest`     |
+| `Data\AdminsPageData`              | `Data\TeamPageData`               |
+| `Data\CreateAdminPageData`         | `Data\CreateMemberPageData`       |
+| `Data\EditAdminPageData`           | `Data\EditMemberPageData`         |
+| `Tables\Admins`                    | `Tables\Members`                  |
+
+The entry "The code is grouped by module" lists their old namespaces.
+
+#### The admin's category actions moved to the core
+
+The admin's `MoveCategory`, `MoveCategoryPayload` and `DeleteCategory` are gone: moving a
+category among its siblings and deleting it with every category below it are now the core's
+`MoveCategory` and `DeleteCategoryTree`, so every app gets the same behavior and events. The
+admin also needs the core's category actions that take payloads.
+
+##### Who is affected
+
+Plugins and apps that call `Larasell\Admin\Category\Actions\MoveCategory` or
+`Larasell\Admin\Category\Actions\DeleteCategory`. Apps that never call them can skip this.
+
+##### How to upgrade
+
+```php
+// Before
+use Larasell\Admin\Category\Actions\DeleteCategory;
+use Larasell\Admin\Category\Actions\MoveCategory;
+use Larasell\Admin\Category\Actions\MoveCategoryPayload;
+
+app(MoveCategory::class)->handle($boots, new MoveCategoryPayload(parentId: $sale->id, position: 1));
+app(DeleteCategory::class)->handle($shoes, 'Shoes');
+
+// After
+use Larasell\Larasell\Catalog\Actions\DeleteCategoryTree;
+use Larasell\Larasell\Catalog\Actions\MoveCategory;
+use Larasell\Larasell\Catalog\Actions\MoveCategoryPayload;
+use Larasell\Larasell\Catalog\CategoryId;
+
+app(MoveCategory::class)->handle(CategoryId::of($boots), new MoveCategoryPayload(CategoryId::of($sale), 1));
+app(DeleteCategoryTree::class)->handle(CategoryId::of($shoes));
+```
+
+The typed confirmation is now checked by the delete route's request, not by the action.
+
+#### The code is grouped by module
+
+The panel's classes used to be filed by type, e.g. `Http\Controllers`, `Data\View` and `Tables`, so
+one feature was spread over up to ten folders. They are now grouped by feature: each module is a
+namespace of its own, such as `Larasell\Admin\Product` or `Larasell\Admin\Category`, and what
+modules and apps plug into lives under `Larasell\Admin\Platform`. Every class keeps its name, apart
+from the ones the Team rename changed, but most moved to another namespace. The old namespaces don't
+work anymore; there are no aliases.
+
+##### Who is affected
+
+Apps that import any of the panel's classes. The common ones are the table API (`Table`, its
+columns, actions and attributes), `Icon`, `NavItem` and the `Navigation` facade, the `Admin` model,
+the audit API (`Auditor`, `AuditRecord`, `AuditCategory`, `Subject` and the actors) and the content
+locale contracts.
+
+Apps that only configure the panel, add pages through `routes/admin.php` and
+`resources/js/admin`, and import nothing from `Larasell\Admin` are not affected. `AdminPanel` and
+`AdminServiceProvider` didn't move.
+
+##### How to upgrade
+
+Change the imports. The ones most apps use:
+
+```php
+// Before
+use Larasell\Admin\Enums\Icon;
+use Larasell\Admin\Enums\NavItem;
+use Larasell\Admin\Enums\Table\Variant;
+use Larasell\Admin\Facades\Navigation;
+use Larasell\Admin\Models\Admin;
+use Larasell\Admin\Audit\AuditRecord;
+use Larasell\Admin\Tables\Actions\Action;
+use Larasell\Admin\Tables\Columns\TextColumn;
+use Larasell\Admin\Tables\Table;
+
+// After
+use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Navigation\NavItem;
+use Larasell\Admin\Platform\Tables\Enums\Variant;
+use Larasell\Admin\Platform\Navigation\Facades\Navigation;
+use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Tables\Actions\Action;
+use Larasell\Admin\Platform\Tables\Columns\TextColumn;
+use Larasell\Admin\Platform\Tables\Table;
+```
+
+Classes that `php artisan make:larasell-table` and `make:larasell-audit-record` generate from now
+on already import the new namespaces.
+
+Every moved class, without the `Larasell\Admin\` prefix:
+
+<details>
+<summary>All moved classes</summary>
+
+| Before                                                              | After                                                                   |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `ServiceProviders\ApiTokenServiceProvider`                          | `ApiToken\ApiTokenServiceProvider`                                      |
+| `Models\ApiToken`                                                   | `ApiToken\Models\ApiToken`                                              |
+| `Actions\Categories\DeleteCategory`                                 | `Category\Actions\DeleteCategory`                                       |
+| `Actions\Categories\MoveCategory`                                   | `Category\Actions\MoveCategory`                                         |
+| `Payloads\Categories\MoveCategoryPayload`                           | `Category\Actions\MoveCategoryPayload`                                  |
+| `ServiceProviders\CategoryServiceProvider`                          | `Category\CategoryServiceProvider`                                      |
+| `Data\View\Categories\CategoriesPageData`                           | `Category\Data\CategoriesPageData`                                      |
+| `Data\ViewModel\Categories\CategoryData`                            | `Category\Data\CategoryData`                                            |
+| `Data\ViewModel\Categories\CategoryDetailData`                      | `Category\Data\CategoryDetailData`                                      |
+| `Data\ViewModel\Categories\CategoryOptionData`                      | `Category\Data\CategoryOptionData`                                      |
+| `Data\View\Categories\CategoryPageData`                             | `Category\Data\CategoryPageData`                                        |
+| `Data\View\Categories\CreateCategoryPageData`                       | `Category\Data\CreateCategoryPageData`                                  |
+| `Data\View\Categories\MissingCategoryPageData`                      | `Category\Data\MissingCategoryPageData`                                 |
+| `Http\Controllers\Categories\CategoryController`                    | `Category\Http\Controllers\CategoryController`                          |
+| `Http\Controllers\Categories\CategoryProductController`             | `Category\Http\Controllers\CategoryProductController`                   |
+| `Http\Controllers\Categories\HideCategoryController`                | `Category\Http\Controllers\HideCategoryController`                      |
+| `Http\Controllers\Categories\MoveCategoryController`                | `Category\Http\Controllers\MoveCategoryController`                      |
+| `Http\Controllers\Categories\SearchCategoriesController`            | `Category\Http\Controllers\SearchCategoriesController`                  |
+| `Http\Controllers\Categories\SearchProductsNotInCategoryController` | `Category\Http\Controllers\SearchProductsNotInCategoryController`       |
+| `Http\Controllers\Categories\UnhideCategoryController`              | `Category\Http\Controllers\UnhideCategoryController`                    |
+| `Http\Requests\Categories\AddProductToCategoryRequest`              | `Category\Http\Requests\AddProductToCategoryRequest`                    |
+| `Http\Requests\Categories\CategoryRequest`                          | `Category\Http\Requests\CategoryRequest`                                |
+| `Http\Requests\Categories\MoveCategoryRequest`                      | `Category\Http\Requests\MoveCategoryRequest`                            |
+| `Tables\Categories\CategoryProducts`                                | `Category\Tables\CategoryProducts`                                      |
+| `Actions\Customers\DeleteCustomer`                                  | `Customer\Actions\DeleteCustomer`                                       |
+| `ServiceProviders\CustomerServiceProvider`                          | `Customer\CustomerServiceProvider`                                      |
+| `Data\View\Customers\CreateCustomerPageData`                        | `Customer\Data\CreateCustomerPageData`                                  |
+| `Data\ViewModel\Customers\CustomerDetailData`                       | `Customer\Data\CustomerDetailData`                                      |
+| `Data\View\Customers\EditCustomerPageData`                          | `Customer\Data\EditCustomerPageData`                                    |
+| `Http\Controllers\Customers\CustomerController`                     | `Customer\Http\Controllers\CustomerController`                          |
+| `Http\Controllers\Customers\SearchCustomersController`              | `Customer\Http\Controllers\SearchCustomersController`                   |
+| `Http\Requests\Customers\CustomerRequest`                           | `Customer\Http\Requests\CustomerRequest`                                |
+| `Tables\Customers\Customers`                                        | `Customer\Tables\Customers`                                             |
+| `Data\ViewModel\Orders\AddressData`                                 | `Order\Data\AddressData`                                                |
+| `Data\ViewModel\Orders\AmountData`                                  | `Order\Data\AmountData`                                                 |
+| `Data\ViewModel\Orders\BadgeData`                                   | `Order\Data\BadgeData`                                                  |
+| `Data\ViewModel\Orders\OrderDetailData`                             | `Order\Data\OrderDetailData`                                            |
+| `Data\ViewModel\Orders\OrderItemData`                               | `Order\Data\OrderItemData`                                              |
+| `Data\View\Orders\OrderPageData`                                    | `Order\Data\OrderPageData`                                              |
+| `Data\ViewModel\Orders\PaymentData`                                 | `Order\Data\PaymentData`                                                |
+| `Http\Controllers\Orders\OrderController`                           | `Order\Http\Controllers\OrderController`                                |
+| `Http\Controllers\Orders\SearchOrdersController`                    | `Order\Http\Controllers\SearchOrdersController`                         |
+| `ServiceProviders\OrderServiceProvider`                             | `Order\OrderServiceProvider`                                            |
+| `Tables\Customers\CustomerOrders`                                   | `Order\Tables\CustomerOrders`                                           |
+| `Tables\Orders\Orders`                                              | `Order\Tables\Orders`                                                   |
+| `Audit\Actor`                                                       | `Platform\Audit\Actors\Actor`                                           |
+| `Audit\AuditCategory`                                               | `Platform\Audit\Enums\AuditCategory`                                    |
+| `Exceptions\AuditFailed`                                            | `Platform\Audit\Exceptions\AuditFailed`                                 |
+| `Audit\AuditRecord`                                                 | `Platform\Audit\AuditRecord`                                            |
+| `Audit\Auditor`                                                     | `Platform\Audit\Auditor`                                                |
+| `Console\PruneAuditLogCommand`                                      | `Platform\Audit\Log\Console\PruneAuditLogCommand`                       |
+| `Audit\Subject`                                                     | `Platform\Audit\Subject`                                                |
+| `Audit\SystemActor`                                                 | `Platform\Audit\Actors\SystemActor`                                     |
+| `Audit\UnknownActor`                                                | `Platform\Audit\Actors\UnknownActor`                                    |
+| `Data\View\LoginPageData`                                           | `Platform\Auth\Data\LoginPageData`                                      |
+| `Http\Controllers\LoginController`                                  | `Platform\Auth\Http\Controllers\LoginController`                        |
+| `Http\Controllers\LogoutController`                                 | `Platform\Auth\Http\Controllers\LogoutController`                       |
+| `Http\Middleware\Authenticate`                                      | `Platform\Auth\Http\Middleware\Authenticate`                            |
+| `Http\Middleware\RedirectIfAuthenticated`                           | `Platform\Auth\Http\Middleware\RedirectIfAuthenticated`                 |
+| `Http\Requests\LoginRequest`                                        | `Platform\Auth\Http\Requests\LoginRequest`                              |
+| `Models\Admin`                                                      | `Platform\Auth\Models\Admin`                                            |
+| `Actions\ContentLocale\SetContentLocale`                            | `Platform\ContentLocale\Actions\SetContentLocale`                       |
+| `Payloads\ContentLocale\SetContentLocalePayload`                    | `Platform\ContentLocale\Actions\SetContentLocalePayload`                |
+| `ContentLocale\AvailableLocales`                                    | `Platform\ContentLocale\Locales\AvailableLocales`                       |
+| `ContentLocale\ContentLocaleResolver`                               | `Platform\ContentLocale\Resolvers\ContentLocaleResolver`                |
+| `ContentLocale\CurrentContentLocale`                                | `Platform\ContentLocale\CurrentContentLocale`                           |
+| `Data\ViewModel\ContentLocale\ContentLocaleData`                    | `Platform\ContentLocale\Data\ContentLocaleData`                         |
+| `Data\ViewModel\ContentLocale\ContentLocaleOptionData`              | `Platform\ContentLocale\Data\ContentLocaleOptionData`                   |
+| `Http\Controllers\ContentLocale\SwitchContentLocaleController`      | `Platform\ContentLocale\Http\Controllers\SwitchContentLocaleController` |
+| `Http\Requests\ContentLocale\SetContentLocaleRequest`               | `Platform\ContentLocale\Http\Requests\SetContentLocaleRequest`          |
+| `ContentLocale\SessionContentLocaleResolver`                        | `Platform\ContentLocale\Resolvers\SessionContentLocaleResolver`         |
+| `ContentLocale\StoreLocales`                                        | `Platform\ContentLocale\Locales\StoreLocales`                           |
+| `Exceptions\InvalidNavigationItem`                                  | `Platform\Navigation\Exceptions\InvalidNavigationItem`                  |
+| `Enums\NavItem`                                                     | `Platform\Navigation\NavItem`                                           |
+| `Navigation`                                                        | `Platform\Navigation\Navigation`                                        |
+| `NavigationGroup`                                                   | `Platform\Navigation\NavigationGroup`                                   |
+| `ValueObjects\NavigationItem`                                       | `Platform\Navigation\NavigationItem`                                    |
+| `Data\ViewModel\NavigationItemData`                                 | `Platform\Navigation\Data\NavigationItemData`                           |
+| `Console\LinkAdminAssetsCommand`                                    | `Platform\Panel\Console\LinkAdminAssetsCommand`                         |
+| `Data\ViewModel\CommandMenuData`                                    | `Platform\Panel\Data\CommandMenuData`                                   |
+| `Data\View\HomePageData`                                            | `Platform\Panel\Data\HomePageData`                                      |
+| `Data\ViewModel\PaginatedData`                                      | `Platform\Panel\Data\PaginatedData`                                     |
+| `Http\Controllers\Dev\RouteController`                              | `Platform\Panel\Http\Controllers\Dev\RouteController`                   |
+| `Http\Controllers\Dev\SessionController`                            | `Platform\Panel\Http\Controllers\Dev\SessionController`                 |
+| `Http\Controllers\HomeController`                                   | `Platform\Panel\Http\Controllers\HomeController`                        |
+| `Http\Controllers\SettingsController`                               | `Platform\Panel\Http\Controllers\SettingsController`                    |
+| `Http\Middleware\HandleAdminInertiaRequests`                        | `Platform\Panel\Http\Middleware\HandleAdminInertiaRequests`             |
+| `Http\Middleware\LogLicensingPlan`                                  | `Platform\Panel\Http\Middleware\LogLicensingPlan`                       |
+| `Enums\Icon`                                                        | `Platform\Panel\Icon`                                                   |
+| `Data\ViewModel\Search\SearchData`                                  | `Platform\Search\Data\SearchData`                                       |
+| `Data\ViewModel\Search\SearchMatchData`                             | `Platform\Search\Data\SearchMatchData`                                  |
+| `Data\ViewModel\Search\SearchResultData`                            | `Platform\Search\Data\SearchResultData`                                 |
+| `Http\Requests\SearchRequest`                                       | `Platform\Search\Http\Requests\SearchRequest`                           |
+| `Search\SearchQuery`                                                | `Platform\Search\SearchQuery`                                           |
+| `Search\Searches`                                                   | `Platform\Search\Searches`                                              |
+| `Search\TextMatch`                                                  | `Platform\Search\TextMatch`                                             |
+| `Enums\Concerns\HasLabel`                                           | `Platform\Support\Concerns\HasLabel`                                    |
+| `Rules\Slug`                                                        | `Platform\Support\Rules\Slug`                                           |
+| `Tables\Actions\Action`                                             | `Platform\Tables\Actions\Action`                                        |
+| `Tables\Actions\TableAction`                                        | `Platform\Tables\Actions\TableAction`                                   |
+| `Tables\Attributes\Remember`                                        | `Platform\Tables\Attributes\Remember`                                   |
+| `Tables\Attributes\UseModel`                                        | `Platform\Tables\Attributes\UseModel`                                   |
+| `Tables\Columns\BadgeColumn`                                        | `Platform\Tables\Columns\BadgeColumn`                                   |
+| `Tables\Columns\CellImage`                                          | `Platform\Tables\Columns\CellImage`                                     |
+| `Tables\Columns\Column`                                             | `Platform\Tables\Columns\Column`                                        |
+| `Tables\Columns\Concerns\HasTextValue`                              | `Platform\Tables\Columns\Concerns\HasTextValue`                         |
+| `Tables\Columns\IconImage`                                          | `Platform\Tables\Columns\IconImage`                                     |
+| `Tables\Columns\Image`                                              | `Platform\Tables\Columns\Image`                                         |
+| `Tables\Columns\PictureImage`                                       | `Platform\Tables\Columns\PictureImage`                                  |
+| `Tables\Columns\TextColumn`                                         | `Platform\Tables\Columns\TextColumn`                                    |
+| `Console\MakeTableCommand`                                          | `Platform\Tables\Console\MakeTableCommand`                              |
+| `Enums\Table\ImageStyle`                                            | `Platform\Tables\Enums\ImageStyle`                                      |
+| `Enums\Table\Variant`                                               | `Platform\Tables\Enums\Variant`                                         |
+| `Exceptions\InvalidTableAction`                                     | `Platform\Tables\Exceptions\InvalidTableAction`                         |
+| `Exceptions\InvalidTableColumn`                                     | `Platform\Tables\Exceptions\InvalidTableColumn`                         |
+| `Exceptions\InvalidTableEmptyState`                                 | `Platform\Tables\Exceptions\InvalidTableEmptyState`                     |
+| `Http\Controllers\TableActionController`                            | `Platform\Tables\Http\Controllers\TableActionController`                |
+| `Http\Controllers\TableController`                                  | `Platform\Tables\Http\Controllers\TableController`                      |
+| `Tables\Table`                                                      | `Platform\Tables\Table`                                                 |
+| `Actions\Product\DeleteProduct`                                     | `Product\Actions\DeleteProduct`                                         |
+| `Data\View\CreateProductPageData`                                   | `Product\Data\CreateProductPageData`                                    |
+| `Data\ViewModel\DimensionsData`                                     | `Product\Data\DimensionsData`                                           |
+| `Data\View\EditProductPageData`                                     | `Product\Data\EditProductPageData`                                      |
+| `Data\ViewModel\ProductDetailData`                                  | `Product\Data\ProductDetailData`                                        |
+| `Data\ViewModel\ProductImageData`                                   | `Product\Data\ProductImageData`                                         |
+| `Data\ViewModel\WeightData`                                         | `Product\Data\WeightData`                                               |
+| `Http\Controllers\ProductController`                                | `Product\Http\Controllers\ProductController`                            |
+| `Http\Controllers\ProductImageController`                           | `Product\Http\Controllers\ProductImageController`                       |
+| `Http\Controllers\SearchProductsController`                         | `Product\Http\Controllers\SearchProductsController`                     |
+| `Http\Requests\ProductImagesRequest`                                | `Product\Http\Requests\ProductImagesRequest`                            |
+| `Http\Requests\ProductRequest`                                      | `Product\Http\Requests\ProductRequest`                                  |
+| `ServiceProviders\ProductServiceProvider`                           | `Product\ProductServiceProvider`                                        |
+| `Rules\Barcode`                                                     | `Product\Rules\Barcode`                                                 |
+| `Tables\Product\Products`                                           | `Product\Tables\Products`                                               |
+| `Actions\CreateAdmin`                                               | `Team\Actions\CreateAdmin`                                              |
+| `Actions\DeleteAdmin`                                               | `Team\Actions\DeleteAdmin`                                              |
+| `Console\CreateAdminUserCommand`                                    | `Team\Console\CreateAdminUserCommand`                                   |
+| `Console\ListAdminsCommand`                                         | `Team\Console\ListAdminsCommand`                                        |
+| `Console\RemoveAdminCommand`                                        | `Team\Console\RemoveAdminCommand`                                       |
+| `Data\ViewModel\AdminData`                                          | `Team\Data\AdminData`                                                   |
+| `Data\View\AdminsPageData`                                          | `Team\Data\TeamPageData`                                                |
+| `Data\View\CreateAdminPageData`                                     | `Team\Data\CreateMemberPageData`                                        |
+| `Data\View\EditAdminPageData`                                       | `Team\Data\EditMemberPageData`                                          |
+| `Data\View\ProfilePageData`                                         | `Team\Data\ProfilePageData`                                             |
+| `Exceptions\AdminRemovalFailed`                                     | `Team\Exceptions\AdminRemovalFailed`                                    |
+| `Http\Controllers\AdminController`                                  | `Team\Http\Controllers\TeamController`                                  |
+| `Http\Controllers\AvatarController`                                 | `Team\Http\Controllers\AvatarController`                                |
+| `Http\Controllers\ProfileController`                                | `Team\Http\Controllers\ProfileController`                               |
+| `Http\Requests\AdminRequest`                                        | `Team\Http\Requests\MemberRequest`                                      |
+| `Http\Requests\AvatarRequest`                                       | `Team\Http\Requests\AvatarRequest`                                      |
+| `Http\Requests\ProfileRequest`                                      | `Team\Http\Requests\ProfileRequest`                                     |
+| `Rules\AdminPassword`                                               | `Team\Rules\AdminPassword`                                              |
+| `Tables\Panel\Admins`                                               | `Team\Tables\Members`                                                   |
+
+</details>
+
+#### The panel's page names are now the paths of their files
+
+The panel's frontend is now grouped by module like its PHP code: a module's pages live in
+`resources/js/<Module>/Pages`, the platform's in `resources/js/Platform/<Area>/Pages`. Each page's
+Inertia name is its file's path, so `Product/Edit` is now `Product/Pages/Edit`.
+
+##### Who is affected
+
+Apps that render one of the panel's own pages with `Inertia::render()`, or that register an
+extension page under one of their names. Apps whose pages are their own, such as
+`acme-wishlists::Wishlist/Show`, are not affected.
+
+##### How to upgrade
+
+Use the new names:
+
+```php
+// Before
+Inertia::render('TablePage', $props);
+Inertia::render('Product/Edit', $props);
+
+// After
+Inertia::render('Platform/Tables/Pages/TablePage', $props);
+Inertia::render('Product/Pages/Edit', $props);
+```
+
+<details>
+<summary>All renamed pages</summary>
+
+| Before                | After                             |
+| --------------------- | --------------------------------- |
+| `ApiToken/Create`     | `ApiToken/Pages/Create`           |
+| `ApiToken/Index`      | `ApiToken/Pages/Index`            |
+| `AuditLog/Index`      | `Platform/Audit/Pages/Index`      |
+| `Category/Create`     | `Category/Pages/Create`           |
+| `Category/Index`      | `Category/Pages/Index`            |
+| `Category/Show`       | `Category/Pages/Show`             |
+| `Customer/Create`     | `Customer/Pages/Create`           |
+| `Customer/Edit`       | `Customer/Pages/Edit`             |
+| `GuestNotFound`       | `Platform/Panel/Pages/GuestError` |
+| `Home`                | `Platform/Panel/Pages/Home`       |
+| `Login`               | `Platform/Auth/Pages/Login`       |
+| `NotFound`            | `Platform/Panel/Pages/Error`      |
+| `Order/Show`          | `Order/Pages/Show`                |
+| `Product/Create`      | `Product/Pages/Create`            |
+| `Product/Edit`        | `Product/Pages/Edit`              |
+| `Profile`             | `Team/Pages/Profile`              |
+| `SalesChannel/Create` | `SalesChannel/Pages/Create`       |
+| `SalesChannel/Edit`   | `SalesChannel/Pages/Edit`         |
+| `TablePage`           | `Platform/Tables/Pages/TablePage` |
+| `Team/Create`         | `Team/Pages/Create`               |
+| `Team/Edit`           | `Team/Pages/Edit`                 |
+| `Team/Index`          | `Team/Pages/Index`                |
+
+</details>
+
+#### Products are edited in a content locale, not in the interface locale
+
+The product pages used to read and save a product's name and slug in the app's current locale
+(`App::currentLocale()`), the language of the panel's interface. They now use a separate content
+locale: admins pick it with a select in the top right of the product pages, and it starts at
+`larasell.locale.default`. This lets admins translate products without changing the panel's
+language.
+
+Picking another locale than the default needs a Pro plan: content translations are the
+`admin.content-translations` entitlement. On Free, which production shops without an active license
+get, the select is hidden and products are read and saved in `larasell.locale.default` only. Their
+other translations are kept.
+
+##### Who is affected
+
+- Apps whose `app.locale` differs from `larasell.locale.default`. Their admins used to see and
+  edit products in `app.locale` and now see the default locale first.
+- Apps that edit translations by switching the app locale for admin requests, e.g. with a
+  middleware that calls `App::setLocale()`. That no longer changes which translation the product
+  pages edit.
+- Shops on the Free plan whose `app.locale` differs from `larasell.locale.default`. They used to
+  edit products in `app.locale` and can now only edit them in the default locale.
+
+Apps where `app.locale` and `larasell.locale.default` are the same, and that don't switch the locale
+for admin requests, are not affected.
+
+##### How to upgrade
+
+Usually nothing is needed: admins pick the language with the select, which only shows while
+`larasell.locale.supported` has more than one locale. To start in another locale, set it as the
+default:
+
+```php
+// config/larasell/locale.php
+'default' => Locale::GERMAN,
+```
+
+To keep editing in the app's current locale, bind your own `ContentLocaleResolver`:
+
+```php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
+use Larasell\Larasell\Enums\Locale;
+
+class CurrentLocaleResolver implements ContentLocaleResolver
+{
+    public function resolve(Request $request): Locale
+    {
+        return Locale::from(Locale::canonicalize(App::currentLocale()));
+    }
+
+    // The app's own locale switching decides, so the select has nothing to remember.
+    public function remember(Request $request, Locale $locale): void {}
+}
+
+// AppServiceProvider::register()
+$this->app->bind(ContentLocaleResolver::class, CurrentLocaleResolver::class);
+```
+
+#### The `Slug` validation rule is gone
+
+Products and categories no longer have slugs, so nothing in the panel validated
+with `Larasell\Admin\Platform\Support\Rules\Slug` anymore.
+
+##### Who is affected
+
+Apps and extensions that use `Larasell\Admin\Platform\Support\Rules\Slug` in
+their own validation rules. Everyone else can skip this entry.
+
+##### How to upgrade
+
+Use a `regex` rule with the same pattern:
+
+```php
+// Before
+use Larasell\Admin\Platform\Support\Rules\Slug;
+
+'handle' => ['required', 'string', new Slug],
+
+// After
+'handle' => ['required', 'string', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+```
+
+#### Products and categories have URLs per sales channel instead of a slug
+
+The product and category forms no longer have a **Slug** field. A product's
+storefront address is now an SEO URL from the core's SEO module: one per sales
+channel and language, made from the name unless an admin types a custom path in
+the product page's new **URLs** section. Old paths keep redirecting.
+
+##### Why
+
+The core dropped the `slug` columns: a URL now belongs to a sales channel and
+language, not to the product, and the core keeps their history for redirects.
+
+##### Who is affected
+
+Apps that post to the product or category routes themselves, read the page
+props, or extend the panel's catalog classes. Everyone else only needs the
+new core version.
+
+- The `slug` input of `products.store`, `products.update`, `categories.store`
+  and `categories.update` is gone. Post a product's paths as
+  `sections[seo][urls][{channel ID}][path]`; an empty path follows the name.
+- `ProductDetailData` and `CategoryDetailData` no longer have `slug` and
+  `fallbackSlug`.
+- The core models moved to `Larasell\Larasell\Catalog\Models`:
+
+```php
+// Before
+use Larasell\Larasell\Models\Product;
+
+// After
+use Larasell\Larasell\Catalog\Models\Product;
+```
+
+- `Larasell\Admin\Category\Actions\DeleteCategory` and `MoveCategory` now take
+  the core's actions in their constructors; resolve them from the container
+  instead of calling `new`.
+
 ## [0.6.0](https://github.com/Larasell-dev/admin/compare/v0.5.6...v0.6.0) (2026-11-03)
 
 

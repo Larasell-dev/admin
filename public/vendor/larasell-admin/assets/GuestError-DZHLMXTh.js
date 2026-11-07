@@ -1,0 +1,1 @@
+import{d9 as e,kn as t}from"./lib-DV0BQ2hr.js";import{t as n}from"./ErrorState-B_GvEuNw.js";var r=e(t(),1);function i({status:e}){return(0,r.jsx)(`main`,{className:`flex min-h-dvh items-center justify-center bg-base-canvas px-6 py-12`,children:(0,r.jsx)(n,{status:e})})}export{i as default};
