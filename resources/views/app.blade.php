@@ -39,6 +39,11 @@
             @vite(\Larasell\Admin\AdminPanel::resolve()->scripts())
         @endif
 
+        {{-- How the browser listens for live props; none when the app has no Reverb or Pusher. --}}
+        @if ($live = \Larasell\Admin\Platform\Panel\LiveUpdates::echoOptions())
+            <script type="application/json" id="larasell-admin-live">{!! json_encode($live, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) !!}</script>
+        @endif
+
         @head
         <x-inertia::head />
     </head>

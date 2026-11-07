@@ -13,6 +13,7 @@ import { extensions, Larasell, SectionForm } from "./extensions";
 import { sharedModules } from "./sharedModules";
 import { AppHotkeysProvider } from "./utils/hotkeys";
 import { setUpInterfaceLocale } from "./utils/interfaceLocale";
+import { setUpLive } from "./utils/live";
 
 type PageModule = { default: ResolvedComponent };
 
@@ -69,6 +70,7 @@ window.LarasellAdmin = {
     void setUpInterfaceLocale().then(() =>
       createInertiaApp({
         serverHead: true,
+        live: setUpLive(),
         resolve: async (name, page) => {
           // Alongside the page, so the sections' fields are there when its form mounts.
           const sections = Array.isArray(page?.props.sections) ? page.props.sections : [];

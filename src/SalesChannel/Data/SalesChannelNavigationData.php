@@ -4,6 +4,7 @@ namespace Larasell\Admin\SalesChannel\Data;
 
 use Inertia\Inertia;
 use Inertia\OnceProp;
+use Larasell\Admin\SalesChannel\Events\SalesChannelsChanged;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -24,8 +25,9 @@ class SalesChannelNavigationData extends Data
     ) {}
 
     /**
-     * Sent once, then kept by the browser across pages, until a sales channel is created,
-     * renamed or deleted in this session.
+     * Sent once, then kept by the browser across pages. When a sales channel is created, renamed
+     * or deleted, this session gets it again with its next page, and every other signed-in
+     * admin's browser reloads it as soon as SalesChannelsChanged is broadcast.
      */
     public static function prop(): OnceProp
     {
@@ -37,7 +39,7 @@ class SalesChannelNavigationData extends Data
                     url: route('larasell.admin.sales-channels.edit', $channel),
                 ))->all(),
             createUrl: route('larasell.admin.sales-channels.create'),
-        ))->fresh(session()->has(self::CHANGED));
+        ))->fresh(session()->has(self::CHANGED))->live(on: SalesChannelsChanged::class);
     }
 
     public static function refreshOnNextPage(): void

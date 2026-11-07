@@ -4,3 +4,6 @@ services:
     port: 8000
     portal:
       title: Larasell Admin
+  reverb:
+    command: vendor/bin/testbench reverb:start --host=127.0.0.1 --port=8080
+    port: 8080
