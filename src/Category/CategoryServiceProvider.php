@@ -5,6 +5,7 @@ namespace Larasell\Admin\Category;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Category\Enums\CategorySection;
 use Larasell\Admin\Category\Http\Controllers\CategoryController;
 use Larasell\Admin\Category\Http\Controllers\CategoryProductController;
 use Larasell\Admin\Category\Http\Controllers\HideCategoryController;
@@ -19,6 +20,8 @@ use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Search\Searches;
+use Larasell\Admin\Platform\Sections\Facades\Section;
+use Larasell\Admin\Platform\Sections\SectionForm;
 
 /**
  * The categories module: the category tree, its navigation item, and the pages to add, edit,
@@ -40,6 +43,9 @@ class CategoryServiceProvider extends ServiceProvider
         if (! config('larasell.admin.categories.enabled')) {
             return;
         }
+
+        // Sections that modules and plugins add to the category form go before or after these.
+        Section::anchors(SectionForm::Category, CategorySection::class);
 
         Navigation::add(NavItem::Categories->label(), NavItem::Categories->value, icon: Icon::Folders)->position(NavItem::Categories->position());
 

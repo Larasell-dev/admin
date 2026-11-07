@@ -6,10 +6,10 @@ use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
- * The product's URL in one storefront channel, in the content locale.
+ * A product's or category's URL in one storefront channel, in the content locale.
  */
 #[TypeScript]
-class ProductUrlData extends Data
+class SeoUrlData extends Data
 {
     public function __construct(
         public int $channelId,
@@ -17,9 +17,9 @@ class ProductUrlData extends Data
         public string $channel,
         /** Where the channel's storefront starts in the content locale, e.g. "https://shop.de/". */
         public string $baseUrl,
-        /** The path the admin picked, null while the URL follows the product's name. */
+        /** The path the admin picked, null while the URL follows the name. */
         public ?string $customPath,
-        /** The path made from the product's name, null before the product has one in the locale. */
+        /** The path made from the name, null before the product or category has one in the locale. */
         public ?string $automaticPath,
     ) {}
 }

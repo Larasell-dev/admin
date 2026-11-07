@@ -20,4 +20,10 @@ enum SectionForm: string
      * ProductSection cases; sections save with ProductSaved.
      */
     case Product = 'product';
+
+    /**
+     * The category form, on the category's create and show pages. Its own sections are the
+     * CategorySection cases; sections save with CategorySaved.
+     */
+    case Category = 'category';
 }

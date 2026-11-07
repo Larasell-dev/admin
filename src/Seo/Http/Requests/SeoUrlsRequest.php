@@ -3,15 +3,15 @@
 namespace Larasell\Admin\Seo\Http\Requests;
 
 use Larasell\Admin\Platform\Sections\SectionRequest;
-use Larasell\Admin\Seo\Actions\ProductUrlsPayload;
+use Larasell\Admin\Seo\Actions\SeoUrlsPayload;
 
 /**
- * The URLs section of the product page: a path per channel, posted as urls[{channel ID}][path].
- * Whether a path is free is only known while saving; SaveProductUrls reports that.
+ * The URLs section of the product and category pages: a path per channel, posted as urls[{channel ID}][path].
+ * Whether a path is free is only known while saving; SaveSeoUrls reports that.
  */
-class ProductUrlsRequest extends SectionRequest
+class SeoUrlsRequest extends SectionRequest
 {
-    /** The section's key on the product page. */
+    /** The section's key on the product and category pages. */
     public const SECTION = 'seo';
 
     /**
@@ -34,7 +34,7 @@ class ProductUrlsRequest extends SectionRequest
     /**
      * Null when the section posted no URLs, e.g. with no storefront selling in the locale.
      */
-    public function payload(): ?ProductUrlsPayload
+    public function payload(): ?SeoUrlsPayload
     {
         $urls = $this->validated('urls');
 
@@ -49,6 +49,6 @@ class ProductUrlsRequest extends SectionRequest
             $paths[(int) $channelId] = $path === '' ? null : $path;
         }
 
-        return new ProductUrlsPayload($paths);
+        return new SeoUrlsPayload($paths);
     }
 }

@@ -2,7 +2,7 @@ import { Form } from "@inertiajs/react";
 import { Section, SectionStack } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 
-import CategoryForm from "../../Components/Category/CategoryForm";
+import CategoryForm, { CategorySections } from "../../Components/Category/CategoryForm";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/Category/ProductsTable";
@@ -21,6 +21,7 @@ export default function Create({
   parent,
   createProductUrl,
   contentLocale,
+  sections,
 }: Props) {
   return (
     <>
@@ -68,19 +69,24 @@ export default function Create({
             method="post"
           >
             {parent && <input type="hidden" name="parent_id" value={parent.id} />}
-            <Section.Root>
-              <Section.Header
-                title={fbs(
-                  "General",
-                  "New category page: heading of the form section with the category's name and description",
-                )}
-                description={fbs(
-                  "How the category is named and found in the store.",
-                  "New category page: explains the form section with the category's name and description",
-                )}
-              />
-              <CategoryForm />
-            </Section.Root>
+            <CategorySections
+              sections={sections}
+              general={
+                <Section.Root>
+                  <Section.Header
+                    title={fbs(
+                      "General",
+                      "New category page: heading of the form section with the category's name and description",
+                    )}
+                    description={fbs(
+                      "How the category is named and found in the store.",
+                      "New category page: explains the form section with the category's name and description",
+                    )}
+                  />
+                  <CategoryForm />
+                </Section.Root>
+              }
+            />
             <UnsavedChangesToast />
           </Form>
           <ProductsTable mode="create" createProductUrl={createProductUrl} />
