@@ -24,29 +24,21 @@ import {
 import { AnimatePresence } from "motion/react";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { fbs } from "fbtee";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { SectionComponentProps } from "../../extensions";
 import type { TableRowAction } from "../../types";
 import ConfirmActionDialog from "../../Platform/Panel/Components/ConfirmActionDialog";
 import { overlayExclusive } from "../../Platform/Support/hotkeys";
+import { useStorage } from "../../Platform/Support/useStorage";
 import PopupMotion from "../../Platform/Support/PopupMotion";
 
 type Props = Larasell.Admin.Seo.Data.SeoUrlsData;
-
-const hiddenStorageKey = "larasell-admin-seo-hidden-channels";
 
 /**
  * The IDs of the channels the admin chose not to see. The hidden ones are kept rather than the
  * shown ones, so a channel added later shows.
  */
-function storedHiddenChannels(): string[] {
-  try {
-    const stored = JSON.parse(localStorage.getItem(hiddenStorageKey) ?? "[]");
-    return Array.isArray(stored) ? stored.map(String) : [];
-  } catch {
-    return [];
-  }
-}
+const HIDDEN_CHANNELS_STORAGE_KEY = "larasell-admin-seo-hidden-channels";
 
 /**
  * The header and URL fields of a product's or category's URLs section, one per storefront channel
@@ -66,7 +58,9 @@ export default function UrlFields({
   description,
   empty,
 }: SectionComponentProps<Props> & { title: string; description: string; empty: ReactNode }) {
-  const [hidden, setHidden] = useState(storedHiddenChannels);
+  const [stored, setHidden] = useStorage<string[]>(HIDDEN_CHANNELS_STORAGE_KEY, []);
+  // Whatever another version of the panel stored there, only a list of IDs is used.
+  const hidden = Array.isArray(stored) ? stored.map(String) : [];
   const ids = props.urls.map((url) => String(url.channelId));
   // Channels added since the choice was made show, so a new channel isn't silently hidden.
   const shown = ids.filter((id) => !hidden.includes(id));
@@ -75,8 +69,6 @@ export default function UrlFields({
   const choose = (value: string[]) => {
     const next = ids.filter((id) => !value.includes(id));
     setHidden(next);
-    if (next.length === 0) localStorage.removeItem(hiddenStorageKey);
-    else localStorage.setItem(hiddenStorageKey, JSON.stringify(next));
   };
 
   return (
@@ -165,7 +157,7 @@ export default function UrlFields({
 }
 
 /** The page sizes the server takes, the first by default. */
-const pageSizes = [10, 25, 50, 100];
+const PAGE_SIZES = [10, 25, 50, 100];
 
 /**
  * This page's address with the channel's old URLs on the given page and page size, in
@@ -178,7 +170,7 @@ function withPage(channelId: number, page: number, pageSize: number): string {
       ? next.searchParams.delete(`old-urls[${channelId}][${key}]`)
       : next.searchParams.set(`old-urls[${channelId}][${key}]`, String(value));
   set("page", page, 1);
-  set("size", pageSize, pageSizes[0]);
+  set("size", pageSize, PAGE_SIZES[0]);
   return next.pathname + next.search + next.hash;
 }
 
@@ -316,13 +308,13 @@ function OldUrls({ url }: { url: Larasell.Admin.Seo.Data.SeoUrlData }) {
         </Table.Content>
       </Table.Root>
       {/* Shown while there's more than the smallest page, so a bigger size can be undone. */}
-      {url.history.total > pageSizes[0] && (
+      {url.history.total > PAGE_SIZES[0] && (
         <div className="border-t border-base-subtle px-(--inset) py-3">
           <Pagination
             page={url.history.page}
             pageSize={url.history.pageSize}
             total={url.history.total}
-            pageSizeOptions={pageSizes}
+            pageSizeOptions={PAGE_SIZES}
             onPaginationChange={({ page, pageSize }) =>
               router.visit(withPage(url.channelId, page, pageSize), options)
             }
@@ -355,27 +347,32 @@ function ChannelFilter({
 }) {
   const [open, setOpen] = useState(false);
   const names = new Map(channels.map((url) => [String(url.channelId), url.channel]));
-  const label =
-    shown.length === 0
-      ? fbs(
-          "No sales channels",
-          "Product and category forms, URLs section: button that picks which sales channels' URLs show, while none show",
-        )
-      : shown.length === channels.length
-        ? fbs(
-            "All sales channels",
-            "Product and category forms, URLs section: button that picks which sales channels' URLs show, while all of them show",
-          )
-        : fbs(
-            [
-              fbs.plural("sales channel", shown.length, {
-                many: "sales channels",
-                showCount: "yes",
-                name: "count",
-              }),
-            ],
-            "Product and category forms, URLs section: button that picks which sales channels' URLs show, naming how many show, e.g. '3 sales channels'",
-          );
+  const label = useMemo(() => {
+    if (shown.length === 0) {
+      return fbs(
+        "No sales channels",
+        "Product and category forms, URLs section: button that picks which sales channels' URLs show, while none show",
+      );
+    }
+
+    if (shown.length === channels.length) {
+      return fbs(
+        "All sales channels",
+        "Product and category forms, URLs section: button that picks which sales channels' URLs show, while all of them show",
+      );
+    }
+
+    return fbs(
+      [
+        fbs.plural("sales channel", shown.length, {
+          many: "sales channels",
+          showCount: "yes",
+          name: "count",
+        }),
+      ],
+      "Product and category forms, URLs section: button that picks which sales channels' URLs show, naming how many show, e.g. '3 sales channels'",
+    );
+  }, [shown.length, channels.length]);
 
   return (
     <Combobox.Root

@@ -13,7 +13,8 @@ use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Seo\Data\SeoUrlsProps;
-use Larasell\Admin\Seo\Http\Controllers\OldUrlController;
+use Larasell\Admin\Seo\Http\Controllers\RemoveOldUrlController;
+use Larasell\Admin\Seo\Http\Controllers\RestoreOldUrlController;
 use Larasell\Admin\Seo\Http\Requests\SeoUrlsRequest;
 use Larasell\Larasell\Seo\Exceptions\CustomUrlRejected;
 use Larasell\Larasell\Seo\Exceptions\InvalidSeoPath;
@@ -39,8 +40,8 @@ class SeoServiceProvider extends ServiceProvider
             ->request(SeoUrlsRequest::class);
 
         AdminPanel::resolve()->routes(function (): void {
-            Route::delete('seo-urls/{url}', [OldUrlController::class, 'destroy'])->whereNumber('url')->name('seo-urls.destroy');
-            Route::post('seo-urls/{url}/restore', [OldUrlController::class, 'restore'])->whereNumber('url')->name('seo-urls.restore');
+            Route::delete('seo-urls/{url}', RemoveOldUrlController::class)->where('url', '[1-9][0-9]*')->name('seo-urls.destroy');
+            Route::post('seo-urls/{url}/restore', RestoreOldUrlController::class)->where('url', '[1-9][0-9]*')->name('seo-urls.restore');
         });
 
         // A path the core refused shows on its field, and nothing of the page is saved.
