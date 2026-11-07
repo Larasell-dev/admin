@@ -68,6 +68,7 @@
   "No orders yet": "Noch keine Bestellungen",
   "No products yet": "Noch keine Produkte",
   "Not tracked": "Nicht erfasst",
+  "Open orders or reserved stock still need this product, so it can't be deleted yet.": "Offene Bestellungen oder reservierter Bestand brauchen dieses Produkt noch, daher kann es noch nicht gelöscht werden.",
   "Order": "Bestellung",
   "Order #:number": "Bestellung #:number",
   "Orders": "Bestellungen",

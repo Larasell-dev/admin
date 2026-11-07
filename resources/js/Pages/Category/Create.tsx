@@ -72,11 +72,11 @@ export default function Create({
               <Section.Header
                 title={fbs(
                   "General",
-                  "New category page: heading of the form section with the category's name, slug and description",
+                  "New category page: heading of the form section with the category's name and description",
                 )}
                 description={fbs(
                   "How the category is named and found in the store.",
-                  "New category page: explains the form section with the category's name, slug and description",
+                  "New category page: explains the form section with the category's name and description",
                 )}
               />
               <CategoryForm />

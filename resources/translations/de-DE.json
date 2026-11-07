@@ -1530,28 +1530,6 @@
       ],
       "types": []
     },
-    "bRSyunbbwXHzeZRT79hChg==": {
-      "description": "New category page: heading of the form section with the category's name, slug and description",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Allgemein",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "HN7o5ERkBY02idcu8F+jZw==": {
-      "description": "New category page: explains the form section with the category's name, slug and description",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Wie die Kategorie heißt und im Shop gefunden wird.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "SHPBmsI0MIixfwFOivyQTg==": {
       "description": "Categories page: shown when the store has no categories at all",
       "tokens": [],
@@ -1591,28 +1569,6 @@
       "translations": [
         {
           "translation": "Kategorie nicht gefunden",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "n4JsGbzuLl56lP2VbH7+Ng==": {
-      "description": "Category page: heading of the form section with the category's name, slug and description",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Allgemein",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "GmPedzQbEGjn8NxccVIvLg==": {
-      "description": "Category page: explains the form section with the category's name, slug and description",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Wie die Kategorie heißt und im Shop gefunden wird.",
           "variations": {}
         }
       ],
@@ -2366,28 +2322,6 @@
       ],
       "types": []
     },
-    "qlD70rkmnh3BcXUJuWqCGQ==": {
-      "description": "Product form: heading of the section with the product's name, slug and visibility",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Allgemein",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "g2nDEANtQDFKpA6GUnZ0Gw==": {
-      "description": "Product form: text below the heading of the General section, with the name, slug and visibility",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Wie das Produkt heißt und im Shop gefunden wird.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "s9YVNTJoLyTtPawO2RFqtA==": {
       "description": "Product form: heading of the section with the product's images",
       "tokens": [],
@@ -2504,17 +2438,6 @@
       "translations": [
         {
           "translation": "Name",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "NUhxQmF6FftkrbZEBtYqmQ==": {
-      "description": "Product form: label of the field for the product's URL slug, the part of its storefront address made from its name",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Slug",
           "variations": {}
         }
       ],
@@ -3081,17 +3004,6 @@
       ],
       "types": []
     },
-    "MwRyA7VQXT7+s2zrLSzFSw==": {
-      "description": "Category form: label of the field for the category's URL slug, the part of its storefront address made from its name",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Slug",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "QuJxIae9U1t8+2ebqcjEGQ==": {
       "description": "Category tree in the sidebar of the categories pages: accessible name of the button that collapses a category to hide its subcategories, e.g. 'Close Shirts'",
       "tokens": [],
@@ -3373,6 +3285,72 @@
       "translations": [
         {
           "translation": "Produkt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z56dAX52mYmmlZRUfYAUYw==": {
+      "description": "New category page: heading of the form section with the category's name and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BosqyLOIASYobc3wfTs5hA==": {
+      "description": "New category page: explains the form section with the category's name and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie die Kategorie heißt und im Shop gefunden wird.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HbndwNNVbOKtrqC6WfQdjw==": {
+      "description": "Category page: heading of the form section with the category's name and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jhA6j/I3S4CVuigU2IdFgA==": {
+      "description": "Category page: explains the form section with the category's name and description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie die Kategorie heißt und im Shop gefunden wird.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1MEf948PEUDSloa083W+Qg==": {
+      "description": "Product form: heading of the section with the product's name and visibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lP8WcMkZf/4M/VEEPZOHnA==": {
+      "description": "Product form: text below the heading of the General section, with the name and visibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie das Produkt heißt und im Shop gefunden wird.",
           "variations": {}
         }
       ],

@@ -10,17 +10,16 @@ use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\SectionRequests;
 use Larasell\Admin\Platform\Sections\Sections;
-use Larasell\Admin\Platform\Support\Rules\Slug;
 use Larasell\Admin\Product\Rules\Barcode;
 use Larasell\Larasell\Barcode as LarasellBarcode;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\Models\ProductImage;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
-use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Weight;
 
 class ProductRequest extends FormRequest
@@ -33,20 +32,10 @@ class ProductRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(#[CurrentContentLocale] Locale $locale): array
+    public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'slug' => [
-                'required',
-                'string',
-                'max:255',
-                new Slug,
-                // The storefront finds products by their slug in each locale, so it only needs to be
-                // unique in the content locale. Updating ignores the product's own slug; creating
-                // has no product, so ignores nothing.
-                Rule::unique(Product::class, 'slug->'.$locale->value)->ignore($this->route('product')),
-            ],
             'status' => ['required', Rule::enum(Visibility::class)],
             // Optional, since digital products have neither. The units always come with the
             // form, so only the amounts decide whether there is a weight or dimensions.
@@ -188,16 +177,14 @@ class ProductRequest extends FormRequest
     }
 
     /**
-     * The product's images keyed by id, each with its position, ready to sync. None when the
-     * field is left out.
+     * The ids of the product's images in its order, the first its thumbnail. None when the field
+     * is left out.
      *
-     * @return array<int, array{position: int}>
+     * @return list<int>
      */
-    public function images(): array
+    public function imageIds(): array
     {
-        $ids = array_map(intval(...), array_values($this->validated('images', [])));
-
-        return array_combine($ids, array_map(fn (int $position) => ['position' => $position], array_keys($ids)));
+        return array_map(intval(...), array_values($this->validated('images', [])));
     }
 
     /**
@@ -208,7 +195,7 @@ class ProductRequest extends FormRequest
      */
     public function imageAlts(): array
     {
-        return array_intersect_key($this->validated('image_alts', []), $this->images());
+        return array_intersect_key($this->validated('image_alts', []), array_flip($this->imageIds()));
     }
 
     /**

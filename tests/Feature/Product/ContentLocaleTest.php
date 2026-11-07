@@ -9,11 +9,11 @@ use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
 use Larasell\Admin\Platform\ContentLocale\ContentLocaleResolver;
 use Larasell\Chronicle\Facades\Chronicle;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Plan;
 use Larasell\Larasell\Facades\Entitlement;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 
@@ -25,11 +25,10 @@ beforeEach(function () {
 
 /**
  * @param  array<string, string>  $name
- * @param  array<string, string>  $slug
  */
-function translatedProduct(array $name, array $slug): Product
+function translatedProduct(array $name): Product
 {
-    return Product::create(['name' => $name, 'slug' => $slug, 'price' => Price::of(1000)]);
+    return Product::create(['name' => $name, 'price' => Price::of(1000)]);
 }
 
 function switchContentLocale(string $locale, ?string $from = null): void
@@ -41,14 +40,13 @@ function switchContentLocale(string $locale, ?string $from = null): void
 
 it('edits products in the default locale until the admin picks another, and offers the store\'s locales', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.name', 'Boots')
-            ->where('product.slug', 'boots')
             ->where('contentLocale', [
                 'current' => 'en',
                 'options' => [
@@ -93,7 +91,7 @@ it('offers no content locale to guests', function () {
 
 it('goes back to the page the locale was picked on', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     // Act & Assert
     $this->from(route('larasell.admin.products.edit', $boots))
@@ -103,9 +101,9 @@ it('goes back to the page the locale was picked on', function () {
 
 it('keeps the picked locale across reloads, other products and categories', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
-    $socks = translatedProduct(['en' => 'Socks', 'de' => 'Socken'], ['en' => 'socks', 'de' => 'socken']);
-    $shoes = Category::create(['name' => Translatable::fromString('Shoes'), 'slug' => Translatable::fromString('shoes')]);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
+    $socks = translatedProduct(['en' => 'Socks', 'de' => 'Socken']);
+    $shoes = Category::create(['name' => Translatable::fromString('Shoes')]);
 
     switchContentLocale('de', route('larasell.admin.products.edit', $boots));
 
@@ -113,7 +111,6 @@ it('keeps the picked locale across reloads, other products and categories', func
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.name', 'Stiefel')
-            ->where('product.slug', 'stiefel')
             ->where('contentLocale.current', 'de'));
 
     $this->get(route('larasell.admin.categories.show', $shoes))->assertOk();
@@ -129,7 +126,7 @@ it('keeps the picked locale across reloads, other products and categories', func
 
 it('changes the language of the products, not of the interface', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     switchContentLocale('de');
 
@@ -145,36 +142,20 @@ it('changes the language of the products, not of the interface', function () {
     expect(App::currentLocale())->toBe('en-US');
 });
 
-it('saves the name and slug in the picked locale and keeps the other translations', function () {
+it('saves the name in the picked locale and keeps the other translations', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     switchContentLocale('de');
 
     // Act
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Gummistiefel', 'slug' => 'gummistiefel', 'status' => 'visible'])
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Gummistiefel', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     // Assert
     $boots->refresh();
 
-    expect($boots->name->all())->toBe(['en' => 'Boots', 'de' => 'Gummistiefel'])
-        ->and($boots->slug->all())->toBe(['en' => 'boots', 'de' => 'gummistiefel']);
-});
-
-it('checks the slug against the other products\' slugs in the picked locale', function () {
-    // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
-    translatedProduct(['en' => 'Socks', 'de' => 'Socken'], ['en' => 'socks', 'de' => 'socken']);
-
-    switchContentLocale('de');
-
-    // Act & Assert
-    // Another product's English slug is free in German, but not its German one.
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Stiefel', 'slug' => 'socks', 'status' => 'visible'])
-        ->assertSessionHasNoErrors();
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Stiefel', 'slug' => 'socken', 'status' => 'visible'])
-        ->assertSessionHasErrors('slug');
+    expect($boots->name->all())->toBe(['en' => 'Boots', 'de' => 'Gummistiefel']);
 });
 
 it('creates a product in the picked locale', function () {
@@ -182,19 +163,18 @@ it('creates a product in the picked locale', function () {
     switchContentLocale('de');
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Wollsocken', 'slug' => 'wollsocken', 'status' => 'visible'])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Wollsocken', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     // Assert
     $product = Product::query()->sole();
 
-    expect($product->name->all())->toBe(['de' => 'Wollsocken'])
-        ->and($product->slug->all())->toBe(['de' => 'wollsocken']);
+    expect($product->name->all())->toBe(['de' => 'Wollsocken']);
 });
 
-it('leaves an untranslated name and slug empty, with what the store shows instead', function () {
+it('leaves an untranslated name empty, with what the store shows instead', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots'], ['en' => 'boots']);
+    $boots = translatedProduct(['en' => 'Boots']);
 
     switchContentLocale('de');
 
@@ -202,14 +182,12 @@ it('leaves an untranslated name and slug empty, with what the store shows instea
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('product.name', null)
-            ->where('product.slug', null)
-            ->where('product.fallbackName', 'Boots')
-            ->where('product.fallbackSlug', 'boots'));
+            ->where('product.fallbackName', 'Boots'));
 });
 
 it('rejects a locale the store does not support', function (mixed $locale) {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     // Act
     $this->put(route('larasell.admin.content-locale.update'), ['locale' => $locale])
@@ -226,7 +204,7 @@ it('rejects a locale the store does not support', function (mixed $locale) {
 
 it('falls back to the default locale once the picked one is no longer supported', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     switchContentLocale('de');
     config(['larasell.locale.supported' => [Locale::ENGLISH]]);
@@ -241,7 +219,7 @@ it('falls back to the default locale once the picked one is no longer supported'
 it('logs which locale an admin picked and which one each request edits in', function () {
     // Arrange
     $chronicle = Chronicle::fake();
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     // Act
     switchContentLocale('de');
@@ -279,7 +257,7 @@ it('offers the locales of the AvailableLocales bound in the container', function
         }
     });
 
-    $boots = translatedProduct(['en' => 'Boots', 'fr' => 'Bottes'], ['en' => 'boots', 'fr' => 'bottes']);
+    $boots = translatedProduct(['en' => 'Boots', 'fr' => 'Bottes']);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
@@ -307,13 +285,13 @@ it('edits products in the locale of the ContentLocaleResolver bound in the conta
         public function remember(Request $request, Locale $locale): void {}
     });
 
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('product.name', 'Stiefel'));
 
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Gummistiefel', 'slug' => 'gummistiefel', 'status' => 'visible'])
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Gummistiefel', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     expect($boots->refresh()->name->all())->toBe(['en' => 'Boots', 'de' => 'Gummistiefel']);
@@ -331,7 +309,7 @@ it('makes content translations a Pro entitlement', function () {
 it('only edits products in the default locale without content translations, and offers no other', function () {
     // Arrange
     Entitlement::fake(Plan::Free);
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
@@ -349,7 +327,7 @@ it('only edits products in the default locale without content translations, and 
 
 it('goes back to the default locale once the plan no longer has content translations, and keeps the others', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
 
     switchContentLocale('de');
     Entitlement::fake(Plan::Free);
@@ -358,7 +336,7 @@ it('goes back to the default locale once the plan no longer has content translat
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('contentLocale.current', 'en'));
 
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'slug' => 'rain-boots', 'status' => 'visible'])
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     expect($boots->refresh()->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel']);
@@ -390,9 +368,9 @@ it('also limits the locales of an AvailableLocales an app binds to the default o
 
 it('offers the categories by their name in the picked locale', function () {
     // Arrange
-    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
-    Category::create(['name' => ['en' => 'Shoes', 'de' => 'Schuhe'], 'slug' => ['en' => 'shoes', 'de' => 'schuhe']]);
-    Category::create(['name' => ['en' => 'Bags'], 'slug' => ['en' => 'bags']]);
+    $boots = translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
+    Category::create(['name' => ['en' => 'Shoes', 'de' => 'Schuhe']]);
+    Category::create(['name' => ['en' => 'Bags']]);
 
     switchContentLocale('de');
 
@@ -408,8 +386,8 @@ it('offers the categories by their name in the picked locale', function () {
 
 it('lists the products by their name in the picked locale', function () {
     // Arrange
-    translatedProduct(['en' => 'Boots', 'de' => 'Stiefel'], ['en' => 'boots', 'de' => 'stiefel']);
-    translatedProduct(['en' => 'Socks'], ['en' => 'socks']);
+    translatedProduct(['en' => 'Boots', 'de' => 'Stiefel']);
+    translatedProduct(['en' => 'Socks']);
 
     switchContentLocale('de');
 

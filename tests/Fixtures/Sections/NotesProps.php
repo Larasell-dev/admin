@@ -8,7 +8,7 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Larasell\Admin\Platform\Sections\Props;
 use Larasell\Admin\Platform\Sections\SectionContext;
-use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Catalog\Models\Product;
 
 /** Asks the container for a dependency, as Props classes may. */
 class NotesProps implements Props

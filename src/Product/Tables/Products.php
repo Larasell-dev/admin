@@ -13,8 +13,8 @@ use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Enums\Variant;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Product\Actions\DeleteProduct;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Translatable;
 
 #[UseModel(Product::class)]

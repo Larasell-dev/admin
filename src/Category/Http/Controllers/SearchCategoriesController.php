@@ -10,8 +10,8 @@ use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Search\Data\SearchMatchData;
 use Larasell\Admin\Platform\Search\Data\SearchResultData;
 use Larasell\Admin\Platform\Search\Http\Requests\SearchRequest;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Category;
 
 /**
  * The command menu's category search: each category's name in the content locale, and the name

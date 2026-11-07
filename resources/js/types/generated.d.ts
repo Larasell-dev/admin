@@ -34,9 +34,7 @@ declare namespace Larasell.Admin.Category.Data {
   export type CategoryDetailData = {
     id: number;
     name: string | null;
-    slug: string | null;
     fallbackName: string;
-    fallbackSlug: string;
     visible: boolean;
   };
   export type CategoryOptionData = {
@@ -268,9 +266,7 @@ declare namespace Larasell.Admin.Product.Data {
   export type ProductDetailData = {
     id: number;
     name: string | null;
-    slug: string | null;
     fallbackName: string;
-    fallbackSlug: string;
     visible: boolean;
     weight: Larasell.Admin.Product.Data.WeightData | null;
     dimensions: Larasell.Admin.Product.Data.DimensionsData | null;

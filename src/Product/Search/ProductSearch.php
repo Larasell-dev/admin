@@ -4,7 +4,7 @@ namespace Larasell\Admin\Product\Search;
 
 use Illuminate\Support\Collection;
 use Larasell\Admin\Platform\Search\SearchQuery;
-use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Catalog\Models\Product;
 
 /**
  * Finds products, by their name in any locale, their SKU and barcode, and those of their variants, for the command menu.

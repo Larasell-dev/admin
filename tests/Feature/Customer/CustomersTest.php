@@ -11,6 +11,7 @@ use Larasell\Larasell\Enums\OrderStatus;
 use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\SalesChannels\SalesContext;
 
 it('lists customers with their order count, newest first', function () {
     // Arrange
@@ -278,7 +279,7 @@ it('turns the customers off when disabled in the config', function () {
 
 function customerOrder(string $number, ?Customer $customer, array $attributes = []): Order
 {
-    return Order::create([
+    return Order::createIn(SalesContext::for('default', 'en'), [
         'number' => $number,
         'customer_id' => $customer?->id,
         'customer_email' => 'ada@example.com',

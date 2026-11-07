@@ -9,13 +9,14 @@ use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Search\Searches;
 use Larasell\Admin\Platform\Search\SearchQuery;
 use Larasell\Admin\Product\Search\ProductSearch;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\SalesChannels\SalesContext;
 
 beforeEach(function () {
     config(['larasell.locale.supported' => [Locale::ENGLISH, Locale::GERMAN], 'larasell.locale.default' => Locale::ENGLISH]);
@@ -34,7 +35,6 @@ function searchableProduct(array $name, array $attributes = []): Product
 {
     return Product::create([
         'name' => $name,
-        'slug' => collect($name)->map(fn (string $value) => str($value)->slug()->value())->all(),
         'price' => Price::of(1000),
         ...$attributes,
     ]);
@@ -47,7 +47,6 @@ function searchableCategory(array $name): Category
 {
     return Category::create([
         'name' => $name,
-        'slug' => collect($name)->map(fn (string $value) => str($value)->slug()->value())->all(),
     ]);
 }
 
@@ -56,7 +55,7 @@ function searchableCategory(array $name): Category
  */
 function searchableOrder(string $number, array $attributes = []): Order
 {
-    return Order::create([
+    return Order::createIn(SalesContext::for('default', 'en'), [
         'number' => $number,
         'customer_email' => 'grace@example.com',
         'customer_name' => 'Grace Hopper',

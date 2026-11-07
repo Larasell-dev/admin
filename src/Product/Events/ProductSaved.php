@@ -9,7 +9,7 @@ use Larasell\Admin\Platform\Sections\SectionRequest;
 use Larasell\Admin\Platform\Sections\SectionRequests;
 use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
-use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Catalog\Models\Product;
 
 /**
  * The product page saved a product, created or edited. Sections of the page listen to it to

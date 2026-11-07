@@ -22,9 +22,7 @@ function props(
     product: {
       id: 1,
       name,
-      slug: name === null ? null : name.toLowerCase(),
       fallbackName,
-      fallbackSlug: fallbackName.toLowerCase(),
       visible: true,
       weight: null,
       dimensions: null,
@@ -161,9 +159,6 @@ it("leaves an untranslated name empty and shows what the store shows instead", a
   // Assert
   await expect.element(nameField()).toHaveValue("");
   await expect.element(nameField()).toHaveAttribute("placeholder", "Boots");
-  await expect
-    .element(page.getByRole("textbox", { name: "Slug" }))
-    .toHaveAttribute("placeholder", "boots");
   await expect.element(page.getByRole("heading", { name: "Boots" })).toBeVisible();
 });
 

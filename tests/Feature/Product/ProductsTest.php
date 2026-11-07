@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\Models\ProductImage;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
-use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 use Larasell\Larasell\Weight;
@@ -32,8 +32,8 @@ it('lists the products by name, stock, and a visibility badge', function () {
     // Arrange
     signInAdmin();
 
-    Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Visible]);
-    Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500), 'stock' => 12, 'status' => Visibility::Hidden]);
+    Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Visible]);
+    Product::create(['name' => 'Socks', 'price' => Price::of(500), 'stock' => 12, 'status' => Visibility::Hidden]);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.index'))
@@ -61,7 +61,7 @@ it('shows a stock of zero as 0, not as untracked', function () {
     // Arrange
     signInAdmin();
 
-    Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'stock' => 0]);
+    Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'stock' => 0]);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.index'))
@@ -101,7 +101,7 @@ it('links each product to its edit page', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.index'))
@@ -127,7 +127,7 @@ it('creates a product and opens it', function (Visibility $status) {
     signInAdmin();
 
     // Act
-    $response = $this->post(route('larasell.admin.products.store'), ['name' => 'Linen Shirt', 'slug' => 'linen-shirt', 'status' => $status->value]);
+    $response = $this->post(route('larasell.admin.products.store'), ['name' => 'Linen Shirt', 'status' => $status->value]);
 
     // Assert
     $product = Product::query()->sole();
@@ -136,7 +136,6 @@ it('creates a product and opens it', function (Visibility $status) {
         ->assertRedirect(route('larasell.admin.products.edit', $product));
 
     expect($product->name->all())->toBe(['en' => 'Linen Shirt'])
-        ->and($product->slug->all())->toBe(['en' => 'linen-shirt'])
         ->and($product->status)->toBe($status)
         // The form has no price yet, and every product needs one.
         ->and($product->price->amount())->toBe('0');
@@ -149,7 +148,7 @@ it('shows the product\'s values to edit on its page', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Hidden]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'status' => Visibility::Hidden]);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
@@ -159,9 +158,7 @@ it('shows the product\'s values to edit on its page', function () {
             ->where('product', [
                 'id' => $boots->id,
                 'name' => 'Boots',
-                'slug' => 'boots',
                 'fallbackName' => 'Boots',
-                'fallbackSlug' => 'boots',
                 'visible' => false,
                 'weight' => null,
                 'dimensions' => null,
@@ -184,7 +181,6 @@ it('shows the product\'s weight and dimensions in the units they were saved in',
     signInAdmin();
 
     $poster = Product::create([
-        'slug' => 'poster',
         'name' => 'Poster',
         'price' => Price::of(1999),
         'weight' => Weight::of('12.5', 'lb'),
@@ -206,7 +202,6 @@ it('saves the weight and dimensions as entered, without converting them', functi
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Poster',
-        'slug' => 'poster',
         'status' => 'visible',
         'weight' => ['amount' => '1500', 'unit' => 'g'],
         'dimensions' => ['length' => '50', 'width' => '35.5', 'height' => '0.2', 'unit' => 'mm'],
@@ -230,7 +225,6 @@ it('accepts a weight and dimensions of zero', function () {
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'E-book',
-        'slug' => 'e-book',
         'status' => 'visible',
         'weight' => ['amount' => '0', 'unit' => 'kg'],
         'dimensions' => ['length' => '0', 'width' => '0', 'height' => '0', 'unit' => 'cm'],
@@ -250,7 +244,6 @@ it('saves no weight or dimensions when their amounts are left empty, whatever th
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'E-book',
-        'slug' => 'e-book',
         'status' => 'visible',
         'weight' => ['amount' => '', 'unit' => 'kg'],
         'dimensions' => ['length' => '', 'width' => '', 'height' => '', 'unit' => 'cm'],
@@ -268,7 +261,6 @@ it('removes the weight and dimensions when they are cleared', function () {
     signInAdmin();
 
     $poster = Product::create([
-        'slug' => 'poster',
         'name' => 'Poster',
         'price' => Price::of(1999),
         'weight' => Weight::of('2', 'kg'),
@@ -278,7 +270,6 @@ it('removes the weight and dimensions when they are cleared', function () {
     // Act
     $this->put(route('larasell.admin.products.update', $poster), [
         'name' => 'Poster',
-        'slug' => 'poster',
         'status' => 'visible',
         'weight' => ['amount' => '', 'unit' => 'kg'],
         'dimensions' => ['length' => '', 'width' => '', 'height' => '', 'unit' => 'cm'],
@@ -298,7 +289,6 @@ it('rejects an invalid weight or dimensions', function (array $input, string $er
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Poster',
-        'slug' => 'poster',
         'status' => 'visible',
         'weight' => ['amount' => '2', 'unit' => 'kg'],
         'dimensions' => ['length' => '50', 'width' => '35', 'height' => '5', 'unit' => 'cm'],
@@ -330,7 +320,6 @@ it('explains invalid weights and dimensions in words, not field paths', function
     // Act & Assert
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Poster',
-        'slug' => 'poster',
         'status' => 'visible',
         'weight' => ['amount' => '-1', 'unit' => 'kg'],
         'dimensions' => ['length' => '50', 'width' => 'wide', 'height' => '', 'unit' => 'cm'],
@@ -345,7 +334,7 @@ it('shows the product\'s SKU and barcode on its page', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
@@ -361,7 +350,6 @@ it('saves the SKU as entered and the barcode as its digits', function () {
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
-        'slug' => 'boots',
         'status' => 'visible',
         'sku' => 'Boot/42-black',
         'barcode' => '400-6381 333931',
@@ -379,7 +367,7 @@ it('saves no SKU or barcode when they are left empty', function () {
     signInAdmin();
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'sku' => '', 'barcode' => ''])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'sku' => '', 'barcode' => ''])
         ->assertSessionHasNoErrors();
 
     // Assert
@@ -393,8 +381,8 @@ it('changes and removes the SKU and barcode, and keeps them when they are unchan
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
-    $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', ...$input]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
+    $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', ...$input]);
 
     // Act & Assert
     // Its own SKU and barcode aren't taken by another product.
@@ -412,10 +400,10 @@ it('rejects an invalid or taken SKU or barcode', function (array $input, string 
     // Arrange
     signInAdmin();
 
-    Product::create(['slug' => 'shirt', 'name' => 'Shirt', 'price' => Price::of(1000), 'sku' => 'SHIRT-1', 'barcode' => '4006381333931']);
+    Product::create(['name' => 'Shirt', 'price' => Price::of(1000), 'sku' => 'SHIRT-1', 'barcode' => '4006381333931']);
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', ...$input])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', ...$input])
         ->assertSessionHasErrors($error);
 
     // Assert
@@ -435,7 +423,7 @@ it('explains why a barcode is invalid', function (string $barcode, string $messa
     signInAdmin();
 
     // Act & Assert
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'barcode' => $barcode])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'barcode' => $barcode])
         ->assertSessionHasErrors(['barcode' => $message]);
 })->with([
     'letters' => ['40063813339A1', 'A barcode must contain only digits.'],
@@ -448,7 +436,6 @@ it('shows the product\'s stock, backorders and quantity limits on its page', fun
     signInAdmin();
 
     $socks = Product::create([
-        'slug' => 'socks',
         'name' => 'Socks',
         'price' => Price::of(300),
         'stock' => 500,
@@ -473,7 +460,6 @@ it('saves the stock, backorders and quantity limits', function () {
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Socks',
-        'slug' => 'socks',
         'status' => 'visible',
         'stock' => '500',
         'allow_backorders' => '0',
@@ -500,7 +486,6 @@ it('leaves the stock untracked and the quantity unlimited when they are left emp
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'E-book',
-        'slug' => 'e-book',
         'status' => 'visible',
         'stock' => '',
         'allow_backorders' => '1',
@@ -522,7 +507,7 @@ it('accepts a stock of zero and below, which backorders lead to', function (stri
     signInAdmin();
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', 'stock' => $stock])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'status' => 'visible', 'stock' => $stock])
         ->assertSessionHasNoErrors();
 
     // Assert
@@ -537,7 +522,6 @@ it('changes the stock, backorders and quantity limits of a product', function ()
     signInAdmin();
 
     $socks = Product::create([
-        'slug' => 'socks',
         'name' => 'Socks',
         'price' => Price::of(300),
         'stock' => 500,
@@ -545,7 +529,7 @@ it('changes the stock, backorders and quantity limits of a product', function ()
         'min_quantity' => 5,
         'max_quantity' => 10,
     ]);
-    $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $socks), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', ...$input]);
+    $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $socks), ['name' => 'Socks', 'status' => 'visible', ...$input]);
 
     // Act & Assert
     // A new minimum above the old maximum, then a new maximum below the old minimum.
@@ -566,7 +550,7 @@ it('rejects an invalid stock, backorders or quantity limit', function (array $in
     signInAdmin();
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible', ...$input])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'status' => 'visible', ...$input])
         ->assertSessionHasErrors($error);
 
     // Assert
@@ -585,10 +569,10 @@ it('offers the store\'s categories as a tree when adding or editing a product', 
     // Arrange
     signInAdmin();
 
-    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
-    $shirts = Category::create(['name' => 'Shirts', 'slug' => 'shirts', 'parent_id' => $clothing->id]);
-    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $clothing = Category::create(['name' => 'Clothing']);
+    $shirts = Category::create(['name' => 'Shirts', 'parent_id' => $clothing->id]);
+    $shoes = Category::create(['name' => 'Shoes']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     $tree = fn (AssertableInertia $page) => $page
         ->has('categories', 2)
@@ -607,7 +591,7 @@ it('links to creating a category from adding or editing a product', function () 
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
     $link = fn (AssertableInertia $page) => $page->where('createCategoryUrl', route('larasell.admin.categories.create'));
 
     // Act & Assert
@@ -620,9 +604,9 @@ it('still puts products into categories while the categories are turned off', fu
     $this->bootingWith(fn () => config(['larasell.admin.categories.enabled' => false]));
     signInAdmin();
 
-    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
-    $shirts = Category::create(['name' => 'Shirts', 'slug' => 'shirts', 'parent_id' => $clothing->id]);
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $clothing = Category::create(['name' => 'Clothing']);
+    $shirts = Category::create(['name' => 'Shirts', 'parent_id' => $clothing->id]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
     $boots->categories()->attach($shirts);
 
     // There are no category pages to link to.
@@ -637,7 +621,7 @@ it('still puts products into categories while the categories are turned off', fu
     $this->get(route('larasell.admin.products.create'))->assertInertia($form);
     $this->get(route('larasell.admin.products.edit', $boots))->assertInertia($form);
 
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'categories' => [$clothing->id, $shirts->id]])
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', 'categories' => [$clothing->id, $shirts->id]])
         ->assertRedirect(route('larasell.admin.products.edit', $boots));
 
     expect($boots->categories()->get()->modelKeys())->toEqualCanonicalizing([$clothing->id, $shirts->id]);
@@ -647,10 +631,10 @@ it('shows the categories a product is in on its page', function () {
     // Arrange
     signInAdmin();
 
-    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
-    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
-    Category::create(['name' => 'Socks', 'slug' => 'socks']);
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $clothing = Category::create(['name' => 'Clothing']);
+    $shoes = Category::create(['name' => 'Shoes']);
+    Category::create(['name' => 'Socks']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
     $boots->categories()->attach([$shoes->id, $clothing->id]);
 
     // Act & Assert
@@ -663,14 +647,13 @@ it('adds a new product to the selected categories', function () {
     // Arrange
     signInAdmin();
 
-    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
-    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
-    Category::create(['name' => 'Socks', 'slug' => 'socks']);
+    $clothing = Category::create(['name' => 'Clothing']);
+    $shoes = Category::create(['name' => 'Shoes']);
+    Category::create(['name' => 'Socks']);
 
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
-        'slug' => 'boots',
         'status' => 'visible',
         'categories' => [(string) $clothing->id, (string) $shoes->id],
     ])->assertSessionHasNoErrors();
@@ -684,11 +667,11 @@ it('moves a product into the selected categories, and out of all when none are s
     // Arrange
     signInAdmin();
 
-    $clothing = Category::create(['name' => 'Clothing', 'slug' => 'clothing']);
-    $shoes = Category::create(['name' => 'Shoes', 'slug' => 'shoes']);
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $clothing = Category::create(['name' => 'Clothing']);
+    $shoes = Category::create(['name' => 'Shoes']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
     $boots->categories()->attach($clothing);
-    $valid = ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'];
+    $valid = ['name' => 'Boots', 'status' => 'visible'];
 
     // Act
     $this->put(route('larasell.admin.products.update', $boots), [...$valid, 'categories' => [(string) $shoes->id]])
@@ -709,7 +692,7 @@ it('rejects categories that do not exist', function (mixed $categories, string $
     signInAdmin();
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'categories' => $categories])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'categories' => $categories])
         ->assertSessionHasErrors($error);
 
     // Assert
@@ -726,7 +709,7 @@ it('shows the product\'s images on its page in their order, whatever order they 
     config(['larasell.images.disk' => 'public']);
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
     $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
     $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png'), 'alt' => 'Boots from the front']);
     $boots->images()->attach([$side->id => ['position' => 1], $front->id => ['position' => 0]]);
@@ -772,9 +755,9 @@ it('links the submitted images to a product in their order, the first as its thu
 
     [$front, $side, $back] = collect(['front.png', 'side.png', 'back.png'])
         ->map(fn (string $name) => ProductImage::create(['file' => UploadedFile::fake()->image($name)]));
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
     $boots->images()->attach($front, ['position' => 0]);
-    $valid = ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'];
+    $valid = ['name' => 'Boots', 'status' => 'visible'];
 
     // Act
     // Out of id order, and the existing image moves from first to second.
@@ -804,7 +787,7 @@ it('links the submitted images to a new product in their order', function () {
     $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => [(string) $side->id, (string) $front->id]])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'images' => [(string) $side->id, (string) $front->id]])
         ->assertSessionHasNoErrors();
 
     // Assert
@@ -819,12 +802,11 @@ it('saves the alt text of the product\'s images', function () {
 
     [$front, $side, $other] = collect(['front.png', 'side.png', 'other.png'])
         ->map(fn (string $name) => ProductImage::create(['file' => UploadedFile::fake()->image($name), 'alt' => "Old {$name}"]));
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act
     $this->put(route('larasell.admin.products.update', $boots), [
         'name' => 'Boots',
-        'slug' => 'boots',
         'status' => 'visible',
         'images' => [(string) $front->id, (string) $side->id],
         // An emptied alt text is removed; one for an image the product doesn't have is ignored.
@@ -848,7 +830,6 @@ it('saves the alt text of a new product\'s images', function () {
     // Act
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
-        'slug' => 'boots',
         'status' => 'visible',
         'images' => [(string) $front->id],
         'image_alts' => [$front->id => 'Boots from the front'],
@@ -869,7 +850,6 @@ it('rejects alt text longer than the column holds', function () {
     // Act & Assert
     $this->post(route('larasell.admin.products.store'), [
         'name' => 'Boots',
-        'slug' => 'boots',
         'status' => 'visible',
         'images' => [(string) $front->id],
         'image_alts' => [$front->id => str_repeat('a', 256)],
@@ -882,7 +862,7 @@ it('rejects images that do not exist', function (mixed $images, string $error, s
     signInAdmin();
 
     // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible', 'images' => $images])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'images' => $images])
         ->assertSessionHasErrors([$error => $message]);
 
     // Assert
@@ -940,10 +920,10 @@ it('updates a product and stays on its page, keeping its price', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'slug' => 'rain-boots', 'status' => 'hidden'])
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'status' => 'hidden'])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('larasell.admin.products.edit', $boots));
 
@@ -951,40 +931,37 @@ it('updates a product and stays on its page, keeping its price', function () {
     $boots->refresh();
 
     expect($boots->name->get())->toBe('Rain Boots')
-        ->and($boots->slug->get())->toBe('rain-boots')
         ->and($boots->status)->toBe(Visibility::Hidden)
         ->and($boots->price->amount())->toBe('1000');
 });
 
-it('only changes the current locale\'s product name and slug', function () {
+it('only changes the current locale\'s product name', function () {
     // Arrange
     signInAdmin();
 
     $boots = Product::create([
         'name' => ['en' => 'Boots', 'de' => 'Stiefel'],
-        'slug' => ['en' => 'boots', 'de' => 'stiefel'],
         'price' => Price::of(1000),
     ]);
 
     // Act
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'slug' => 'rain-boots', 'status' => 'visible'])
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Rain Boots', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     // Assert
     $boots->refresh();
 
-    expect($boots->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel'])
-        ->and($boots->slug->all())->toBe(['en' => 'rain-boots', 'de' => 'stiefel']);
+    expect($boots->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel']);
 });
 
 it('rejects an invalid product', function (array $input, string $error) {
     // Arrange
     signInAdmin();
 
-    Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act
-    $this->post(route('larasell.admin.products.store'), [...['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'], ...$input])
+    $this->post(route('larasell.admin.products.store'), [...['name' => 'Socks', 'status' => 'visible'], ...$input])
         ->assertSessionHasErrors($error);
 
     // Assert
@@ -992,37 +969,19 @@ it('rejects an invalid product', function (array $input, string $error) {
 })->with([
     'missing name' => [['name' => ''], 'name'],
     'too long name' => [['name' => str_repeat('a', 256)], 'name'],
-    'missing slug' => [['slug' => ''], 'slug'],
-    'slug with spaces' => [['slug' => 'wool socks'], 'slug'],
-    'slug with capitals' => [['slug' => 'Socks'], 'slug'],
-    'slug of another product' => [['slug' => 'boots'], 'slug'],
     'missing visibility' => [['status' => null], 'status'],
     'unknown visibility' => [['status' => 'secret'], 'status'],
 ]);
 
-it('lets a product keep its own slug, but not take another one\'s', function () {
-    // Arrange
-    signInAdmin();
-
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
-    Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500)]);
-
-    // Act & Assert
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'visible'])
-        ->assertSessionHasNoErrors();
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'slug' => 'socks', 'status' => 'visible'])
-        ->assertSessionHasErrors('slug');
-});
-
 it('does not let guests create or edit products', function () {
     // Arrange
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act
     $this->get(route('larasell.admin.products.create'))->assertRedirect(route('larasell.admin.login'));
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
     $this->get(route('larasell.admin.products.edit', $boots))->assertRedirect(route('larasell.admin.login'));
-    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
     $this->post(route('larasell.admin.products.images.store'), ['image' => UploadedFile::fake()->image('front.png')])->assertRedirect(route('larasell.admin.login'));
 
     // Assert
@@ -1034,7 +993,7 @@ it('offers to delete each product', function () {
     // Arrange
     signInAdmin();
 
-    Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.index'))
@@ -1050,8 +1009,8 @@ it('deletes a product with its variants and keeps the others', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
-    Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    Product::create(['name' => 'Socks', 'price' => Price::of(500)]);
 
     $delete = $this->get(route('larasell.admin.products.index'))->inertiaProps('table.rows.0._actions.0.url');
 
@@ -1059,7 +1018,7 @@ it('deletes a product with its variants and keeps the others', function () {
     $this->from(route('larasell.admin.products.index'))->post($delete)->assertRedirect(route('larasell.admin.products.index'));
 
     // Assert
-    expect(Product::query()->pluck('slug')->map->get()->all())->toBe(['socks'])
+    expect(Product::query()->pluck('id')->all())->not->toContain($boots->id)->toHaveCount(1)
         ->and(DB::table('larasell_product_variants')->where('product_id', $boots->id)->exists())->toBeFalse();
 });
 
@@ -1067,9 +1026,9 @@ it('removes a deleted product from its categories and keeps the categories', fun
     // Arrange
     signInAdmin();
 
-    $shoes = Category::create(['name' => Translatable::fromString('Shoes'), 'slug' => Translatable::fromString('shoes')]);
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
-    $socks = Product::create(['slug' => 'socks', 'name' => 'Socks', 'price' => Price::of(500)]);
+    $shoes = Category::create(['name' => Translatable::fromString('Shoes')]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $socks = Product::create(['name' => 'Socks', 'price' => Price::of(500)]);
     $boots->categories()->attach($shoes);
     $socks->categories()->attach($shoes);
 

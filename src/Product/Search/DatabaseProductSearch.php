@@ -5,7 +5,7 @@ namespace Larasell\Admin\Product\Search;
 use Illuminate\Support\Collection;
 use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
 use Larasell\Admin\Platform\Search\SearchQuery;
-use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Catalog\Models\Product;
 
 /**
  * Searches the products table, so it needs no search engine.

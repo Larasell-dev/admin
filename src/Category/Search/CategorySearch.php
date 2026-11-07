@@ -4,7 +4,7 @@ namespace Larasell\Admin\Category\Search;
 
 use Illuminate\Support\Collection;
 use Larasell\Admin\Platform\Search\SearchQuery;
-use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Catalog\Models\Category;
 
 /**
  * Finds categories, by their name in any locale, for the command menu.

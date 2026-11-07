@@ -3,9 +3,9 @@
 namespace Larasell\Admin\Category\Data;
 
 use Illuminate\Support\Collection;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Category;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 

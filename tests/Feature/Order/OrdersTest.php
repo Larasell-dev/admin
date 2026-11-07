@@ -13,11 +13,12 @@ use Larasell\Larasell\Enums\TaxPriceMode;
 use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\SalesChannels\SalesContext;
 use Larasell\Larasell\Translatable;
 
 function createOrder(string $number, array $attributes = []): Order
 {
-    return Order::create([
+    return Order::createIn(SalesContext::for('default', 'en'), [
         'number' => $number,
         'customer_email' => 'ada@example.com',
         'customer_name' => 'Ada Lovelace',

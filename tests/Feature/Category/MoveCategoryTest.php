@@ -5,14 +5,13 @@ declare(strict_types=1);
 use Larasell\Admin\Category\Actions\MoveCategory;
 use Larasell\Admin\Category\Actions\MoveCategoryPayload;
 use Larasell\Admin\Platform\Auth\Models\Admin;
-use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Translatable;
 
 function categoryToMove(string $name, ?Category $parent = null): Category
 {
     return Category::create([
         'parent_id' => $parent?->id,
-        'slug' => Translatable::fromString(str($name)->slug()->value()),
         'name' => Translatable::fromString($name),
     ]);
 }

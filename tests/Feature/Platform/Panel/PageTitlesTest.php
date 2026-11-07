@@ -10,10 +10,11 @@ use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
-use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\SalesChannels\SalesContext;
 use Larasell\Larasell\Translatable;
 
 class ReadingListTable extends Table
@@ -94,7 +95,7 @@ it('titles an order\'s page with its number', function () {
     // Arrange
     signedInAdmin();
 
-    $order = Order::create(['number' => '2026-000123', 'customer_email' => 'ada@example.com', 'customer_name' => 'Ada Lovelace', 'currency' => 'EUR', 'subtotal' => Price::of(0), 'total' => Price::of(0)]);
+    $order = Order::createIn(SalesContext::for('default', 'en'), ['number' => '2026-000123', 'customer_email' => 'ada@example.com', 'customer_name' => 'Ada Lovelace', 'currency' => 'EUR', 'subtotal' => Price::of(0), 'total' => Price::of(0)]);
 
     // Act & Assert
     expect(pageTitle($this->get(route('larasell.admin.orders.show', $order))))->toBe('Order #2026-000123 - Admin');
@@ -106,7 +107,6 @@ it('titles category pages with the category name', function (string $uri, string
 
     Category::create([
         'name' => Translatable::fromString('Shoes & Boots'),
-        'slug' => Translatable::fromString('shoes-boots'),
     ]);
 
     // Act & Assert

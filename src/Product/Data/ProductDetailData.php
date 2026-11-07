@@ -2,9 +2,9 @@
 
 namespace Larasell\Admin\Product\Data;
 
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Product;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -15,10 +15,8 @@ class ProductDetailData extends Data
         public int $id,
         /** In the content locale, null while the product has none in it. */
         public ?string $name,
-        public ?string $slug,
         /** What the store shows in the content locale, the name of another locale while it has none. */
         public string $fallbackName,
-        public string $fallbackSlug,
         public bool $visible,
         public ?WeightData $weight,
         public ?DimensionsData $dimensions,
@@ -42,9 +40,7 @@ class ProductDetailData extends Data
         return new self(
             id: $product->id,
             name: $product->name->has($locale->value) ? $product->name->get($locale->value) : null,
-            slug: $product->slug->has($locale->value) ? $product->slug->get($locale->value) : null,
             fallbackName: $product->name->get($locale->value),
-            fallbackSlug: $product->slug->get($locale->value),
             visible: $product->status === Visibility::Visible,
             weight: $product->weight === null ? null : WeightData::fromWeight($product->weight),
             dimensions: $product->dimensions === null ? null : DimensionsData::fromDimensions($product->dimensions),
