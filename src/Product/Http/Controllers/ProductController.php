@@ -19,10 +19,12 @@ use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
 use Larasell\Larasell\Catalog\Actions\CreateProduct;
+use Larasell\Larasell\Catalog\Actions\CreateProductPayload;
 use Larasell\Larasell\Catalog\Actions\SetProductCategories;
 use Larasell\Larasell\Catalog\Actions\SetProductImages;
 use Larasell\Larasell\Catalog\Actions\UpdateProduct;
 use Larasell\Larasell\Catalog\Actions\UpdateProductImage;
+use Larasell\Larasell\Catalog\Actions\UpdateProductPayload;
 use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\ImageId;
 use Larasell\Larasell\Catalog\Models\Category;
@@ -67,7 +69,7 @@ class ProductController
     {
         // With the sections' own fields, so a section that fails leaves no product behind.
         $product = DB::transaction(function () use ($request, $locale): Product {
-            $product = $this->createProduct->handle([
+            $product = $this->createProduct->handle(new CreateProductPayload([
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
                 'weight' => $request->weight(),
@@ -76,7 +78,7 @@ class ProductController
                 'barcode' => $request->validated('barcode'),
                 ...$request->stock(),
                 'price' => Price::of(0),
-            ]);
+            ], $request->attachments()));
 
             $this->saveRelations($request, $product);
             $this->saved($request, $product, true, $locale);
@@ -117,7 +119,7 @@ class ProductController
                 ? ['max_quantity' => $stock['max_quantity'], 'min_quantity' => $stock['min_quantity']]
                 : ['min_quantity' => $stock['min_quantity'], 'max_quantity' => $stock['max_quantity']];
 
-            $product = $this->updateProduct->handle(ProductId::of($product), [
+            $product = $this->updateProduct->handle(ProductId::of($product), new UpdateProductPayload([
                 'name' => $product->name->with($locale->value, $request->validated('name')),
                 'status' => $request->validated('status'),
                 'weight' => $request->weight(),
@@ -126,7 +128,7 @@ class ProductController
                 'barcode' => $request->validated('barcode'),
                 ...$limits,
                 ...array_diff_key($stock, $limits),
-            ]);
+            ], $request->attachments()));
 
             $this->saveRelations($request, $product);
             $this->saved($request, $product, false, $locale);
