@@ -85,3 +85,15 @@ it('refuses a URL another page uses, and saves nothing of the product', function
 
     expect($socks->fresh()->name->get())->toBe('Socks');
 });
+
+it('saves a custom path longer than 255 characters, since the core takes paths of any length', function () {
+    // Arrange
+    $path = 'sale/'.str_repeat('a', 300);
+
+    // Act
+    $this->post(route('larasell.admin.products.store'), productUrlsInput('Boots', [$this->europe => $path]))
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect(app(SeoUrlManager::class)->canonical(Product::query()->sole(), SalesContext::for('europe', 'en'))?->path)->toBe($path);
+});

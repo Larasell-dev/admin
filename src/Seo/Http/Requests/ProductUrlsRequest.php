@@ -22,7 +22,7 @@ class ProductUrlsRequest extends SectionRequest
         return [
             'urls' => ['array'],
             'urls.*' => ['array:path'],
-            'urls.*.path' => ['nullable', 'string', 'max:255'],
+            'urls.*.path' => ['nullable', 'string'],
         ];
     }
 
