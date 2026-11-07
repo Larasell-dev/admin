@@ -10,7 +10,7 @@ use Larasell\Admin\Platform\Tables\Attributes\UseModel;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Team\Actions\DeleteAdmin;
-use LogicException;
+use Larasell\Chronicle\Exceptions\StructuredLogicException;
 
 #[UseModel(Admin::class)]
 class Members extends Table
@@ -56,7 +56,11 @@ class Members extends Table
         $admin = auth('larasell-admin')->user();
 
         if (! $admin instanceof Admin) {
-            throw new LogicException('The team table runs actions only for a signed-in admin.');
+            throw new StructuredLogicException(
+                errorCode: 'larasell-admin.team.table-without-admin',
+                message: 'The team table runs actions only for a signed-in admin.',
+                why: 'The table is behind the panel\'s authentication, so an action without a signed-in admin is a bug.',
+            );
         }
 
         return $admin;

@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Larasell\Admin\Platform\Navigation\Data\NavigationItemData;
 use Larasell\Admin\Platform\Navigation\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Platform\Panel\Icon;
-use LogicException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class NavigationItem
@@ -128,7 +127,7 @@ class NavigationItem
         $this->navigation?->assertOpen($this->id());
 
         if ($this->navigation === null) {
-            throw new LogicException("Navigation item [{$this->id()}] was not registered through the navigation, so it cannot have children.");
+            throw InvalidNavigationItem::notRegistered($this->id());
         }
 
         $define(new NavigationGroup($this->navigation, $this->id()));
@@ -234,15 +233,15 @@ class NavigationItem
         $placements = count(array_filter([$this->position, $this->before, $this->after], fn (int|string|null $value): bool => $value !== null));
 
         if ($placements > 1) {
-            throw new LogicException("Navigation item [{$this->id()}] has more than one placement.");
+            throw InvalidNavigationItem::alreadyPlaced($this->id());
         }
 
         if ($this->position !== null && ($this->position < self::POSITION_MIN || $this->position > self::POSITION_MAX)) {
-            throw new LogicException("Navigation item [{$this->id()}] has a position outside its range.");
+            throw InvalidNavigationItem::positionOutOfRange($this->id(), $this->position, self::POSITION_MIN, self::POSITION_MAX);
         }
 
         if (in_array($this->id(), [$this->parent, $this->before, $this->after], true)) {
-            throw new LogicException("Navigation item [{$this->id()}] refers to itself.");
+            throw InvalidNavigationItem::selfTarget($this->id());
         }
     }
 

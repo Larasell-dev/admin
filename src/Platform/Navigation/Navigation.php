@@ -8,7 +8,7 @@ use Larasell\Admin\Platform\Navigation\Data\NavigationItemData;
 use Larasell\Admin\Platform\Navigation\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Table;
-use LogicException;
+use Larasell\Chronicle\Exceptions\StructuredLogicException;
 
 /**
  * The admin panel's sidebar navigation. Items are registered in any order and stay flat,
@@ -78,7 +78,7 @@ class Navigation
             $route = Route::index($uri, $table);
         });
 
-        $name = $route?->getName() ?? throw new LogicException("Index route [{$uri}] was not registered with a name.");
+        $name = $route?->getName() ?? throw InvalidNavigationItem::unnamedIndexRoute($uri);
 
         return $this->add($label, $name, $icon);
     }
@@ -236,7 +236,7 @@ class Navigation
     protected static function assert(bool $condition, string $message): void
     {
         if (! $condition) {
-            throw new LogicException($message);
+            throw new StructuredLogicException(errorCode: 'larasell-admin.navigation.invariant', message: $message);
         }
     }
 }

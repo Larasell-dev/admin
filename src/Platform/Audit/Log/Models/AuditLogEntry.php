@@ -5,7 +5,7 @@ namespace Larasell\Admin\Platform\Audit\Log\Models;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use LogicException;
+use Larasell\Chronicle\Exceptions\StructuredLogicException;
 
 /**
  * A stored audit record, read for the audit log page. Records are written by the Auditor and
@@ -48,7 +48,12 @@ class AuditLogEntry extends Model
 
     protected static function booted(): void
     {
-        $refuse = fn () => throw new LogicException('Audit records are append-only: record new ones with Auditor::record().');
+        $refuse = fn () => throw new StructuredLogicException(
+            errorCode: 'larasell-admin.audit.append-only',
+            message: 'Audit records are append-only: record new ones with Auditor::record().',
+            why: 'The audit log is evidence of what happened, so a stored record is never changed or deleted.',
+            fix: 'Record a new audit record with Auditor::record() instead.',
+        );
 
         static::saving($refuse);
         static::deleting($refuse);
