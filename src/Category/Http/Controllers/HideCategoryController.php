@@ -4,6 +4,7 @@ namespace Larasell\Admin\Category\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Larasell\Larasell\Catalog\Actions\UpdateCategory;
+use Larasell\Larasell\Catalog\Actions\UpdateCategoryPayload;
 use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Enums\Visibility;
@@ -15,7 +16,7 @@ class HideCategoryController
      */
     public function __invoke(Category $category, UpdateCategory $update): RedirectResponse
     {
-        $update->handle(CategoryId::of($category), ['status' => Visibility::Hidden]);
+        $update->handle(CategoryId::of($category), new UpdateCategoryPayload(status: Visibility::Hidden));
 
         return back();
     }

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Larasell\Admin\Category\Actions\MoveCategory;
-use Larasell\Admin\Category\Actions\MoveCategoryPayload;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Translatable;
@@ -26,38 +24,6 @@ function namesAndPositions(?Category $parent): array
         ->map(fn (Category $category): array => [$category->name->get(), $category->position])
         ->all();
 }
-
-it('moves a category into another at a position and numbers the new siblings from 0', function () {
-    // Arrange
-    $clothing = categoryToMove('Clothing');
-    categoryToMove('Shirts', $clothing);
-    categoryToMove('Trousers', $clothing);
-    $shoes = categoryToMove('Shoes');
-
-    // Act
-    app(MoveCategory::class)->handle($shoes, new MoveCategoryPayload(parentId: $clothing->id, position: 1));
-
-    // Assert
-    expect(namesAndPositions($clothing))->toBe([['Shirts', 0], ['Shoes', 1], ['Trousers', 2]])
-        ->and($shoes->fresh()->parent_id)->toBe($clothing->id);
-});
-
-it('moves a category last without a position or past its last sibling', function (?int $position) {
-    // Arrange
-    $clothing = categoryToMove('Clothing');
-    $shoes = categoryToMove('Shoes');
-    categoryToMove('Sale');
-
-    // Act
-    app(MoveCategory::class)->handle($clothing, new MoveCategoryPayload(parentId: null, position: $position));
-
-    // Assert
-    expect(namesAndPositions(null))->toBe([['Shoes', 0], ['Sale', 1], ['Clothing', 2]])
-        ->and($shoes->fresh()->position)->toBe(0);
-})->with([
-    'without a position' => [null],
-    'past the end' => [99],
-]);
 
 it('reads the parent and position from form input sent as strings', function () {
     // Arrange

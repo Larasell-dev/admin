@@ -4,33 +4,29 @@ namespace Larasell\Admin\Category\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Category\Actions\DeleteCategory;
 use Larasell\Admin\Category\Data\CategoriesPageData;
 use Larasell\Admin\Category\Data\CategoryData;
 use Larasell\Admin\Category\Data\CategoryDetailData;
 use Larasell\Admin\Category\Data\CategoryPageData;
 use Larasell\Admin\Category\Data\CreateCategoryPageData;
 use Larasell\Admin\Category\Data\MissingCategoryPageData;
-use Larasell\Admin\Category\Events\CategorySaved;
-use Larasell\Admin\Category\Exceptions\CategoryNotSavedAtomically;
 use Larasell\Admin\Category\Http\Requests\CategoryRequest;
+use Larasell\Admin\Category\Http\Requests\DeleteCategoryRequest;
 use Larasell\Admin\Category\Tables\CategoryProducts;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\Sections;
-use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Larasell\Catalog\Actions\CreateCategory;
+use Larasell\Larasell\Catalog\Actions\DeleteCategoryTree;
 use Larasell\Larasell\Catalog\Actions\UpdateCategory;
 use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -114,22 +110,12 @@ class CategoryController
     }
 
     /**
-     * Creates a category, inside its parent when given, with the name in the content locale.
+     * Creates a category, inside its parent when given, with the name in the content locale. The
+     * page's sections save with it, through the core action's events.
      */
     public function store(CategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create): RedirectResponse
     {
-        // With the sections' own fields, so a section that fails leaves no category behind.
-        $category = DB::transaction(function () use ($request, $locale, $create): Category {
-            $category = $create->handle([
-                'parent_id' => $request->validated('parent_id'),
-                'name' => Translatable::fromString($request->validated('name'), $locale->value),
-                'status' => $request->validated('status'),
-            ]);
-
-            $this->saved($request, $category, true, $locale);
-
-            return $category;
-        });
+        $category = $create->handle($request->createPayload($locale));
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -139,15 +125,7 @@ class CategoryController
      */
     public function update(CategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update): RedirectResponse
     {
-        // With the sections' own fields, so a section that fails leaves the category unchanged.
-        DB::transaction(function () use ($request, $category, $locale, $update): void {
-            $category = $update->handle(CategoryId::of($category), [
-                'name' => $category->name->with($locale->value, $request->validated('name')),
-                'status' => $request->validated('status'),
-            ]);
-
-            $this->saved($request, $category, false, $locale);
-        });
+        $update->handle(CategoryId::of($category), $request->updatePayload($category, $locale));
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -156,9 +134,9 @@ class CategoryController
      * Deletes the category with all categories below it. Goes back, unless the previous page
      * was one of the deleted categories.
      */
-    public function destroy(Request $request, Category $category, DeleteCategory $delete): RedirectResponse
+    public function destroy(DeleteCategoryRequest $request, Category $category, DeleteCategoryTree $delete): RedirectResponse
     {
-        $delete->handle($category, $request->string('confirmation')->value() ?: null);
+        $delete->handle(CategoryId::of($category));
 
         try {
             $previous = Route::getRoutes()->match(Request::create(url()->previous()));
@@ -173,17 +151,6 @@ class CategoryController
         }
 
         return back();
-    }
-
-    /**
-     * Lets the page's sections save their own fields, in the same transaction.
-     */
-    protected function saved(CategoryRequest $request, Category $category, bool $created, Locale $locale): void
-    {
-        // The promise CategorySaved documents, and asserts again: its listeners run in the save's transaction.
-        Assert::that(DB::transactionLevel() > 0, CategoryNotSavedAtomically::outsideTransaction(...));
-
-        event(new CategorySaved($category, $created, new SectionContext($locale), $request->sections()));
     }
 
     /**

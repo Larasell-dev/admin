@@ -9,9 +9,14 @@ use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\SectionRequests;
 use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Larasell\Attachments\Attachments;
+use Larasell\Larasell\Catalog\Actions\CreateCategoryPayload;
+use Larasell\Larasell\Catalog\Actions\UpdateCategoryPayload;
+use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Translatable;
 
 class CategoryRequest extends FormRequest
 {
@@ -30,6 +35,31 @@ class CategoryRequest extends FormRequest
         ];
     }
 
+    /**
+     * A new category with its name in the content locale, inside its parent when given.
+     */
+    public function createPayload(Locale $locale): CreateCategoryPayload
+    {
+        return new CreateCategoryPayload(
+            name: Translatable::fromString($this->validated('name'), $locale->value),
+            status: Visibility::from($this->validated('status')),
+            parentId: $this->validated('parent_id') === null ? null : new CategoryId((int) $this->validated('parent_id')),
+            attachments: new Attachments(...$this->sections()->payloads()),
+        );
+    }
+
+    /**
+     * The category's name in the content locale, keeping its other translations.
+     */
+    public function updatePayload(Category $category, Locale $locale): UpdateCategoryPayload
+    {
+        return new UpdateCategoryPayload(
+            name: $category->name->with($locale->value, $this->validated('name')),
+            status: Visibility::from($this->validated('status')),
+            attachments: new Attachments(...$this->sections()->payloads()),
+        );
+    }
+
     protected function prepareForValidation(): void
     {
         $this->sections()->prepare($this);
@@ -46,7 +76,7 @@ class CategoryRequest extends FormRequest
     }
 
     /**
-     * The requests of the page's sections, which the category's saved event hands to them.
+     * The requests of the page's sections, whose payloads go along with the core's actions.
      */
     public function sections(): SectionRequests
     {

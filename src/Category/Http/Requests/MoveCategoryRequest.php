@@ -6,7 +6,8 @@ use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Larasell\Admin\Category\Actions\MoveCategoryPayload;
+use Larasell\Larasell\Catalog\Actions\MoveCategoryPayload;
+use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\Models\Category;
 
 class MoveCategoryRequest extends FormRequest
@@ -34,7 +35,7 @@ class MoveCategoryRequest extends FormRequest
     public function payload(): MoveCategoryPayload
     {
         return new MoveCategoryPayload(
-            parentId: $this->filled('parent_id') ? $this->integer('parent_id') : null,
+            parentId: $this->filled('parent_id') ? new CategoryId($this->integer('parent_id')) : null,
             position: $this->filled('position') ? $this->integer('position') : null,
         );
     }

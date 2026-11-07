@@ -49,6 +49,6 @@ class SeoUrlsRequest extends SectionRequest
             $paths[(int) $channelId] = $path === '' ? null : $path;
         }
 
-        return new SeoUrlsPayload($paths);
+        return new SeoUrlsPayload($this->context()->locale, $paths);
     }
 }
