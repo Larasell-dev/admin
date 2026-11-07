@@ -8,6 +8,7 @@ import { goToCommand } from "./Platform/Panel/Components/CommandMenu/goToCommand
 import { logOutCommand } from "./Platform/Panel/Components/CommandMenu/logOutCommand";
 import { themeCommand } from "./Platform/Panel/Components/CommandMenu/themeCommand";
 import { interfaceLocaleCommand } from "./Platform/Panel/Components/CommandMenu/interfaceLocaleCommand";
+import { ErrorBoundary } from "./Platform/Panel/Components/ErrorBoundary";
 import { ThemeChangedToasts } from "./Platform/Panel/Components/Shell/ThemeChangedToast";
 import { extensions, Larasell, SectionForm } from "./extensions";
 import { sharedModules } from "./sharedModules";
@@ -95,12 +96,22 @@ window.LarasellAdmin = {
         },
         setup({ el, App, props }) {
           createRoot(el).render(
-            <AppHotkeysProvider>
-              <ToastProvider>
-                <App {...props} />
-                <ThemeChangedToasts />
-              </ToastProvider>
-            </AppHotkeysProvider>,
+            // The last resort, for crashes outside a page's layout, such as in a guest page or the
+            // sidebar. Nothing reliable is left to keep, so it fills the screen.
+            <ErrorBoundary
+              frame={(crashed) => (
+                <main className="flex min-h-dvh items-center justify-center bg-base-canvas px-6 py-12">
+                  {crashed}
+                </main>
+              )}
+            >
+              <AppHotkeysProvider>
+                <ToastProvider>
+                  <App {...props} />
+                  <ThemeChangedToasts />
+                </ToastProvider>
+              </AppHotkeysProvider>
+            </ErrorBoundary>,
           );
         },
       }),

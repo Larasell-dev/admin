@@ -2,15 +2,18 @@
 
 namespace Larasell\Admin;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RouteDefinition;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\ValidationException;
 use Inertia\ExceptionResponse;
 use Larasell\Admin\ApiToken\ApiTokenServiceProvider;
 use Larasell\Admin\Category\CategoryServiceProvider;
@@ -54,6 +57,7 @@ use Laravel\Head\HeadServiceProvider;
 use Laravel\Pennant\PennantServiceProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Throwable;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -115,7 +119,7 @@ class AdminServiceProvider extends ServiceProvider
             ->withHead(title: AdminPanel::TITLE)
             ->group(__DIR__.'/../routes/web.php');
 
-        $this->renderNotFoundPage();
+        $this->renderErrorPage();
 
         $this->loadApplicationExtensions($this->app->make(AdminPanel::class));
 
@@ -170,35 +174,52 @@ class AdminServiceProvider extends ServiceProvider
     }
 
     /**
-     * Admin pages that 404, such as unknown admin addresses (the fallback route) or editing an
-     * admin that does not exist, show the panel's 404 page: inside the sidebar for signed-in
-     * admins, on its own for guests. Other requests keep the application's 404.
+     * Admin pages that fail with a 403, 404, 500 or 503, such as unknown admin addresses (the
+     * fallback route) or editing an admin that does not exist, show the panel's error page:
+     * inside the sidebar for signed-in admins, on its own for guests. Server errors keep
+     * Laravel's stack trace while debugging. Other requests keep the application's response.
      *
      * A renderable rather than Inertia::handleExceptionsUsing(), which takes the exception
      * handler's only respondUsing() slot and so would replace the application's own callback.
      */
-    private function renderNotFoundPage(): void
+    private function renderErrorPage(): void
     {
         $this->callAfterResolving(ExceptionHandler::class, function (ExceptionHandler $handler): void {
             if (! $handler instanceof Handler) {
                 return;
             }
 
-            $handler->renderable(function (HttpExceptionInterface $exception, Request $request) {
-                if ($exception->getStatusCode() !== 404
+            $handler->renderable(function (Throwable $exception, Request $request) {
+                // The handler turns these into responses of their own, such as validation errors.
+                if ($exception instanceof AuthenticationException
+                    || $exception instanceof ValidationException
+                    || $exception instanceof HttpResponseException) {
+                    return null;
+                }
+
+                $status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+
+                if (! in_array($status, [403, 404, 500, 503], true)
+                    || ($status >= 500 && config('app.debug'))
                     || ! $request->isMethod('GET')
                     || $request->expectsJson()
                     || ! $request->route()?->named('larasell.admin.*')) {
                     return null;
                 }
 
-                Head::title(__('Page not found'));
+                Head::title(match ($status) {
+                    403 => __('Access denied'),
+                    404 => __('Page not found'),
+                    500 => __('Something went wrong'),
+                    503 => __('Temporarily unavailable'),
+                });
 
-                return (new ExceptionResponse($exception, $request, new Response(status: 404), app(Router::class), app(Kernel::class)))
+                return (new ExceptionResponse($exception, $request, new Response(status: $status), app(Router::class), app(Kernel::class)))
                     ->usingMiddleware(HandleAdminInertiaRequests::class)
-                    ->render(Auth::guard('larasell-admin')->check() ? 'Platform/Panel/Pages/NotFound' : 'Platform/Panel/Pages/GuestNotFound')
+                    ->render(Auth::guard('larasell-admin')->check() ? 'Platform/Panel/Pages/Error' : 'Platform/Panel/Pages/GuestError', ['status' => $status])
                     ->withSharedData()
-                    ->toResponse($request);
+                    ->toResponse($request)
+                    ->setStatusCode($status);
             });
         });
     }

@@ -27,29 +27,29 @@ Inertia::render('Product/Pages/Edit', $props);
 <details>
 <summary>All renamed pages</summary>
 
-| Before                | After                                |
-| --------------------- | ------------------------------------ |
-| `ApiToken/Create`     | `ApiToken/Pages/Create`              |
-| `ApiToken/Index`      | `ApiToken/Pages/Index`               |
-| `AuditLog/Index`      | `Platform/Audit/Pages/Index`         |
-| `Category/Create`     | `Category/Pages/Create`              |
-| `Category/Index`      | `Category/Pages/Index`               |
-| `Category/Show`       | `Category/Pages/Show`                |
-| `Customer/Create`     | `Customer/Pages/Create`              |
-| `Customer/Edit`       | `Customer/Pages/Edit`                |
-| `GuestNotFound`       | `Platform/Panel/Pages/GuestNotFound` |
-| `Home`                | `Platform/Panel/Pages/Home`          |
-| `Login`               | `Platform/Auth/Pages/Login`          |
-| `NotFound`            | `Platform/Panel/Pages/NotFound`      |
-| `Order/Show`          | `Order/Pages/Show`                   |
-| `Product/Create`      | `Product/Pages/Create`               |
-| `Product/Edit`        | `Product/Pages/Edit`                 |
-| `Profile`             | `Team/Pages/Profile`                 |
-| `SalesChannel/Create` | `SalesChannel/Pages/Create`          |
-| `SalesChannel/Edit`   | `SalesChannel/Pages/Edit`            |
-| `TablePage`           | `Platform/Tables/Pages/TablePage`    |
-| `Team/Create`         | `Team/Pages/Create`                  |
-| `Team/Edit`           | `Team/Pages/Edit`                    |
-| `Team/Index`          | `Team/Pages/Index`                   |
+| Before                | After                             |
+| --------------------- | --------------------------------- |
+| `ApiToken/Create`     | `ApiToken/Pages/Create`           |
+| `ApiToken/Index`      | `ApiToken/Pages/Index`            |
+| `AuditLog/Index`      | `Platform/Audit/Pages/Index`      |
+| `Category/Create`     | `Category/Pages/Create`           |
+| `Category/Index`      | `Category/Pages/Index`            |
+| `Category/Show`       | `Category/Pages/Show`             |
+| `Customer/Create`     | `Customer/Pages/Create`           |
+| `Customer/Edit`       | `Customer/Pages/Edit`             |
+| `GuestNotFound`       | `Platform/Panel/Pages/GuestError` |
+| `Home`                | `Platform/Panel/Pages/Home`       |
+| `Login`               | `Platform/Auth/Pages/Login`       |
+| `NotFound`            | `Platform/Panel/Pages/Error`      |
+| `Order/Show`          | `Order/Pages/Show`                |
+| `Product/Create`      | `Product/Pages/Create`            |
+| `Product/Edit`        | `Product/Pages/Edit`              |
+| `Profile`             | `Team/Pages/Profile`              |
+| `SalesChannel/Create` | `SalesChannel/Pages/Create`       |
+| `SalesChannel/Edit`   | `SalesChannel/Pages/Edit`         |
+| `TablePage`           | `Platform/Tables/Pages/TablePage` |
+| `Team/Create`         | `Team/Pages/Create`               |
+| `Team/Edit`           | `Team/Pages/Edit`                 |
+| `Team/Index`          | `Team/Pages/Index`                |
 
 </details>
