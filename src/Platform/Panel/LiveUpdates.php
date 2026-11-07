@@ -19,7 +19,8 @@ final class LiveUpdates
             return null;
         }
 
-        $options = $connection['options'] ?? [];
+        // Where browsers connect, when that's not where the server sends its broadcasts, e.g. behind a proxy.
+        $options = [...($connection['options'] ?? []), ...array_filter(config('larasell.admin.panel.live', []), fn (mixed $value): bool => $value !== null)];
         $tls = ($options['scheme'] ?? 'https') === 'https';
 
         return array_filter([
