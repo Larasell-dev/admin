@@ -116,7 +116,6 @@
   "System: :id": "System: :id",
   "Tax": "Steuer",
   "Team": "Team",
-  "The :attribute may only contain lowercase letters, numbers, and single dashes between them.": ":attribute darf nur Kleinbuchstaben, Zahlen und einzelne Bindestriche dazwischen enthalten.",
   "The :attribute must be a number of 0 or more, with a dot for decimals.": ":attribute muss eine Zahl ab 0 sein, mit Punkt als Dezimaltrennzeichen.",
   "The default currency must be one the channel sells in.": "Die Standardwährung muss eine der Währungen des Kanals sein.",
   "The default language must be one the channel sells in.": "Die Standardsprache muss eine der Sprachen des Kanals sein.",
