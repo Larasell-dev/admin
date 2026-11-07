@@ -8,7 +8,7 @@ use Larasell\Admin\Category\Events\CategorySaved;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Seo\Http\Requests\SeoUrlsRequest;
-use Larasell\Larasell\Seo\InvalidSeoPath;
+use Larasell\Larasell\Seo\Exceptions\InvalidSeoPath;
 use Larasell\Larasell\Seo\SeoUrlManager;
 
 /**

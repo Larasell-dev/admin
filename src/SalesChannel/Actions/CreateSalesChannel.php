@@ -4,7 +4,7 @@ namespace Larasell\Admin\SalesChannel\Actions;
 
 use Illuminate\Validation\ValidationException;
 use Larasell\Larasell\SalesChannels\Actions\CreateSalesChannel as CoreCreateSalesChannel;
-use Larasell\Larasell\SalesChannels\InvalidSalesChannel;
+use Larasell\Larasell\SalesChannels\Exceptions\InvalidSalesChannel;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 
 class CreateSalesChannel
