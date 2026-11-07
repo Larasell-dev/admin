@@ -299,6 +299,56 @@ declare namespace Larasell.Admin.Product.Enums {
     | "weight-and-dimensions"
     | "identifiers";
 }
+declare namespace Larasell.Admin.SalesChannel.Data {
+  export type CreateSalesChannelPageData = {
+    storeUrl: string;
+    types: Array<string>;
+    locales: Array<Larasell.Admin.SalesChannel.Data.SalesChannelOptionData>;
+    currencies: Array<Larasell.Admin.SalesChannel.Data.SalesChannelOptionData>;
+  };
+  export type EditSalesChannelPageData = {
+    channel: Larasell.Admin.SalesChannel.Data.SalesChannelData;
+    updateUrl: string;
+    destroyUrl: string;
+    locales: Array<Larasell.Admin.SalesChannel.Data.SalesChannelOptionData>;
+    currencies: Array<Larasell.Admin.SalesChannel.Data.SalesChannelOptionData>;
+    entryPoints: Array<Larasell.Admin.SalesChannel.Data.EntryPointData> | null;
+    addEntryPointUrl: string | null;
+  };
+  export type EntryPointData = {
+    id: number;
+    url: string;
+    domain: string;
+    locale: string;
+    defaultCurrency: string | null;
+    primary: boolean;
+    destroyUrl: string;
+  };
+  export type SalesChannelData = {
+    id: number;
+    key: string;
+    name: string;
+    type: string;
+    locales: Array<string>;
+    currencies: Array<string>;
+    defaultLocale: string;
+    defaultCurrency: string;
+    active: boolean;
+  };
+  export type SalesChannelLinkData = {
+    id: number;
+    name: string;
+    url: string;
+  };
+  export type SalesChannelNavigationData = {
+    channels: Array<Larasell.Admin.SalesChannel.Data.SalesChannelLinkData>;
+    createUrl: string;
+  };
+  export type SalesChannelOptionData = {
+    value: string;
+    label: string;
+  };
+}
 declare namespace Larasell.Admin.Team.Data {
   export type AdminData = {
     name: string;

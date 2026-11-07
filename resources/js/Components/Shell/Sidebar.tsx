@@ -1,6 +1,6 @@
 import { Link, usePage } from "@inertiajs/react";
 import { Icon, IconButton } from "@larasell-dev/ui";
-import { ArrowRightSLine } from "@larasell-dev/ui/icons";
+import { AddLine, ArrowRightSLine } from "@larasell-dev/ui/icons";
 import { motion } from "motion/react";
 import { Fragment, type ReactNode, useId, useState } from "react";
 import { RovingFocusGroup, RovingFocusItem } from "@roving-focus/react";
@@ -77,6 +77,7 @@ export default function Sidebar({ frozen = false }: { frozen?: boolean }) {
             </Fragment>
           );
         })}
+        {props.salesChannels && <SalesChannels navigation={props.salesChannels} url={page.url} />}
       </RovingFocusGroup>
 
       <UserMenu />
@@ -105,6 +106,7 @@ function NavigationLink({
         <Link
           href={item.url}
           aria-current={active ? "page" : undefined}
+          data-sidebar-row
           className={cn(
             // Row
             "type-body-md flex items-center gap-3 px-6 py-2",
@@ -128,6 +130,68 @@ function NavigationLink({
       </RovingFocusItem>
       {toggle && <div className="absolute top-0 right-0 flex items-center">{toggle}</div>}
     </div>
+  );
+}
+
+/**
+ * The sales channels below the navigation, under a header with a link that adds one. A channel's
+ * row stays current on all of its pages, e.g. `/admin/sales-channels/3/edit`.
+ */
+function SalesChannels({
+  navigation,
+  url,
+}: {
+  navigation: Larasell.Admin.SalesChannel.Data.SalesChannelNavigationData;
+  url: string;
+}) {
+  const headingId = useId();
+  const path = pathOf(url);
+
+  return (
+    <section aria-labelledby={headingId} className="pt-4">
+      <div data-sidebar-row className="flex items-center justify-between py-1 pl-6">
+        <h2 id={headingId} className="type-label-sm text-base-tertiary">
+          <fbt desc="Sidebar: header of the section that lists the shop's sales channels, such as its storefronts">
+            Sales channels
+          </fbt>
+        </h2>
+        <RovingFocusItem asChild>
+          <IconButton
+            variant="tertiary"
+            size="sm"
+            aria-label={fbs(
+              "Add sales channel",
+              "Sidebar: accessible name of the plus button next to the sales channels header, which opens the form to add a sales channel",
+            )}
+            render={<Link href={navigation.createUrl} />}
+            DANGEROUS_className="focus-visible:-outline-offset-2"
+          >
+            <Icon icon={AddLine} />
+          </IconButton>
+        </RovingFocusItem>
+      </div>
+      <ul>
+        {navigation.channels.map((channel) => {
+          const channelPath = pathOf(channel.url).replace(/\/edit$/, "");
+          const active = path === channelPath || isUnder(path, channelPath);
+
+          return (
+            <li key={channel.id}>
+              <NavigationLink
+                item={{
+                  id: `sales-channel-${channel.id}`,
+                  label: channel.name,
+                  url: channel.url,
+                  icon: "Store",
+                  children: [],
+                }}
+                active={active}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 

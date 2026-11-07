@@ -15,6 +15,7 @@ const MODULE_DEPENDENCIES = [
     'Order' => [],
     // The product form picks categories with the Category module's options.
     'Product' => ['Category'],
+    'SalesChannel' => [],
     'Team' => [],
 ];
 

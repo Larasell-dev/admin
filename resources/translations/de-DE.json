@@ -3355,6 +3355,589 @@
         }
       ],
       "types": []
+    },
+    "lNvrHInC+iUxd+x+FWEeiA==": {
+      "description": "New sales channel page: title of the page with the form that adds a sales channel, such as a storefront",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Verkaufskanal",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4CIGU880DRYT0u00TaWmLg==": {
+      "description": "Sales channel page: heading of the last section, with the button that deletes the channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkaufskanal löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1EMgMEzlzHvJtDfG3bZ7Fw==": {
+      "description": "Sales channel page: explains the section with the button that deletes the channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunden erreichen den Kanal nicht mehr. Kanäle mit Bestellungen oder Warenkörben lassen sich nur deaktivieren.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0BT0Zdbs4B+xyQ5BkbO7cg==": {
+      "description": "Sales channel page: button in the delete section, below the currencies, that asks to delete the channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SU6MozZn+/7XsqW699GK3g==": {
+      "description": "Sales channel page: title of the dialog that asks to confirm deleting the channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkaufskanal löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kVS1StWIozuh7xXPvMf0yQ==": {
+      "description": "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunden erreichen {channelName} nicht mehr. Das lässt sich nicht rückgängig machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0HmnWwjsXn2OWXHx+htyAA==": {
+      "description": "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib „{channelName}“ zur Bestätigung ein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Wh5V3qDNWBDNDvjAAL0Ynw==": {
+      "description": "Sales channel page: button that closes the delete dialog without deleting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yvYz3C5KR6D7D++qSDgFxA==": {
+      "description": "Sales channel page: button in the dialog that deletes the channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tQwXx11mb6YPeowtpL5iow==": {
+      "description": "Sidebar: header of the section that lists the shop's sales channels, such as its storefronts",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkaufskanäle",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TmWpcpgkix2Ur/2Y5v+i+g==": {
+      "description": "Sidebar: accessible name of the plus button next to the sales channels header, which opens the form to add a sales channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkaufskanal hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XdliREGymaT331FPaYjn7A==": {
+      "description": "Sales channel page: heading of the section with the URLs a storefront is reached through",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Domains",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XmklDxDshvDm5jPmYqPDdw==": {
+      "description": "Sales channel page: explains the domains section; a primary domain is the one links in its language point to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die URLs, unter denen Kunden die Storefront öffnen, je eine Sprache. Auf jeder können Kunden zwischen den Währungen des Kanals wechseln. Links in einer Sprache nutzen ihre primäre Domain.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "16B7ApvIt/wy1CrIg3J34w==": {
+      "description": "Sales channel page: badge on the domain that links in its language and currency use",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Primär",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7J7+OlFx5ioTJav0HeZNvg==": {
+      "description": "Sales channel page: under a domain, the currency its visits start in, e.g. 'Starts in Swiss Franc'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Startet in {currency}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oafgzInR03vFfIA2RYfOzA==": {
+      "description": "Sales channel page: accessible name of the button on a domain that deletes it, e.g. 'Delete https://shop.example/de'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{url} löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cWq3PTtkJaSlDNXw3u5TxQ==": {
+      "description": "Sales channel page: shown in the domains section while the storefront has none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Storefront hat keine Domains, Kunden erreichen sie also noch nicht.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4tTlzgQf13/NYz6rSb1tdA==": {
+      "description": "Sales channel page: button below the domains that opens the dialog to add one",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Domain hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vf03yvk3BvSSpuqiDfSKWw==": {
+      "description": "Sales channel page: title of the dialog that adds a URL the storefront is reached through",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Domain hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fygKwa089akAgzMAq4fGsg==": {
+      "description": "Add domain dialog: reminds the admin that the domain's DNS must already lead to the shop",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Richte die Domain zuerst auf diesen Shop aus; Larasell prüft weder DNS noch Zertifikat.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "K6ZnBCYHGW78F5nOKsXh3Q==": {
+      "description": "Add domain dialog: label of the field for the URL, a host with an optional path",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "URL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IIvh3dsZ5Fyz9y9pR2g2lw==": {
+      "description": "Add domain dialog: hint below the URL field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein Host, mit Pfad für mehrere Sprachen auf einem Host, z. B. https://shop.example/de.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "olFfnLQoGaJM8YRNk/Fw0g==": {
+      "description": "Add domain dialog: label of the select for the language the domain shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2rOGk/rgFqHEvdZpbYBkaQ==": {
+      "description": "Add domain dialog: label of the optional select for the currency visits through the domain start in; visitors can still switch",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Startwährung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X0kHRy2qt2TjkE0K5J6gTg==": {
+      "description": "Add domain dialog: hint below the starting currency select",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunden können zu jeder Währung des Kanals wechseln.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QZcY1aQs2m80MRFOk3VfXg==": {
+      "description": "Add domain dialog: first option of the starting currency select, which uses the channel's default currency, e.g. 'Channel default (Swiss Franc)'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Standard des Kanals ({currency})",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "h+IxUasLzJPXcUxDSeXK8Q==": {
+      "description": "Add domain dialog: checkbox that makes links in the domain's language and currency use it; the first domain of them is primary anyway",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Als primär festlegen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N6Xbxq9ZW8ZzmKyBygTxQA==": {
+      "description": "Add domain dialog: button that closes it without adding",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e/NqvIdn0i8BxYSfgAEj+Q==": {
+      "description": "Add domain dialog: button that adds the domain",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xPScuzTGHNKnDzxhdpa6gg==": {
+      "description": "Sales channel page: title of the dialog that asks to confirm deleting a domain",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Domain löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hVc4J5mVZSRJpa2zfT8Aog==": {
+      "description": "Sales channel page: explains what deleting a domain does, e.g. 'Customers can no longer open the storefront at https://shop.example/de.'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunden können die Storefront unter {url} nicht mehr öffnen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GUk6gQ7epBCU5jcbs5SXfQ==": {
+      "description": "Delete domain dialog: label of the field the admin types the domain into, without https://, to confirm, e.g. 'Type \"shop.example/de\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib „{domain}“ zur Bestätigung ein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sqY389Erq+vgDPYalTLe+g==": {
+      "description": "Delete domain dialog: button that closes it without deleting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OXN6IdvFehvYbZ6U7NH2Tw==": {
+      "description": "Delete domain dialog: button that deletes the domain",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RqYL+8jzc5vWviwnVF5jiQ==": {
+      "description": "Sales channel form: heading of the section with the channel's name, key and whether it's active",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YvdGOwheEqddF/bz0jvOzg==": {
+      "description": "Sales channel form: explains the section with the channel's name and key",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie der Kanal hier und im Code heißt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "km6yV3KvewyWQIPr7FtwAQ==": {
+      "description": "Sales channel form: label of the field for the channel's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gXgIlWWyJ31P0okW2lqeEg==": {
+      "description": "Sales channel form: label of the field for the channel's key, the name code uses for it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schlüssel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+pFQ3RjuPaO8E6TI//UCiA==": {
+      "description": "Sales channel form: hint below the read-only key of an existing channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Code verweist über den Schlüssel auf den Kanal, daher kann er sich nicht ändern.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JiIMq/4Pq6CvEJwe/6dJjQ==": {
+      "description": "Sales channel form: hint below the key field of a new channel, listing its rules",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kleinbuchstaben und Ziffern, verbunden durch - oder _. Lässt sich später nicht ändern.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tFRKvY+Ui9oKTOO5yNLkRA==": {
+      "description": "Sales channel form: label of the select for the kind of channel, e.g. storefront",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Typ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "glGR09QXYZxBO61gqmwbfg==": {
+      "description": "Sales channel form: label of the checkbox that lets customers buy through the channel",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktiv",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6QM9oNvmhXvD5IYir88UCg==": {
+      "description": "Sales channel form: heading of the section with the languages the channel sells in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprachen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "k7fncb+aHZG3kRs47ph4Xw==": {
+      "description": "Sales channel form: explains the languages section; the options are configured in larasell.locale.supported",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Sprachen, in denen Kunden einkaufen können. Sie stammen aus den unterstützten Sprachen des Shops.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fDGaixDVB96G80vTulIgIg==": {
+      "description": "Sales channel form: label of the field that picks the languages the channel can sell in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkauft in",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/fY6gMTWMowwfr5jlOULKQ==": {
+      "description": "Sales channel form: label of the select for the language the channel uses when a customer picks none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Standardsprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "93Pg3axTFt1LDLvXVqghUg==": {
+      "description": "Sales channel form: heading of the section with the currencies the channel sells in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Währungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FnsjBa0SO8BjTLZkFHGeWw==": {
+      "description": "Sales channel form: explains the currencies section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Währungen, in denen Kunden bezahlen können. Sie stammen aus den in den Einstellungen aktivierten Währungen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EnYibzymqZ0oCqpuHV3w2A==": {
+      "description": "Sales channel form: label of the field that picks the currencies the channel can sell in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkauft in",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yaN+1m8eMiIWzKVKMigEGw==": {
+      "description": "Sales channel form: label of the select for the currency prices are shown in first",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Standardwährung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nzV4V65POZvm4O97nbS0uA==": {
+      "description": "Sales channel form: placeholder of the field that picks the channel's languages or currencies, which typing searches",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "J7mpf72wvyGUdQvYE3PJlQ==": {
+      "description": "Sales channel form: shown in the list of languages or currencies when the typed text matches none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Treffer",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Du2p1YnZSGVIc9zaz3HeIQ==": {
+      "description": "Sales channel form: accessible name of the button on a picked language or currency that removes it, e.g. 'Remove Euro (EUR)'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{item} entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
