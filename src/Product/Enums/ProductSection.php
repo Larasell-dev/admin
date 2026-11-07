@@ -16,8 +16,6 @@ enum ProductSection: string
     /** The name and visibility. */
     case General = 'general';
 
-    case Images = 'images';
-
     case Categories = 'categories';
 
     /** The stock level, backorders and order quantity limits. */

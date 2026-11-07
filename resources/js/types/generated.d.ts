@@ -250,7 +250,6 @@ declare namespace Larasell.Admin.Product.Data {
     indexUrl: string;
     categories: Array<Larasell.Admin.Category.Data.CategoryOptionData>;
     createCategoryUrl: string | null;
-    uploadImagesUrl: string;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
   };
   export type DimensionsData = {
@@ -265,7 +264,6 @@ declare namespace Larasell.Admin.Product.Data {
     indexUrl: string;
     categories: Array<Larasell.Admin.Category.Data.CategoryOptionData>;
     createCategoryUrl: string | null;
-    uploadImagesUrl: string;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
   };
   export type ProductDetailData = {
@@ -282,13 +280,6 @@ declare namespace Larasell.Admin.Product.Data {
     minQuantity: number | null;
     maxQuantity: number | null;
     categoryIds: Array<number>;
-    images: Array<Larasell.Admin.Product.Data.ProductImageData>;
-  };
-  export type ProductImageData = {
-    id: number;
-    url: string;
-    filename: string;
-    alt: string | null;
   };
   export type WeightData = {
     amount: string;
@@ -298,7 +289,6 @@ declare namespace Larasell.Admin.Product.Data {
 declare namespace Larasell.Admin.Product.Enums {
   export type ProductSection =
     | "general"
-    | "images"
     | "categories"
     | "stock"
     | "weight-and-dimensions"

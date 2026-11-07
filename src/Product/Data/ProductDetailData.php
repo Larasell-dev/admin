@@ -28,8 +28,6 @@ class ProductDetailData extends Data
         public ?int $maxQuantity,
         /** @var int[] */
         public array $categoryIds,
-        /** @var ProductImageData[] In the product's order, so the first is its thumbnail. */
-        public array $images,
     ) {}
 
     public static function fromModel(Product $product, Locale $locale): self
@@ -51,7 +49,6 @@ class ProductDetailData extends Data
             minQuantity: $product->min_quantity,
             maxQuantity: $product->max_quantity,
             categoryIds: $product->categories()->orderBy($categoryKey)->pluck($categoryKey)->all(),
-            images: $product->images->map(ProductImageData::fromModel(...))->all(),
         );
     }
 }

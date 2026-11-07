@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
-use Larasell\Larasell\Catalog\Models\ProductImage;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
@@ -118,8 +115,7 @@ it('shows the page for adding a product', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Pages/Create')
             ->where('storeUrl', route('larasell.admin.products.store'))
-            ->where('indexUrl', route('larasell.admin.products.index'))
-            ->where('uploadImagesUrl', route('larasell.admin.products.images.store')));
+            ->where('indexUrl', route('larasell.admin.products.index')));
 });
 
 it('creates a product and opens it', function (Visibility $status) {
@@ -169,11 +165,9 @@ it('shows the product\'s values to edit on its page', function () {
                 'minQuantity' => null,
                 'maxQuantity' => null,
                 'categoryIds' => [],
-                'images' => [],
             ])
             ->where('updateUrl', route('larasell.admin.products.update', $boots))
-            ->where('indexUrl', route('larasell.admin.products.index'))
-            ->where('uploadImagesUrl', route('larasell.admin.products.images.store')));
+            ->where('indexUrl', route('larasell.admin.products.index')));
 });
 
 it('shows the product\'s weight and dimensions in the units they were saved in', function () {
@@ -703,211 +697,6 @@ it('rejects categories that do not exist', function (mixed $categories, string $
     'not an id' => [['shoes'], 'categories.0'],
 ]);
 
-it('shows the product\'s images on its page in their order, whatever order they were added in', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
-    $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
-    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png'), 'alt' => 'Boots from the front']);
-    $boots->images()->attach([$side->id => ['position' => 1], $front->id => ['position' => 0]]);
-
-    // Act & Assert
-    $this->get(route('larasell.admin.products.edit', $boots))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('product.images', [
-                // Named after the stored file, which is what opening it shows.
-                ['id' => $front->id, 'url' => $front->url(), 'filename' => basename($front->file), 'alt' => 'Boots from the front'],
-                ['id' => $side->id, 'url' => $side->url(), 'filename' => basename($side->file), 'alt' => null],
-            ]));
-});
-
-it('uploads an image without linking it to a product', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    // Act
-    $response = $this->postJson(route('larasell.admin.products.images.store'), [
-        'image' => UploadedFile::fake()->image('back.webp'),
-    ])->assertCreated();
-
-    // Assert
-    $image = ProductImage::query()->sole();
-
-    // The file is stored under a new name, but keeps its type.
-    expect(pathinfo($image->file, PATHINFO_EXTENSION))->toBe('webp')
-        // Saving a product links it; uploading doesn't.
-        ->and($image->products()->exists())->toBeFalse();
-
-    $response->assertExactJson(['image' => ['id' => $image->id, 'url' => $image->url(), 'filename' => basename($image->file), 'alt' => null]]);
-    Storage::disk('public')->assertExists($image->file);
-});
-
-it('links the submitted images to a product in their order, the first as its thumbnail', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    [$front, $side, $back] = collect(['front.png', 'side.png', 'back.png'])
-        ->map(fn (string $name) => ProductImage::create(['file' => UploadedFile::fake()->image($name)]));
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
-    $boots->images()->attach($front, ['position' => 0]);
-    $valid = ['name' => 'Boots', 'status' => 'visible'];
-
-    // Act
-    // Out of id order, and the existing image moves from first to second.
-    $this->put(route('larasell.admin.products.update', $boots), [...$valid, 'images' => [(string) $back->id, (string) $front->id, (string) $side->id]])
-        ->assertSessionHasNoErrors();
-
-    // Assert
-    expect($boots->images()->get()->modelKeys())->toBe([$back->id, $front->id, $side->id])
-        ->and($boots->fresh()?->thumbnail?->id)->toBe($back->id);
-
-    // The form leaves the field out when the product has no images.
-    $this->put(route('larasell.admin.products.update', $boots), $valid)->assertSessionHasNoErrors();
-
-    // Removing images only unlinks them; the images and their files stay.
-    expect($boots->images()->exists())->toBeFalse()
-        ->and(ProductImage::query()->count())->toBe(3);
-    Storage::disk('public')->assertExists([$front->file, $side->file, $back->file]);
-});
-
-it('links the submitted images to a new product in their order', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
-    $side = ProductImage::create(['file' => UploadedFile::fake()->image('side.png')]);
-
-    // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'images' => [(string) $side->id, (string) $front->id]])
-        ->assertSessionHasNoErrors();
-
-    // Assert
-    expect(Product::query()->sole()->images->modelKeys())->toBe([$side->id, $front->id]);
-});
-
-it('saves the alt text of the product\'s images', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    [$front, $side, $other] = collect(['front.png', 'side.png', 'other.png'])
-        ->map(fn (string $name) => ProductImage::create(['file' => UploadedFile::fake()->image($name), 'alt' => "Old {$name}"]));
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
-
-    // Act
-    $this->put(route('larasell.admin.products.update', $boots), [
-        'name' => 'Boots',
-        'status' => 'visible',
-        'images' => [(string) $front->id, (string) $side->id],
-        // An emptied alt text is removed; one for an image the product doesn't have is ignored.
-        'image_alts' => [$front->id => 'Boots from the front', $side->id => '', $other->id => 'Hijacked'],
-    ])->assertSessionHasNoErrors();
-
-    // Assert
-    expect($front->fresh()?->alt)->toBe('Boots from the front')
-        ->and($side->fresh()?->alt)->toBeNull()
-        ->and($other->fresh()?->alt)->toBe('Old other.png');
-});
-
-it('saves the alt text of a new product\'s images', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
-
-    // Act
-    $this->post(route('larasell.admin.products.store'), [
-        'name' => 'Boots',
-        'status' => 'visible',
-        'images' => [(string) $front->id],
-        'image_alts' => [$front->id => 'Boots from the front'],
-    ])->assertSessionHasNoErrors();
-
-    // Assert
-    expect($front->fresh()?->alt)->toBe('Boots from the front');
-});
-
-it('rejects alt text longer than the column holds', function () {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    $front = ProductImage::create(['file' => UploadedFile::fake()->image('front.png')]);
-
-    // Act & Assert
-    $this->post(route('larasell.admin.products.store'), [
-        'name' => 'Boots',
-        'status' => 'visible',
-        'images' => [(string) $front->id],
-        'image_alts' => [$front->id => str_repeat('a', 256)],
-    ])->assertSessionHasErrors(["image_alts.{$front->id}" => 'The alt text field must not be greater than 255 characters.']);
-});
-
-// The form shows these beside the images, so they name an image rather than its key.
-it('rejects images that do not exist', function (mixed $images, string $error, string $message) {
-    // Arrange
-    signInAdmin();
-
-    // Act
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'images' => $images])
-        ->assertSessionHasErrors([$error => $message]);
-
-    // Assert
-    expect(Product::query()->exists())->toBeFalse();
-})->with([
-    'not a list' => ['front', 'images', 'The images field must be an array.'],
-    'missing image' => [['999'], 'images.0', 'The selected image is invalid.'],
-    'not an id' => [['front'], 'images.0', 'The image field must be an integer.'],
-]);
-
-it('rejects uploads that are not one image', function (Closure $image) {
-    // Arrange
-    Storage::fake('public');
-    config(['larasell.images.disk' => 'public']);
-    signInAdmin();
-
-    // Act
-    $this->postJson(route('larasell.admin.products.images.store'), ['image' => $image()])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('image');
-
-    // Assert
-    expect(ProductImage::query()->count())->toBe(0)
-        ->and(Storage::disk('public')->allFiles())->toBe([]);
-})->with([
-    'none' => fn () => null,
-    // One at a time, so a failure can't leave some of a request's images stored.
-    'several' => fn () => [UploadedFile::fake()->image('front.png'), UploadedFile::fake()->image('back.png')],
-    'a document' => fn () => UploadedFile::fake()->create('manual.pdf', 10, 'application/pdf'),
-    'an SVG' => fn () => UploadedFile::fake()->create('logo.svg', 1, 'image/svg+xml'),
-    'too large' => fn () => UploadedFile::fake()->image('huge.png')->size(10 * 1024 + 1),
-]);
-
-// PHP drops files over its upload_max_filesize, which defaults to 2 MB, before the size rule runs.
-it('explains images that PHP could not receive', function () {
-    // Arrange
-    signInAdmin();
-    $file = new UploadedFile(UploadedFile::fake()->image('huge.png')->getPathname(), 'huge.png', 'image/png', UPLOAD_ERR_INI_SIZE, true);
-
-    // Act & Assert
-    $this->postJson(route('larasell.admin.products.images.store'), ['image' => $file])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['image' => 'The image may be larger than the server accepts.']);
-});
-
 it('returns 404 for editing a product that does not exist', function () {
     // Arrange
     signInAdmin();
@@ -982,11 +771,9 @@ it('does not let guests create or edit products', function () {
     $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
     $this->get(route('larasell.admin.products.edit', $boots))->assertRedirect(route('larasell.admin.login'));
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Socks', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
-    $this->post(route('larasell.admin.products.images.store'), ['image' => UploadedFile::fake()->image('front.png')])->assertRedirect(route('larasell.admin.login'));
 
     // Assert
-    expect(Product::query()->sole()->name->get())->toBe('Boots')
-        ->and(ProductImage::query()->count())->toBe(0);
+    expect(Product::query()->sole()->name->get())->toBe('Boots');
 });
 
 it('offers to delete each product', function () {
@@ -1069,7 +856,6 @@ it('turns the products off when disabled in the config', function () {
     $this->get('/admin/products')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get('/admin/products/create')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->post('/admin/products')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
-    $this->post('/admin/products/images')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('navigation', fn ($items) => ! collect($items)->pluck('label')->contains('Products')));

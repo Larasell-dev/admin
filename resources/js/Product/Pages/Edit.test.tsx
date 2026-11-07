@@ -33,13 +33,11 @@ function props(
       minQuantity: null,
       maxQuantity: null,
       categoryIds: [],
-      images: [],
     },
     updateUrl: "/admin/products/1",
     indexUrl: "/admin/products",
     categories: [],
     createCategoryUrl: null,
-    uploadImagesUrl: "/admin/products/images",
     sections: [],
     contentLocale: {
       current: "en",
@@ -256,7 +254,6 @@ it("places sections before or after the product's own sections, or after all of 
   expect([...document.querySelectorAll("h3")].map((heading) => heading.textContent)).toEqual([
     "Before general",
     "General",
-    "Images",
     "Categories",
     "Stock",
     "After stock",
