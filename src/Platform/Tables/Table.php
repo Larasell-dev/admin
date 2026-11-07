@@ -17,10 +17,10 @@ use Larasell\Admin\Platform\Tables\Attributes\Remember;
 use Larasell\Admin\Platform\Tables\Attributes\UseModel;
 use Larasell\Admin\Platform\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Platform\Tables\Columns\Column;
+use Larasell\Admin\Platform\Tables\Exceptions\InvalidTable;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableAction;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableColumn;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableEmptyState;
-use LogicException;
 use ReflectionClass;
 
 /**
@@ -197,9 +197,7 @@ abstract class Table implements JsonSerializable
     {
         $state = $this->state();
 
-        $slug = static::slug() ?? throw new LogicException(
-            static::class.' must live in the '.config('larasell.admin.panel.tables.namespace').' namespace to run actions.',
-        );
+        $slug = static::slug() ?? throw InvalidTable::outsideNamespace(static::class);
 
         return route('larasell.admin.tables.actions', [
             'table' => $slug,
@@ -222,7 +220,7 @@ abstract class Table implements JsonSerializable
 
         foreach ($parameters as $parameter) {
             if ($parameter->getAttributes(Remember::class) === [] || ! $parameter->isPromoted()) {
-                throw new LogicException(static::class." must mark its constructor argument [\${$parameter->getName()}] as a promoted property with #[Remember] to run actions.");
+                throw InvalidTable::unrememberedArgument(static::class, $parameter->getName());
             }
 
             $value = $this->{$parameter->getName()};
@@ -378,7 +376,7 @@ abstract class Table implements JsonSerializable
             return $guess;
         }
 
-        throw new LogicException(static::class.' must define a model with the UseModel attribute or a $model property'.($guess !== null ? ", or there must be a [{$guess}] model." : '.'));
+        throw InvalidTable::missingModel(static::class, $guess);
     }
 
     /**
@@ -431,7 +429,7 @@ abstract class Table implements JsonSerializable
 
         $names = array_map(fn (Action $action): string => $action->name(), $actions);
         foreach (array_unique(array_diff_assoc($names, array_unique($names))) as $duplicate) {
-            throw new LogicException(static::class." defines more than one action named [{$duplicate}].");
+            throw InvalidTableAction::duplicateName(static::class, $duplicate);
         }
 
         $pageSize = request()->integer('per_page');

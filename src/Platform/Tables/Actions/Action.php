@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableAction;
 use Larasell\Admin\Platform\Tables\Table;
-use LogicException;
+use Larasell\Chronicle\Exceptions\StructuredLogicException;
 
 class Action
 {
@@ -183,7 +183,7 @@ class Action
     public function assertConfigured(): void
     {
         if ($this->handle === null && $this->url === null) {
-            throw new LogicException("Action [{$this->name()}] needs a handler or a link: pass a handle closure to Action::make(), or call to() or route().");
+            throw InvalidTableAction::missingHandler($this->name());
         }
     }
 
@@ -195,7 +195,11 @@ class Action
     public function run(Model $record): void
     {
         if ($this->handle === null) {
-            throw new LogicException("Action [{$this->name()}] has no handler to run.");
+            throw new StructuredLogicException(
+                errorCode: 'larasell-admin.table.action.not-runnable',
+                message: "Action [{$this->name()}] has no handler to run.",
+                why: 'Only actions with a handler run; the table checks runs() before it calls run().',
+            );
         }
 
         ($this->handle)($record);

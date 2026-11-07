@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 use JsonSerializable;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableAction;
-use LogicException;
+use Larasell\Chronicle\Exceptions\StructuredLogicException;
 
 /**
  * An action for the whole table rather than one row, such as a link to add a
@@ -133,7 +133,10 @@ final class TableAction implements JsonSerializable
             'label' => $this->label(),
             'method' => 'get',
             // Paired with assertConfigured(), which the table calls first and which names the table.
-            'url' => $this->url ?? throw new LogicException("Action [{$this->label}] needs a link: call to() or route()."),
+            'url' => $this->url ?? throw new StructuredLogicException(
+                errorCode: 'larasell-admin.table.action.missing-link',
+                message: "Action [{$this->label}] needs a link: call to() or route().",
+            ),
             'icon' => $this->icon?->name,
         ];
     }

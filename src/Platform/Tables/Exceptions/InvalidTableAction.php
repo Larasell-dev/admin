@@ -99,4 +99,24 @@ class InvalidTableAction extends InvalidArgumentException implements StructuredE
             fix: "Remove one of the [{$label}] actions, or give them different labels.",
         );
     }
+
+    public static function missingHandler(string $action): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.table.action.missing-handler',
+            message: "Action [{$action}] needs a handler or a link.",
+            why: "Without either, clicking [{$action}] would do nothing.",
+            fix: 'Pass a handle closure to Action::make(), or call to() or route().',
+        );
+    }
+
+    public static function duplicateName(string $table, string $action): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.table.action.duplicate-name',
+            message: "{$table} defines more than one action named [{$action}].",
+            why: "The table finds the action to run by its name, so it could not tell the [{$action}] actions apart.",
+            fix: "Remove one of the [{$action}] actions, or give them different labels.",
+        );
+    }
 }

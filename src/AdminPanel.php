@@ -5,10 +5,10 @@ namespace Larasell\Admin;
 use Closure;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Route;
-use InvalidArgumentException;
 use Larasell\Admin\Platform\Auth\Http\Middleware\Authenticate;
 use Larasell\Admin\Platform\InterfaceLocale\Http\Middleware\SetInterfaceLocale;
 use Larasell\Admin\Platform\Navigation\Navigation;
+use Larasell\Admin\Platform\Panel\Exceptions\InvalidExtension;
 use Larasell\Admin\Platform\Panel\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Platform\Panel\Http\Middleware\LogLicensingPlan;
 
@@ -116,7 +116,7 @@ class AdminPanel
      */
     public function extensionVite(string $name): Vite
     {
-        $extension = $this->extensions[$name] ?? throw new InvalidArgumentException("No extension assets are registered as [{$name}].");
+        $extension = $this->extensions[$name] ?? throw InvalidExtension::notRegistered($name);
 
         return (clone app(Vite::class))
             ->useBuildDirectory("vendor/{$name}")

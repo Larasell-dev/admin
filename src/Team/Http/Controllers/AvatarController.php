@@ -4,8 +4,8 @@ namespace Larasell\Admin\Team\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Team\Exceptions\AvatarNotStored;
 use Larasell\Admin\Team\Http\Requests\AvatarRequest;
-use RuntimeException;
 
 class AvatarController
 {
@@ -28,7 +28,7 @@ class AvatarController
         $path = $request->file('avatar')->storePublicly('avatars', ['disk' => config('larasell.admin.panel.disk')]);
 
         if ($path === false) {
-            throw new RuntimeException('Unable to store the avatar.');
+            throw AvatarNotStored::onDisk();
         }
 
         $request->session()->put(self::PENDING_SESSION_KEY, $path);

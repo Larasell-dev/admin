@@ -194,4 +194,24 @@ class InvalidNavigationItem extends InvalidArgumentException implements Structur
             fix: 'Register the route, or pass the name of an existing route; names without a dot get the larasell.admin. prefix.',
         );
     }
+
+    public static function unnamedIndexRoute(string $uri): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.navigation.unnamed-index-route',
+            message: "Index route [{$uri}] was not registered with a name.",
+            why: 'Navigation items link to routes by name, and the index route for [{$uri}] has none.',
+            fix: 'Keep the name Route::index() gives the route; do not register it again under the same URI.',
+        );
+    }
+
+    public static function notRegistered(string $id): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.navigation.not-registered',
+            message: "Navigation item [{$id}] was not registered through the navigation, so it cannot have children.",
+            why: 'Children are added to the navigation the item belongs to, and this item was built on its own.',
+            fix: 'Create the item with the Navigation facade, e.g. Navigation::add(), before calling children().',
+        );
+    }
 }
