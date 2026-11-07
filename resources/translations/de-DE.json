@@ -4114,6 +4114,28 @@
         }
       ],
       "types": []
+    },
+    "Fqpm3Jm+CymaoVgSFzmvCQ==": {
+      "description": "Product and category pages: placeholder of the search field in the content language select's list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprachen durchsuchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ywCsP1d85ePGTjNfR6Ae8g==": {
+      "description": "Product and category pages: shown in the content language select's list when the search matches no language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Sprachen gefunden",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

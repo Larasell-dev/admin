@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/react";
-import { Input } from "@larasell-dev/ui";
+import { Select } from "@larasell-dev/ui";
 import { useUnsavedChanges } from "../../Panel/Components/UnsavedChangesToast";
 import { fbs } from "fbtee";
 
@@ -19,34 +19,46 @@ export default function ContentLocaleSelect({
 
   if (!contentLocale || contentLocale.options.length < 2) return null;
 
+  const current = contentLocale.options.find((option) => option.value === contentLocale.current);
+
   return (
     <div className="w-40">
-      <Input
-        aria-label={fbs(
-          "Content language",
-          "Product and category pages: accessible name of the select that picks the language the content is edited in, not the panel's own language",
-        )}
-        defaultValue={contentLocale.current}
+      <Select.Root
+        items={contentLocale.options}
+        itemToKey={(option) => option.value}
+        itemToLabel={(option) => option.label}
+        defaultValue={current ?? null}
+        onValueChange={(option) => {
+          if (!option || option.value === contentLocale.current) return;
+
+          router.put(contentLocale.switchUrl, { locale: option.value }, { preserveScroll: true });
+        }}
+        filter={{
+          placeholder: fbs(
+            "Search languages",
+            "Product and category pages: placeholder of the search field in the content language select's list",
+          ),
+          empty: (
+            <fbt desc="Product and category pages: shown in the content language select's list when the search matches no language">
+              No languages found
+            </fbt>
+          ),
+        }}
         disabled={unsavedChanges}
-        render={
-          // On the select, which types its own change events; Input types them for an input.
-          <select
-            onChange={(event) =>
-              router.put(
-                contentLocale.switchUrl,
-                { locale: event.currentTarget.value },
-                { preserveScroll: true },
-              )
-            }
-          >
-            {contentLocale.options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        }
-      />
+      >
+        <Select.Trigger
+          aria-label={fbs(
+            "Content language",
+            "Product and category pages: accessible name of the select that picks the language the content is edited in, not the panel's own language",
+          )}
+          DANGEROUS_className="w-full"
+        />
+        <Select.Popup>
+          {(option: (typeof contentLocale.options)[number]) => (
+            <Select.Item key={option.value} item={option} />
+          )}
+        </Select.Popup>
+      </Select.Root>
     </div>
   );
 }
