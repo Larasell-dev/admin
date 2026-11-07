@@ -111,23 +111,26 @@ it("switches the product's content to the picked language", async () => {
   const requests = fakeServer(props("Stiefel", { current: "de" }));
   await renderEdit(props("Boots"));
 
-  await expect.element(select()).toHaveDisplayValue("English");
+  await expect.element(select()).toHaveTextContent("English");
   await expect.element(nameField()).toHaveValue("Boots");
 
   // Act
-  await select().selectOptions("German");
+  await select().click();
+  await page.getByRole("option", { name: "German" }).click();
 
   // Assert
   await expect.element(nameField()).toHaveValue("Stiefel");
-  await expect.element(select()).toHaveDisplayValue("German");
-  expect(requests).toEqual([
+  await expect.element(select()).toHaveTextContent("German");
+  // Moving the pointer to the select can prefetch the back link on hover, which isn't a switch.
+  const switches = requests.filter((request) => request.method !== "get");
+  expect(switches).toEqual([
     {
       method: "put",
       url: expect.stringContaining("/admin/content-locale"),
       data: expect.anything(),
     },
   ]);
-  expect(JSON.stringify(requests[0]?.data)).toContain('"locale":"de"');
+  expect(JSON.stringify(switches[0]?.data)).toContain('"locale":"de"');
 });
 
 it("leaves out the select while the store has only one language", async () => {
