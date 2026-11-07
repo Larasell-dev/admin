@@ -37,6 +37,13 @@ class AdminPanel
      */
     protected array $extensions = [];
 
+    /**
+     * Props that modules and extensions add to every admin page, by name.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $shared = [];
+
     /** Whether routes() is running its callback, so a nested call doesn't open the group again. */
     private bool $registeringRoutes = false;
 
@@ -114,6 +121,23 @@ class AdminPanel
         return (clone app(Vite::class))
             ->useBuildDirectory("vendor/{$name}")
             ->useHotFile("{$extension['publicPath']}/hot");
+    }
+
+    /**
+     * Adds a prop to every admin page, but not to the app's own Inertia pages. Pass a closure or
+     * an Inertia prop such as Inertia::once(), so it's only resolved when a page is rendered.
+     */
+    public function share(string $key, mixed $value): void
+    {
+        $this->shared[$key] = $value;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function shared(): array
+    {
+        return $this->shared;
     }
 
     public function pagePath(string $path): void

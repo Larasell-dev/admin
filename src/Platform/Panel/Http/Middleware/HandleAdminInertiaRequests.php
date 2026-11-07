@@ -65,6 +65,7 @@ class HandleAdminInertiaRequests extends Middleware
             'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),
             'loginUrl' => fn (): string => route('larasell.admin.login.store'),
+            ...app(AdminPanel::class)->shared(),
         ];
     }
 }
