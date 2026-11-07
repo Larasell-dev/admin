@@ -5,11 +5,19 @@
   :root {
     /* The height of the nav bar above the page below lg. Pages and overlays start below it. */
     --mobile-nav-height: 3.5rem;
+    /* Popups keep clear of the nav bar while it shows. */
+    --popup-collision-top: var(--mobile-nav-height);
     /* The toasts' width from the theme, kept here: while the unsaved changes toast shows, it sets
        --toast-width on <body> to its own width, so the other toasts line up with it. */
     --toast-min-width: var(--toast-width);
     color-scheme: light;
     background-color: var(--background-color-base-canvas);
+  }
+
+  @variant lg {
+    :root {
+      --popup-collision-top: 0px;
+    }
   }
 
   :root.dark {

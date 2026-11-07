@@ -1,13 +1,12 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import { useFormContext } from "@inertiajs/react";
-import { Checkbox, Field, Input, Section, SectionStack, Stack } from "@larasell-dev/ui";
+import { Checkbox, Field, Input, Section, SectionStack, Select, Stack } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import { type ReactNode, useState } from "react";
 import { slugify } from "../../Platform/Support/slugify";
 import { truncate } from "../../Platform/Support/truncate";
 import { useCoupledField } from "../../Platform/Support/useCoupledField";
 import FormCheckbox from "../../Platform/Panel/Components/FormCheckbox";
-import FormSelect from "../../Platform/Panel/Components/FormSelect";
 
 type Channel = Larasell.Admin.SalesChannel.Data.SalesChannelData;
 type Option = Larasell.Admin.SalesChannel.Data.SalesChannelOptionData;
@@ -100,16 +99,21 @@ export default function SalesChannelForm({
 
           {!channel &&
             (types.length > 1 ? (
-              <FormSelect
+              <Field
                 label={fbs(
                   "Type",
                   "Sales channel form: label of the select for the kind of channel, e.g. storefront",
                 )}
-                error={errors.type}
                 name="type"
-                items={types.map((type) => ({ value: type, label: type }))}
-                defaultValue={types.slice(0, 1)}
-              />
+                error={errors.type}
+              >
+                <Select
+                  items={types}
+                  itemToKey={(type) => type}
+                  itemToLabel={(type) => type}
+                  defaultValue={types[0] ?? null}
+                />
+              </Field>
             ) : (
               <input type="hidden" name="type" value={types[0] ?? ""} />
             ))}
@@ -230,40 +234,42 @@ function Choices({
   children: ReactNode;
 }) {
   return (
-    <Stack spacing={5}>
-      <FormSelect
-        label={label}
-        error={error}
-        name={`${name}[]`}
-        multiple
-        items={options}
-        itemToLabel={(option) => optionLabel(option, withCode)}
-        defaultValue={picked}
-        onValueChange={onChange}
-        placeholder={fbs(
-          "None picked",
-          "Sales channel form: shown on the button of the languages or currencies field while none is picked",
-        )}
-        filter={{
-          placeholder: fbs(
-            "Search",
-            "Sales channel form: placeholder of the search field in the list of languages or currencies the channel sells in",
-          ),
-          empty: fbs(
-            "Nothing matches",
-            "Sales channel form: shown in the list of languages or currencies when the typed text matches none",
-          ),
-        }}
-      >
-        {(option) => (
-          <>
-            {option.label}
-            {withCode && <span className="text-base-tertiary"> {option.value}</span>}
-          </>
-        )}
-      </FormSelect>
-      {children}
-    </Stack>
+    // One width for both selects, so they line up; full width on phones.
+    <div className="sm:max-w-sm">
+      <Stack spacing={5}>
+        <Field label={label} name={name} error={error}>
+          <Select
+            multiple
+            items={options}
+            itemToKey={(option) => option.value}
+            itemToLabel={(option) => optionLabel(option, withCode)}
+            defaultValue={picked}
+            onValueChange={onChange}
+            placeholder={fbs(
+              "None picked",
+              "Sales channel form: shown on the button of the languages or currencies field while none is picked",
+            )}
+            filter={{
+              placeholder: fbs(
+                "Search",
+                "Sales channel form: placeholder of the search field in the list of languages or currencies the channel sells in",
+              ),
+              empty: fbs(
+                "Nothing matches",
+                "Sales channel form: shown in the list of languages or currencies when the typed text matches none",
+              ),
+            }}
+            renderItem={(option) => (
+              <>
+                {option.label}
+                {withCode && <span className="text-base-tertiary"> {option.value}</span>}
+              </>
+            )}
+          />
+        </Field>
+        {children}
+      </Stack>
+    </div>
   );
 }
 
@@ -287,17 +293,21 @@ function DefaultSelect({
   withCode?: boolean;
   error?: string;
 }) {
+  const [value, setValue] = useState(defaultValue ?? null);
+  const offered = options.some((option) => option.value === value)
+    ? value
+    : (options[0]?.value ?? null);
+
   return (
-    <div className="max-w-xs">
-      <FormSelect
-        label={label}
-        error={error}
-        name={name}
+    <Field label={label} name={name} error={error}>
+      <Select
         items={options}
+        itemToKey={(option) => option.value}
         itemToLabel={(option) => optionLabel(option, withCode)}
-        defaultValue={defaultValue ? [defaultValue] : []}
+        value={offered}
+        onValueChange={setValue}
         disabled={options.length === 0}
       />
-    </div>
+    </Field>
   );
 }

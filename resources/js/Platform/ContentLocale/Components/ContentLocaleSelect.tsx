@@ -1,5 +1,6 @@
 import { router } from "@inertiajs/react";
-import { Select } from "@larasell-dev/ui";
+import { Button, Icon, Select } from "@larasell-dev/ui";
+import { ArrowDownSLine } from "@larasell-dev/ui/icons";
 import { useUnsavedChanges } from "../../Panel/Components/UnsavedChangesToast";
 import { fbs } from "fbtee";
 
@@ -19,19 +20,17 @@ export default function ContentLocaleSelect({
 
   if (!contentLocale || contentLocale.options.length < 2) return null;
 
-  const current = contentLocale.options.find((option) => option.value === contentLocale.current);
-
   return (
     <div className="w-40">
       <Select.Root
         items={contentLocale.options}
         itemToKey={(option) => option.value}
         itemToLabel={(option) => option.label}
-        value={current ?? null}
-        onValueChange={(option) => {
-          if (!option || option.value === contentLocale.current) return;
+        value={contentLocale.current}
+        onValueChange={(locale) => {
+          if (!locale || locale === contentLocale.current) return;
 
-          router.put(contentLocale.switchUrl, { locale: option.value }, { preserveScroll: true });
+          router.put(contentLocale.switchUrl, { locale }, { preserveScroll: true });
         }}
         filter={{
           placeholder: fbs(
@@ -47,17 +46,18 @@ export default function ContentLocaleSelect({
         disabled={unsavedChanges}
       >
         <Select.Trigger
+          render={<Button variant="secondary" fullWidth DANGEROUS_className="justify-between" />}
           aria-label={fbs(
             "Content language",
             "Product and category pages: accessible name of the select that picks the language the content is edited in, not the panel's own language",
           )}
-          DANGEROUS_className="w-full"
-        />
-        <Select.Popup>
-          {(option: (typeof contentLocale.options)[number]) => (
-            <Select.Item key={option.value} item={option} />
+        >
+          {(selected: ContentLocale["options"]) => (
+            <span className="min-w-0 truncate">{selected[0]?.label}</span>
           )}
-        </Select.Popup>
+          <Icon icon={ArrowDownSLine} />
+        </Select.Trigger>
+        <Select.Popup />
       </Select.Root>
     </div>
   );

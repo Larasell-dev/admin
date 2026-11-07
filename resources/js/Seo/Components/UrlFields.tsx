@@ -366,10 +366,10 @@ function ChannelFilter({
     <Select.Root
       multiple
       items={channels}
-      itemToKey={(url) => url.channelId}
+      itemToKey={(url) => String(url.channelId)}
       itemToLabel={(url) => url.channel}
-      value={channels.filter((url) => shown.includes(String(url.channelId)))}
-      onValueChange={(value) => onChange(value.map((url) => String(url.channelId)))}
+      value={shown}
+      onValueChange={onChange}
       filter={{
         placeholder: fbs(
           "Search sales channels",
@@ -385,14 +385,7 @@ function ChannelFilter({
         {label}
         <Icon icon={ArrowDownSLine} />
       </Select.Trigger>
-      <Select.Popup align="end">
-        {(url: Larasell.Admin.Seo.Data.SeoUrlData) => (
-          <Select.Item item={url}>
-            <Select.ItemCheckbox />
-            {url.channel}
-          </Select.Item>
-        )}
-      </Select.Popup>
+      <Select.Popup align="end" />
     </Select.Root>
   );
 }
