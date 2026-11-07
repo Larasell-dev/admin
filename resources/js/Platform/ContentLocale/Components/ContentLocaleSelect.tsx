@@ -27,7 +27,7 @@ export default function ContentLocaleSelect({
         items={contentLocale.options}
         itemToKey={(option) => option.value}
         itemToLabel={(option) => option.label}
-        defaultValue={current ?? null}
+        value={current ?? null}
         onValueChange={(option) => {
           if (!option || option.value === contentLocale.current) return;
 
