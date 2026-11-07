@@ -1,0 +1,1 @@
+function e(){return n(`sign-in`)}function t(){return n(`sign-out`)}function n(e){return window.matchMedia(`(prefers-reduced-motion: reduce)`).matches?!1:t=>{let n=document.documentElement;n.dataset.authTransition=e;let r=()=>delete n.dataset.authTransition;t.finished.then(r,r)}}export{t as n,e as t};
