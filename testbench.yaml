@@ -4,6 +4,7 @@ providers:
   - Laravel\Head\HeadServiceProvider
   - Larasell\Admin\AdminServiceProvider
   - Workbench\App\ProductNotes\ProductNotesServiceProvider
+  - Workbench\App\Storefront\StorefrontServiceProvider
   - Inertia\ServiceProvider
   - Spatie\LaravelData\LaravelDataServiceProvider
 
