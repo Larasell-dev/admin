@@ -15,6 +15,8 @@ export default defineConfig({
   rules: {
     "@nkzw/fbtee/no-empty-strings": "error",
     "@nkzw/fbtee/no-unhelpful-desc": "error",
+    // Like tests/Arch/ModulesTest.php for the PHP code.
+    "larasell-admin/module-boundaries": "error",
   },
   overrides: [
     {

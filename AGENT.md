@@ -25,8 +25,10 @@ stay at an area's top level, such as `Audit\Auditor`, `Navigation\NavigationItem
 its default, e.g. `ContentLocaleResolver`) and `Locales/` (the lists of locales offered).
 
 The platform never uses a module, and a module uses another one only when
-`tests/Arch/ModulesTest.php` lists it as what it builds on. When a module needs the
-platform to know about it, it registers itself, e.g. `Auditor::actorType()`.
+`lint/modules.json` lists it as what it builds on. When a module needs the platform to know
+about it, it registers itself, e.g. `Auditor::actorType()`. `tests/Arch/ModulesTest.php` checks
+this for the PHP code, and the `larasell-admin/module-boundaries` rule in `npm run lint` for
+the frontend.
 
 Code in `src/` throws structured exceptions, never PHP's own such as `LogicException`: a named
 constructor on the area's exception in `Exceptions/` (implementing `StructuredException` with

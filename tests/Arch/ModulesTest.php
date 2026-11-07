@@ -5,21 +5,13 @@ declare(strict_types=1);
 /*
  * The panel is a modular monolith. The platform (Larasell\Admin\Platform) is what modules and
  * apps plug into, so it never uses a module. A module owns one feature and uses the platform,
- * plus only the other modules listed here as what it builds on.
+ * plus only the other modules it builds on. lint/modules.json lists those, and why, for this test
+ * and the frontend's module-boundaries lint rule alike.
  */
-const MODULE_DEPENDENCIES = [
-    'ApiToken' => [],
-    'Category' => [],
-    // The customer page lists the customer's orders with the Order module's table.
-    'Customer' => ['Order'],
-    'Order' => [],
-    // The product form picks categories with the Category module's options.
-    'Product' => ['Category'],
-    'SalesChannel' => [],
-    // The URLs sections are sections of the Product and Category modules' pages.
-    'Seo' => ['Product', 'Category'],
-    'Team' => [],
-];
+define('MODULE_DEPENDENCIES', array_map(
+    fn (array $module): array => $module['buildsOn'],
+    json_decode((string) file_get_contents(__DIR__.'/../../lint/modules.json'), true, flags: JSON_THROW_ON_ERROR),
+));
 
 /**
  * @param  list<string>  $modules
