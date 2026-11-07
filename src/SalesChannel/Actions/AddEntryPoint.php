@@ -3,7 +3,7 @@
 namespace Larasell\Admin\SalesChannel\Actions;
 
 use Illuminate\Validation\ValidationException;
-use Larasell\Larasell\SalesChannels\InvalidSalesChannel;
+use Larasell\Larasell\SalesChannels\Exceptions\InvalidSalesChannel;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Larasell\Larasell\SalesChannels\SalesChannelId;
 use Larasell\Larasell\Storefront\Actions\AddEntryPoint as CoreAddEntryPoint;
