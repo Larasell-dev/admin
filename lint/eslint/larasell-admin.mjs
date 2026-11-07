@@ -1,5 +1,8 @@
 // Project lint rules, loaded by oxlint as a JS plugin (ESLint's rule API).
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 const MARKER = /^\s*((?:Arrange|Act|Assert)(?: & (?:Arrange|Act|Assert))*)\s*$/;
 
 /** `it`, `test`, `it.skip`, `test.each([...])` and the like, but not `pattern.test(...)`. */
@@ -78,7 +81,71 @@ const arrangeActAssert = {
   },
 };
 
+/** What each module builds on, shared with tests/Arch/ModulesTest.php. */
+const MODULES = JSON.parse(readFileSync(new URL("../modules.json", import.meta.url), "utf8"));
+
+const FRONTEND = path.resolve(import.meta.dirname, "../../resources/js");
+
+/** "Platform", a module's name, or null for files outside both, such as app.tsx and types/. */
+function areaOf(file) {
+  const [first] = path.relative(FRONTEND, file).split(path.sep);
+
+  return first === "Platform" || Object.hasOwn(MODULES, first) ? first : null;
+}
+
+/**
+ * The frontend keeps the backend's module boundaries: resources/js/Platform never imports a
+ * module, and a module imports only the platform, itself and the modules it builds on.
+ */
+const moduleBoundaries = {
+  meta: {
+    type: "problem",
+    messages: {
+      platform:
+        "The platform doesn't use modules, but this imports the {{module}} module. " +
+        "Have the module register itself with the platform instead, e.g. through Larasell.booting().",
+      module:
+        "The {{from}} module doesn't build on the {{module}} module. " +
+        "Move what both need into resources/js/Platform, or list {{module}} in {{from}}'s buildsOn in lint/modules.json.",
+    },
+  },
+  create(context) {
+    const from = areaOf(context.filename);
+    if (from === null) {
+      return {};
+    }
+
+    function check(source) {
+      if (
+        source?.type !== "Literal" ||
+        typeof source.value !== "string" ||
+        !source.value.startsWith(".")
+      ) {
+        return;
+      }
+
+      const module = areaOf(path.resolve(path.dirname(context.filename), source.value));
+      if (module === null || module === "Platform" || module === from) {
+        return;
+      }
+
+      if (from === "Platform") {
+        context.report({ node: source, messageId: "platform", data: { module } });
+      } else if (!MODULES[from].buildsOn.includes(module)) {
+        context.report({ node: source, messageId: "module", data: { from, module } });
+      }
+    }
+
+    return {
+      ImportDeclaration: (node) => check(node.source),
+      ExportNamedDeclaration: (node) => check(node.source),
+      ExportAllDeclaration: (node) => check(node.source),
+      ImportExpression: (node) => check(node.source),
+    };
+  },
+};
+
 export default {
   meta: { name: "larasell-admin" },
-  rules: { "arrange-act-assert": arrangeActAssert },
+  rules: { "arrange-act-assert": arrangeActAssert, "module-boundaries": moduleBoundaries },
 };

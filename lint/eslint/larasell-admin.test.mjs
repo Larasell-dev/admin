@@ -129,3 +129,50 @@ new RuleTester().run("arrange-act-assert", plugin.rules["arrange-act-assert"], {
     },
   ],
 });
+
+const frontend = new URL("../../resources/js/", import.meta.url).pathname;
+const at = (file, code) => ({ code, filename: `${frontend}${file}` });
+
+new RuleTester().run("module-boundaries", plugin.rules["module-boundaries"], {
+  valid: [
+    at("Product/Pages/Edit.tsx", `import { Page } from "../../Platform/Panel/Components/Page";`),
+    at("Product/Pages/Edit.tsx", `import ProductForm from "../Components/ProductForm";`),
+    at(
+      "Product/Pages/Edit.tsx",
+      `import CategoryCheckboxTree from "../../Category/Components/CategoryCheckboxTree";`,
+    ),
+    at("Platform/Panel/Pages/Home.tsx", `import { slugify } from "../../Support/slugify";`),
+    at("Category/Pages/Show.tsx", `import { router } from "@inertiajs/react";`),
+    at("app.tsx", `import Edit from "./Product/Pages/Edit";`),
+  ],
+  invalid: [
+    {
+      ...at(
+        "Category/Pages/Show.tsx",
+        `import ProductForm from "../../Product/Components/ProductForm";`,
+      ),
+      errors: [{ messageId: "module", data: { from: "Category", module: "Product" } }],
+    },
+    {
+      ...at(
+        "Platform/Panel/Pages/Home.tsx",
+        `import ProductForm from "../../../Product/Components/ProductForm";`,
+      ),
+      errors: [{ messageId: "platform", data: { module: "Product" } }],
+    },
+    {
+      ...at(
+        "Order/Pages/Show.tsx",
+        `export { default } from "../../Customer/Components/CustomerForm";`,
+      ),
+      errors: [{ messageId: "module", data: { from: "Order", module: "Customer" } }],
+    },
+    {
+      ...at(
+        "Team/Pages/Index.tsx",
+        `const form = () => import("../../Customer/Components/CustomerForm");`,
+      ),
+      errors: [{ messageId: "module", data: { from: "Team", module: "Customer" } }],
+    },
+  ],
+});

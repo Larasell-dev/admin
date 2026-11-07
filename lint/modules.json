@@ -1,0 +1,19 @@
+{
+  "ApiToken": { "buildsOn": [] },
+  "Category": { "buildsOn": [] },
+  "Customer": {
+    "buildsOn": ["Order"],
+    "why": "The customer page lists the customer's orders with the Order module's table."
+  },
+  "Order": { "buildsOn": [] },
+  "Product": {
+    "buildsOn": ["Category"],
+    "why": "The product form picks categories with the Category module's options."
+  },
+  "SalesChannel": { "buildsOn": [] },
+  "Seo": {
+    "buildsOn": ["Product", "Category"],
+    "why": "The URLs sections are sections of the Product and Category modules' pages."
+  },
+  "Team": { "buildsOn": [] }
+}
