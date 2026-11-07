@@ -9,7 +9,7 @@ import { logOutCommand } from "./Components/CommandMenu/logOutCommand";
 import { themeCommand } from "./Components/CommandMenu/themeCommand";
 import { interfaceLocaleCommand } from "./Components/CommandMenu/interfaceLocaleCommand";
 import { ThemeChangedToasts } from "./Components/Shell/ThemeChangedToast";
-import { extensions } from "./extensions";
+import { extensions, Larasell, SectionForm } from "./extensions";
 import { sharedModules } from "./sharedModules";
 import { AppHotkeysProvider } from "./utils/hotkeys";
 import { setUpInterfaceLocale } from "./utils/interfaceLocale";
@@ -55,6 +55,14 @@ window.LarasellAdmin = {
       contentLocaleCommand,
       logOutCommand,
     );
+    // The panel's own sections, which the server adds like an extension's.
+    Larasell.booting(({ sections }) => {
+      sections.register(
+        SectionForm.Product,
+        "seo",
+        () => import("./Components/Seo/ProductUrlsSection"),
+      );
+    });
     extensions.boot();
 
     // The translations load before the first render, so the panel never shows in English first.

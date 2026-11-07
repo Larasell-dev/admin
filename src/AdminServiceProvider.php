@@ -41,6 +41,7 @@ use Larasell\Admin\Platform\Tables\Console\MakeTableCommand;
 use Larasell\Admin\Platform\Tables\Http\Controllers\TableController;
 use Larasell\Admin\Product\ProductServiceProvider;
 use Larasell\Admin\SalesChannel\SalesChannelServiceProvider;
+use Larasell\Admin\Seo\SeoServiceProvider;
 use Larasell\Admin\Team\Console\CreateAdminUserCommand;
 use Larasell\Admin\Team\Console\ListAdminsCommand;
 use Larasell\Admin\Team\Console\RemoveAdminCommand;
@@ -74,6 +75,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->register(ApiTokenServiceProvider::class);
         $this->app->register(TeamServiceProvider::class);
         $this->app->register(SalesChannelServiceProvider::class);
+        $this->app->register(SeoServiceProvider::class);
 
         $this->app->singleton(AdminPanel::class);
         $this->app->singleton(Navigation::class);

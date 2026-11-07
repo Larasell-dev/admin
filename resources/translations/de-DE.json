@@ -3938,6 +3938,50 @@
         }
       ],
       "types": []
+    },
+    "eAGlS/PR3Jo3fwU40KEYYA==": {
+      "description": "Product form: heading of the section with the product's web addresses",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "URLs",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "twC66OuCW3Ss/mWNGk7upQ==": {
+      "description": "Product form: explains the URLs section; an empty field gives the product an address made from its name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wo Kunden das Produkt in jedem Shop finden. Lass eine URL leer, damit sie aus dem Produktnamen entsteht und einer Namensänderung folgt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NABbmHeA8UXoB/GUWsHXcQ==": {
+      "description": "Product form: placeholder of a URL field while the product has no name in the content language yet",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus dem Namen erstellt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OGHC3oXQ1StT8LkhgSyFJA==": {
+      "description": "Product form: shown in the URLs section while no storefront has a domain in the content language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch kein Shop hat eine Domain in dieser Sprache, daher hat das Produkt in ihr keine URL.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

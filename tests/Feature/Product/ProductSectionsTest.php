@@ -67,12 +67,14 @@ it('gives the product page its sections, with props for the product in the conte
         ->assertInertia(fn (AssertableInertia $page) => $page->where('sections', [
             ['form' => 'product', 'key' => 'gift-wrap', 'props' => ['locale' => 'de'], 'before' => null, 'after' => null],
             ['form' => 'product', 'key' => 'notes', 'props' => ['name' => 'Stiefel', 'app' => 'Acme'], 'before' => null, 'after' => null],
+            // The panel's own URLs section, added the same way; no storefront sells in German here.
+            ['form' => 'product', 'key' => 'seo', 'props' => ['urls' => []], 'before' => null, 'after' => 'identifiers'],
         ]));
 
     $this->get(route('larasell.admin.products.create'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('sections.1.props', ['name' => null, 'app' => 'Acme'])
-            ->count('sections', 2));
+            ->count('sections', 3));
 });
 
 it('places sections before or after the product form\'s own sections, ordered by position, then by key', function () {
@@ -95,6 +97,7 @@ it('places sections before or after the product form\'s own sections, ordered by
                 ['gift-wrap', null, null],
                 ['moved', 'general', null],
                 ['notes', null, null],
+                ['seo', null, 'identifiers'],
                 ['zeta', null, 'stock'],
                 ['late', null, 'stock'],
             ],
@@ -251,6 +254,7 @@ it('leaves a wrongly set up section off the form in production, and keeps the fo
                 // Placed after the form's own sections instead.
                 ['misplaced', null],
                 ['notes', null],
+                ['seo', 'identifiers'],
             ],
         ));
 
