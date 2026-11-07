@@ -36,4 +36,28 @@
             </li>
         @endforeach
     </ul>
+
+    <h2>Redirects</h2>
+    <p>Every old URL in {{ $storefront->sales->channel }} / {{ $storefront->sales->locale->value }}, newest first. Open one to follow it.</p>
+    @if ($redirects === [])
+        <p><code>No old URLs yet. Rename a product or category, or give it a custom URL, in the admin.</code></p>
+    @else
+        <table>
+            <tr><th>Old path</th><th>Page</th><th>Status</th><th>Leads to</th></tr>
+            @foreach ($redirects as $redirect)
+                <tr>
+                    <td><a href="{{ $redirect->url }}"><code>/{{ $redirect->path }}</code></a></td>
+                    <td>{{ $redirect->resource }}</td>
+                    <td><span class="badge {{ $redirect->status }}">{{ $redirect->status }}</span></td>
+                    <td>
+                        @if ($redirect->target_url)
+                            301 → <a href="{{ $redirect->target_url }}"><code>/{{ $redirect->target }}</code></a>
+                        @else
+                            410 Gone
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </table>
+    @endif
 @endsection
