@@ -4,6 +4,7 @@ namespace Workbench\App\Providers;
 
 use DateTimeInterface;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Larasell\Enums\Locale;
@@ -55,6 +56,14 @@ class WorkbenchServiceProvider extends ServiceProvider
 
         // The playground store serves every locale, so sales channels can pick from all of them.
         config(['larasell.locale.supported' => Locale::cases()]);
+
+        // workbench/live-proxy.mjs serves Reverb on the panel's own origin, so browsers connect to
+        // live updates wherever they opened the panel, inside the orb or through its portal.
+        if (! $this->app->runningInConsole()) {
+            $request = $this->app->make(Request::class);
+            $request->setTrustedProxies([(string) $request->server('REMOTE_ADDR')], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+            config(['larasell.admin.panel.live' => ['host' => $request->getHost(), 'port' => $request->getPort(), 'scheme' => $request->getScheme()]]);
+        }
 
         // Portals open at the site root; send it to the panel.
         Route::redirect('/', '/'.config('larasell.admin.panel.path'));
