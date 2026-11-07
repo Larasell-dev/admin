@@ -10,15 +10,14 @@ use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\SectionRequests;
 use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Larasell\Attachments\Attachments;
-use Larasell\Larasell\Catalog\Actions\CreateCategoryPayload;
-use Larasell\Larasell\Catalog\Actions\UpdateCategoryPayload;
-use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Translatable;
 
-class CategoryRequest extends FormRequest
+/**
+ * What creating and updating a category share: the name, the visibility and the page's sections.
+ */
+abstract class CategoryRequest extends FormRequest
 {
     private ?SectionRequests $sections = null;
 
@@ -30,34 +29,15 @@ class CategoryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::enum(Visibility::class)],
-            // Only creating reads it; a category keeps its place in the tree when it's updated.
-            'parent_id' => ['nullable', 'integer', Rule::exists(Category::class, 'id')],
         ];
     }
 
     /**
-     * A new category with its name in the content locale, inside its parent when given.
+     * The payloads of the page's sections, passed along with the core's action.
      */
-    public function createPayload(Locale $locale): CreateCategoryPayload
+    protected function attachments(): Attachments
     {
-        return new CreateCategoryPayload(
-            name: Translatable::fromString($this->validated('name'), $locale->value),
-            status: Visibility::from($this->validated('status')),
-            parentId: $this->validated('parent_id') === null ? null : new CategoryId((int) $this->validated('parent_id')),
-            attachments: new Attachments(...$this->sections()->payloads()),
-        );
-    }
-
-    /**
-     * The category's name in the content locale, keeping its other translations.
-     */
-    public function updatePayload(Category $category, Locale $locale): UpdateCategoryPayload
-    {
-        return new UpdateCategoryPayload(
-            name: $category->name->with($locale->value, $this->validated('name')),
-            status: Visibility::from($this->validated('status')),
-            attachments: new Attachments(...$this->sections()->payloads()),
-        );
+        return new Attachments(...$this->sections()->payloads());
     }
 
     protected function prepareForValidation(): void

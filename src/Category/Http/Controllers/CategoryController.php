@@ -13,8 +13,9 @@ use Larasell\Admin\Category\Data\CategoryDetailData;
 use Larasell\Admin\Category\Data\CategoryPageData;
 use Larasell\Admin\Category\Data\CreateCategoryPageData;
 use Larasell\Admin\Category\Data\MissingCategoryPageData;
-use Larasell\Admin\Category\Http\Requests\CategoryRequest;
+use Larasell\Admin\Category\Http\Requests\CreateCategoryRequest;
 use Larasell\Admin\Category\Http\Requests\DeleteCategoryRequest;
+use Larasell\Admin\Category\Http\Requests\UpdateCategoryRequest;
 use Larasell\Admin\Category\Tables\CategoryProducts;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
@@ -113,9 +114,9 @@ class CategoryController
      * Creates a category, inside its parent when given, with the name in the content locale. The
      * page's sections save with it, through the core action's events.
      */
-    public function store(CategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create): RedirectResponse
+    public function store(CreateCategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create): RedirectResponse
     {
-        $category = $create->handle($request->createPayload($locale));
+        $category = $create->handle($request->payload($locale));
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -123,9 +124,9 @@ class CategoryController
     /**
      * Changes the name in the content locale and keeps its other translations.
      */
-    public function update(CategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update): RedirectResponse
+    public function update(UpdateCategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update): RedirectResponse
     {
-        $update->handle(CategoryId::of($category), $request->updatePayload($category, $locale));
+        $update->handle(CategoryId::of($category), $request->payload($category, $locale));
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
