@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use Larasell\Admin\Platform\Audit\AuditCategory;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Subject;
 

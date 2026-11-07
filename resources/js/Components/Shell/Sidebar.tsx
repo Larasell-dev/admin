@@ -13,7 +13,7 @@ import Logo from "./Logo";
 import UserMenu from "./UserMenu";
 import { fbs } from "fbtee";
 
-type NavigationItem = Larasell.Admin.Platform.Navigation.NavigationItemData;
+type NavigationItem = Larasell.Admin.Platform.Navigation.Data.NavigationItemData;
 
 /** `frozen` keeps showing the page as it was, such as while the mobile nav slides out. */
 export default function Sidebar({ frozen = false }: { frozen?: boolean }) {

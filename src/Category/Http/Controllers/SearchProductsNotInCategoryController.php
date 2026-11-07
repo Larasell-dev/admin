@@ -4,8 +4,8 @@ namespace Larasell\Admin\Category\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Platform\ContentLocale\Locales\AvailableLocales;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;

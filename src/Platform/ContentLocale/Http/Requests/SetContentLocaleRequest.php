@@ -5,7 +5,7 @@ namespace Larasell\Admin\Platform\ContentLocale\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Larasell\Admin\Platform\ContentLocale\Actions\SetContentLocalePayload;
-use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
+use Larasell\Admin\Platform\ContentLocale\Locales\AvailableLocales;
 use Larasell\Larasell\Enums\Locale;
 
 class SetContentLocaleRequest extends FormRequest

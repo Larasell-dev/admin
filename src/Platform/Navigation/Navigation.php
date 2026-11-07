@@ -4,6 +4,8 @@ namespace Larasell\Admin\Platform\Navigation;
 
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Platform\Navigation\Data\NavigationItemData;
+use Larasell\Admin\Platform\Navigation\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Table;
 use LogicException;

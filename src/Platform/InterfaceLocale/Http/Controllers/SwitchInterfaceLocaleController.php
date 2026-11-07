@@ -4,7 +4,7 @@ namespace Larasell\Admin\Platform\InterfaceLocale\Http\Controllers;
 
 use Inertia\Inertia;
 use Larasell\Admin\Platform\InterfaceLocale\Http\Requests\SetInterfaceLocaleRequest;
-use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocaleResolver;
+use Larasell\Admin\Platform\InterfaceLocale\Resolvers\InterfaceLocaleResolver;
 use Symfony\Component\HttpFoundation\Response;
 
 class SwitchInterfaceLocaleController

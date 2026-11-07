@@ -15,6 +15,11 @@ and their parts), `Enums/`, `Events/` (what it broadcasts), `Exceptions/`, `Http
 `resources/js/Components/<Module>/`, and tests in `tests/Feature/<Module>/` or
 `tests/Feature/Platform/<Area>/`.
 
+Platform areas use the same folders. Only the classes apps and modules work with directly
+stay at an area's top level, such as `Audit\Auditor`, `Navigation\NavigationItem` or
+`InterfaceLocale\Translate`. Areas with a swappable strategy add `Resolvers/` (the contract and
+its default, e.g. `ContentLocaleResolver`) and `Locales/` (the lists of locales offered).
+
 The platform never uses a module, and a module uses another one only when
 `tests/Arch/ModulesTest.php` lists it as what it builds on. When a module needs the
 platform to know about it, it registers itself, e.g. `Auditor::actorType()`.

@@ -4,9 +4,9 @@ namespace Larasell\Admin\Team\Actions;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Platform\Audit\Actor;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\UnknownActor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\AuditRecords\AdminDeleted;
 use Larasell\Admin\Team\Exceptions\AdminRemovalFailed;

@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Team\Console;
 
 use Illuminate\Console\Command;
-use Larasell\Admin\Platform\Audit\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\Actions\DeleteAdmin;
 use Larasell\Admin\Team\Exceptions\AdminRemovalFailed;

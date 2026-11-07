@@ -4,8 +4,8 @@ namespace Larasell\Admin\Platform\InterfaceLocale\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Larasell\Admin\Platform\InterfaceLocale\AvailableInterfaceLocales;
 use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
+use Larasell\Admin\Platform\InterfaceLocale\Locales\AvailableInterfaceLocales;
 
 class SetInterfaceLocaleRequest extends FormRequest
 {

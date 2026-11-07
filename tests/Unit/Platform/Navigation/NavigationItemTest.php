@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Platform\Navigation\InvalidNavigationItem;
+use Larasell\Admin\Platform\Navigation\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Platform\Navigation\NavigationItem;
 use Larasell\Admin\Platform\Panel\Icon;
 

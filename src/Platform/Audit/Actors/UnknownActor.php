@@ -1,6 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Platform\Audit;
+namespace Larasell\Admin\Platform\Audit\Actors;
+
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 
 /**
  * For the rare action whose actor can't be known, with the reason why, e.g. data imported from

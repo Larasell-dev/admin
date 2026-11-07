@@ -4,7 +4,7 @@ namespace Larasell\Admin\Team\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
-use Larasell\Admin\Platform\Audit\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Team\Actions\CreateAdmin;
 
 class CreateAdminUserCommand extends Command

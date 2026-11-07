@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Platform\ContentLocale\Data;
 
 use Illuminate\Support\Facades\App;
-use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
+use Larasell\Admin\Platform\ContentLocale\Locales\AvailableLocales;
 use Larasell\Larasell\Enums\Locale;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\Audit;
+namespace Larasell\Admin\Platform\Audit\Enums;
 
 /**
  * How an audited action came in, apart from who did it.

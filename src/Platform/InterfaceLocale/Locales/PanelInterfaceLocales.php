@@ -1,6 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Platform\InterfaceLocale;
+namespace Larasell\Admin\Platform\InterfaceLocale\Locales;
+
+use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
 
 /**
  * The languages the panel ships translations for, and the pseudo-languages while it runs locally,

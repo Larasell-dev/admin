@@ -3,9 +3,9 @@
 namespace Larasell\Admin\Team\Actions;
 
 use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Platform\Audit\Actor;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\UnknownActor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\AuditRecords\AdminUpdated;
 

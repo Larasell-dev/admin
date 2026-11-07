@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\ContentLocale;
+namespace Larasell\Admin\Platform\ContentLocale\Resolvers;
 
 use Illuminate\Http\Request;
 use Larasell\Larasell\Enums\Locale;

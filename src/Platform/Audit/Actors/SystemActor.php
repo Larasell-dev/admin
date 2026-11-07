@@ -1,6 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Platform\Audit;
+namespace Larasell\Admin\Platform\Audit\Actors;
+
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 
 /**
  * A job or command acting on its own, named for what it does, e.g. inventory-reconciliation.

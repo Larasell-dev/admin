@@ -5,10 +5,10 @@ namespace Larasell\Admin\Platform\Audit\Log\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Platform\Audit\AuditCategory;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogPruned;
-use Larasell\Admin\Platform\Audit\SystemActor;
 
 /**
  * Deletes audit records older than their category's retention period, set in

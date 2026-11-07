@@ -2,7 +2,7 @@
 
 namespace Larasell\Admin\Product\Tables;
 
-use Larasell\Admin\Platform\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;

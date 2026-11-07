@@ -1,6 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Platform\InterfaceLocale;
+namespace Larasell\Admin\Platform\InterfaceLocale\Locales;
+
+use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
 
 /**
  * The languages admins can show the panel in.

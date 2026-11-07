@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
-use Larasell\Admin\Platform\InterfaceLocale\CookieInterfaceLocaleResolver;
+use Larasell\Admin\Platform\InterfaceLocale\Resolvers\CookieInterfaceLocaleResolver;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;

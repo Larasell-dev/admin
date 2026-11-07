@@ -3,8 +3,8 @@
 namespace Larasell\Admin\ApiToken\AuditRecords;
 
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\AuditCategory;
 use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Subject;
 
 /**
