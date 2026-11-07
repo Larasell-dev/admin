@@ -2,7 +2,8 @@
 
 The product and category forms no longer have a **Slug** field. A product's
 storefront address is now an SEO URL from the core's SEO module: one per sales
-channel and language, made from the name. Old paths keep redirecting.
+channel and language, made from the name unless an admin types a custom path in
+the product page's new **URLs** section. Old paths keep redirecting.
 
 ## Why
 
@@ -16,7 +17,8 @@ props, or extend the panel's catalog classes. Everyone else only needs the
 new core version.
 
 - The `slug` input of `products.store`, `products.update`, `categories.store`
-  and `categories.update` is gone.
+  and `categories.update` is gone. Post a product's paths as
+  `sections[seo][urls][{channel ID}][path]`; an empty path follows the name.
 - `ProductDetailData` and `CategoryDetailData` no longer have `slug` and
   `fallbackSlug`.
 - The core models moved to `Larasell\Larasell\Catalog\Models`:

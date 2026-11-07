@@ -349,6 +349,18 @@ declare namespace Larasell.Admin.SalesChannel.Data {
     label: string;
   };
 }
+declare namespace Larasell.Admin.Seo.Data {
+  export type ProductUrlData = {
+    channelId: number;
+    channel: string;
+    baseUrl: string;
+    customPath: string | null;
+    automaticPath: string | null;
+  };
+  export type ProductUrlsData = {
+    urls: Array<Larasell.Admin.Seo.Data.ProductUrlData>;
+  };
+}
 declare namespace Larasell.Admin.Team.Data {
   export type AdminData = {
     name: string;
