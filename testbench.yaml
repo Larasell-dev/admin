@@ -6,6 +6,7 @@ providers:
   - Workbench\App\ProductNotes\ProductNotesServiceProvider
   - Workbench\App\Storefront\StorefrontServiceProvider
   - Inertia\ServiceProvider
+  - Laravel\Reverb\ApplicationManagerServiceProvider
   - Laravel\Reverb\ReverbServiceProvider
   - Spatie\LaravelData\LaravelDataServiceProvider
 
