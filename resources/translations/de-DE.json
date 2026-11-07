@@ -3906,34 +3906,12 @@
       ],
       "types": []
     },
-    "nzV4V65POZvm4O97nbS0uA==": {
-      "description": "Sales channel form: placeholder of the field that picks the channel's languages or currencies, which typing searches",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Suchen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "J7mpf72wvyGUdQvYE3PJlQ==": {
       "description": "Sales channel form: shown in the list of languages or currencies when the typed text matches none",
       "tokens": [],
       "translations": [
         {
           "translation": "Keine Treffer",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Du2p1YnZSGVIc9zaz3HeIQ==": {
-      "description": "Sales channel form: accessible name of the button on a picked language or currency that removes it, e.g. 'Remove Euro (EUR)'",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{item} entfernen",
           "variations": {}
         }
       ],
@@ -4363,6 +4341,50 @@
       "translations": [
         {
           "translation": "Weiterleitung löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "774um5jLdh1Itl/gunUXhg==": {
+      "description": "Add domain dialog: placeholder of the search field in the list of languages",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprachen suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qUfDhFrgwox+bfDFQxrUMg==": {
+      "description": "Add domain dialog: shown in the list of languages when the typed text matches none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Sprache passt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1OHGIRqs0A2sVKlNOxnrFA==": {
+      "description": "Sales channel form: shown on the button of the languages or currencies field while none is picked",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine ausgewählt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IsPdMz5I1xfAtz26bOa1SA==": {
+      "description": "Sales channel form: placeholder of the search field in the list of languages or currencies the channel sells in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Suchen",
           "variations": {}
         }
       ],

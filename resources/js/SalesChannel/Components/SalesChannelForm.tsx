@@ -1,14 +1,6 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import { useFormContext } from "@inertiajs/react";
-import {
-  Checkbox,
-  Field,
-  Input,
-  Section,
-  SectionStack,
-  Stack,
-  TagCombobox,
-} from "@larasell-dev/ui";
+import { Checkbox, Field, Input, Section, SectionStack, Select, Stack } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import { type ReactNode, useState } from "react";
 import { slugify } from "../../Platform/Support/slugify";
@@ -115,17 +107,11 @@ export default function SalesChannelForm({
                 name="type"
                 error={errors.type}
               >
-                <Input
-                  defaultValue={types[0]}
-                  render={
-                    <select>
-                      {types.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  }
+                <Select
+                  items={types}
+                  itemToKey={(type) => type}
+                  itemToLabel={(type) => type}
+                  defaultValue={types[0] ?? null}
                 />
               </Field>
             ) : (
@@ -224,9 +210,9 @@ export default function SalesChannelForm({
 }
 
 /**
- * Picks the options as tags, submitted as `name[]`, with the select of the default below. Typing
- * filters them, which hundreds of locales or currencies need. With `withCode`, each option shows
- * its code after its name, less prominent.
+ * Picks several options, with the select of the default below. Typing filters them, which
+ * hundreds of locales or currencies need. With `withCode`, each option shows its code after its
+ * name, less prominent.
  */
 function Choices({
   name,
@@ -248,40 +234,42 @@ function Choices({
   children: ReactNode;
 }) {
   return (
-    <Stack spacing={5}>
-      <Field label={label} name={name} error={error}>
-        <TagCombobox.Root
-          value={picked}
-          onValueChange={onChange}
-          placeholder={fbs(
-            "Search",
-            "Sales channel form: placeholder of the field that picks the channel's languages or currencies, which typing searches",
-          )}
-          empty={fbs(
-            "Nothing matches",
-            "Sales channel form: shown in the list of languages or currencies when the typed text matches none",
-          )}
-          removeLabel={(item) =>
-            fbs(
-              ["Remove ", fbs.param("item", item)],
-              "Sales channel form: accessible name of the button on a picked language or currency that removes it, e.g. 'Remove Euro (EUR)'",
-            )
-          }
-        >
-          {options.map((option) => (
-            <TagCombobox.Item
-              key={option.value}
-              value={option.value}
-              label={optionLabel(option, withCode)}
-            >
-              {option.label}
-              {withCode && <span className="text-base-tertiary"> {option.value}</span>}
-            </TagCombobox.Item>
-          ))}
-        </TagCombobox.Root>
-      </Field>
-      {children}
-    </Stack>
+    // One width for both selects, so they line up; full width on phones.
+    <div className="sm:max-w-sm">
+      <Stack spacing={5}>
+        <Field label={label} name={name} error={error}>
+          <Select
+            multiple
+            items={options}
+            itemToKey={(option) => option.value}
+            itemToLabel={(option) => optionLabel(option, withCode)}
+            defaultValue={picked}
+            onValueChange={onChange}
+            placeholder={fbs(
+              "None picked",
+              "Sales channel form: shown on the button of the languages or currencies field while none is picked",
+            )}
+            filter={{
+              placeholder: fbs(
+                "Search",
+                "Sales channel form: placeholder of the search field in the list of languages or currencies the channel sells in",
+              ),
+              empty: fbs(
+                "Nothing matches",
+                "Sales channel form: shown in the list of languages or currencies when the typed text matches none",
+              ),
+            }}
+            renderItem={(option) => (
+              <>
+                {option.label}
+                {withCode && <span className="text-base-tertiary"> {option.value}</span>}
+              </>
+            )}
+          />
+        </Field>
+        {children}
+      </Stack>
+    </div>
   );
 }
 
@@ -289,6 +277,7 @@ function Choices({
 const optionLabel = (option: Option, withCode: boolean) =>
   withCode && option.label !== option.value ? `${option.label} (${option.value})` : option.label;
 
+/** Picks one of the picked options as the default; a removed default falls back to the first. */
 function DefaultSelect({
   name,
   label,
@@ -304,29 +293,21 @@ function DefaultSelect({
   withCode?: boolean;
   error?: string;
 }) {
+  const [value, setValue] = useState(defaultValue ?? null);
+  const offered = options.some((option) => option.value === value)
+    ? value
+    : (options[0]?.value ?? null);
+
   return (
-    <div className="max-w-xs">
-      <Field label={label} name={name} error={error}>
-        <Input
-          // Remounts when the options change, so a removed default falls back to the first one.
-          key={options.map((option) => option.value).join()}
-          defaultValue={
-            options.some((option) => option.value === defaultValue)
-              ? defaultValue
-              : options[0]?.value
-          }
-          disabled={options.length === 0}
-          render={
-            <select>
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {optionLabel(option, withCode)}
-                </option>
-              ))}
-            </select>
-          }
-        />
-      </Field>
-    </div>
+    <Field label={label} name={name} error={error}>
+      <Select
+        items={options}
+        itemToKey={(option) => option.value}
+        itemToLabel={(option) => optionLabel(option, withCode)}
+        value={offered}
+        onValueChange={setValue}
+        disabled={options.length === 0}
+      />
+    </Field>
   );
 }

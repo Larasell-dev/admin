@@ -11,6 +11,7 @@ import {
   IconButton,
   Input,
   Section,
+  Select,
   Stack,
 } from "@larasell-dev/ui";
 import { AddLine, DeleteBinLine } from "@larasell-dev/ui/icons";
@@ -215,17 +216,21 @@ function AddEntryPoint({
                     name="locale"
                     error={errors.locale}
                   >
-                    <Input
+                    <Select
+                      items={locales}
+                      itemToKey={(option) => option.value}
+                      itemToLabel={(option) => option.label}
                       defaultValue={channel.defaultLocale}
-                      render={
-                        <select>
-                          {locales.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      }
+                      filter={{
+                        placeholder: fbs(
+                          "Search languages",
+                          "Add domain dialog: placeholder of the search field in the list of languages",
+                        ),
+                        empty: fbs(
+                          "No language matches",
+                          "Add domain dialog: shown in the list of languages when the typed text matches none",
+                        ),
+                      }}
                     />
                   </Field>
                   <Field
@@ -240,29 +245,30 @@ function AddEntryPoint({
                       "Add domain dialog: hint below the starting currency select",
                     )}
                   >
-                    <Input
+                    <Select
+                      items={[
+                        {
+                          value: "",
+                          label: fbs(
+                            [
+                              "Channel default (",
+                              fbs.param("currency", label(currencies, channel.defaultCurrency)),
+                              ")",
+                            ],
+                            "Add domain dialog: first option of the starting currency select, which uses the channel's default currency, e.g. 'Channel default (Swiss Franc)'",
+                          ),
+                        },
+                        ...currencies.map((option) => ({
+                          value: option.value,
+                          label:
+                            option.label === option.value
+                              ? option.label
+                              : `${option.label} (${option.value})`,
+                        })),
+                      ]}
+                      itemToKey={(option) => option.value}
+                      itemToLabel={(option) => option.label}
                       defaultValue=""
-                      render={
-                        <select>
-                          <option value="">
-                            {fbs(
-                              [
-                                "Channel default (",
-                                fbs.param("currency", label(currencies, channel.defaultCurrency)),
-                                ")",
-                              ],
-                              "Add domain dialog: first option of the starting currency select, which uses the channel's default currency, e.g. 'Channel default (Swiss Franc)'",
-                            )}
-                          </option>
-                          {currencies.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label === option.value
-                                ? option.label
-                                : `${option.label} (${option.value})`}
-                            </option>
-                          ))}
-                        </select>
-                      }
                     />
                   </Field>
                 </div>
