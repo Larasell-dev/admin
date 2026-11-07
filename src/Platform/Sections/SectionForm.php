@@ -23,7 +23,7 @@ enum SectionForm: string
 
     /**
      * The category form, on the category's create and show pages. Its own sections are the
-     * CategorySection cases; sections save with CategorySaved.
+     * CategorySection cases; sections save with the core's CategoryCreated and CategoryUpdated, which carry their payloads as Attachments.
      */
     case Category = 'category';
 }

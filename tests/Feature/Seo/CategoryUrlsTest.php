@@ -106,3 +106,18 @@ it('creates no category when its URL is refused', function () {
 
     expect(Category::query()->count())->toBe(1);
 });
+
+it('saves a URL when nothing else about the category changed', function () {
+    // Arrange
+    $this->post(route('larasell.admin.categories.store'), categoryUrlsInput('Shoes', [$this->europe => '']));
+    $shoes = Category::query()->sole();
+
+    // Act
+    $this->put(route('larasell.admin.categories.update', $shoes), categoryUrlsInput('Shoes', [$this->europe => 'footwear']))
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect(app(SeoUrlManager::class)->canonical($shoes, SalesContext::for('europe', 'en')))
+        ->path->toBe('footwear')
+        ->is_custom->toBeTrue();
+});

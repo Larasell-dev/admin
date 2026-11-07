@@ -79,6 +79,20 @@ final class SectionRequests
     }
 
     /**
+     * The validated sections' payloads that are objects, to pass along with a core action as its
+     * Extensions; sections without one are left out.
+     *
+     * @return list<object>
+     */
+    public function payloads(): array
+    {
+        return array_values(array_filter(
+            array_map(fn (SectionRequest $request): mixed => $request->payload(), $this->requests),
+            is_object(...),
+        ));
+    }
+
+    /**
      * A section's validated request, by its class, e.g. in a listener of the page's saved event.
      *
      * @template T of SectionRequest

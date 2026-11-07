@@ -4,10 +4,11 @@ namespace Larasell\Admin\Seo\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
-use Larasell\Admin\Category\Events\CategorySaved;
-use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Seo\Http\Requests\SeoUrlsRequest;
+use Larasell\Larasell\Catalog\Events\CategoryCreated;
+use Larasell\Larasell\Catalog\Events\CategoryUpdated;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Seo\Exceptions\InvalidSeoPath;
 use Larasell\Larasell\Seo\SeoUrlManager;
 
@@ -24,24 +25,28 @@ class SaveSeoUrls
      */
     public function product(ProductSaved $event): void
     {
-        $this->save($event->product, $event->context, $event->section(SeoUrlsRequest::class));
+        $this->save($event->product, $event->section(SeoUrlsRequest::class)->payload());
     }
 
     /**
+     * Runs in the core action's transaction, so a refused path saves nothing of the category.
+     *
      * @throws ValidationException when a path is malformed, reserved or used by another page
      */
-    public function category(CategorySaved $event): void
+    public function category(CategoryCreated|CategoryUpdated $event): void
     {
-        $this->save($event->category, $event->context, $event->section(SeoUrlsRequest::class));
+        $payload = $event->attachments->get(SeoUrlsPayload::class);
+
+        if ($payload !== null) {
+            $this->save(Category::query()->findOrFail($event->categoryId->value), $payload);
+        }
     }
 
     /**
      * @throws ValidationException
      */
-    private function save(Model $resource, SectionContext $page, SeoUrlsRequest $section): void
+    private function save(Model $resource, ?SeoUrlsPayload $payload): void
     {
-        $payload = $section->payload();
-
         if ($payload === null) {
             return;
         }
@@ -49,7 +54,7 @@ class SaveSeoUrls
         foreach ($this->urls->contexts() as $context) {
             $channelId = $context->channelId->value;
 
-            if ($context->locale !== $page->locale || ! array_key_exists($channelId, $payload->paths)) {
+            if ($context->locale !== $payload->locale || ! array_key_exists($channelId, $payload->paths)) {
                 continue;
             }
 

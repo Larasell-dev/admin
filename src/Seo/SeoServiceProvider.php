@@ -5,7 +5,6 @@ namespace Larasell\Admin\Seo;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\Category\Enums\CategorySection;
-use Larasell\Admin\Category\Events\CategorySaved;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
@@ -13,11 +12,13 @@ use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Seo\Actions\SaveSeoUrls;
 use Larasell\Admin\Seo\Data\SeoUrlsProps;
 use Larasell\Admin\Seo\Http\Requests\SeoUrlsRequest;
+use Larasell\Larasell\Catalog\Events\CategoryCreated;
+use Larasell\Larasell\Catalog\Events\CategoryUpdated;
 
 /**
  * The SEO module: the URLs sections of the product and category pages, added through the pages'
  * sections like a plugin's, so the Product and Category modules know nothing about URLs. Writes
- * go through the core's SeoUrlManager, in the product's or category's transaction.
+ * go through the core's SeoUrlManager, in the product's or category's transaction: the category's through the core actions' events.
  */
 class SeoServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,7 @@ class SeoServiceProvider extends ServiceProvider
             ->request(SeoUrlsRequest::class);
 
         Event::listen(ProductSaved::class, [SaveSeoUrls::class, 'product']);
-        Event::listen(CategorySaved::class, [SaveSeoUrls::class, 'category']);
+        // The category form passes the section's payload along with the core's actions.
+        Event::listen([CategoryCreated::class, CategoryUpdated::class], [SaveSeoUrls::class, 'category']);
     }
 }
