@@ -16,6 +16,8 @@ use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\SalesChannels\Actions\CreateSalesChannel;
+use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Larasell\Larasell\SalesChannels\SalesContext;
 
 beforeEach(function () {
@@ -244,6 +246,23 @@ it('finds categories by their name in any locale and shows the name in the conte
         ]]]);
 });
 
+it('finds sales channels by their name', function () {
+    // Arrange
+    signInSearchAdmin();
+    SalesChannel::query()->whereKey(1)->update(['name' => 'Webshop']);
+    app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'Wholesale Shop', 'type' => 'storefront', 'locales' => ['en'], 'currencies' => ['USD']]);
+    $wholesale = SalesChannel::query()->where('key', 'b2b')->firstOrFail();
+
+    // Act & Assert
+    $this->getJson(route('larasell.admin.search.sales-channels', ['q' => 'wholesaleshop']))
+        ->assertExactJson(['results' => [[
+            'id' => $wholesale->id,
+            'label' => 'Wholesale Shop',
+            'url' => route('larasell.admin.sales-channels.edit', $wholesale),
+            'match' => null,
+        ]]]);
+});
+
 it('needs a search of at most 200 characters', function (string $route) {
     // Arrange
     signInSearchAdmin();
@@ -256,6 +275,7 @@ it('needs a search of at most 200 characters', function (string $route) {
     'orders' => 'larasell.admin.search.orders',
     'customers' => 'larasell.admin.search.customers',
     'categories' => 'larasell.admin.search.categories',
+    'sales channels' => 'larasell.admin.search.sales-channels',
 ]);
 
 it('searches only for signed-in admins', function (string $route) {
@@ -269,6 +289,7 @@ it('searches only for signed-in admins', function (string $route) {
     'larasell.admin.search.orders',
     'larasell.admin.search.customers',
     'larasell.admin.search.categories',
+    'larasell.admin.search.sales-channels',
 ]);
 
 it('searches with the product search bound in the container', function () {
@@ -304,13 +325,14 @@ it('shares the searches of the enabled modules with signed-in admins', function 
             ['id' => 'categories', 'label' => 'Search categories', 'icon' => 'Folders', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.categories')],
             ['id' => 'customers', 'label' => 'Search customers', 'icon' => 'Group', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.customers')],
             ['id' => 'orders', 'label' => 'Search orders', 'icon' => 'Receipt', 'placeholder' => 'Search by number, customer or email', 'url' => route('larasell.admin.search.orders')],
+            ['id' => 'sales-channels', 'label' => 'Search sales channels', 'icon' => 'Store', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.sales-channels')],
         ]));
 
     $this->bootingWith(fn () => config(['larasell.admin.orders.enabled' => false]));
     signInSearchAdmin();
 
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'customers']));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'customers', 'sales-channels']));
 });
 
 it('lets a plugin add its own search to the command menu', function () {
@@ -326,7 +348,7 @@ it('lets a plugin add its own search to the command menu', function () {
 
     // Act & Assert
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.4', [
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.5', [
             'id' => 'gift-cards',
             'label' => 'Search gift cards',
             'icon' => 'Gift',
