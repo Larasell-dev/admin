@@ -20,6 +20,17 @@ return [
      * a URL that names the table by its path in this namespace, for example
      * App\Tables\ProductReviews becomes "product-reviews".
      */
+    /*
+     * Where browsers connect to Reverb or Pusher for live updates, when that is not the host, port
+     * and scheme of the broadcasting connection the server sends to, e.g. behind a proxy. Unset
+     * values fall back to the connection's.
+     */
+    'live' => [
+        'host' => env('LARASELL_ADMIN_LIVE_HOST'),
+        'port' => env('LARASELL_ADMIN_LIVE_PORT'),
+        'scheme' => env('LARASELL_ADMIN_LIVE_SCHEME'),
+    ],
+
     'tables' => [
         'namespace' => 'App\\Tables',
     ],

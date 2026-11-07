@@ -41,6 +41,8 @@ beforeEach(function () {
         }
     });
     config(['broadcasting.connections.capture' => ['driver' => 'capture'], 'broadcasting.default' => 'capture']);
+    // Browsers connect where the server does, whatever a local .env says.
+    config(['larasell.admin.panel.live' => ['host' => null, 'port' => null, 'scheme' => null]]);
 });
 
 it('tells the browser to reload the sidebar on the private admin channel when sales channels change', function () {
@@ -150,4 +152,19 @@ it('gives the browser what it needs to connect to Reverb or Pusher, and nothing 
         'authEndpoint' => route('larasell.admin.broadcasting.auth'),
     ])
         ->and($log)->not->toContain('larasell-admin-live');
+});
+
+it('lets browsers reach the broadcaster at another address than the server does, e.g. behind a proxy', function () {
+    // Arrange
+    $this->actingAs($this->admin, 'larasell-admin');
+    config(['broadcasting.default' => 'reverb', 'broadcasting.connections.reverb' => [
+        'driver' => 'reverb', 'key' => 'public-key', 'secret' => 'secret', 'app_id' => '1', 'options' => ['host' => 'localhost', 'port' => 8080, 'scheme' => 'http'],
+    ], 'larasell.admin.panel.live' => ['host' => 'shop.example', 'port' => 443, 'scheme' => 'https']]);
+
+    // Act
+    $page = $this->get(route('larasell.admin.home'))->getContent();
+
+    // Assert
+    preg_match('#<script type="application/json" id="larasell-admin-live">(.*?)</script>#s', $page, $match);
+    expect(json_decode($match[1] ?? 'null', true))->toMatchArray(['wsHost' => 'shop.example', 'wsPort' => 443, 'wssPort' => 443, 'forceTLS' => true]);
 });
