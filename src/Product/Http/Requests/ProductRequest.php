@@ -11,6 +11,7 @@ use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\SectionRequests;
 use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Product\Rules\Barcode;
+use Larasell\Larasell\Attachments\Attachments;
 use Larasell\Larasell\Barcode as LarasellBarcode;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
@@ -97,6 +98,14 @@ class ProductRequest extends FormRequest
     public function after(): array
     {
         return [$this->sections()->validate()];
+    }
+
+    /**
+     * The sections' payloads, passed along with the core's action, e.g. the product's custom URLs.
+     */
+    public function attachments(): Attachments
+    {
+        return new Attachments(...$this->sections()->payloads());
     }
 
     /**

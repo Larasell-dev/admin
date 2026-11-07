@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e13ef05437e4f5a14792e2e085300bd",
+    "content-hash": "7c9d6e16943071c9d27575ccf7d40a98",
     "packages": [
         {
             "name": "brick/math",
@@ -1198,16 +1198,16 @@
         },
         {
             "name": "larasell-dev/chronicle",
-            "version": "v0.4.0",
+            "version": "v0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/chronicle.git",
-                "reference": "208a296f02503728d7340bd16f4fcc2f170d9939"
+                "reference": "ee8fa14f23e859be4e1a00aca159f004d555b9ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/chronicle/zipball/208a296f02503728d7340bd16f4fcc2f170d9939",
-                "reference": "208a296f02503728d7340bd16f4fcc2f170d9939",
+                "url": "https://api.github.com/repos/Larasell-dev/chronicle/zipball/ee8fa14f23e859be4e1a00aca159f004d555b9ec",
+                "reference": "ee8fa14f23e859be4e1a00aca159f004d555b9ec",
                 "shasum": ""
             },
             "require": {
@@ -1243,23 +1243,23 @@
             "description": "Simple structured request logging for Laravel.",
             "support": {
                 "issues": "https://github.com/Larasell-dev/chronicle/issues",
-                "source": "https://github.com/Larasell-dev/chronicle/tree/v0.4.0"
+                "source": "https://github.com/Larasell-dev/chronicle/tree/v0.4.1"
             },
-            "time": "2026-11-03T19:48:37+00:00",
-            "published-time": "2026-11-03T19:48:51+00:00"
+            "time": "2026-11-03T22:09:35+00:00",
+            "published-time": "2026-11-03T22:10:46+00:00"
         },
         {
             "name": "larasell-dev/larasell",
-            "version": "v1.24.1",
+            "version": "v1.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "1d4b4f796d234337121ec46dd64543a17b61196b"
+                "reference": "e2002f5be987bdabbbb53a5240a2534d8396c6af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/1d4b4f796d234337121ec46dd64543a17b61196b",
-                "reference": "1d4b4f796d234337121ec46dd64543a17b61196b",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/e2002f5be987bdabbbb53a5240a2534d8396c6af",
+                "reference": "e2002f5be987bdabbbb53a5240a2534d8396c6af",
                 "shasum": ""
             },
             "require": {
@@ -1320,8 +1320,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-11-07T08:28:25+00:00",
-            "published-time": "2026-11-07T08:28:42+00:00"
+            "time": "2026-11-07T11:03:40+00:00",
+            "published-time": "2026-11-07T11:03:56+00:00"
         },
         {
             "name": "laravel/framework",
