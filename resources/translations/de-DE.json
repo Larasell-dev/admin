@@ -4136,6 +4136,258 @@
         }
       ],
       "types": []
+    },
+    "qrCdHrEiM3D31dQMkYLTBA==": {
+      "description": "Product and category forms, URLs section: name of the table of a channel's earlier URLs",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Old URLs in {channel}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QLGba65fe0DBiyGunlHRhw==": {
+      "description": "Product and category forms, URLs section: heading of the column with earlier URLs that now redirect to the current one",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Redirects to the current URL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vC6jubaVRJZCb/oJgCP2dw==": {
+      "description": "Product and category forms, URLs section: heading of the column with each old URL's menu of actions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Actions",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hPwyWw5lcOn9cF14WNXchA==": {
+      "description": "Product and category forms, URLs section: label of the button that opens an old URL's menu",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Actions for /{path}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aI/ytFxasssHJUD3fqgKZw==": {
+      "description": "Product and category forms, URLs section: menu item that makes an old URL the current one again",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Make current URL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zp+k+K5Nj+t44eDAYIeojw==": {
+      "description": "Product and category forms, URLs section: menu item that removes an old URL, so it stops redirecting",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Remove redirect",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/1lR7Eo2kLfzVjMToBAU6w==": {
+      "description": "Product and category forms, URLs section: label of the field with the current address in a sales channel, e.g. 'URL in Europe'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "URL in {channel}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QdT8Kk1M6+JXHxaP8cnzsA==": {
+      "description": "Product and category forms, URLs section: button that picks which sales channels' URLs show, while all of them show",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "All sales channels",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "whUmjnO1SnqgNVHoqsziWQ==": {
+      "description": "Product and category forms, URLs section: button that picks which sales channels' URLs show, naming how many show, e.g. '3 sales channels'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{count} sales channels",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c0DoKJ559zO9YnHLV4vITQ==": {
+      "description": "Product and category forms, URLs section: button that picks which sales channels' URLs show, naming how many show, e.g. '3 sales channels'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 sales channel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8VqQJVZikwzXjyWxR4N/Rw==": {
+      "description": "Product and category forms, URLs section: placeholder of the search field in the list of sales channels to show",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search sales channels",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AH2oLKhA1pYE9wMMO946qg==": {
+      "description": "Product and category forms, URLs section: shown in the list of sales channels when the search matches none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No sales channel matches.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lmSI2j3blchtbb7zzmcApw==": {
+      "description": "Product and category forms, URLs section: heading shown when the admin unchecked every sales channel in the filter",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No sales channels selected",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IdZ3hBOJliIjRJ4tHpWBSw==": {
+      "description": "Product and category forms, URLs section: text below 'No sales channels selected'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Pick sales channels in the filter to see their URLs.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uP7pdm8/1qFOr4308jSCDw==": {
+      "description": "Product and category forms, URLs section: button in the empty state that shows every sales channel's URLs again",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Show all sales channels",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AihtZsftjcgm4bxg+ZdC6Q==": {
+      "description": "Product and category forms, URLs section: button that picks which sales channels' URLs show, while none show",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No sales channels",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JUqBumenNUlZS8y1cRmY1g==": {
+      "description": "Product and category forms, URLs section: title of the dialog that confirms removing an old URL",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete this redirect?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f1/Wpeo1tb53s9+BR3An+A==": {
+      "description": "Product and category forms, URLs section: text of the dialog that confirms removing an old URL, naming its path",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "/{path} will no longer lead to this page, and another page can use it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "B6NAed40TnuGPl+e+TqH+Q==": {
+      "description": "Product and category forms, URLs section: button in the dialog that removes an old URL",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete redirect",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dM4f1fo2RKTG/d9WrpsADA==": {
+      "description": "Product and category forms, URLs section: button that closes the dialog without removing the old URL",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Cancel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cv6QM2ARW40S96fVuHwSuQ==": {
+      "description": "Product and category forms, URLs section: text the admin types to confirm removing an old URL",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete redirect",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

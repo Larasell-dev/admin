@@ -63,7 +63,14 @@ export default function UnsavedChangesToast() {
 
     const stopVisits = router.on("before", (event) => {
       // Prefetching only loads the page in the background; it doesn't leave this one.
-      if (saving.current || event.detail.visit.prefetch) return;
+      // A visit that keeps the page's state, such as removing an old URL, stays on this page
+      // and keeps what was typed.
+      if (
+        saving.current ||
+        event.detail.visit.prefetch ||
+        event.detail.visit.preserveState === true
+      )
+        return;
 
       store.wobble();
       return false;

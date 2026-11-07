@@ -43,7 +43,7 @@ it('gives a category a URL per channel in the content language, custom where one
     $this->get(route('larasell.admin.categories.show', $shoes))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('sections.0.key', 'seo')
-            ->where('sections.0.props.urls', [
+            ->where('sections.0.props.urls', fn ($urls) => collect($urls)->map(fn ($url) => collect($url)->except('history')->all())->all() === [
                 ['channelId' => $this->europe, 'channel' => 'Europe', 'baseUrl' => 'https://shop.de/en/', 'customPath' => 'footwear', 'automaticPath' => 'shoes'],
                 ['channelId' => 1, 'channel' => 'Laravel', 'baseUrl' => rtrim(config('app.url'), '/').'/', 'customPath' => null, 'automaticPath' => 'shoes'],
             ]));

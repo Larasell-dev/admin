@@ -12,7 +12,8 @@ export default function CategoryUrlsSection(
 ) {
   return (
     <Section.Root>
-      <Section.Header
+      <UrlFields
+        {...section}
         title={fbs(
           "URLs",
           "Category form: heading of the section with the category's web addresses",
@@ -21,9 +22,6 @@ export default function CategoryUrlsSection(
           "Where customers find the category in each storefront. Leave a URL empty to make it from the category's name, below its parent's URL, so it follows when either changes.",
           "Category form: explains the URLs section; an empty field gives the category an address made from its name and its parent's address",
         )}
-      />
-      <UrlFields
-        {...section}
         empty={
           <fbt desc="Category form: shown in the URLs section while no storefront has a domain in the content language">
             No storefront has a domain in this language yet, so the category has no URL in it.

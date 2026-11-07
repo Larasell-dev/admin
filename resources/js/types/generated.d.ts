@@ -355,12 +355,25 @@ declare namespace Larasell.Admin.SalesChannel.Data {
   };
 }
 declare namespace Larasell.Admin.Seo.Data {
+  export type OldUrlData = {
+    id: number;
+    path: string;
+    removeUrl: string;
+    restoreUrl: string;
+  };
+  export type OldUrlsData = {
+    urls: Array<Larasell.Admin.Seo.Data.OldUrlData>;
+    page: number;
+    pageSize: number;
+    total: number;
+  };
   export type SeoUrlData = {
     channelId: number;
     channel: string;
     baseUrl: string;
     customPath: string | null;
     automaticPath: string | null;
+    history: Larasell.Admin.Seo.Data.OldUrlsData;
   };
   export type SeoUrlsData = {
     urls: Array<Larasell.Admin.Seo.Data.SeoUrlData>;
