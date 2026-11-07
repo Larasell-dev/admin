@@ -14,7 +14,6 @@ export default function Create({
   indexUrl,
   categories,
   createCategoryUrl,
-  uploadImagesUrl,
   sections,
   contentLocale,
 }: Props) {
@@ -46,7 +45,6 @@ export default function Create({
         <ProductForm
           categories={categories}
           createCategoryUrl={createCategoryUrl}
-          uploadImagesUrl={uploadImagesUrl}
           sections={sections}
         />
         <UnsavedChangesToast />

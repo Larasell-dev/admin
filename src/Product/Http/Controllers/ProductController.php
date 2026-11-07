@@ -21,12 +21,9 @@ use Larasell\Admin\Product\Http\Requests\ProductRequest;
 use Larasell\Larasell\Catalog\Actions\CreateProduct;
 use Larasell\Larasell\Catalog\Actions\CreateProductPayload;
 use Larasell\Larasell\Catalog\Actions\SetProductCategories;
-use Larasell\Larasell\Catalog\Actions\SetProductImages;
 use Larasell\Larasell\Catalog\Actions\UpdateProduct;
-use Larasell\Larasell\Catalog\Actions\UpdateProductImage;
 use Larasell\Larasell\Catalog\Actions\UpdateProductPayload;
 use Larasell\Larasell\Catalog\CategoryId;
-use Larasell\Larasell\Catalog\ImageId;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\ProductId;
@@ -45,8 +42,6 @@ class ProductController
         private readonly CreateProduct $createProduct,
         private readonly UpdateProduct $updateProduct,
         private readonly SetProductCategories $setCategories,
-        private readonly SetProductImages $setImages,
-        private readonly UpdateProductImage $updateImage,
     ) {}
 
     public function create(#[CurrentContentLocale] Locale $locale): Response
@@ -56,7 +51,6 @@ class ProductController
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
-            uploadImagesUrl: route('larasell.admin.products.images.store'),
             sections: $this->sections->data(SectionForm::Product, null, new SectionContext($locale)),
         ));
     }
@@ -99,7 +93,6 @@ class ProductController
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
-            uploadImagesUrl: route('larasell.admin.products.images.store'),
             sections: $this->sections->data(SectionForm::Product, $product, new SectionContext($locale)),
         ));
     }
@@ -149,16 +142,11 @@ class ProductController
     }
 
     /**
-     * Saves the product's categories, its images in their order, and their alt texts.
+     * Saves the product's categories.
      */
     protected function saveRelations(ProductRequest $request, Product $product): void
     {
         $this->setCategories->handle(ProductId::of($product), CategoryId::many($request->categoryIds()));
-        $this->setImages->handle(ProductId::of($product), ImageId::many($request->imageIds()));
-
-        foreach ($request->imageAlts() as $id => $alt) {
-            $this->updateImage->handle(new ImageId((int) $id), ['alt' => $alt]);
-        }
     }
 
     /**

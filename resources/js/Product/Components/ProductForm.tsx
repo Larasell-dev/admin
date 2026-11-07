@@ -1,52 +1,25 @@
-import { Button as BaseButton } from "@base-ui/react/button";
 import { Field as BaseField } from "@base-ui/react/field";
-import { router, useFormContext, useHttp, usePage } from "@inertiajs/react";
-import { cn } from "cn";
+import { useFormContext } from "@inertiajs/react";
 import {
-  Badge,
   Checkbox,
   Error,
   Field,
   Icon,
-  IconButton,
   Input,
-  Menu,
   Section,
   SectionStack,
-  Spinner,
   Stack,
-  useToast,
 } from "@larasell-dev/ui";
-import { AddLine, ArrowDownSLine, FileReduceLine, More2Fill } from "@larasell-dev/ui/icons";
-import { Accessibility, type defaultPreset } from "@dnd-kit/dom";
-import { type DragEndEvent, DragDropProvider } from "@dnd-kit/react";
-import { isSortable, useSortable } from "@dnd-kit/react/sortable";
-import { HotkeysProvider } from "@tanstack/react-hotkeys";
-import {
-  type ChangeEventHandler,
-  Fragment,
-  type ReactNode,
-  type Ref,
-  type RefObject,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
-import { plugins, sensors } from "../../Platform/Support/dragAndDrop";
-import { overlayExclusive } from "../../Platform/Support/hotkeys";
-import { useMergedRef } from "../../Platform/Support/useMergedRef";
+import { ArrowDownSLine } from "@larasell-dev/ui/icons";
+import { type ChangeEventHandler, Fragment, type ReactNode, type Ref, useRef } from "react";
 import CategoryCheckboxTree from "../../Category/Components/CategoryCheckboxTree";
 import ExtensionSections from "../../Platform/Sections/Components/ExtensionSections";
 import FormCheckbox from "../../Platform/Panel/Components/FormCheckbox";
-import { useFrozen } from "../../Platform/Panel/Components/Freeze";
-import ProductImageLightbox from "./ProductImageLightbox";
 import VisibilityField from "../../Platform/Panel/Components/VisibilityField";
 import { fbs } from "fbtee";
 
 type Product = Omit<Larasell.Admin.Product.Data.ProductDetailData, "id">;
 type Category = Larasell.Admin.Category.Data.CategoryOptionData;
-type Image = Larasell.Admin.Product.Data.ProductImageData;
 type Errors = Record<string, string | undefined>;
 type ExtensionSection = Larasell.Admin.Platform.Sections.Data.SectionData;
 /** The product form's own sections, generated from the ProductSection enum. */
@@ -60,7 +33,6 @@ export default function ProductForm({
   product,
   categories,
   createCategoryUrl,
-  uploadImagesUrl,
   sections = [],
 }: {
   product?: Product;
@@ -69,8 +41,6 @@ export default function ProductForm({
   /** Where the store's first categories are created, offered while it has none. Null while the
    * categories are turned off. */
   createCategoryUrl: string | null;
-  /** Where images are uploaded before saving the product links them. */
-  uploadImagesUrl: string;
   /** The sections that modules and plugins add, placed around the product's own. */
   sections?: ExtensionSection[];
 }) {
@@ -91,18 +61,6 @@ export default function ProductForm({
           )}
         />
         <GeneralFields product={product} errors={errors} />
-      </Section.Root>
-    ),
-    images: (
-      <Section.Root>
-        <Section.Header
-          title={fbs("Images", "Product form: heading of the section with the product's images")}
-          description={fbs(
-            "The first image is the product's thumbnail.",
-            "Product form: text below the heading of the Images section, saying the first image is shown as the product's thumbnail",
-          )}
-        />
-        <ImageGrid images={product?.images ?? []} uploadUrl={uploadImagesUrl} saveErrors={errors} />
       </Section.Root>
     ),
     categories: (
@@ -206,427 +164,6 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
       <VisibilityField defaultVisible={product?.visible ?? true} error={errors.status} />
     </Stack>
   );
-}
-
-// Without the plugin that makes each image a focusable button for keyboard dragging, which only
-// the pointer can do here, so the images stay the list's items.
-const imagePlugins = (defaults: typeof defaultPreset.plugins) =>
-  plugins(defaults).filter((plugin) => plugin !== Accessibility);
-
-/** The file types the server accepts. */
-const IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/avif";
-
-/**
- * The product's images in its order, then a square that opens the system's file picker. The
- * chosen images are uploaded right away, one at a time so a rejected one keeps none of the others
- * out, with a plain request since the unsaved changes toast blocks Inertia visits, and join the
- * grid. Dragging an image moves it to another's place; clicking it opens it in a lightbox, which
- * edits its alt text. The form submits the grid's image ids in order and each one's alt text, so
- * saving the product links and describes them; until then, cancelling the changes drops them again.
- * Saving waits for the uploads; cancelling or leaving the page stops them.
- */
-function ImageGrid({
-  images: savedImages,
-  uploadUrl,
-  saveErrors,
-}: {
-  images: Image[];
-  uploadUrl: string;
-  /** The form's errors from saving, of which those for its images show here too. */
-  saveErrors: Errors;
-}) {
-  const [images, setImages] = useState(savedImages);
-  // The files still to upload, each shown as a loading card where its image will appear.
-  const [uploading, setUploading] = useState<File[]>([]);
-  // Why chosen images weren't uploaded, one message per image.
-  const [errors, setErrors] = useState<string[]>([]);
-  const lightbox = useLightboxUrl();
-  const openImage = images.find(({ id }) => id === lightbox.imageId);
-  // The last image opened, kept while the lightbox closes so it fades out with it. Mounted from
-  // then on, so the lightbox keeps its background for the next image.
-  const lightboxImage = useFrozen(openImage, openImage === undefined);
-  // A URL naming an image the product doesn't have, e.g. a stale link, stops naming it, and a
-  // toast says why the image didn't open.
-  const toast = useToast();
-  const dropMissingImage = useEffectEvent(() => {
-    lightbox.close();
-    // By id, so strict mode's second run doesn't show it twice.
-    toast.add({
-      id: "missing-lightbox-image",
-      title: fbs(
-        "Image not found",
-        "Product form: toast when a link opened the full-screen view of an image the product doesn't have (anymore)",
-      ),
-    });
-  });
-  const missingImage = lightbox.imageId !== null && openImage === undefined;
-  useEffect(() => {
-    if (missingImage) dropMissingImage();
-  }, [missingImage]);
-  const grid = useRef<HTMLUListElement>(null);
-  const upload = useHttp<{ image: File | null }, { image: Image }>({ image: null });
-  // The running uploads; replacing it stops them from adding anything more.
-  const run = useRef<object | null>(null);
-  const cancelUpload = upload.cancel;
-
-  // Inertia's <Form> only rechecks whether it's dirty on input, change and reset events, which
-  // inputs React adds or removes don't fire. Without this, uploading wouldn't show the unsaved
-  // changes toast.
-  useEffect(() => {
-    grid.current?.dispatchEvent(new Event("input", { bubbles: true }));
-  }, [images]);
-
-  // Once the product is saved, the rejected images no longer matter.
-  useEffect(() => router.on("success", () => setErrors([])), []);
-
-  // Stops the uploads when the form goes away, e.g. when leaving the page.
-  useEffect(
-    () => () => {
-      run.current = null;
-      cancelUpload();
-    },
-    [cancelUpload],
-  );
-
-  // Cancelling the changes resets the form, which puts its fields back to their saved values but
-  // can't remove the hidden inputs of images uploaded since. Going back to the saved images does,
-  // after stopping the uploads that would add more.
-  useFormReset(grid, () => {
-    run.current = null;
-    cancelUpload();
-    setUploading([]);
-    setErrors([]);
-    setImages(savedImages);
-  });
-
-  // The grid reorders while dragging; dropping keeps that order, cancelling puts it back.
-  const drop = ({ canceled, operation: { source } }: DragEndEvent) => {
-    if (canceled || !isSortable(source) || source.initialIndex === source.index) return;
-    setImages((current) => {
-      const next = [...current];
-      next.splice(source.index, 0, ...next.splice(source.initialIndex, 1));
-      return next;
-    });
-  };
-
-  async function uploadFiles(input: HTMLInputElement) {
-    const files = [...(input.files ?? [])];
-    // Lets the same files be chosen again.
-    input.value = "";
-    if (files.length === 0) return;
-
-    const current = {};
-    run.current = current;
-    setErrors([]);
-    setUploading(files);
-
-    for (const file of files) {
-      let reason: string = fbs(
-        "Try again.",
-        "Product form: the reason after 'Couldn't upload <file name>.' when uploading an image failed for no known reason",
-      );
-      let response: { image: Image } | undefined;
-      upload.transform(() => ({ image: file }));
-      try {
-        // Undefined when the image is invalid; onError says why.
-        response = await upload.post(uploadUrl, {
-          onError: (fieldErrors) => (reason = Object.values(fieldErrors)[0] ?? reason),
-          onHttpException: ({ status }) => {
-            if (status === 413) {
-              reason = fbs(
-                "It's larger than the server accepts.",
-                "Product form: the reason after 'Couldn't upload <file name>.' when the image file is too large",
-              );
-            }
-          },
-        });
-      } catch {
-        // The reason stays "Try again.", unless the uploads were stopped.
-      }
-      if (run.current !== current) return;
-
-      const uploaded = response?.image;
-      if (uploaded) setImages((images) => [...images, uploaded]);
-      else {
-        const error = fbs(
-          ["Couldn't upload ", fbs.param("fileName", file.name), ". ", fbs.param("reason", reason)],
-          "Product form, images: error below the image grid when an image wasn't uploaded, with the file's name and why, e.g. 'Couldn't upload photo.png. Try again.'",
-        );
-        setErrors((errors) => [...errors, error]);
-      }
-      setUploading((files) => files.slice(1));
-    }
-  }
-
-  // Why saving refused the images, e.g. one deleted since it was uploaded. Once per reason, however
-  // many images have it.
-  const invalidImages = [
-    ...new Set(
-      Object.entries(saveErrors)
-        .filter(
-          ([key]) => key === "images" || key.startsWith("images.") || key.startsWith("image_alts."),
-        )
-        .map(([, error]) => error)
-        .filter((error) => error !== undefined),
-    ),
-  ];
-
-  return (
-    <BaseField.Root
-      invalid={invalidImages.length + errors.length > 0}
-      className="flex flex-col gap-1.5"
-    >
-      {/* Fewer columns as the form narrows, so the images stay large enough to tell apart. */}
-      <div className="@container">
-        <ul
-          ref={grid}
-          aria-label={fbs(
-            "Images",
-            "Product form: accessible name of the grid of the product's images",
-          )}
-          aria-busy={uploading.length > 0}
-          className="grid auto-rows-fr grid-cols-1 gap-3 @xs:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4"
-        >
-          <DragDropProvider sensors={sensors} plugins={imagePlugins} onDragEnd={drop}>
-            {images.map((image, index) => (
-              <ImageCard
-                key={image.id}
-                image={image}
-                index={index}
-                onOpen={() => lightbox.open(image.id)}
-                onRemove={() => setImages((current) => current.filter(({ id }) => id !== image.id))}
-              />
-            ))}
-          </DragDropProvider>
-          {uploading.map((file, index) => (
-            <li
-              // The same file can be chosen twice, so its name isn't unique.
-              key={index}
-              className="border-base-subtle flex aspect-square items-center justify-center border bg-base-section text-base-secondary"
-            >
-              <Spinner
-                aria-label={fbs(
-                  ["Uploading ", fbs.param("fileName", file.name)],
-                  "Product form, images: accessible name of the spinner in place of an image that is still uploading, with the file's name",
-                )}
-                size={6}
-              />
-            </li>
-          ))}
-          <li>
-            {/* A label, so clicking anywhere on the square opens the file picker. */}
-            <label
-              className={cn(
-                // A square with the icon in its middle. Relative keeps the hidden file input inside
-                // it; otherwise focusing the input scrolls the whole page to where it would be.
-                "relative flex aspect-square items-center justify-center",
-                "border border-dashed border-base-medium",
-                "text-base-secondary",
-                // Clickable while no upload is running, dimmed while one is
-                "cursor-pointer has-disabled:cursor-default has-disabled:opacity-50",
-                "not-has-disabled:hover:bg-state-hover",
-                // Focus is on the hidden file input inside
-                "has-focus-visible:focus-ring",
-              )}
-            >
-              <input
-                type="file"
-                multiple
-                accept={IMAGE_TYPES}
-                aria-label={fbs(
-                  "Add images",
-                  "Product form, images: accessible name of the square that opens the file picker to upload images",
-                )}
-                disabled={uploading.length > 0}
-                className="sr-only"
-                onChange={(event) => uploadFiles(event.currentTarget)}
-              />
-              <Icon icon={AddLine} size={6} />
-            </label>
-          </li>
-        </ul>
-      </div>
-      {lightboxImage && (
-        <ProductImageLightbox
-          open={openImage !== undefined}
-          image={lightboxImage}
-          onClose={lightbox.close}
-          onAltChange={(alt) =>
-            setImages((current) =>
-              current.map((image) => (image.id === lightboxImage.id ? { ...image, alt } : image)),
-            )
-          }
-        />
-      )}
-      {[...invalidImages, ...errors].map((error, index) => (
-        // The same file can be chosen twice, so its message isn't unique.
-        <Error key={index} match>
-          {error}
-        </Error>
-      ))}
-    </BaseField.Root>
-  );
-}
-
-/**
- * An image in the grid, which drags from anywhere on it, its menu too once the pointer moves.
- * Clicking it without moving opens it.
- */
-function ImageCard({
-  image,
-  index,
-  onOpen,
-  onRemove,
-}: {
-  image: Image;
-  index: number;
-  onOpen: () => void;
-  onRemove: () => void;
-}) {
-  // No transition, so the other images jump to their new places instead of sliding there.
-  const { ref, handleRef, isDragging } = useSortable({ id: image.id, index, transition: null });
-
-  return (
-    <li
-      // The whole card is its handle, since dragging never starts from a button otherwise.
-      ref={useMergedRef(ref, handleRef)}
-      data-dragging={isDragging || undefined}
-      className={cn(
-        "border-base-subtle relative aspect-square cursor-grab overflow-hidden border bg-base-section select-none",
-        "data-dragging:cursor-grabbing data-dragging:opacity-60",
-        // On the card rather than its button, whose ring the card's overflow would clip.
-        "has-[>button:focus-visible]:focus-ring",
-        // Otherwise iOS opens its share and save menu on the long press that starts a touch
-        // drag; it takes over the touch, and no image drags after that.
-        "[-webkit-touch-callout:none]",
-      )}
-    >
-      <input type="hidden" name="images[]" value={image.id} />
-      <input type="hidden" name={`image_alts[${image.id}]`} value={image.alt ?? ""} />
-      <BaseButton
-        aria-label={fbs(
-          ["Open image ", fbs.param("imagePosition", String(index + 1))],
-          "Product form, images: accessible name of an image that opens it in a full-screen view, with its position in the grid, e.g. 'Open image 2'",
-        )}
-        onClick={onOpen}
-        className="size-full cursor-[inherit] outline-none"
-      >
-        {/* A native image drag would take over the pointer before ours starts. */}
-        <img
-          src={image.url}
-          alt={fbs(
-            ["Image ", fbs.param("imagePosition", String(index + 1))],
-            "Product form, images: fallback alternative text of an image in the grid, with its position, e.g. 'Image 2'",
-          )}
-          draggable={false}
-          className="size-full object-cover"
-        />
-      </BaseButton>
-      {index === 0 && (
-        // Flex, so the badge doesn't sit on a text line that adds space above it.
-        <div className="absolute top-2 left-2 flex">
-          <Badge>
-            <fbt desc="Product form, images: badge on the first image, which is shown as the product's thumbnail">
-              Thumbnail
-            </fbt>
-          </Badge>
-        </div>
-      )}
-      <div className="absolute top-2 right-2">
-        <ImageMenu
-          label={fbs(
-            ["Actions for image ", fbs.param("imagePosition", String(index + 1))],
-            "Product form, images: accessible name of the button that opens an image's menu of actions, with its position, e.g. 'Actions for image 2'",
-          )}
-          onRemove={onRemove}
-        />
-      </div>
-    </li>
-  );
-}
-
-/**
- * An image's actions, always visible so they're found without hovering. Removing only takes the
- * image out of the grid: saving unlinks it from the product, cancelling brings it back.
- */
-function ImageMenu({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <Menu.Root>
-      <Menu.Trigger
-        render={
-          // A solid chip like the thumbnail badge, so it stands out on any image.
-          <IconButton variant="secondary" size="sm" aria-label={label}>
-            <Icon icon={More2Fill} />
-          </IconButton>
-        }
-      />
-      <Menu.Popup>
-        <HotkeysProvider scope="image-actions-menu" exclusive={overlayExclusive}>
-          <Menu.Item variant="destructive" icon={FileReduceLine} onClick={onRemove}>
-            <fbt desc="Product form, an image's actions menu: takes the image out of the product's images (saved with the product)">
-              Remove
-            </fbt>
-          </Menu.Item>
-        </HotkeysProvider>
-      </Menu.Popup>
-    </Menu.Root>
-  );
-}
-
-const LIGHTBOX = "product-image-lightbox";
-
-/**
- * Which image the lightbox shows, by id so it stays the same image whatever its position. The URL
- * holds it, as `?dialog=product-image-lightbox&image-id=7`, so a link opens it. Opening and closing
- * only change the URL in the browser: a visit to the server would lose the form's changes, and the
- * unsaved changes toast stops those anyway. They replace the page's history entry instead of adding
- * one, since Inertia remounts the page when going back to an entry, which would drop the changes.
- */
-function useLightboxUrl() {
-  const { url } = usePage();
-  const query = new URL(url, window.location.origin).searchParams;
-  const imageId = query.get("dialog") === LIGHTBOX ? Number(query.get("image-id")) : null;
-
-  const withQuery = (change: (query: URLSearchParams) => void) => {
-    const next = new URL(url, window.location.origin);
-    change(next.searchParams);
-    return {
-      url: next.pathname + next.search + next.hash,
-      preserveScroll: true,
-      preserveState: true,
-    };
-  };
-
-  return {
-    imageId,
-    open: (id: number) =>
-      router.replace(
-        withQuery((query) => {
-          query.set("dialog", LIGHTBOX);
-          query.set("image-id", String(id));
-        }),
-      ),
-    close: () =>
-      router.replace(
-        withQuery((query) => {
-          query.delete("dialog");
-          query.delete("image-id");
-        }),
-      ),
-  };
-}
-
-/** Calls `onReset` whenever the form around `element` is reset, e.g. by cancelling its changes. */
-function useFormReset(element: RefObject<HTMLElement | null>, onReset: () => void) {
-  // Always the latest callback, without listening anew on every render.
-  const reset = useEffectEvent(onReset);
-
-  useEffect(() => {
-    const form = element.current?.closest("form");
-    if (!form) return;
-    form.addEventListener("reset", reset);
-    return () => form.removeEventListener("reset", reset);
-  }, [element]);
 }
 
 /** Both optional; the barcode is saved as its digits, without spaces or dashes. */

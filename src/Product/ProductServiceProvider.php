@@ -14,7 +14,6 @@ use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
-use Larasell\Admin\Product\Http\Controllers\ProductImageController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
 use Larasell\Admin\Product\Search\DatabaseProductSearch;
 use Larasell\Admin\Product\Search\ProductSearch;
@@ -51,7 +50,6 @@ class ProductServiceProvider extends ServiceProvider
             Route::post('products', [ProductController::class, 'store'])->name('products.store');
             Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
-            Route::post('products/images', [ProductImageController::class, 'store'])->name('products.images.store');
             Route::get('search/products', SearchProductsController::class)->name('search.products');
         });
     }

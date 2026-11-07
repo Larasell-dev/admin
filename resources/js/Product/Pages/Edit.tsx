@@ -15,7 +15,6 @@ export default function Edit({
   indexUrl,
   categories,
   createCategoryUrl,
-  uploadImagesUrl,
   sections,
   contentLocale,
 }: Props) {
@@ -48,7 +47,6 @@ export default function Edit({
           product={product}
           categories={categories}
           createCategoryUrl={createCategoryUrl}
-          uploadImagesUrl={uploadImagesUrl}
           sections={sections}
         />
         <UnsavedChangesToast />

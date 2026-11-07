@@ -15,7 +15,6 @@ use Larasell\Larasell\Attachments\Attachments;
 use Larasell\Larasell\Barcode as LarasellBarcode;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
-use Larasell\Larasell\Catalog\Models\ProductImage;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
@@ -61,12 +60,6 @@ class ProductRequest extends FormRequest
             // The form leaves it out when no category is selected.
             'categories' => ['sometimes', 'array'],
             'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
-            // Uploaded images, in the product's order. The form leaves it out when there are none.
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['integer', 'distinct', Rule::exists(ProductImage::class, 'id')],
-            // Each image's alt text keyed by its id. Empty removes it.
-            'image_alts' => ['sometimes', 'array'],
-            'image_alts.*' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -151,9 +144,6 @@ class ProductRequest extends FormRequest
             'allow_backorders' => __('backorders'),
             'min_quantity' => __('minimum quantity'),
             'max_quantity' => __('maximum quantity'),
-            // Shown beside the images, which have no key the admin would know.
-            'images.*' => __('image'),
-            'image_alts.*' => __('alt text'),
         ];
     }
 
@@ -183,28 +173,6 @@ class ProductRequest extends FormRequest
     public function categoryIds(): array
     {
         return array_map(intval(...), $this->validated('categories', []));
-    }
-
-    /**
-     * The ids of the product's images in its order, the first its thumbnail. None when the field
-     * is left out.
-     *
-     * @return list<int>
-     */
-    public function imageIds(): array
-    {
-        return array_map(intval(...), array_values($this->validated('images', [])));
-    }
-
-    /**
-     * The alt text of the product's images keyed by id, null where it was emptied. Those of images
-     * the product doesn't have are left out, so the form can only describe its own.
-     *
-     * @return array<int, ?string>
-     */
-    public function imageAlts(): array
-    {
-        return array_intersect_key($this->validated('image_alts', []), array_flip($this->imageIds()));
     }
 
     /**
