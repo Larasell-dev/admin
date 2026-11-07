@@ -16,8 +16,8 @@ const MODULE_DEPENDENCIES = [
     // The product form picks categories with the Category module's options.
     'Product' => ['Category'],
     'SalesChannel' => [],
-    // The URLs section is a section of the Product module's product page.
-    'Seo' => ['Product'],
+    // The URLs sections are sections of the Product and Category modules' pages.
+    'Seo' => ['Product', 'Category'],
     'Team' => [],
 ];
 

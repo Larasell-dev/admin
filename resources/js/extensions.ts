@@ -29,6 +29,7 @@ export type SectionForm = Larasell.Admin.Platform.Sections.SectionForm;
  */
 export const SectionForm = {
   Product: "product",
+  Category: "category",
 } as const satisfies Record<string, SectionForm>;
 
 export type BootingContext = {

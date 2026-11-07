@@ -53,6 +53,7 @@ declare namespace Larasell.Admin.Category.Data {
     availableProductsUrl: string;
     addProductUrl: string;
     createProductUrl: string | null;
+    sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
   };
   export type CreateCategoryPageData = {
     categories: Array<Larasell.Admin.Category.Data.CategoryData>;
@@ -61,12 +62,16 @@ declare namespace Larasell.Admin.Category.Data {
     indexUrl: string;
     parent: Larasell.Admin.Category.Data.CategoryDetailData | null;
     createProductUrl: string | null;
+    sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
   };
   export type MissingCategoryPageData = {
     categories: Array<Larasell.Admin.Category.Data.CategoryData>;
     createUrl: string;
     category: null;
   };
+}
+declare namespace Larasell.Admin.Category.Enums {
+  export type CategorySection = "general";
 }
 declare namespace Larasell.Admin.Customer.Data {
   export type CreateCustomerPageData = {
@@ -228,7 +233,7 @@ declare namespace Larasell.Admin.Platform.Search.Data {
   };
 }
 declare namespace Larasell.Admin.Platform.Sections {
-  export type SectionForm = "product";
+  export type SectionForm = "product" | "category";
 }
 declare namespace Larasell.Admin.Platform.Sections.Data {
   export type SectionData = {
@@ -350,15 +355,15 @@ declare namespace Larasell.Admin.SalesChannel.Data {
   };
 }
 declare namespace Larasell.Admin.Seo.Data {
-  export type ProductUrlData = {
+  export type SeoUrlData = {
     channelId: number;
     channel: string;
     baseUrl: string;
     customPath: string | null;
     automaticPath: string | null;
   };
-  export type ProductUrlsData = {
-    urls: Array<Larasell.Admin.Seo.Data.ProductUrlData>;
+  export type SeoUrlsData = {
+    urls: Array<Larasell.Admin.Seo.Data.SeoUrlData>;
   };
 }
 declare namespace Larasell.Admin.Team.Data {

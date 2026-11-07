@@ -4,6 +4,7 @@ namespace Larasell\Admin\Category\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,9 +15,15 @@ use Larasell\Admin\Category\Data\CategoryDetailData;
 use Larasell\Admin\Category\Data\CategoryPageData;
 use Larasell\Admin\Category\Data\CreateCategoryPageData;
 use Larasell\Admin\Category\Data\MissingCategoryPageData;
+use Larasell\Admin\Category\Events\CategorySaved;
+use Larasell\Admin\Category\Exceptions\CategoryNotSavedAtomically;
 use Larasell\Admin\Category\Http\Requests\CategoryRequest;
 use Larasell\Admin\Category\Tables\CategoryProducts;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Platform\Sections\SectionContext;
+use Larasell\Admin\Platform\Sections\SectionForm;
+use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Larasell\Catalog\Actions\CreateCategory;
 use Larasell\Larasell\Catalog\Actions\UpdateCategory;
 use Larasell\Larasell\Catalog\CategoryId;
@@ -30,6 +37,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CategoryController
 {
+    public function __construct(private readonly Sections $sections) {}
+
     /**
      * Opens the top-most root category. Only a store without categories sees the index itself.
      */
@@ -76,6 +85,7 @@ class CategoryController
             availableProductsUrl: route('larasell.admin.categories.available-products.index', $category),
             addProductUrl: route('larasell.admin.categories.products.store', $category),
             createProductUrl: Product::query()->exists() ? null : $this->createProductUrl(),
+            sections: $this->sections->data(SectionForm::Category, $category, new SectionContext($locale)),
         ))->toResponse($request);
     }
 
@@ -99,6 +109,7 @@ class CategoryController
             indexUrl: route('larasell.admin.categories.index'),
             parent: $parent ? CategoryDetailData::fromModel($parent, $locale) : null,
             createProductUrl: $this->createProductUrl(),
+            sections: $this->sections->data(SectionForm::Category, null, new SectionContext($locale)),
         ));
     }
 
@@ -107,11 +118,18 @@ class CategoryController
      */
     public function store(CategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create): RedirectResponse
     {
-        $category = $create->handle([
-            'parent_id' => $request->validated('parent_id'),
-            'name' => Translatable::fromString($request->validated('name'), $locale->value),
-            'status' => $request->validated('status'),
-        ]);
+        // With the sections' own fields, so a section that fails leaves no category behind.
+        $category = DB::transaction(function () use ($request, $locale, $create): Category {
+            $category = $create->handle([
+                'parent_id' => $request->validated('parent_id'),
+                'name' => Translatable::fromString($request->validated('name'), $locale->value),
+                'status' => $request->validated('status'),
+            ]);
+
+            $this->saved($request, $category, true, $locale);
+
+            return $category;
+        });
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -121,10 +139,15 @@ class CategoryController
      */
     public function update(CategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update): RedirectResponse
     {
-        $update->handle(CategoryId::of($category), [
-            'name' => $category->name->with($locale->value, $request->validated('name')),
-            'status' => $request->validated('status'),
-        ]);
+        // With the sections' own fields, so a section that fails leaves the category unchanged.
+        DB::transaction(function () use ($request, $category, $locale, $update): void {
+            $category = $update->handle(CategoryId::of($category), [
+                'name' => $category->name->with($locale->value, $request->validated('name')),
+                'status' => $request->validated('status'),
+            ]);
+
+            $this->saved($request, $category, false, $locale);
+        });
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -150,6 +173,17 @@ class CategoryController
         }
 
         return back();
+    }
+
+    /**
+     * Lets the page's sections save their own fields, in the same transaction.
+     */
+    protected function saved(CategoryRequest $request, Category $category, bool $created, Locale $locale): void
+    {
+        // The promise CategorySaved documents, and asserts again: its listeners run in the save's transaction.
+        Assert::that(DB::transactionLevel() > 0, CategoryNotSavedAtomically::outsideTransaction(...));
+
+        event(new CategorySaved($category, $created, new SectionContext($locale), $request->sections()));
     }
 
     /**

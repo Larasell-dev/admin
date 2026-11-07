@@ -3961,23 +3961,56 @@
       ],
       "types": []
     },
-    "NABbmHeA8UXoB/GUWsHXcQ==": {
-      "description": "Product form: placeholder of a URL field while the product has no name in the content language yet",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Aus dem Namen erstellt",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OGHC3oXQ1StT8LkhgSyFJA==": {
       "description": "Product form: shown in the URLs section while no storefront has a domain in the content language",
       "tokens": [],
       "translations": [
         {
           "translation": "Noch kein Shop hat eine Domain in dieser Sprache, daher hat das Produkt in ihr keine URL.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TDYDJM/a9bTmHCJm3r7Zpg==": {
+      "description": "Category form: heading of the section with the category's web addresses",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "URLs",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ibhRJMfapn2wo2hgTrNQTg==": {
+      "description": "Category form: explains the URLs section; an empty field gives the category an address made from its name and its parent's address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wo Kunden die Kategorie in jedem Shop finden. Lass eine URL leer, damit sie aus dem Kategorienamen unter der URL der übergeordneten Kategorie entsteht und Änderungen an beiden folgt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YutQFLdJaLVqRQSpRRE4Yw==": {
+      "description": "Category form: shown in the URLs section while no storefront has a domain in the content language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch kein Shop hat eine Domain in dieser Sprache, daher hat die Kategorie in ihr keine URL.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mue+eK1vJQK167A18gySSQ==": {
+      "description": "Product and category forms: placeholder of a URL field while there is no name in the content language yet",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus dem Namen erstellt",
           "variations": {}
         }
       ],

@@ -63,6 +63,11 @@ window.LarasellAdmin = {
         "seo",
         () => import("./Components/Seo/ProductUrlsSection"),
       );
+      sections.register(
+        SectionForm.Category,
+        "seo",
+        () => import("./Components/Seo/CategoryUrlsSection"),
+      );
     });
     extensions.boot();
 

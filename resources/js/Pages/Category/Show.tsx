@@ -3,7 +3,7 @@ import { Button, EmptyState, Icon, Section, SectionStack } from "@larasell-dev/u
 import { AddLine, FolderUnknowLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 
-import CategoryForm from "../../Components/Category/CategoryForm";
+import CategoryForm, { CategorySections } from "../../Components/Category/CategoryForm";
 import ContentLocaleSelect from "../../Components/ContentLocale/ContentLocaleSelect";
 import { Page } from "../../Components/Page";
 import ProductsTable from "../../Components/Category/ProductsTable";
@@ -52,19 +52,24 @@ export default function Show(props: Props) {
               // The saved values become the new baseline, so the form is no longer dirty.
               setDefaultsOnSuccess
             >
-              <Section.Root>
-                <Section.Header
-                  title={fbs(
-                    "General",
-                    "Category page: heading of the form section with the category's name and description",
-                  )}
-                  description={fbs(
-                    "How the category is named and found in the store.",
-                    "Category page: explains the form section with the category's name and description",
-                  )}
-                />
-                <CategoryForm category={props.category} />
-              </Section.Root>
+              <CategorySections
+                sections={props.sections}
+                general={
+                  <Section.Root>
+                    <Section.Header
+                      title={fbs(
+                        "General",
+                        "Category page: heading of the form section with the category's name and description",
+                      )}
+                      description={fbs(
+                        "How the category is named and found in the store.",
+                        "Category page: explains the form section with the category's name and description",
+                      )}
+                    />
+                    <CategoryForm category={props.category} />
+                  </Section.Root>
+                }
+              />
               <UnsavedChangesToast />
             </Form>
             <ProductsTable
