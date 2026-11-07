@@ -13,6 +13,8 @@ export type SharedProps = {
   commandMenu: Larasell.Admin.Platform.Panel.Data.CommandMenuData | null;
   /** The language the panel's own text is shown in, and the others to switch to. Null for guests. */
   interfaceLocale: Larasell.Admin.Platform.InterfaceLocale.Data.InterfaceLocaleData | null;
+  /** The sidebar's sales channels; sent once and kept across pages. Null for guests. */
+  salesChannels: Larasell.Admin.SalesChannel.Data.SalesChannelNavigationData | null;
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;

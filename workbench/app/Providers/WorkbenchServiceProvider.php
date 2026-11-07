@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Larasell\Larasell\Enums\Locale;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\TypeScriptTransformer\Transformers\EnumTransformer;
 use Spatie\TypeScriptTransformer\Writers\TypeDefinitionWriter;
@@ -51,6 +52,9 @@ class WorkbenchServiceProvider extends ServiceProvider
 
         // Product images default to the private local disk, which the browser can't load.
         config(['larasell.images.disk' => 'public']);
+
+        // The playground store serves every locale, so sales channels can pick from all of them.
+        config(['larasell.locale.supported' => Locale::cases()]);
 
         // Portals open at the site root; send it to the panel.
         Route::redirect('/', '/'.config('larasell.admin.panel.path'));

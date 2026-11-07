@@ -51,13 +51,13 @@ export default function MobileNav() {
       <Drawer.Portal>
         <Drawer.Backdrop className="fixed inset-0 z-40 bg-base-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Drawer.Viewport className="fixed inset-0 z-50 pointer-events-none">
-          {/* The sidebar extends a screen width to the left, so dragging the panel right keeps its background, border and highlight. */}
+          {/* The sidebar extends a screen width to the left, so dragging the panel right keeps its background, border and highlight. Rows that start at its left edge carry `data-sidebar-row`. */}
           <Drawer.Popup
             aria-label={fbs(
               "Navigation",
               "Mobile: accessible name of the drawer with the admin panel's navigation",
             )}
-            className="pointer-events-auto h-full w-fit translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0 [&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_nav_a]:pl-[calc(100vw+1.5rem)] [&_aside>button]:pl-[calc(100vw+1.5rem)]"
+            className="pointer-events-auto h-full w-fit translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0 [&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_[data-sidebar-row]]:pl-[calc(100vw+1.5rem)] [&_aside>button]:pl-[calc(100vw+1.5rem)]"
           >
             <HotkeysProvider scope="mobile-nav" exclusive={overlayExclusive} enabled={open}>
               <Sidebar frozen={frozen} />
