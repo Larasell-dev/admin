@@ -3,10 +3,10 @@
 namespace Workbench\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Category;
 use Larasell\Larasell\Models\Customer;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 
@@ -60,7 +60,6 @@ class DatabaseSeeder extends Seeder
 
                 foreach ($products as $productName => $price) {
                     Product::create([
-                        'slug' => Translatable::fromString(str($productName)->slug()->value()),
                         'name' => Translatable::fromString($productName),
                         'price' => Price::of($price),
                         'status' => Visibility::Visible,
@@ -78,7 +77,6 @@ class DatabaseSeeder extends Seeder
     {
         return Category::create([
             'parent_id' => $parent?->id,
-            'slug' => Translatable::fromString(str($name)->slug()->value()),
             'name' => Translatable::fromString($name),
             'status' => Visibility::Visible,
         ]);

@@ -3,17 +3,19 @@
 namespace Larasell\Admin\Category\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Larasell\Larasell\Catalog\Actions\UpdateCategory;
+use Larasell\Larasell\Catalog\CategoryId;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Category;
 
 class HideCategoryController
 {
     /**
      * Hides the category, so the storefront no longer shows it.
      */
-    public function __invoke(Category $category): RedirectResponse
+    public function __invoke(Category $category, UpdateCategory $update): RedirectResponse
     {
-        $category->update(['status' => Visibility::Hidden]);
+        $update->handle(CategoryId::of($category), ['status' => Visibility::Hidden]);
 
         return back();
     }

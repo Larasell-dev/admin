@@ -10,9 +10,12 @@ use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Attributes\Remember;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
+use Larasell\Larasell\Catalog\Actions\SetProductCategories;
+use Larasell\Larasell\Catalog\CategoryId;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\ProductId;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Translatable;
 
 /**
@@ -61,7 +64,10 @@ class CategoryProducts extends Table
                 ->route('larasell.admin.products.edit')
                 ->icon(Icon::Eye)
                 ->hidden(! config('larasell.admin.products.enabled')),
-            Action::make(Translate::later('Remove'), handle: fn (Product $product) => $this->category->products()->detach($product))
+            Action::make(Translate::later('Remove'), handle: fn (Product $product) => app(SetProductCategories::class)->handle(
+                ProductId::of($product),
+                CategoryId::many($product->categories()->allRelatedIds()->map(fn (mixed $id): int => (int) $id)->reject(fn (int $id): bool => $id === $this->category->id)),
+            ))
                 ->confirm(
                     title: __('Remove product'),
                     message: __('The product is only removed from this category. It stays in the store and its other categories.'),

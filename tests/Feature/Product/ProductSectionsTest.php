@@ -27,8 +27,8 @@ use Larasell\Admin\Tests\Fixtures\Sections\NotesPayload;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesProps;
 use Larasell\Admin\Tests\Fixtures\Sections\NotesRequest;
 use Larasell\Admin\Tests\Fixtures\Sections\UnusedRequest;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
 
 beforeEach(function () {
@@ -36,7 +36,7 @@ beforeEach(function () {
 
     $this->actingAs(Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']), 'larasell-admin');
 
-    $this->boots = Product::create(['name' => ['en' => 'Boots', 'de' => 'Stiefel'], 'slug' => ['en' => 'boots', 'de' => 'stiefel'], 'price' => Price::of(1000)]);
+    $this->boots = Product::create(['name' => ['en' => 'Boots', 'de' => 'Stiefel'], 'price' => Price::of(1000)]);
 
     config(['app.name' => 'Acme']);
 
@@ -55,7 +55,7 @@ beforeEach(function () {
  */
 function saveBoots(array $sections = [], string $name = 'Rain Boots'): TestResponse
 {
-    return test()->put(route('larasell.admin.products.update', test()->boots), ['name' => $name, 'slug' => 'boots', 'status' => 'visible', 'sections' => $sections]);
+    return test()->put(route('larasell.admin.products.update', test()->boots), ['name' => $name, 'status' => 'visible', 'sections' => $sections]);
 }
 
 it('gives the product page its sections, with props for the product in the content locale', function () {
@@ -128,7 +128,7 @@ it('hands listeners each section\'s prepared, validated input and its typed payl
         'gift-wrap' => ['wrap' => '1', 'note' => 'Happy birthday'],
     ])->assertSessionHasNoErrors();
 
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     // Assert
@@ -169,7 +169,7 @@ it('saves nothing when a section fails while saving, so the product and its sect
     // Act & Assert
     saveBoots()->assertSessionHasErrors(['sections.notes.note' => 'The note service is down.']);
 
-    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Socks', 'status' => 'visible'])
         ->assertSessionHasErrors('sections.notes.note');
 
     expect($this->boots->fresh()->name->get('en'))->toBe('Boots')

@@ -2,7 +2,7 @@
 
 namespace Larasell\Admin\Product\Data;
 
-use Larasell\Larasell\Models\ProductImage;
+use Larasell\Larasell\Catalog\Models\ProductImage;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 

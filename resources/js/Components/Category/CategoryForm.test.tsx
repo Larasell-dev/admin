@@ -11,9 +11,7 @@ type Category = ComponentProps<typeof CategoryForm>["category"];
 
 const shoes = {
   name: "Shoes",
-  slug: "shoes",
   fallbackName: "Shoes",
-  fallbackSlug: "shoes",
   visible: true,
 };
 
@@ -50,7 +48,6 @@ function renderPage(category?: Category) {
 const toast = () => page.getByRole("region", { name: "Unsaved changes" });
 const visible = () => page.getByRole("checkbox", { name: "Visible in the store" });
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
-const slugInput = () => page.getByRole("textbox", { name: "Slug" });
 const formData = () => new FormData(page.getByTestId("form").element() as HTMLFormElement);
 const submitted = () => formData().get("status");
 
@@ -87,139 +84,15 @@ it("shows the visibility it was reset to on cancel", async () => {
   await expect.element(toast()).not.toBeInTheDocument();
 });
 
-describe("slug", () => {
-  it("follows the name of a new category as a slug", async () => {
-    // Arrange
-    await renderPage();
-
-    // Act
-    await nameInput().fill("Men's Running Shoes");
-
-    // Assert
-    await expect.element(slugInput()).toHaveValue("mens-running-shoes");
-    expect(formData().get("slug")).toBe("mens-running-shoes");
-
-    await nameInput().fill("Straße & Café");
-    await expect.element(slugInput()).toHaveValue("strasse-cafe");
-  });
-
-  it("doesn't count a slug that follows the name back to empty as a change", async () => {
-    // Arrange
-    await renderPage();
-
-    // Act
-    await nameInput().fill("Shoes");
-
-    // Assert
-    await expect.element(slugInput()).toHaveValue("shoes");
-    await expect.element(toast()).toBeVisible();
-
-    await nameInput().clear();
-    await expect.element(slugInput()).toHaveValue("");
-    await expect.element(toast()).not.toBeInTheDocument();
-  });
-
-  it("cuts the slug to the 255 characters the server allows", async () => {
-    // Arrange
-    await renderPage();
-
-    // Act
-    // Each "ß" becomes "ss", so the cut would end on the dash before "shoes".
-    await nameInput().fill(`${"ß".repeat(127)} Shoes`);
-
-    // Assert
-    await expect.element(slugInput()).toHaveValue("s".repeat(254));
-  });
-
-  it("stops following the name once the slug is edited", async () => {
-    // Arrange
-    await renderPage();
-    await nameInput().fill("Shoes");
-    await expect.element(slugInput()).toHaveValue("shoes");
-
-    // Act
-    await slugInput().fill("footwear");
-    await nameInput().fill("Running Shoes");
-
-    // Assert
-    await expect.element(nameInput()).toHaveValue("Running Shoes");
-    await expect.element(slugInput()).toHaveValue("footwear");
-  });
-
-  it("follows the name again once the edited slug is cleared", async () => {
-    // Arrange
-    await renderPage();
-    await nameInput().fill("Shoes");
-    await slugInput().fill("footwear");
-
-    // Act
-    await slugInput().clear();
-
-    // Assert
-    await expect.element(slugInput()).toHaveValue("");
-    await nameInput().fill("Boots");
-
-    await expect.element(slugInput()).toHaveValue("boots");
-  });
-
-  it("follows the name again after cancelling the changes", async () => {
-    // Arrange
-    await renderPage();
-    await nameInput().fill("Shoes");
-    await slugInput().fill("footwear");
-    await nameInput().fill("Boots");
-    await expect.element(slugInput()).toHaveValue("footwear");
-
-    // Act
-    await toast().getByRole("button", { name: "Cancel" }).click();
-
-    // Assert
-    await expect.element(slugInput()).toHaveValue("");
-
-    await nameInput().fill("Sneakers");
-    await expect.element(slugInput()).toHaveValue("sneakers");
-  });
-
-  it("leaves the slug of an existing category alone", async () => {
-    // Arrange
-    await renderPage(shoes);
-
-    // Act
-    await nameInput().fill("Sneakers");
-
-    // Assert
-    await expect.element(nameInput()).toHaveValue("Sneakers");
-    await expect.element(slugInput()).toHaveValue("shoes");
-
-    await slugInput().clear();
-    await nameInput().fill("Boots");
-    await expect.element(nameInput()).toHaveValue("Boots");
-    await expect.element(slugInput()).toHaveValue("");
-  });
-});
-
 describe("translation", () => {
-  const untranslated = { ...shoes, name: null, slug: null };
+  const untranslated = { ...shoes, name: null };
 
-  it("leaves an untranslated name and slug empty and shows what the store shows instead", async () => {
+  it("leaves an untranslated name empty and shows what the store shows instead", async () => {
     // Act
     await renderPage(untranslated);
 
     // Assert
     await expect.element(nameInput()).toHaveValue("");
     await expect.element(nameInput()).toHaveAttribute("placeholder", "Shoes");
-    await expect.element(slugInput()).toHaveValue("");
-    await expect.element(slugInput()).toHaveAttribute("placeholder", "shoes");
-  });
-
-  it("fills in an untranslated slug from the name", async () => {
-    // Arrange
-    await renderPage(untranslated);
-
-    // Act
-    await nameInput().fill("Schuhe");
-
-    // Assert
-    await expect.element(slugInput()).toHaveValue("schuhe");
   });
 });

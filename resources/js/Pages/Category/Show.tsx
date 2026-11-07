@@ -56,11 +56,11 @@ export default function Show(props: Props) {
                 <Section.Header
                   title={fbs(
                     "General",
-                    "Category page: heading of the form section with the category's name, slug and description",
+                    "Category page: heading of the form section with the category's name and description",
                   )}
                   description={fbs(
                     "How the category is named and found in the store.",
-                    "Category page: explains the form section with the category's name, slug and description",
+                    "Category page: explains the form section with the category's name and description",
                   )}
                 />
                 <CategoryForm category={props.category} />

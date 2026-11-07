@@ -15,6 +15,8 @@ env:
   - DB_CONNECTION=sqlite
   - SESSION_DRIVER=file
   - CACHE_STORE=file
+  # No queue worker runs in the playground, e.g. for the SEO URLs a new product gets.
+  - QUEUE_CONNECTION=sync
 
 workbench:
   install: false

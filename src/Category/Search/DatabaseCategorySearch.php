@@ -5,7 +5,7 @@ namespace Larasell\Admin\Category\Search;
 use Illuminate\Support\Collection;
 use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
 use Larasell\Admin\Platform\Search\SearchQuery;
-use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Catalog\Models\Category;
 
 /**
  * Searches the categories table, so it needs no search engine.

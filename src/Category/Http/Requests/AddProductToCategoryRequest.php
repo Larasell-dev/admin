@@ -4,8 +4,8 @@ namespace Larasell\Admin\Category\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
 
 class AddProductToCategoryRequest extends FormRequest
 {

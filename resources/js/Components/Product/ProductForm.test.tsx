@@ -84,9 +84,7 @@ function savedPage(errors: Record<string, string> = {}) {
 
 const boots = {
   name: "Boots",
-  slug: "boots",
   fallbackName: "Boots",
-  fallbackSlug: "boots",
   visible: true,
   weight: null,
   dimensions: null,
@@ -101,13 +99,12 @@ const boots = {
 };
 
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
-const slugInput = () => page.getByRole("textbox", { name: "Slug" });
 const visible = () => page.getByRole("checkbox", { name: "Visible in the store" });
 /** What submitting the form would send. */
 const formData = () => new FormData(page.getByTestId("form").element() as HTMLFormElement);
 const submitted = () => Object.fromEntries(formData());
 
-it("starts a new product empty and visible, with a slug that follows the name", async () => {
+it("starts a new product empty and visible", async () => {
   // Arrange
   await renderForm();
   await expect.element(visible()).toBeChecked();
@@ -116,15 +113,10 @@ it("starts a new product empty and visible, with a slug that follows the name", 
   await userEvent.type(nameInput(), "Linen Shirt");
 
   // Assert
-  await expect.element(slugInput()).toHaveValue("linen-shirt");
-  expect(submitted()).toMatchObject({
-    name: "Linen Shirt",
-    slug: "linen-shirt",
-    status: "visible",
-  });
+  expect(submitted()).toMatchObject({ name: "Linen Shirt", status: "visible" });
 });
 
-it("shows an existing product's values and leaves its slug alone", async () => {
+it("shows an existing product's values", async () => {
   // Arrange
   await renderForm({ ...boots, visible: false });
   await expect.element(nameInput()).toHaveValue("Boots");
@@ -134,8 +126,7 @@ it("shows an existing product's values and leaves its slug alone", async () => {
   await userEvent.type(nameInput(), " for rain");
 
   // Assert
-  await expect.element(slugInput()).toHaveValue("boots");
-  expect(submitted()).toMatchObject({ name: "Boots for rain", slug: "boots", status: "hidden" });
+  expect(submitted()).toMatchObject({ name: "Boots for rain", status: "hidden" });
 });
 
 const weight = () => page.getByRole("textbox", { name: "Weight", exact: true });

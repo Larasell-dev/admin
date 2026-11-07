@@ -5,9 +5,9 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 
@@ -15,7 +15,6 @@ function category(string $name, ?Category $parent = null, Visibility $status = V
 {
     return Category::create([
         'parent_id' => $parent?->id,
-        'slug' => Translatable::fromString(str($name)->slug()->value()),
         'name' => Translatable::fromString($name),
         'status' => $status,
     ]);
@@ -24,7 +23,6 @@ function category(string $name, ?Category $parent = null, Visibility $status = V
 function product(string $name, Category $category, Visibility $status = Visibility::Visible): Product
 {
     $product = Product::create([
-        'slug' => str($name)->slug()->value(),
         'name' => $name,
         'price' => Price::of(1000),
         'status' => $status,
@@ -257,7 +255,7 @@ it('creates a root category and opens it', function (Visibility $status) {
 
     // Act
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->post(route('larasell.admin.categories.store'), ['name' => 'Summer Sale', 'slug' => 'summer-sale', 'status' => $status->value]);
+        ->post(route('larasell.admin.categories.store'), ['name' => 'Summer Sale', 'status' => $status->value]);
 
     // Assert
     $category = Category::query()->sole();
@@ -266,7 +264,6 @@ it('creates a root category and opens it', function (Visibility $status) {
         ->assertRedirect(route('larasell.admin.categories.show', $category));
 
     expect($category->name->all())->toBe(['en' => 'Summer Sale'])
-        ->and($category->slug->all())->toBe(['en' => 'summer-sale'])
         ->and($category->status)->toBe($status)
         ->and($category->parent_id)->toBeNull();
 })->with([
@@ -289,7 +286,6 @@ it('shows the category\'s values to edit on its page', function () {
             ->where('categories.0.children.0.name', 'Linen')
             ->where('category.id', $linen->id)
             ->where('category.name', 'Linen')
-            ->where('category.slug', 'linen')
             ->where('category.visible', false)
             ->where('createUrl', route('larasell.admin.categories.create'))
             ->where('updateUrl', route('larasell.admin.categories.update', $linen)));
@@ -303,7 +299,7 @@ it('updates a category and stays on its page', function () {
 
     // Act
     $this->actingAs($admin, 'larasell-admin')
-        ->put(route('larasell.admin.categories.update', $shirts), ['name' => 'Tops', 'slug' => 'tops', 'status' => 'hidden'])
+        ->put(route('larasell.admin.categories.update', $shirts), ['name' => 'Tops', 'status' => 'hidden'])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('larasell.admin.categories.show', $shirts));
 
@@ -311,30 +307,27 @@ it('updates a category and stays on its page', function () {
     $shirts->refresh();
 
     expect($shirts->name->get())->toBe('Tops')
-        ->and($shirts->slug->get())->toBe('tops')
         ->and($shirts->status)->toBe(Visibility::Hidden)
         ->and($shirts->parent_id)->toBe($clothing->id);
 });
 
-it('only changes the current locale\'s name and slug', function () {
+it('only changes the current locale\'s name', function () {
     // Arrange
     $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
     $shoes = Category::create([
         'name' => ['en' => 'Shoes', 'de' => 'Schuhe'],
-        'slug' => ['en' => 'shoes', 'de' => 'schuhe'],
         'status' => Visibility::Visible,
     ]);
 
     // Act
     $this->actingAs($admin, 'larasell-admin')
-        ->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Footwear', 'slug' => 'footwear', 'status' => 'visible'])
+        ->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Footwear', 'status' => 'visible'])
         ->assertSessionHasNoErrors();
 
     // Assert
     $shoes->refresh();
 
-    expect($shoes->name->all())->toBe(['en' => 'Footwear', 'de' => 'Schuhe'])
-        ->and($shoes->slug->all())->toBe(['en' => 'footwear', 'de' => 'schuhe']);
+    expect($shoes->name->all())->toBe(['en' => 'Footwear', 'de' => 'Schuhe']);
 });
 
 it('rejects an invalid category', function (array $input, string $error) {
@@ -344,7 +337,7 @@ it('rejects an invalid category', function (array $input, string $error) {
 
     // Act
     $this->actingAs($admin, 'larasell-admin')
-        ->post(route('larasell.admin.categories.store'), [...['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'], ...$input])
+        ->post(route('larasell.admin.categories.store'), [...['name' => 'Sale', 'status' => 'visible'], ...$input])
         ->assertSessionHasErrors($error);
 
     // Assert
@@ -352,43 +345,9 @@ it('rejects an invalid category', function (array $input, string $error) {
 })->with([
     'missing name' => [['name' => ''], 'name'],
     'too long name' => [['name' => str_repeat('a', 256)], 'name'],
-    'missing slug' => [['slug' => ''], 'slug'],
-    'slug with spaces' => [['slug' => 'summer sale'], 'slug'],
-    'slug with capitals' => [['slug' => 'Sale'], 'slug'],
-    'slug with a trailing dash' => [['slug' => 'sale-'], 'slug'],
-    'slug of another category' => [['slug' => 'shoes'], 'slug'],
     'missing visibility' => [['status' => null], 'status'],
     'unknown visibility' => [['status' => 'secret'], 'status'],
 ]);
-
-it('lets a category keep its own slug', function () {
-    // Arrange
-    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
-    $shoes = category('Shoes');
-
-    // Act
-    $this->actingAs($admin, 'larasell-admin')
-        ->put(route('larasell.admin.categories.update', $shoes), ['name' => 'All Shoes', 'slug' => 'shoes', 'status' => 'visible'])
-        ->assertSessionHasNoErrors();
-
-    // Assert
-    expect($shoes->fresh()->name->get())->toBe('All Shoes');
-});
-
-it('does not let a category take the slug of another one', function () {
-    // Arrange
-    $admin = Admin::create(['name' => 'Test Admin', 'email' => 'admin@example.com', 'password' => 'password']);
-    category('Shoes');
-    $boots = category('Boots');
-
-    // Act
-    $this->actingAs($admin, 'larasell-admin')
-        ->put(route('larasell.admin.categories.update', $boots), ['name' => 'Boots', 'slug' => 'shoes', 'status' => 'visible'])
-        ->assertSessionHasErrors('slug');
-
-    // Assert
-    expect($boots->fresh()->slug->get())->toBe('boots');
-});
 
 it('does not let guests create or edit categories', function () {
     // Arrange
@@ -396,8 +355,8 @@ it('does not let guests create or edit categories', function () {
 
     // Act
     $this->get(route('larasell.admin.categories.create'))->assertRedirect(route('larasell.admin.login'));
-    $this->post(route('larasell.admin.categories.store'), ['name' => 'Sale', 'slug' => 'sale', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
-    $this->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Boots', 'slug' => 'boots', 'status' => 'hidden'])->assertRedirect(route('larasell.admin.login'));
+    $this->post(route('larasell.admin.categories.store'), ['name' => 'Sale', 'status' => 'visible'])->assertRedirect(route('larasell.admin.login'));
+    $this->put(route('larasell.admin.categories.update', $shoes), ['name' => 'Boots', 'status' => 'hidden'])->assertRedirect(route('larasell.admin.login'));
 
     // Assert
     expect(Category::query()->count())->toBe(1)
@@ -630,8 +589,8 @@ it('deletes a category with all its descendants but keeps its parent, siblings a
     $jackets = category('Jackets', $men);
     category('Rain jackets', $jackets);
     category('Shirts', $men);
-    category('Women', $clothing);
-    category('Shoes');
+    $women = category('Women', $clothing);
+    $shoes = category('Shoes');
     $coat = product('Coat', $jackets);
 
     // Act
@@ -643,8 +602,7 @@ it('deletes a category with all its descendants but keeps its parent, siblings a
 
     // Assert
     expect(Category::query()->orderBy('id')->pluck('id')->all())
-        ->toBe(Category::query()->whereIn('slug->en', ['clothing', 'women', 'shoes'])->orderBy('id')->pluck('id')->all())
-        ->and(Category::query()->count())->toBe(3)
+        ->toBe([$clothing->id, $women->id, $shoes->id])
         ->and($coat->fresh())->not->toBeNull()
         ->and($coat->categories()->count())->toBe(0);
 });
@@ -790,10 +748,10 @@ it('creates a category inside another one and opens it', function () {
 
     // Act
     $response = $this->actingAs($admin, 'larasell-admin')
-        ->post(route('larasell.admin.categories.store'), ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $men->id]);
+        ->post(route('larasell.admin.categories.store'), ['name' => 'Jackets', 'status' => 'visible', 'parent_id' => $men->id]);
 
     // Assert
-    $jackets = Category::query()->where('slug->en', 'jackets')->sole();
+    $jackets = Category::query()->where('parent_id', $men->id)->sole();
 
     $response->assertSessionHasNoErrors()
         ->assertRedirect(route('larasell.admin.categories.show', $jackets));
@@ -807,7 +765,7 @@ it('rejects a parent that does not exist', function (mixed $parentId) {
 
     // Act
     $this->actingAs($admin, 'larasell-admin')
-        ->post(route('larasell.admin.categories.store'), ['name' => 'Jackets', 'slug' => 'jackets', 'status' => 'visible', 'parent_id' => $parentId])
+        ->post(route('larasell.admin.categories.store'), ['name' => 'Jackets', 'status' => 'visible', 'parent_id' => $parentId])
         ->assertSessionHasErrors('parent_id');
 
     // Assert
@@ -826,7 +784,7 @@ it('does not move a category to another parent when it is updated', function () 
 
     // Act
     $this->actingAs($admin, 'larasell-admin')
-        ->put(route('larasell.admin.categories.update', $men), ['name' => 'Men', 'slug' => 'men', 'status' => 'visible', 'parent_id' => $shoes->id])
+        ->put(route('larasell.admin.categories.update', $men), ['name' => 'Men', 'status' => 'visible', 'parent_id' => $shoes->id])
         ->assertSessionHasNoErrors();
 
     // Assert
@@ -1048,7 +1006,7 @@ it('turns the categories off when disabled in the config', function () {
     // The routes aren't registered, so there are no route names to use.
     $this->get('/admin/categories')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get('/admin/categories/create')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
-    $this->post('/admin/categories', ['name' => 'Socks', 'slug' => 'socks', 'status' => 'visible'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->post('/admin/categories', ['name' => 'Socks', 'status' => 'visible'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get("/admin/categories/{$shoes->id}")->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->delete("/admin/categories/{$shoes->id}", ['confirmation' => 'Shoes'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get(route('larasell.admin.home'))

@@ -5,7 +5,7 @@ namespace Larasell\Admin\Category\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Larasell\Admin\Category\Actions\MoveCategory;
 use Larasell\Admin\Category\Http\Requests\MoveCategoryRequest;
-use Larasell\Larasell\Models\Category;
+use Larasell\Larasell\Catalog\Models\Category;
 
 class MoveCategoryController
 {

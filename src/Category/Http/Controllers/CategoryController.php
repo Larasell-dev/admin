@@ -17,9 +17,12 @@ use Larasell\Admin\Category\Data\MissingCategoryPageData;
 use Larasell\Admin\Category\Http\Requests\CategoryRequest;
 use Larasell\Admin\Category\Tables\CategoryProducts;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Larasell\Catalog\Actions\CreateCategory;
+use Larasell\Larasell\Catalog\Actions\UpdateCategory;
+use Larasell\Larasell\Catalog\CategoryId;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -100,14 +103,13 @@ class CategoryController
     }
 
     /**
-     * Creates a category, inside its parent when given, with the name and slug in the content locale.
+     * Creates a category, inside its parent when given, with the name in the content locale.
      */
-    public function store(CategoryRequest $request, #[CurrentContentLocale] Locale $locale): RedirectResponse
+    public function store(CategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create): RedirectResponse
     {
-        $category = Category::create([
+        $category = $create->handle([
             'parent_id' => $request->validated('parent_id'),
             'name' => Translatable::fromString($request->validated('name'), $locale->value),
-            'slug' => Translatable::fromString($request->validated('slug'), $locale->value),
             'status' => $request->validated('status'),
         ]);
 
@@ -115,13 +117,12 @@ class CategoryController
     }
 
     /**
-     * Changes the name and slug in the content locale and keeps their other translations.
+     * Changes the name in the content locale and keeps its other translations.
      */
-    public function update(CategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale): RedirectResponse
+    public function update(CategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update): RedirectResponse
     {
-        $category->update([
+        $update->handle(CategoryId::of($category), [
             'name' => $category->name->with($locale->value, $request->validated('name')),
-            'slug' => $category->slug->with($locale->value, $request->validated('slug')),
             'status' => $request->validated('status'),
         ]);
 

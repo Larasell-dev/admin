@@ -34,10 +34,7 @@ import {
   useState,
 } from "react";
 import { plugins, sensors } from "../../utils/dragAndDrop";
-import { slugify } from "../../utils/slugify";
 import { overlayExclusive } from "../../utils/hotkeys";
-import { truncate } from "../../utils/truncate";
-import { useCoupledField } from "../../utils/useCoupledField";
 import { useMergedRef } from "../../utils/useMergedRef";
 import CategoryCheckboxTree from "../Category/CategoryCheckboxTree";
 import ExtensionSections from "../ExtensionSections";
@@ -86,11 +83,11 @@ export default function ProductForm({
         <Section.Header
           title={fbs(
             "General",
-            "Product form: heading of the section with the product's name, slug and visibility",
+            "Product form: heading of the section with the product's name and visibility",
           )}
           description={fbs(
             "How the product is named and found in the store.",
-            "Product form: text below the heading of the General section, with the name, slug and visibility",
+            "Product form: text below the heading of the General section, with the name and visibility",
           )}
         />
         <GeneralFields product={product} errors={errors} />
@@ -189,50 +186,22 @@ export default function ProductForm({
 }
 
 function GeneralFields({ product, errors }: { product?: Product; errors: Errors }) {
-  // A new product's slug follows its name, as does one in a language it has no slug in yet; an
-  // existing one keeps the slug its links use.
-  const slug = useCoupledField([slugify, truncate(255), slugify], {
-    enabled: !product || product.slug === null,
-  });
   // Untranslated fields stay empty and show what the store shows instead.
   const untranslated = product?.name === null;
 
   return (
     <Stack spacing={5}>
-      {/* Side by side when the form is wide enough, stacked otherwise. */}
-      <div className="@container">
-        <div className="grid items-start gap-5 @md:grid-cols-2">
-          <Field
-            label={fbs("Name", "Product form: label of the field for the product's name")}
-            name="name"
-            error={errors.name}
-          >
-            <Input
-              {...slug.source}
-              defaultValue={product?.name ?? undefined}
-              placeholder={untranslated ? product.fallbackName : undefined}
-              autoComplete="off"
-            />
-          </Field>
-
-          <Field
-            label={fbs(
-              "Slug",
-              "Product form: label of the field for the product's URL slug, the part of its storefront address made from its name",
-            )}
-            name="slug"
-            error={errors.slug}
-          >
-            <Input
-              {...slug.target}
-              defaultValue={product?.slug ?? undefined}
-              placeholder={product?.slug === null ? product.fallbackSlug : undefined}
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </Field>
-        </div>
-      </div>
+      <Field
+        label={fbs("Name", "Product form: label of the field for the product's name")}
+        name="name"
+        error={errors.name}
+      >
+        <Input
+          defaultValue={product?.name ?? undefined}
+          placeholder={untranslated ? product.fallbackName : undefined}
+          autoComplete="off"
+        />
+      </Field>
 
       <VisibilityField defaultVisible={product?.visible ?? true} error={errors.status} />
     </Stack>

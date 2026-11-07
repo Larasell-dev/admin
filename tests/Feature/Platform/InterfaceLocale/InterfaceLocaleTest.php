@@ -7,7 +7,7 @@ use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\CookieInterfaceLocaleResolver;
 use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
 use Larasell\Admin\Platform\InterfaceLocale\PanelInterfaceLocales;
-use Larasell\Larasell\Models\Product;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Price;
 
 function signInForInterfaceLocale(): void
@@ -65,7 +65,7 @@ it('names a table action in English, so a page loaded before switching the langu
     // Arrange
     signInForInterfaceLocale();
     app('translator')->addLines(['*.Delete' => 'Löschen'], 'de-DE');
-    $boots = Product::create(['slug' => 'boots', 'name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
 
     // Act
     $action = $this->withCookie(CookieInterfaceLocaleResolver::COOKIE, 'de-DE')

@@ -13,7 +13,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[TypeScript]
 enum ProductSection: string
 {
-    /** The name, slug and visibility. */
+    /** The name and visibility. */
     case General = 'general';
 
     case Images = 'images';

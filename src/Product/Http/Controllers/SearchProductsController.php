@@ -11,8 +11,8 @@ use Larasell\Admin\Platform\Search\Data\SearchResultData;
 use Larasell\Admin\Platform\Search\Http\Requests\SearchRequest;
 use Larasell\Admin\Platform\Search\SearchQuery;
 use Larasell\Admin\Product\Search\ProductSearch;
+use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Product;
 
 /**
  * The command menu's product search: each product's name in the content locale, and what else

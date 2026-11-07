@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Date;
 use Inertia\ServiceProvider as InertiaServiceProvider;
 use Larasell\Admin\AdminServiceProvider;
 use Larasell\Larasell\LarasellServiceProvider;
+use Larasell\Larasell\Seo\SeoServiceProvider;
+use Larasell\Larasell\Storefront\StorefrontServiceProvider;
 use Laravel\Head\HeadServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Spatie\LaravelData\LaravelDataServiceProvider;
@@ -87,6 +89,8 @@ abstract class TestCase extends OrchestraTestCase
             AdminServiceProvider::class,
             InertiaServiceProvider::class,
             LarasellServiceProvider::class,
+            StorefrontServiceProvider::class,
+            SeoServiceProvider::class,
             LaravelDataServiceProvider::class,
         ];
     }

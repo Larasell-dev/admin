@@ -18,10 +18,17 @@ use Larasell\Admin\Product\Data\ProductDetailData;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
+use Larasell\Larasell\Catalog\Actions\CreateProduct;
+use Larasell\Larasell\Catalog\Actions\SetProductCategories;
+use Larasell\Larasell\Catalog\Actions\SetProductImages;
+use Larasell\Larasell\Catalog\Actions\UpdateProduct;
+use Larasell\Larasell\Catalog\Actions\UpdateProductImage;
+use Larasell\Larasell\Catalog\CategoryId;
+use Larasell\Larasell\Catalog\ImageId;
+use Larasell\Larasell\Catalog\Models\Category;
+use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\ProductId;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Category;
-use Larasell\Larasell\Models\Product;
-use Larasell\Larasell\Models\ProductImage;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
@@ -31,7 +38,14 @@ use Laravel\Head\Facades\Head;
  */
 class ProductController
 {
-    public function __construct(private readonly Sections $sections) {}
+    public function __construct(
+        private readonly Sections $sections,
+        private readonly CreateProduct $createProduct,
+        private readonly UpdateProduct $updateProduct,
+        private readonly SetProductCategories $setCategories,
+        private readonly SetProductImages $setImages,
+        private readonly UpdateProductImage $updateImage,
+    ) {}
 
     public function create(#[CurrentContentLocale] Locale $locale): Response
     {
@@ -46,16 +60,15 @@ class ProductController
     }
 
     /**
-     * Creates a product with the name and slug in the content locale. The form has no price
-     * yet, and every product needs one, so it starts at 0.
+     * Creates a product with the name in the content locale, through the core's actions, which
+     * also give it its URLs. The form has no price yet, and every product needs one, so it starts at 0.
      */
     public function store(ProductRequest $request, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
         // With the sections' own fields, so a section that fails leaves no product behind.
         $product = DB::transaction(function () use ($request, $locale): Product {
-            $product = Product::create([
+            $product = $this->createProduct->handle([
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
-                'slug' => Translatable::fromString($request->validated('slug'), $locale->value),
                 'status' => $request->validated('status'),
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
@@ -65,9 +78,7 @@ class ProductController
                 'price' => Price::of(0),
             ]);
 
-            $product->categories()->attach($request->categoryIds());
-            $product->images()->attach($request->images());
-            $this->saveImageAlts($request);
+            $this->saveRelations($request, $product);
             $this->saved($request, $product, true, $locale);
 
             return $product;
@@ -92,29 +103,32 @@ class ProductController
     }
 
     /**
-     * Changes the name and slug in the content locale and keeps their other translations.
+     * Changes the name in the content locale and keeps its other translations, through the
+     * core's actions, which also move the product's automatic URLs.
      */
     public function update(ProductRequest $request, Product $product, #[CurrentContentLocale] Locale $locale): RedirectResponse
     {
         // With the sections' own fields, so a section that fails leaves the product unchanged.
         DB::transaction(function () use ($request, $product, $locale): void {
-            // The product checks each quantity limit against the other one it already has, so
-            // clearing both first lets a new range lie wholly above or below the old one.
-            $product->fill(['min_quantity' => null, 'max_quantity' => null])->update([
+            $stock = $request->stock();
+            // The product checks each quantity limit against the other one it has as it's set, so
+            // a new range wholly above the old one sets its maximum first, and any other its minimum.
+            $limits = $stock['min_quantity'] !== null && $product->max_quantity !== null && $stock['min_quantity'] > $product->max_quantity
+                ? ['max_quantity' => $stock['max_quantity'], 'min_quantity' => $stock['min_quantity']]
+                : ['min_quantity' => $stock['min_quantity'], 'max_quantity' => $stock['max_quantity']];
+
+            $product = $this->updateProduct->handle(ProductId::of($product), [
                 'name' => $product->name->with($locale->value, $request->validated('name')),
-                'slug' => $product->slug->with($locale->value, $request->validated('slug')),
                 'status' => $request->validated('status'),
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
                 'sku' => $request->validated('sku'),
                 'barcode' => $request->validated('barcode'),
-                ...$request->stock(),
+                ...$limits,
+                ...array_diff_key($stock, $limits),
             ]);
 
-            $product->categories()->sync($request->categoryIds());
-            // Also moves the images the product keeps to their new positions.
-            $product->images()->sync($request->images());
-            $this->saveImageAlts($request);
+            $this->saveRelations($request, $product);
             $this->saved($request, $product, false, $locale);
         });
 
@@ -133,12 +147,15 @@ class ProductController
     }
 
     /**
-     * Saves the alt text the form gives the product's images.
+     * Saves the product's categories, its images in their order, and their alt texts.
      */
-    protected function saveImageAlts(ProductRequest $request): void
+    protected function saveRelations(ProductRequest $request, Product $product): void
     {
+        $this->setCategories->handle(ProductId::of($product), CategoryId::many($request->categoryIds()));
+        $this->setImages->handle(ProductId::of($product), ImageId::many($request->imageIds()));
+
         foreach ($request->imageAlts() as $id => $alt) {
-            ProductImage::query()->whereKey($id)->update(['alt' => $alt]);
+            $this->updateImage->handle(new ImageId((int) $id), ['alt' => $alt]);
         }
     }
 
