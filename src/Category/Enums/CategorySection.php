@@ -15,4 +15,7 @@ enum CategorySection: string
 {
     /** The name and visibility. */
     case General = 'general';
+
+    /** The products listed in the category. */
+    case Products = 'products';
 }

@@ -71,7 +71,7 @@ declare namespace Larasell.Admin.Category.Data {
   };
 }
 declare namespace Larasell.Admin.Category.Enums {
-  export type CategorySection = "general";
+  export type CategorySection = "general" | "products";
 }
 declare namespace Larasell.Admin.Customer.Data {
   export type CreateCustomerPageData = {

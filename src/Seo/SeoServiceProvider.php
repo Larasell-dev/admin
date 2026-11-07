@@ -29,7 +29,7 @@ class SeoServiceProvider extends ServiceProvider
             ->request(SeoUrlsRequest::class);
 
         Section::add(SectionForm::Category, SeoUrlsRequest::SECTION)
-            ->after(CategorySection::General)
+            ->after(CategorySection::Products)
             ->props(SeoUrlsProps::class)
             ->request(SeoUrlsRequest::class);
 

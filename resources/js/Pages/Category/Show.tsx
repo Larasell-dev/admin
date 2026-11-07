@@ -69,16 +69,18 @@ export default function Show(props: Props) {
                     <CategoryForm category={props.category} />
                   </Section.Root>
                 }
+                products={
+                  <ProductsTable
+                    mode="edit"
+                    table={props.products}
+                    availableProductsUrl={props.availableProductsUrl}
+                    addProductUrl={props.addProductUrl}
+                    createProductUrl={props.createProductUrl}
+                  />
+                }
               />
               <UnsavedChangesToast />
             </Form>
-            <ProductsTable
-              mode="edit"
-              table={props.products}
-              availableProductsUrl={props.availableProductsUrl}
-              addProductUrl={props.addProductUrl}
-              createProductUrl={props.createProductUrl}
-            />
           </SectionStack>
         </Page.Body>
       )}
