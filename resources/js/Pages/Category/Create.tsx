@@ -86,10 +86,10 @@ export default function Create({
                   <CategoryForm />
                 </Section.Root>
               }
+              products={<ProductsTable mode="create" createProductUrl={createProductUrl} />}
             />
             <UnsavedChangesToast />
           </Form>
-          <ProductsTable mode="create" createProductUrl={createProductUrl} />
         </SectionStack>
       </Page.Body>
     </>

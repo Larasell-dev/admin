@@ -1,6 +1,6 @@
 import { useFormContext } from "@inertiajs/react";
 import { Field, Input, SectionStack, Stack } from "@larasell-dev/ui";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import ExtensionSections from "../ExtensionSections";
 import VisibilityField from "../VisibilityField";
 import { fbs } from "fbtee";
@@ -44,22 +44,25 @@ type Anchor = Larasell.Admin.Category.Enums.CategorySection;
  * It must sit inside the Inertia `<Form>`, so the added sections' fields are saved with it.
  */
 export function CategorySections({
-  general,
   sections,
+  ...own
 }: {
-  /** The section with the category's name and visibility. */
-  general: ReactNode;
   sections: Larasell.Admin.Platform.Sections.Data.SectionData[];
-}) {
-  // Every one of CategorySection's anchors: a new one fails to compile here until it's rendered.
-  const anchors = ["general"] as const satisfies readonly Anchor[];
+} & Record<Anchor, ReactNode>) {
+  // Every one of CategorySection's anchors, in the order they show: a new one fails to compile
+  // here until the pages render it, so no section placed at it goes missing.
+  const order = ["general", "products"] as const satisfies readonly Anchor[];
 
   return (
     <SectionStack>
-      <ExtensionSections sections={sections} before="general" />
-      {general}
-      <ExtensionSections sections={sections} after="general" />
-      <ExtensionSections sections={sections} anchors={anchors} />
+      {order.map((anchor) => (
+        <Fragment key={anchor}>
+          <ExtensionSections sections={sections} before={anchor} />
+          {own[anchor]}
+          <ExtensionSections sections={sections} after={anchor} />
+        </Fragment>
+      ))}
+      <ExtensionSections sections={sections} anchors={order} />
     </SectionStack>
   );
 }

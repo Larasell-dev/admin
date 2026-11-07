@@ -413,6 +413,9 @@ function AddProductBar({
                 "Category page: placeholder of the search field that picks a product to add to the category",
               )}
               render={<Input />}
+              // The table sits inside the category's form; the search belongs to no form, so it's
+              // neither saved with the category nor submits it on Enter.
+              form=""
             />
             <Combobox.Portal>
               <Combobox.Positioner sideOffset={4} align="start" className="z-50 w-(--anchor-width)">
