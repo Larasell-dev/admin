@@ -4,6 +4,7 @@ import {
   Input,
   Pagination,
   Section,
+  Select,
   Stack,
   Table,
   Button,
@@ -12,16 +13,7 @@ import {
   Tooltip,
   TruncateMiddle,
 } from "@larasell-dev/ui";
-import { Combobox } from "@base-ui/react/combobox";
-import {
-  ArrowDownSLine,
-  ArrowGoBackLine,
-  CheckLine,
-  DeleteBinLine,
-  FilterLine,
-  SearchLine,
-} from "@larasell-dev/ui/icons";
-import { AnimatePresence } from "motion/react";
+import { ArrowDownSLine, ArrowGoBackLine, DeleteBinLine, FilterLine } from "@larasell-dev/ui/icons";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { fbs } from "fbtee";
 import { useMemo, useState, type ReactNode } from "react";
@@ -30,7 +22,6 @@ import type { TableRowAction } from "../../types";
 import ConfirmActionDialog from "../../Platform/Panel/Components/ConfirmActionDialog";
 import { overlayExclusive } from "../../Platform/Support/hotkeys";
 import { useStorage } from "../../Platform/Support/useStorage";
-import PopupMotion from "../../Platform/Support/PopupMotion";
 
 type Props = Larasell.Admin.Seo.Data.SeoUrlsData;
 
@@ -73,16 +64,15 @@ export default function UrlFields({
 
   return (
     <>
-      {/* The filter sits beside the text while the text gets 24rem, and wraps below it otherwise, e.g. in
-          longer languages; the library's header keeps its action on the same line. */}
-      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <div className="min-w-0 flex-1 basis-sm [overflow-wrap:anywhere]">
-          <Section.Header title={title} description={description} />
-        </div>
-        {props.urls.length > 1 && (
-          <ChannelFilter channels={props.urls} shown={shown} onChange={choose} />
-        )}
-      </div>
+      <Section.Header
+        title={title}
+        description={description}
+        action={
+          props.urls.length > 1 && (
+            <ChannelFilter channels={props.urls} shown={shown} onChange={choose} />
+          )
+        }
+      />
       {props.urls.length > 0 ? (
         <Stack spacing={5}>
           {shown.length === 0 && (
@@ -345,8 +335,6 @@ function ChannelFilter({
   shown: string[];
   onChange: (value: string[]) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const names = new Map(channels.map((url) => [String(url.channelId), url.channel]));
   const label = useMemo(() => {
     if (shown.length === 0) {
       return fbs(
@@ -375,66 +363,36 @@ function ChannelFilter({
   }, [shown.length, channels.length]);
 
   return (
-    <Combobox.Root
+    <Select.Root
       multiple
-      items={[...names.keys()]}
-      itemToStringLabel={(id: string) => names.get(id) ?? id}
-      value={shown}
-      onValueChange={onChange}
-      open={open}
-      onOpenChange={setOpen}
+      items={channels}
+      itemToKey={(url) => url.channelId}
+      itemToLabel={(url) => url.channel}
+      value={channels.filter((url) => shown.includes(String(url.channelId)))}
+      onValueChange={(value) => onChange(value.map((url) => String(url.channelId)))}
+      filter={{
+        placeholder: fbs(
+          "Search sales channels",
+          "Product and category forms, URLs section: placeholder of the search field in the list of sales channels to show",
+        ),
+        empty: fbs(
+          "No sales channel matches.",
+          "Product and category forms, URLs section: shown in the list of sales channels when the search matches none",
+        ),
+      }}
     >
-      <Combobox.Trigger render={<Button type="button" variant="secondary" />}>
+      <Select.Trigger render={<Button type="button" variant="secondary" />}>
         {label}
         <Icon icon={ArrowDownSLine} />
-      </Combobox.Trigger>
-      {/* Mounted while open, and kept while it animates out, like the UI library's tag combobox. */}
-      <AnimatePresence>
-        {open && (
-          <Combobox.Portal keepMounted>
-            <Combobox.Positioner sideOffset={4} align="end" className="z-50 outline-none">
-              <Combobox.Popup
-                render={(props, state) => <PopupMotion {...(props as object)} side={state.side} />}
-                className="w-64 outline-none border border-base-subtle bg-base-elevated bg-clip-padding shadow-popover"
-              >
-                <HotkeysProvider scope="seo-channel-filter" exclusive={overlayExclusive}>
-                  <div className="flex items-center gap-2 border-b border-base-subtle px-3.5">
-                    <Icon icon={SearchLine} />
-                    <Combobox.Input
-                      placeholder={fbs(
-                        "Search sales channels",
-                        "Product and category forms, URLs section: placeholder of the search field in the list of sales channels to show",
-                      )}
-                      className="h-10 w-full bg-transparent type-body-md text-base-primary outline-none placeholder:text-base-secondary"
-                    />
-                  </div>
-                  <Combobox.Empty className="px-3.5 py-6 text-center type-body-md text-base-secondary empty:hidden">
-                    <fbt desc="Product and category forms, URLs section: shown in the list of sales channels when the search matches none">
-                      No sales channel matches.
-                    </fbt>
-                  </Combobox.Empty>
-                  <Combobox.List className="max-h-72 overflow-y-auto empty:hidden data-empty:hidden">
-                    {(id: string) => (
-                      <Combobox.Item
-                        key={id}
-                        value={id}
-                        className="group flex cursor-pointer items-center gap-2.5 px-3.5 py-2 type-body-md text-base-primary outline-none select-none data-highlighted:bg-action-neutral-ghost-hover"
-                      >
-                        <span className="flex size-4 shrink-0 items-center justify-center border border-base-strong group-data-selected:border-transparent group-data-selected:bg-action-neutral-primary-default group-data-selected:text-action-neutral-on-color">
-                          <Combobox.ItemIndicator>
-                            <Icon icon={CheckLine} />
-                          </Combobox.ItemIndicator>
-                        </span>
-                        {names.get(id)}
-                      </Combobox.Item>
-                    )}
-                  </Combobox.List>
-                </HotkeysProvider>
-              </Combobox.Popup>
-            </Combobox.Positioner>
-          </Combobox.Portal>
+      </Select.Trigger>
+      <Select.Popup align="end">
+        {(url: Larasell.Admin.Seo.Data.SeoUrlData) => (
+          <Select.Item item={url}>
+            <Select.ItemCheckbox />
+            {url.channel}
+          </Select.Item>
         )}
-      </AnimatePresence>
-    </Combobox.Root>
+      </Select.Popup>
+    </Select.Root>
   );
 }
