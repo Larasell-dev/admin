@@ -3,9 +3,9 @@
 ## Code layout
 
 The panel is a modular monolith. Each feature is a module at the top of `src/`:
-`ApiToken`, `Category`, `Customer`, `Order`, `Product` and `Team`. What modules and
-apps plug into lives under `src/Platform/`: `Panel`, `Auth`, `Navigation`, `Tables`,
-`Search`, `Audit`, `ContentLocale`, `InterfaceLocale` and `Support`.
+`ApiToken`, `Category`, `Customer`, `Order`, `Product`, `SalesChannel`, `Seo` and `Team`.
+What modules and apps plug into lives under `src/Platform/`: `Panel`, `Auth`, `Navigation`,
+`Tables`, `Sections`, `Search`, `Audit`, `ContentLocale`, `InterfaceLocale` and `Support`.
 
 Every module has the same layout, with only the folders it needs:
 `<Module>ServiceProvider.php` (config, bindings, routes, navigation, searches),
