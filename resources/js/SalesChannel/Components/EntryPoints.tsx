@@ -17,6 +17,7 @@ import { AddLine, DeleteBinLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import { useState } from "react";
 import FormCheckbox from "../../Platform/Panel/Components/FormCheckbox";
+import FormSelect from "../../Platform/Panel/Components/FormSelect";
 import Freeze from "../../Platform/Panel/Components/Freeze";
 
 type Channel = Larasell.Admin.SalesChannel.Data.SalesChannelData;
@@ -207,64 +208,59 @@ function AddEntryPoint({
                   />
                 </Field>
                 <div className="grid items-start gap-5">
-                  <Field
+                  <FormSelect
                     label={fbs(
                       "Language",
                       "Add domain dialog: label of the select for the language the domain shows",
                     )}
-                    name="locale"
                     error={errors.locale}
-                  >
-                    <Input
-                      defaultValue={channel.defaultLocale}
-                      render={
-                        <select>
-                          {locales.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      }
-                    />
-                  </Field>
-                  <Field
+                    name="locale"
+                    items={locales}
+                    defaultValue={[channel.defaultLocale]}
+                    filter={{
+                      placeholder: fbs(
+                        "Search languages",
+                        "Add domain dialog: placeholder of the search field in the list of languages",
+                      ),
+                      empty: fbs(
+                        "No language matches",
+                        "Add domain dialog: shown in the list of languages when the typed text matches none",
+                      ),
+                    }}
+                  />
+                  <FormSelect
                     label={fbs(
                       "Starting currency",
                       "Add domain dialog: label of the optional select for the currency visits through the domain start in; visitors can still switch",
                     )}
-                    name="default_currency"
                     error={errors.default_currency}
                     description={fbs(
                       "Customers can switch to any of the channel's currencies.",
                       "Add domain dialog: hint below the starting currency select",
                     )}
-                  >
-                    <Input
-                      defaultValue=""
-                      render={
-                        <select>
-                          <option value="">
-                            {fbs(
-                              [
-                                "Channel default (",
-                                fbs.param("currency", label(currencies, channel.defaultCurrency)),
-                                ")",
-                              ],
-                              "Add domain dialog: first option of the starting currency select, which uses the channel's default currency, e.g. 'Channel default (Swiss Franc)'",
-                            )}
-                          </option>
-                          {currencies.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label === option.value
-                                ? option.label
-                                : `${option.label} (${option.value})`}
-                            </option>
-                          ))}
-                        </select>
-                      }
-                    />
-                  </Field>
+                    name="default_currency"
+                    items={[
+                      {
+                        value: "",
+                        label: fbs(
+                          [
+                            "Channel default (",
+                            fbs.param("currency", label(currencies, channel.defaultCurrency)),
+                            ")",
+                          ],
+                          "Add domain dialog: first option of the starting currency select, which uses the channel's default currency, e.g. 'Channel default (Swiss Franc)'",
+                        ),
+                      },
+                      ...currencies.map((option) => ({
+                        value: option.value,
+                        label:
+                          option.label === option.value
+                            ? option.label
+                            : `${option.label} (${option.value})`,
+                      })),
+                    ]}
+                    defaultValue={[""]}
+                  />
                 </div>
                 <BaseField.Root name="primary" className="relative flex flex-col gap-1.5">
                   <Checkbox.Label>
