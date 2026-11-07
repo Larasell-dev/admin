@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\Navigation;
+namespace Larasell\Admin\Platform\Navigation\Exceptions;
 
 use InvalidArgumentException;
 use Larasell\Chronicle\Exceptions\HasStructuredException;

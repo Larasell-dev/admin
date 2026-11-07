@@ -2,8 +2,8 @@
 
 namespace Larasell\Admin\Team\AuditRecords;
 
-use Larasell\Admin\Platform\Audit\AuditCategory;
 use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 

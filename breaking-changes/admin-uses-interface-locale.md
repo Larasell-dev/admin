@@ -35,7 +35,7 @@ To keep showing the panel in the app's locale, bind your own `InterfaceLocaleRes
 ```php
 use Illuminate\Http\Request;
 use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
-use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocaleResolver;
+use Larasell\Admin\Platform\InterfaceLocale\Resolvers\InterfaceLocaleResolver;
 
 class AppLocaleResolver implements InterfaceLocaleResolver
 {

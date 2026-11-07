@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\Audit;
+namespace Larasell\Admin\Platform\Audit\Actors;
 
 /**
  * Who did an audited action: an admin, an API token, or a SystemActor for jobs and commands.

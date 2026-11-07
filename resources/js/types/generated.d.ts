@@ -188,13 +188,13 @@ declare namespace Larasell.Admin.Platform.InterfaceLocale.Data {
     label: string;
   };
 }
-declare namespace Larasell.Admin.Platform.Navigation {
+declare namespace Larasell.Admin.Platform.Navigation.Data {
   export type NavigationItemData = {
     id: string;
     label: string;
     url: string;
     icon: string;
-    children: Array<Larasell.Admin.Platform.Navigation.NavigationItemData>;
+    children: Array<Larasell.Admin.Platform.Navigation.Data.NavigationItemData>;
   };
 }
 declare namespace Larasell.Admin.Platform.Panel.Data {

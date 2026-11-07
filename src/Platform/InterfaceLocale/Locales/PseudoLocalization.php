@@ -1,6 +1,8 @@
 <?php
 
-namespace Larasell\Admin\Platform\InterfaceLocale;
+namespace Larasell\Admin\Platform\InterfaceLocale\Locales;
+
+use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
 
 /**
  * Turns English text into a pseudo-language, like scripts/translations.mjs does for the frontend.

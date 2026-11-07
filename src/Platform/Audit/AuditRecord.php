@@ -4,6 +4,7 @@ namespace Larasell\Admin\Platform\Audit;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 
 /**
  * One kind of audited action, e.g. an API token was created. Pass an instance to

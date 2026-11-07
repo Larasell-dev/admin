@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Platform\ContentLocale\Actions;
 
 use Illuminate\Http\Request;
-use Larasell\Admin\Platform\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Chronicle\Facades\Chronicle;
 
 class SetContentLocale

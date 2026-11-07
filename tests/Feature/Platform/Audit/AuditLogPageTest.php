@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\AuditCategory;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Subject;
-use Larasell\Admin\Platform\Audit\SystemActor;
-use Larasell\Admin\Platform\Audit\UnknownActor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Laravel\Pennant\Feature;
 

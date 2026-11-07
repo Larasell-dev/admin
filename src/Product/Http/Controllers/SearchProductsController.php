@@ -4,8 +4,8 @@ namespace Larasell\Admin\Product\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
-use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Platform\ContentLocale\Locales\AvailableLocales;
 use Larasell\Admin\Platform\Search\Data\SearchMatchData;
 use Larasell\Admin\Platform\Search\Data\SearchResultData;
 use Larasell\Admin\Platform\Search\Http\Requests\SearchRequest;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Platform\Audit\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\Actions\CreateAdmin;
 use Larasell\Admin\Team\Actions\DeleteAdmin;

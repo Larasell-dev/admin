@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\Audit;
+namespace Larasell\Admin\Platform\Audit\Exceptions;
 
 use Larasell\Chronicle\Exceptions\HasStructuredException;
 use Larasell\Chronicle\Exceptions\StructuredException;

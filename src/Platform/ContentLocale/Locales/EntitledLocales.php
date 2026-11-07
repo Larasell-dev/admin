@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\ContentLocale;
+namespace Larasell\Admin\Platform\ContentLocale\Locales;
 
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Facades\Entitlement;

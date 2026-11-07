@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Product\Search;
 
 use Illuminate\Support\Collection;
-use Larasell\Admin\Platform\ContentLocale\AvailableLocales;
+use Larasell\Admin\Platform\ContentLocale\Locales\AvailableLocales;
 use Larasell\Admin\Platform\Search\SearchQuery;
 use Larasell\Larasell\Catalog\Models\Product;
 

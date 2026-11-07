@@ -1,8 +1,9 @@
 <?php
 
-namespace Larasell\Admin\Platform\InterfaceLocale;
+namespace Larasell\Admin\Platform\InterfaceLocale\Resolvers;
 
 use Illuminate\Http\Request;
+use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
 
 /**
  * How a request picks the language of the panel's interface, which is not the content locale.

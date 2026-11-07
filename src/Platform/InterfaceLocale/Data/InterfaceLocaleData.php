@@ -2,8 +2,8 @@
 
 namespace Larasell\Admin\Platform\InterfaceLocale\Data;
 
-use Larasell\Admin\Platform\InterfaceLocale\AvailableInterfaceLocales;
 use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
+use Larasell\Admin\Platform\InterfaceLocale\Locales\AvailableInterfaceLocales;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 

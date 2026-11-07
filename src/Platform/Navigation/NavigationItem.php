@@ -4,6 +4,8 @@ namespace Larasell\Admin\Platform\Navigation;
 
 use Closure;
 use Illuminate\Support\Str;
+use Larasell\Admin\Platform\Navigation\Data\NavigationItemData;
+use Larasell\Admin\Platform\Navigation\Exceptions\InvalidNavigationItem;
 use Larasell\Admin\Platform\Panel\Icon;
 use LogicException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;

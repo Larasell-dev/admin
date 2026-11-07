@@ -7,7 +7,7 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Larasell\Admin\Platform\Audit\Actor;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 
 /**

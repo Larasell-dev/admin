@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\Navigation;
+namespace Larasell\Admin\Platform\Navigation\Data;
 
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;

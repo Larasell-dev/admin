@@ -40,7 +40,7 @@ To keep editing in the app's current locale, bind your own `ContentLocaleResolve
 ```php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Larasell\Admin\Platform\ContentLocale\ContentLocaleResolver;
+use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Larasell\Enums\Locale;
 
 class CurrentLocaleResolver implements ContentLocaleResolver

@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
+use Larasell\Admin\Platform\Audit\Enums\AuditSource;
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 
 /**
  * Writes audit records to the shop's database, the audit log's source of truth. Records can only

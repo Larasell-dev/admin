@@ -4,7 +4,7 @@ namespace Larasell\Admin\Platform\Auth\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Platform\Audit\Actor;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
 
 class Admin extends Authenticatable implements Actor
 {

@@ -1,7 +1,7 @@
 export type AdminSummary = { name: string; email: string; avatarUrl: string | null };
 
 export type SharedProps = {
-  navigation: Larasell.Admin.Platform.Navigation.NavigationItemData[];
+  navigation: Larasell.Admin.Platform.Navigation.Data.NavigationItemData[];
   admin: AdminSummary | null;
   profileUrl: string;
   logoutUrl: string;

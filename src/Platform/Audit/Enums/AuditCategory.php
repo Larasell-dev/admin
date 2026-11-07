@@ -1,6 +1,6 @@
 <?php
 
-namespace Larasell\Admin\Platform\Audit;
+namespace Larasell\Admin\Platform\Audit\Enums;
 
 /**
  * Groups records by why they're kept, e.g. to keep each group for its own retention period.

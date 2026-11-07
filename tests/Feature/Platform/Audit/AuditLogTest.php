@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\Actor;
-use Larasell\Admin\Platform\Audit\AuditCategory;
-use Larasell\Admin\Platform\Audit\AuditFailed;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 use Larasell\Admin\Platform\Audit\Subject;
-use Larasell\Admin\Platform\Audit\SystemActor;
-use Larasell\Admin\Platform\Audit\UnknownActor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 
 beforeEach(function () {

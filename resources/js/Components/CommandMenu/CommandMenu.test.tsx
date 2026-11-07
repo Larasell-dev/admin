@@ -666,7 +666,7 @@ describe("navigating", () => {
   const navigationItem = (
     label: string,
     url: string,
-    children: Larasell.Admin.Platform.Navigation.NavigationItemData[] = [],
+    children: Larasell.Admin.Platform.Navigation.Data.NavigationItemData[] = [],
   ) => ({ id: `larasell.admin.${label}`, label, url, icon: "Home", children });
   const props = {
     navigation: [

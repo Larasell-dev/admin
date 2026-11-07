@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use Inertia\Testing\AssertableInertia as Assert;
 use Larasell\Admin\Platform\Auth\Models\Admin;
-use Larasell\Admin\Platform\InterfaceLocale\CookieInterfaceLocaleResolver;
 use Larasell\Admin\Platform\InterfaceLocale\InterfaceLocale;
-use Larasell\Admin\Platform\InterfaceLocale\PanelInterfaceLocales;
+use Larasell\Admin\Platform\InterfaceLocale\Locales\PanelInterfaceLocales;
+use Larasell\Admin\Platform\InterfaceLocale\Resolvers\CookieInterfaceLocaleResolver;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Price;
 

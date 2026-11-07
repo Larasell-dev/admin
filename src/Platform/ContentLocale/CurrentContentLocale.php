@@ -5,6 +5,7 @@ namespace Larasell\Admin\Platform\ContentLocale;
 use Attribute;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Chronicle\Facades\Chronicle;
 use Larasell\Larasell\Enums\Locale;
 
