@@ -21,5 +21,7 @@ class SeoUrlData extends Data
         public ?string $customPath,
         /** The path made from the name, null before the product or category has one in the locale. */
         public ?string $automaticPath,
+        /** Its earlier URLs in the channel, which redirect to the current one. */
+        public OldUrlsData $history,
     ) {}
 }

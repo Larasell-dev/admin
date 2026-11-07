@@ -4,13 +4,17 @@ namespace Larasell\Admin\Seo;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
+use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Category\Enums\CategorySection;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Seo\Data\SeoUrlsProps;
+use Larasell\Admin\Seo\Http\Controllers\RemoveOldUrlController;
+use Larasell\Admin\Seo\Http\Controllers\RestoreOldUrlController;
 use Larasell\Admin\Seo\Http\Requests\SeoUrlsRequest;
 use Larasell\Larasell\Seo\Exceptions\CustomUrlRejected;
 use Larasell\Larasell\Seo\Exceptions\InvalidSeoPath;
@@ -34,6 +38,11 @@ class SeoServiceProvider extends ServiceProvider
             ->after(CategorySection::Products)
             ->props(SeoUrlsProps::class)
             ->request(SeoUrlsRequest::class);
+
+        AdminPanel::resolve()->routes(function (): void {
+            Route::delete('seo-urls/{url}', RemoveOldUrlController::class)->where('url', '[1-9][0-9]*')->name('seo-urls.destroy');
+            Route::post('seo-urls/{url}/restore', RestoreOldUrlController::class)->where('url', '[1-9][0-9]*')->name('seo-urls.restore');
+        });
 
         // A path the core refused shows on its field, and nothing of the page is saved.
         // Only the HTTP handler maps exceptions; console runs, e.g. under Collision, have no form.
