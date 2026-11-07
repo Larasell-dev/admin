@@ -47,7 +47,7 @@ class CategoryController
             return redirect()->route('larasell.admin.categories.show', $first);
         }
 
-        return Inertia::render('Category/Index', new CategoriesPageData(
+        return Inertia::render('Category/Pages/Index', new CategoriesPageData(
             categories: $this->tree($locale),
             createUrl: route('larasell.admin.categories.create'),
         ));
@@ -65,7 +65,7 @@ class CategoryController
             Head::title(__('Category not found'));
 
             // Inertia still renders a page that comes with an error status.
-            return Inertia::render('Category/Show', new MissingCategoryPageData(
+            return Inertia::render('Category/Pages/Show', new MissingCategoryPageData(
                 categories: $this->tree($locale),
                 createUrl: route('larasell.admin.categories.create'),
             ))->toResponse($request)->setStatusCode(404);
@@ -73,7 +73,7 @@ class CategoryController
 
         Head::title($category->name->get($locale->value));
 
-        return Inertia::render('Category/Show', new CategoryPageData(
+        return Inertia::render('Category/Pages/Show', new CategoryPageData(
             categories: $this->tree($locale),
             createUrl: route('larasell.admin.categories.create'),
             category: CategoryDetailData::fromModel($category, $locale),
@@ -99,7 +99,7 @@ class CategoryController
             Head::title(__('New category in :category', ['category' => $parent->name->get($locale->value)]));
         }
 
-        return Inertia::render('Category/Create', new CreateCategoryPageData(
+        return Inertia::render('Category/Pages/Create', new CreateCategoryPageData(
             categories: $this->tree($locale),
             createUrl: route('larasell.admin.categories.create'),
             storeUrl: route('larasell.admin.categories.store'),

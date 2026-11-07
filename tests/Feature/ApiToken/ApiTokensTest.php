@@ -69,7 +69,7 @@ it('lists the API tokens in the settings', function () {
         ->get(route('larasell.admin.settings.api-tokens.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('ApiToken/Index')
+            ->component('ApiToken/Pages/Index')
             ->where('createUrl', route('larasell.admin.settings.api-tokens.create'))
             ->where('apiTokens.title', 'API tokens')
             ->where('apiTokens.columns', [
@@ -153,7 +153,7 @@ it('opens the new API token page with a choice of expiry periods, 3 months by de
         ->get(route('larasell.admin.settings.api-tokens.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('ApiToken/Create')
+            ->component('ApiToken/Pages/Create')
             ->where('storeUrl', route('larasell.admin.settings.api-tokens.store'))
             ->where('indexUrl', route('larasell.admin.settings.api-tokens.index'))
             ->where('expiryOptions', [

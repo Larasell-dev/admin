@@ -42,7 +42,7 @@ it('renders the table page for an index route', function () {
         ->get(route('larasell.admin.shop.library.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Platform/Tables/Pages/TablePage')
             ->where('table.title', 'Library')
             ->where('table.columns', [['name' => 'title', 'label' => 'Title', 'type' => 'text']])
             ->where('table.rows', [['id' => $book->id, 'title' => 'Dune', '_actions' => [], '_link' => null, '_images' => [], '_variants' => []]]));

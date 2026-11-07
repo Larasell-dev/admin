@@ -17,7 +17,7 @@ class ProfileController
 {
     public function edit(#[CurrentUser('larasell-admin')] Admin $admin): Response
     {
-        return Inertia::render('Profile', new ProfilePageData(
+        return Inertia::render('Team/Pages/Profile', new ProfilePageData(
             admin: AdminData::fromModel($admin),
             updateUrl: route('larasell.admin.profile.update'),
             avatarUploadUrl: route('larasell.admin.profile.avatar.store'),

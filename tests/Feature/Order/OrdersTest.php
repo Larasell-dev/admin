@@ -47,7 +47,7 @@ it('lists orders with their customer, status and total, newest first', function 
     $this->get(route('larasell.admin.orders.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Platform/Tables/Pages/TablePage')
             ->where('table.title', 'Orders')
             ->where('table.columns', [
                 ['name' => 'number', 'label' => 'Order', 'type' => 'text'],
@@ -191,7 +191,7 @@ it('shows an order with its items, summary, customer, addresses, payments and sh
     $this->get(route('larasell.admin.orders.show', $order))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Order/Show')
+            ->component('Order/Pages/Show')
             ->where('indexUrl', route('larasell.admin.orders.index'))
             ->where('customerUrl', null)
             ->where('order.number', '2026-000123')

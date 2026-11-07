@@ -33,7 +33,7 @@ it('does not offer the dev login button outside the local environment', function
 
     // Act & Assert
     $this->get(route('larasell.admin.login'))->assertInertia(fn (Assert $page) => $page
-        ->component('Login')
+        ->component('Platform/Auth/Pages/Login')
         ->where('devLoginUrl', null)
     );
 })->with('non-local environments');
@@ -44,7 +44,7 @@ it('offers the dev login button in the local environment', function () {
 
     // Act & Assert
     $this->get(route('larasell.admin.login'))->assertInertia(fn (Assert $page) => $page
-        ->component('Login')
+        ->component('Platform/Auth/Pages/Login')
         ->where('devLoginUrl', route('larasell.admin.dev.login'))
     );
 });

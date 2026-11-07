@@ -54,7 +54,7 @@ class AuditLogController
             is_string(...),
         ));
 
-        return Inertia::render('AuditLog/Index', new AuditLogPageData(
+        return Inertia::render('Platform/Audit/Pages/Index', new AuditLogPageData(
             indexUrl: route('larasell.admin.settings.audit-log.index'),
             auditLog: AuditLog::make($filters),
             filters: new AuditLogFiltersData(...$filters),

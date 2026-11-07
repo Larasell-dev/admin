@@ -39,7 +39,7 @@ it('lists the products by name, stock, and a visibility badge', function () {
     $this->get(route('larasell.admin.products.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Platform/Tables/Pages/TablePage')
             ->where('table.title', 'Products')
             ->where('table.columns', [
                 ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
@@ -116,7 +116,7 @@ it('shows the page for adding a product', function () {
     $this->get(route('larasell.admin.products.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Product/Create')
+            ->component('Product/Pages/Create')
             ->where('storeUrl', route('larasell.admin.products.store'))
             ->where('indexUrl', route('larasell.admin.products.index'))
             ->where('uploadImagesUrl', route('larasell.admin.products.images.store')));
@@ -154,7 +154,7 @@ it('shows the product\'s values to edit on its page', function () {
     $this->get(route('larasell.admin.products.edit', $boots))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Product/Edit')
+            ->component('Product/Pages/Edit')
             ->where('product', [
                 'id' => $boots->id,
                 'name' => 'Boots',

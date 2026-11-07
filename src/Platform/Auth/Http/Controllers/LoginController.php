@@ -21,7 +21,7 @@ class LoginController
 {
     public function create(): Response
     {
-        return Inertia::render('Login', new LoginPageData(
+        return Inertia::render('Platform/Auth/Pages/Login', new LoginPageData(
             loginUrl: route('larasell.admin.login.store'),
             devLoginUrl: app()->environment('local') ? route('larasell.admin.dev.login') : null,
         ));

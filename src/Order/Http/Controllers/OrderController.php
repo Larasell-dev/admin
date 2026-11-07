@@ -18,7 +18,7 @@ class OrderController
     {
         Head::title(__('Order #:number', ['number' => $order->number]));
 
-        return Inertia::render('Order/Show', new OrderPageData(
+        return Inertia::render('Order/Pages/Show', new OrderPageData(
             order: OrderDetailData::fromModel($order),
             indexUrl: route('larasell.admin.orders.index'),
             customerUrl: $order->customer_id !== null && config('larasell.admin.customers.enabled')

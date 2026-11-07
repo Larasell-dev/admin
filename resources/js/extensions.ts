@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { type CommandDefinition, commands } from "./Components/CommandMenu/commands";
+import { type CommandDefinition, commands } from "./Platform/Panel/Components/CommandMenu/commands";
 
 export type PageModule = { default: ComponentType<any> };
 

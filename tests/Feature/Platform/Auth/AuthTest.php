@@ -68,7 +68,7 @@ it('fails to log an admin in with invalid credentials', function () {
     expect(auth('larasell-admin')->check())->toBeFalse();
 
     $this->get(route('larasell.admin.login'))->assertInertia(fn (Assert $page) => $page
-        ->component('Login')
+        ->component('Platform/Auth/Pages/Login')
         ->where('errors.email', __('auth.failed'))
     );
 });

@@ -185,6 +185,6 @@ it('sends the empty state to the table page', function () {
         ->get(route('larasell.admin.shelf.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Platform/Tables/Pages/TablePage')
             ->where('table.emptyState', ['title' => 'No books yet', 'description' => null, 'icon' => 'Book', 'actions' => []]));
 });

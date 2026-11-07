@@ -196,7 +196,7 @@ class AdminServiceProvider extends ServiceProvider
 
                 return (new ExceptionResponse($exception, $request, new Response(status: 404), app(Router::class), app(Kernel::class)))
                     ->usingMiddleware(HandleAdminInertiaRequests::class)
-                    ->render(Auth::guard('larasell-admin')->check() ? 'NotFound' : 'GuestNotFound')
+                    ->render(Auth::guard('larasell-admin')->check() ? 'Platform/Panel/Pages/NotFound' : 'Platform/Panel/Pages/GuestNotFound')
                     ->withSharedData()
                     ->toResponse($request);
             });

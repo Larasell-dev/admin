@@ -21,7 +21,7 @@ class ApiTokenController
 {
     public function index(): Response
     {
-        return Inertia::render('ApiToken/Index', new ApiTokensPageData(
+        return Inertia::render('ApiToken/Pages/Index', new ApiTokensPageData(
             createUrl: route('larasell.admin.settings.api-tokens.create'),
             apiTokens: ApiTokens::make(),
         ));
@@ -29,7 +29,7 @@ class ApiTokenController
 
     public function create(): Response
     {
-        return Inertia::render('ApiToken/Create', new CreateApiTokenPageData(
+        return Inertia::render('ApiToken/Pages/Create', new CreateApiTokenPageData(
             storeUrl: route('larasell.admin.settings.api-tokens.store'),
             indexUrl: route('larasell.admin.settings.api-tokens.index'),
             expiryOptions: array_map(fn (ApiTokenExpiry $expiry): array => ['value' => $expiry->value, 'label' => $expiry->label()], ApiTokenExpiry::cases()),

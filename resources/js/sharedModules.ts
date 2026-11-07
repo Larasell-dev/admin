@@ -4,12 +4,12 @@ import * as UI from "@larasell-dev/ui";
 import * as React from "react";
 import * as JsxDevRuntime from "react/jsx-dev-runtime";
 import * as JsxRuntime from "react/jsx-runtime";
-import { defineCommand, useCommand } from "./Components/CommandMenu/commands";
-import { Highlight, matchRanges } from "./Components/CommandMenu/Highlight";
-import { Page } from "./Components/Page";
-import ResourceTable from "./Components/ResourceTable";
+import { defineCommand, useCommand } from "./Platform/Panel/Components/CommandMenu/commands";
+import { Highlight, matchRanges } from "./Platform/Panel/Components/CommandMenu/Highlight";
+import { Page } from "./Platform/Panel/Components/Page";
+import ResourceTable from "./Platform/Tables/Components/ResourceTable";
 import { Larasell, SectionForm } from "./extensions";
-import SidebarLayout from "./Layouts/SidebarLayout";
+import SidebarLayout from "./Platform/Panel/Layouts/SidebarLayout";
 
 /**
  * The panel's copies of the modules that extensions and app pages import. The admin Vite plugin

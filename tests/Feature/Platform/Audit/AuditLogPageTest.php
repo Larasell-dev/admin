@@ -77,7 +77,7 @@ function auditLogPage(array $filters = []): AssertableInertia
         ->get(route('larasell.admin.settings.audit-log.index', $filters))
         ->assertOk()
         ->assertInertia(function (AssertableInertia $inertia) use (&$page) {
-            $page = $inertia->component('AuditLog/Index');
+            $page = $inertia->component('Platform/Audit/Pages/Index');
         });
 
     return $page;

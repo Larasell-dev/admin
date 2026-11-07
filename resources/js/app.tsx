@@ -2,22 +2,26 @@ import "../css/app.css";
 import { createInertiaApp, type ResolvedComponent } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
 import { ToastProvider } from "@larasell-dev/ui";
-import { commands } from "./Components/CommandMenu/commands";
-import { contentLocaleCommand } from "./Components/CommandMenu/contentLocaleCommand";
-import { goToCommand } from "./Components/CommandMenu/goToCommand";
-import { logOutCommand } from "./Components/CommandMenu/logOutCommand";
-import { themeCommand } from "./Components/CommandMenu/themeCommand";
-import { interfaceLocaleCommand } from "./Components/CommandMenu/interfaceLocaleCommand";
-import { ThemeChangedToasts } from "./Components/Shell/ThemeChangedToast";
+import { commands } from "./Platform/Panel/Components/CommandMenu/commands";
+import { contentLocaleCommand } from "./Platform/Panel/Components/CommandMenu/contentLocaleCommand";
+import { goToCommand } from "./Platform/Panel/Components/CommandMenu/goToCommand";
+import { logOutCommand } from "./Platform/Panel/Components/CommandMenu/logOutCommand";
+import { themeCommand } from "./Platform/Panel/Components/CommandMenu/themeCommand";
+import { interfaceLocaleCommand } from "./Platform/Panel/Components/CommandMenu/interfaceLocaleCommand";
+import { ThemeChangedToasts } from "./Platform/Panel/Components/Shell/ThemeChangedToast";
 import { extensions, Larasell, SectionForm } from "./extensions";
 import { sharedModules } from "./sharedModules";
-import { AppHotkeysProvider } from "./utils/hotkeys";
-import { setUpInterfaceLocale } from "./utils/interfaceLocale";
-import { setUpLive } from "./utils/live";
+import { AppHotkeysProvider } from "./Platform/Support/hotkeys";
+import { setUpInterfaceLocale } from "./Platform/Support/interfaceLocale";
+import { setUpLive } from "./Platform/Support/live";
 
 type PageModule = { default: ResolvedComponent };
 
-const pages = import.meta.glob<PageModule>("./Pages/**/*.tsx");
+const pages = import.meta.glob<PageModule>([
+  "./*/Pages/*.tsx",
+  "./Platform/*/Pages/*.tsx",
+  "!**/*.test.tsx",
+]);
 
 async function resolvePage(name: string): Promise<ResolvedComponent> {
   const page = await extensions.resolve(name);
@@ -26,7 +30,7 @@ async function resolvePage(name: string): Promise<ResolvedComponent> {
     return page;
   }
 
-  const loader = pages[`./Pages/${name}.tsx`];
+  const loader = pages[`./${name}.tsx`];
 
   if (!loader) {
     throw new Error(`Admin page [${name}] not found.`);
@@ -61,12 +65,12 @@ window.LarasellAdmin = {
       sections.register(
         SectionForm.Product,
         "seo",
-        () => import("./Components/Seo/ProductUrlsSection"),
+        () => import("./Seo/Components/ProductUrlsSection"),
       );
       sections.register(
         SectionForm.Category,
         "seo",
-        () => import("./Components/Seo/CategoryUrlsSection"),
+        () => import("./Seo/Components/CategoryUrlsSection"),
       );
     });
     extensions.boot();

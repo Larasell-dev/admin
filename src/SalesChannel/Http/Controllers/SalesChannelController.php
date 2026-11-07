@@ -27,7 +27,7 @@ class SalesChannelController
 {
     public function create(SalesChannelTypes $types): Response
     {
-        return Inertia::render('SalesChannel/Create', new CreateSalesChannelPageData(
+        return Inertia::render('SalesChannel/Pages/Create', new CreateSalesChannelPageData(
             storeUrl: route('larasell.admin.sales-channels.store'),
             types: $types->all(),
             locales: SalesChannelOptionData::locales(),
@@ -48,7 +48,7 @@ class SalesChannelController
         Head::title($channel->name);
         $storefront = $channel->type === StorefrontContext::TYPE;
 
-        return Inertia::render('SalesChannel/Edit', new EditSalesChannelPageData(
+        return Inertia::render('SalesChannel/Pages/Edit', new EditSalesChannelPageData(
             channel: SalesChannelData::fromModel($channel),
             updateUrl: route('larasell.admin.sales-channels.update', $channel),
             destroyUrl: route('larasell.admin.sales-channels.destroy', $channel),

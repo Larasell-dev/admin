@@ -28,7 +28,7 @@ it('shows the profile page with the current admin details', function () {
         ->get(route('larasell.admin.profile'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Profile')
+            ->component('Team/Pages/Profile')
             ->where('admin.name', 'Test Admin')
             ->where('admin.email', 'admin@example.com')
         );
