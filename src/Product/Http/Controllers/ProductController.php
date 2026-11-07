@@ -49,7 +49,7 @@ class ProductController
 
     public function create(#[CurrentContentLocale] Locale $locale): Response
     {
-        return Inertia::render('Product/Create', new CreateProductPageData(
+        return Inertia::render('Product/Pages/Create', new CreateProductPageData(
             storeUrl: route('larasell.admin.products.store'),
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories($locale),
@@ -91,7 +91,7 @@ class ProductController
     {
         Head::title($product->name->get($locale->value));
 
-        return Inertia::render('Product/Edit', new EditProductPageData(
+        return Inertia::render('Product/Pages/Edit', new EditProductPageData(
             product: ProductDetailData::fromModel($product, $locale),
             updateUrl: route('larasell.admin.products.update', $product),
             indexUrl: route('larasell.admin.products.index'),

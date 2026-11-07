@@ -11,7 +11,7 @@ class HomeController
 {
     public function __invoke(): Response
     {
-        return Inertia::render('Home', new HomePageData(
+        return Inertia::render('Platform/Panel/Pages/Home', new HomePageData(
             createProductUrl: Route::has('larasell.admin.products.create') ? route('larasell.admin.products.create') : null,
             createCategoryUrl: Route::has('larasell.admin.categories.create') ? route('larasell.admin.categories.create') : null,
             inviteMemberUrl: route('larasell.admin.settings.team.create'),

@@ -18,7 +18,7 @@ it('shows the 404 page in the panel for unknown admin addresses and missing reco
     $response = $this->get($uri)
         ->assertNotFound()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('NotFound', shouldExist: false)
+            ->component('Platform/Panel/Pages/NotFound', shouldExist: false)
             ->where('admin.email', 'ada@example.com')
             ->has('navigation'));
 
@@ -34,7 +34,7 @@ it('shows guests the 404 page without the panel', function () {
     $this->get('/admin/does-not-exist') // @phpstan-ignore larasell.preferRouteHelper
         ->assertNotFound()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('GuestNotFound', shouldExist: false)
+            ->component('Platform/Panel/Pages/GuestNotFound', shouldExist: false)
             ->where('admin', null));
 });
 

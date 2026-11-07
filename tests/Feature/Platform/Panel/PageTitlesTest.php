@@ -123,8 +123,8 @@ it('titles app routes with their own title, their table, or Admin', function (st
 
     AdminPanel::resolve()->routes(function () {
         Route::index('reading-list', ReadingListTable::class);
-        Route::get('untitled', fn () => Inertia::render('Home'));
-        Route::get('titled', fn () => Inertia::render('Home'))->withHead(title: 'Reports');
+        Route::get('untitled', fn () => Inertia::render('Platform/Panel/Pages/Home'));
+        Route::get('titled', fn () => Inertia::render('Platform/Panel/Pages/Home'))->withHead(title: 'Reports');
     });
 
     // Act & Assert

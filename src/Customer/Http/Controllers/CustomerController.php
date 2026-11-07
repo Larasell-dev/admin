@@ -17,7 +17,7 @@ class CustomerController
 {
     public function create(): Response
     {
-        return Inertia::render('Customer/Create', new CreateCustomerPageData(
+        return Inertia::render('Customer/Pages/Create', new CreateCustomerPageData(
             storeUrl: route('larasell.admin.customers.store'),
             indexUrl: route('larasell.admin.customers.index'),
         ));
@@ -34,7 +34,7 @@ class CustomerController
     {
         Head::title($customer->fullName());
 
-        return Inertia::render('Customer/Edit', new EditCustomerPageData(
+        return Inertia::render('Customer/Pages/Edit', new EditCustomerPageData(
             customer: CustomerDetailData::fromModel($customer),
             updateUrl: route('larasell.admin.customers.update', $customer),
             indexUrl: route('larasell.admin.customers.index'),

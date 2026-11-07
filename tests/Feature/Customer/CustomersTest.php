@@ -41,7 +41,7 @@ it('lists customers with their order count, newest first', function () {
         ->get(route('larasell.admin.customers.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('TablePage')
+            ->component('Platform/Tables/Pages/TablePage')
             ->where('table.title', 'Customers')
             ->where('table.columns', [
                 ['name' => 'name', 'label' => 'Name', 'type' => 'text'],
@@ -93,7 +93,7 @@ it('opens the new customer page', function () {
         ->get(route('larasell.admin.customers.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Customer/Create')
+            ->component('Customer/Pages/Create')
             ->where('storeUrl', route('larasell.admin.customers.store'))
             ->where('indexUrl', route('larasell.admin.customers.index')));
 });
@@ -142,7 +142,7 @@ it('opens a customer to edit', function () {
         ->get(route('larasell.admin.customers.edit', $alan))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Customer/Edit')
+            ->component('Customer/Pages/Edit')
             ->where('customer', ['name' => 'Alan Turing', 'firstName' => 'Alan', 'lastName' => 'Turing'])
             ->where('updateUrl', route('larasell.admin.customers.update', $alan))
             ->where('indexUrl', route('larasell.admin.customers.index')));

@@ -30,7 +30,7 @@ it('lists the admins by name and email in the settings', function () {
         ->get(route('larasell.admin.settings.team.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Team/Index')
+            ->component('Team/Pages/Index')
             ->where('createUrl', route('larasell.admin.settings.team.create'))
             ->where('members.title', 'Team')
             ->where('members.columns', [
@@ -131,7 +131,7 @@ it('opens the new admin page in the settings', function () {
         ->get(route('larasell.admin.settings.team.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Team/Create')
+            ->component('Team/Pages/Create')
             ->where('storeUrl', route('larasell.admin.settings.team.store'))
             ->where('indexUrl', route('larasell.admin.settings.team.index')));
 });
@@ -176,7 +176,7 @@ it('opens an admin to edit in the settings', function () {
         ->get(route('larasell.admin.settings.team.edit', $alan))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Team/Edit')
+            ->component('Team/Pages/Edit')
             ->where('member.name', 'Alan Turing')
             ->where('member.email', 'alan@example.com')
             ->where('admin.email', 'ada@example.com')

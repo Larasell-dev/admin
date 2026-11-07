@@ -18,7 +18,7 @@ class TableController
 
         Head::title($resource->title());
 
-        return Inertia::render('TablePage', [
+        return Inertia::render('Platform/Tables/Pages/TablePage', [
             'table' => $resource,
         ]);
     }

@@ -1,0 +1,81 @@
+import { Avatar } from "@base-ui/react/avatar";
+import { Menu } from "@base-ui/react/menu";
+import { Link, router, usePage } from "@inertiajs/react";
+import { Icon } from "@larasell-dev/ui";
+import { ExpandUpDownLine, LogoutBoxRLine, UserLine } from "@larasell-dev/ui/icons";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
+import type { ComponentProps } from "react";
+import { assertPresent } from "ts-extras";
+import type { Page } from "../../../../types";
+import { signOutTransition } from "../../../Support/authTransition";
+import { overlayExclusive } from "../../../Support/hotkeys";
+import { initials } from "../../../Support/initials";
+
+export default function UserMenu() {
+  const { admin, profileUrl, logoutUrl } = usePage<Page>().props;
+  assertPresent(admin, "The user menu needs a signed-in admin.");
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger className="flex w-full border-t border-base-subtle cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-state-hover">
+        <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-base-muted type-body-md text-base-secondary">
+          {admin.avatarUrl && (
+            <Avatar.Image src={admin.avatarUrl} alt="" className="size-full object-cover" />
+          )}
+          <Avatar.Fallback>{initials(admin.name)}</Avatar.Fallback>
+        </Avatar.Root>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate type-body-md-strong text-base-primary">{admin.name}</span>
+          <span className="truncate type-body-sm text-base-tertiary">{admin.email}</span>
+        </span>
+        <span className="flex shrink-0 text-base-tertiary">
+          <Icon icon={ExpandUpDownLine} size={4} />
+        </span>
+      </Menu.Trigger>
+
+      <Menu.Portal>
+        <Menu.Positioner
+          side="top"
+          align="end"
+          sideOffset={6}
+          alignOffset={12}
+          className="z-50 w-58"
+        >
+          <Menu.Popup className="origin-(--transform-origin) border border-base-subtle bg-base-elevated bg-clip-padding shadow-popover outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0">
+            <HotkeysProvider scope="user-menu" exclusive={overlayExclusive}>
+              <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
+                <fbt desc="User menu: goes to the page where the admin edits their own name, avatar and password">
+                  Profile
+                </fbt>
+              </UserMenuItem>
+              <UserMenuItem
+                icon={LogoutBoxRLine}
+                onClick={() => router.post(logoutUrl, {}, { viewTransition: signOutTransition() })}
+              >
+                <fbt desc="User menu: signs the admin out of the panel">Log out</fbt>
+              </UserMenuItem>
+            </HotkeysProvider>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  );
+}
+
+function UserMenuItem({
+  icon,
+  children,
+  ...props
+}: Omit<Menu.Item.Props, "className"> & Pick<ComponentProps<typeof Icon>, "icon">) {
+  return (
+    <Menu.Item
+      {...props}
+      className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-base-primary outline-none select-none hover:bg-state-hover data-highlighted:bg-action-neutral-ghost-hover"
+    >
+      <span className="flex text-base-tertiary">
+        <Icon icon={icon} size={4} />
+      </span>
+      {children}
+    </Menu.Item>
+  );
+}

@@ -22,7 +22,7 @@ class TeamController
 {
     public function index(): Response
     {
-        return Inertia::render('Team/Index', new TeamPageData(
+        return Inertia::render('Team/Pages/Index', new TeamPageData(
             createUrl: route('larasell.admin.settings.team.create'),
             members: Members::make(),
         ));
@@ -30,7 +30,7 @@ class TeamController
 
     public function create(): Response
     {
-        return Inertia::render('Team/Create', new CreateMemberPageData(
+        return Inertia::render('Team/Pages/Create', new CreateMemberPageData(
             storeUrl: route('larasell.admin.settings.team.store'),
             indexUrl: route('larasell.admin.settings.team.index'),
         ));
@@ -47,7 +47,7 @@ class TeamController
     {
         Head::title($admin->name);
 
-        return Inertia::render('Team/Edit', new EditMemberPageData(
+        return Inertia::render('Team/Pages/Edit', new EditMemberPageData(
             member: AdminData::fromModel($admin),
             updateUrl: route('larasell.admin.settings.team.update', $admin),
             indexUrl: route('larasell.admin.settings.team.index'),

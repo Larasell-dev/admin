@@ -82,7 +82,7 @@ it('shows the index when the store has no categories', function () {
         ->get(route('larasell.admin.categories.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Index', shouldExist: false)
+            ->component('Category/Pages/Index', shouldExist: false)
             ->where('categories', []));
 });
 
@@ -101,7 +101,7 @@ it('shows every category of the store as a tree', function () {
         ->get(route('larasell.admin.categories.show', $shoes))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Show', shouldExist: false)
+            ->component('Category/Pages/Show', shouldExist: false)
             ->has('categories', 2)
             ->where('categories.0.name', 'Clothing')
             ->where('categories.0.children.0.name', 'Shirts')
@@ -141,7 +141,7 @@ it('shows a category, including a hidden one, next to the tree', function () {
         ->get(route('larasell.admin.categories.show', $linen))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Show', shouldExist: false)
+            ->component('Category/Pages/Show', shouldExist: false)
             ->where('category.id', $linen->id)
             ->where('category.name', 'Linen')
             ->where('categories.0.children.0.name', 'Linen'));
@@ -157,7 +157,7 @@ it('shows the tree without a category, with a 404, for a category that does not 
         ->get(route('larasell.admin.categories.show', 999))
         ->assertNotFound()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Show', shouldExist: false)
+            ->component('Category/Pages/Show', shouldExist: false)
             ->where('category', null)
             ->missing('updateUrl')
             ->where('categories.0.name', 'Clothing'));
@@ -242,7 +242,7 @@ it('shows the create page next to the tree', function () {
         ->get(route('larasell.admin.categories.create'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Create', shouldExist: false)
+            ->component('Category/Pages/Create', shouldExist: false)
             ->where('categories.0.name', 'Clothing')
             ->where('createUrl', route('larasell.admin.categories.create'))
             ->where('storeUrl', route('larasell.admin.categories.store'))
@@ -282,7 +282,7 @@ it('shows the category\'s values to edit on its page', function () {
         ->get(route('larasell.admin.categories.show', $linen))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Show', shouldExist: false)
+            ->component('Category/Pages/Show', shouldExist: false)
             ->where('categories.0.children.0.name', 'Linen')
             ->where('category.id', $linen->id)
             ->where('category.name', 'Linen')
@@ -715,7 +715,7 @@ it('shows the create page for a category inside another one', function () {
         ->get(route('larasell.admin.categories.create', ['parent' => $clothing]))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Category/Create', shouldExist: false)
+            ->component('Category/Pages/Create', shouldExist: false)
             ->where('parent.id', $clothing->id)
             ->where('parent.name', 'Clothing'));
 });

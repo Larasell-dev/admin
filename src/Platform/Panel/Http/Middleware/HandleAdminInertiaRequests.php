@@ -27,7 +27,7 @@ class HandleAdminInertiaRequests extends Middleware
             'inertia.ssr.enabled' => false,
             'inertia.pages.paths' => [
                 ...config('inertia.pages.paths', []),
-                realpath(__DIR__.'/../../../../../resources/js/Pages'),
+                realpath(__DIR__.'/../../../../../resources/js'),
                 ...app(AdminPanel::class)->pagePaths(),
             ],
         ]);

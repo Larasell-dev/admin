@@ -11,9 +11,13 @@ Every module has the same layout, with only the folders it needs:
 `<Module>ServiceProvider.php` (config, bindings, routes, navigation, searches),
 `Actions/` (with their payloads), `AuditRecords/`, `Console/`, `Data/` (page props
 and their parts), `Enums/`, `Events/` (what it broadcasts), `Exceptions/`, `Http/{Controllers,Middleware,Requests}/`,
-`Models/`, `Rules/`, `Search/` and `Tables/`. The frontend follows the same names:
-`resources/js/Components/<Module>/`, and tests in `tests/Feature/<Module>/` or
+`Models/`, `Rules/`, `Search/` and `Tables/`. Tests live in `tests/Feature/<Module>/` or
 `tests/Feature/Platform/<Area>/`.
+
+The frontend uses the same names: `resources/js/<Module>/` and `resources/js/Platform/<Area>/`, each
+with `Pages/`, `Components/` and `Layouts/` as needed, and helpers in `resources/js/Platform/Support/`.
+Tests sit next to what they test. A page's Inertia name is its path, e.g.
+`Inertia::render('Product/Pages/Edit')`.
 
 Platform areas use the same folders. Only the classes apps and modules work with directly
 stay at an area's top level, such as `Audit\Auditor`, `Navigation\NavigationItem` or
