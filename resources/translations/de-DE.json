@@ -4015,6 +4015,105 @@
         }
       ],
       "types": []
+    },
+    "AcHtIYYJzid96NnnKV80ww==": {
+      "description": "Heading shown when part of the panel crashed in the browser and can't be shown",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Etwas ist schiefgelaufen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hTvdghvMfgJ8nod9LRGzzw==": {
+      "description": "Text below the 'Something went wrong' heading, shown when part of the panel crashed in the browser",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "In diesem Teil des Panels ist ein Problem aufgetreten. Lade die Seite neu, um es erneut zu versuchen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ql1+JJR1UzzWQ887cTWDSQ==": {
+      "description": "Button below a crashed part of the panel that reloads the page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Seite neu laden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gImpgb/EuyEOyJycz3ZOJA==": {
+      "description": "Heading shown when the admin isn't allowed to open the page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zugriff verweigert",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4u6ImDk0J5yUDAxggk9ExQ==": {
+      "description": "Text below the 'Access denied' heading, shown when the admin isn't allowed to open the page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du hast keine Berechtigung, diese Seite zu öffnen. Bitte einen Admin, der dir Zugriff geben kann.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rCJoaRUMLZVReQ3nfv3LPw==": {
+      "description": "Heading shown when the server failed to load the page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Etwas ist schiefgelaufen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uxG3wCrwQaAl1bBIpYalQQ==": {
+      "description": "Text below the 'Something went wrong' heading, shown when the server failed to load the page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beim Laden dieser Seite ist auf dem Server ein Problem aufgetreten. Versuche es gleich noch einmal.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lp+nWC+gQVgQbNAZbUXshg==": {
+      "description": "Heading shown when the server can't serve the page right now, e.g. during maintenance",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorübergehend nicht verfügbar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3yBlXt4ePRNuYOtTfsZ1uw==": {
+      "description": "Text below the 'Temporarily unavailable' heading, shown when the server can't serve the page right now",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wir führen gerade Wartungsarbeiten durch. Schau bald wieder vorbei.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

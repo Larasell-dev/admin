@@ -1,4 +1,6 @@
+import { usePage } from "@inertiajs/react";
 import type { ReactNode } from "react";
+import { ErrorBoundary } from "../Components/ErrorBoundary";
 import CommandMenu from "../Components/CommandMenu/CommandMenu";
 import { SearchCommands } from "../Components/CommandMenu/searchCommands";
 import MobileNav from "../Components/Shell/MobileNav";
@@ -8,6 +10,8 @@ import { SkipLink } from "../Components/Shell/SkipLink";
 import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
+  const { url } = usePage();
+
   return (
     <div className="flex min-h-dvh flex-col bg-base-canvas lg:flex-row">
       <SkipLink />
@@ -24,7 +28,16 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
         tabIndex={-1}
         className="flex h-[calc(100dvh-var(--mobile-nav-height))] min-w-0 flex-col overflow-y-auto focus:outline-none lg:h-dvh lg:flex-1"
       >
-        {children}
+        {/* Around the page only, so the sidebar and command menu stay usable to go elsewhere,
+            which shows the page again. */}
+        <ErrorBoundary
+          resetKey={url}
+          frame={(crashed) => (
+            <div className="flex flex-1 items-center justify-center px-6 py-12">{crashed}</div>
+          )}
+        >
+          {children}
+        </ErrorBoundary>
       </main>
       {/* Outside the page, so a toast can animate out after its page is gone. */}
       <UnsavedChangesToastHost />
