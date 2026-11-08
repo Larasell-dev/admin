@@ -148,6 +148,8 @@ declare namespace Larasell.Admin.Media.Data {
     alt: string | null;
     visibility: "public" | "private";
     showUrl: string;
+    moveUrl: string;
+    moveToNewFolderUrl: string;
   };
   export type MediaShowPageData = {
     media: Larasell.Admin.Media.Data.MediaDetailData;

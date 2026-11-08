@@ -4989,6 +4989,127 @@
         }
       ],
       "types": []
+    },
+    "wl/g0IhCwxFBKWEU7Ws+ew==": {
+      "description": "Media library: in the new folder dialog opened by dropping a media item onto 'New folder', e.g. 'boots.png is moved into it.'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{itemName} wird hineinverschoben.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9+V1URqj1iE1xdKxLdmB9g==": {
+      "description": "Media library: button in the new folder dialog that creates the folder and moves the dropped item into it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstellen und verschieben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TzVC77G6bQzfEOQ/8ITW+A==": {
+      "description": "Media library: accessible name of the button that opens a media item's menu, e.g. 'Actions for boots.png'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {itemName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RjIeGMN+gkjXkGQjlzPoaA==": {
+      "description": "Media library item menu: opens a dialog that moves the item to another folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verschieben nach…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/O6R8G7PrWaH4hjUWrZIEA==": {
+      "description": "Media library: shown on a folder tile while a media item is dragged over it, e.g. 'Move into Summer'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "In {folderName} verschieben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xyhFHZWhioA5TZrMhkZQdw==": {
+      "description": "Media library: title of the dialog that moves a media item to another folder, e.g. 'Move boots.png'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{itemName} verschieben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vyMOxAzzkYzVz4mNqgWjKQ==": {
+      "description": "Media library move dialog: label of the field that picks the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zk7iFq548c1BDSICVpeKXA==": {
+      "description": "Media library move dialog: placeholder of the search in the folder list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ordner suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VoaXVJJ9BL3BOCt4tfWkhA==": {
+      "description": "Media library move dialog: closes it without moving",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mrhy1xJpGZuZsgkAX/YQuw==": {
+      "description": "Media library move dialog: moves the item to the picked folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verschieben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4PQyllBjlHJAaXRdEmoFkg==": {
+      "description": "Media library move dialog: the top level of the library, in the folder list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Medien",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

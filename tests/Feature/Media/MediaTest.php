@@ -66,6 +66,8 @@ it('lists the media newest first, with what the browser needs to show each', fun
                     'alt' => null,
                     'visibility' => 'public',
                     'showUrl' => route('larasell.admin.media.show', $unboxing),
+                    'moveUrl' => route('larasell.admin.media.move', $unboxing),
+                    'moveToNewFolderUrl' => route('larasell.admin.media.move-to-new-folder', $unboxing),
                 ],
                 [
                     'id' => $boots->id,
@@ -79,6 +81,8 @@ it('lists the media newest first, with what the browser needs to show each', fun
                     'alt' => 'Boots',
                     'visibility' => 'public',
                     'showUrl' => route('larasell.admin.media.show', $boots),
+                    'moveUrl' => route('larasell.admin.media.move', $boots),
+                    'moveToNewFolderUrl' => route('larasell.admin.media.move-to-new-folder', $boots),
                 ],
             ])
             ->where('pagination', ['page' => 1, 'pageSize' => 24, 'total' => 2]));

@@ -28,6 +28,8 @@ const boots: Media = {
   thumbnailUrl: thumbnail,
   thumbHash: null,
   showUrl: "/admin/media/1",
+  moveUrl: "/admin/media/1/move",
+  moveToNewFolderUrl: "/admin/media/1/move-to-new-folder",
 };
 const unboxing: Media = {
   id: 2,
@@ -40,6 +42,8 @@ const unboxing: Media = {
   thumbnailUrl: null,
   thumbHash: null,
   showUrl: "/admin/media/2",
+  moveUrl: "/admin/media/2/move",
+  moveToNewFolderUrl: "/admin/media/2/move-to-new-folder",
 };
 
 function props(overrides: Partial<Props> = {}): Props {
@@ -226,6 +230,8 @@ it("sends each chosen file on its own and lists it in the upload toast", async (
       : Promise.resolve({ ok: true, mediaId: 9 });
   };
   uploadQueue.onSucceeded = () => {};
+  // The grid reloads after each upload; a real reload would fail here and leave Inertia's error dialog open.
+  vi.spyOn(router, "reload").mockImplementation(() => {});
   await renderIndex(props());
   await render(<UploadToast />);
 
@@ -246,4 +252,222 @@ it("sends each chosen file on its own and lists it in the upload toast", async (
   (toggle.element() as HTMLButtonElement).click();
   await expect.element(page.getByText("The file is too large to upload.")).toBeVisible();
   uploadQueue.dispatch({ type: "DISMISSED" });
+});
+
+type Folder = Props["folders"][number];
+
+const summerFolder: Folder = {
+  id: 11,
+  name: "Summer",
+  url: "/admin/media?folder=11",
+  mediaCount: 0,
+  folderCount: 0,
+  renameUrl: "/admin/media/folders/11",
+  destroyUrl: "/admin/media/folders/11",
+};
+
+/** Inside Campaigns, which holds Summer; boots is in Campaigns. */
+function inCampaigns(): Props {
+  return props({
+    folderId: 10,
+    folders: [summerFolder],
+    tree: [
+      { id: 10, name: "Campaigns", parentId: null, url: "/admin/media?folder=10" },
+      { id: 11, name: "Summer", parentId: 10, url: "/admin/media?folder=11" },
+    ],
+  });
+}
+
+/** Fires a drag event the way the browser does, and says whether a target accepted it. */
+function fire(type: string, target: Element, data: DataTransfer): boolean {
+  return target.dispatchEvent(
+    new DragEvent(type, { dataTransfer: data, bubbles: true, cancelable: true }),
+  );
+}
+
+/** Starts dragging a media tile, so the data carries what the grid puts in it. */
+function dragTile(name: string): DataTransfer {
+  const data = new DataTransfer();
+  fire("dragstart", page.getByRole("link", { name }).element(), data);
+  return data;
+}
+
+function dropOn(target: Element, data: DataTransfer) {
+  fire("dragenter", target, data);
+  fire("dragover", target, data);
+  return fire("drop", target, data);
+}
+
+it("moves a media item dropped onto a folder tile into that folder", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+  const data = dragTile("Brown boots");
+
+  // Act
+  const tile = page.getByRole("link", { name: /Summer/ }).element();
+  const notCanceled = dropOn(tile, data);
+
+  // Assert
+  expect(notCanceled).toBe(false);
+  expect(post).toHaveBeenCalledWith("/admin/media/1/move", { folder_id: 11 }, expect.anything());
+});
+
+it("keeps a folder tile highlighted while the item crosses its children, and says it lands there", async () => {
+  // Arrange
+  await renderIndex(inCampaigns());
+  const data = dragTile("Brown boots");
+  const tile = page.getByRole("link", { name: /Summer/ }).element();
+  const child = tile.querySelector("span")!;
+
+  // Act
+  fire("dragenter", tile, data);
+  fire("dragenter", child, data);
+  fire("dragleave", tile, data);
+  fire("dragover", child, data);
+
+  // Assert
+  await expect.element(page.getByText("Move into Summer")).toBeVisible();
+  expect(tile.getAttribute("data-drop-target")).toBe("over");
+  fire("dragleave", child, data);
+  await expect.element(page.getByText("Move into Summer")).not.toBeInTheDocument();
+  expect(tile.getAttribute("data-drop-target")).toBeNull();
+});
+
+it("moves a media item dropped onto a breadcrumb there, and not onto the current one", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+  const data = dragTile("Brown boots");
+
+  // Act
+  const current = page.getByText("Campaigns", { exact: true }).element();
+  fire("dragenter", current, data);
+  fire("dragover", current, data);
+  const onCurrent = data.dropEffect;
+  dropOn(page.getByRole("link", { name: "All media" }).element(), data);
+
+  // Assert
+  expect(onCurrent).toBe("none");
+  expect(post).toHaveBeenCalledOnce();
+  expect(post).toHaveBeenCalledWith("/admin/media/1/move", { folder_id: null }, expect.anything());
+});
+
+it("ignores files from the computer and text or links dragged from the page", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+  const tile = page.getByRole("link", { name: /Summer/ }).element();
+  const file = new DataTransfer();
+  file.items.add(new File(["png"], "socks.png", { type: "image/png" }));
+  const link = new DataTransfer();
+  link.setData("text/uri-list", "/admin/media?folder=10");
+  link.setData("text/plain", "Campaigns");
+
+  // Act
+  const accepted = [dropOn(tile, file), dropOn(tile, link)];
+
+  // Assert
+  expect(accepted).toEqual([true, true]);
+  expect(tile.getAttribute("data-drop-target")).toBeNull();
+  expect(post).not.toHaveBeenCalled();
+});
+
+it("ignores drops while a folder dialog is open", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+  const data = dragTile("Brown boots");
+  const allMedia = page.getByRole("link", { name: "All media" }).element();
+  await page.getByRole("button", { name: "Actions for Summer" }).click();
+  await page.getByRole("menuitem", { name: "Rename" }).click();
+  await expect.element(page.getByRole("dialog")).toBeVisible();
+
+  // Act
+  const accepted = dropOn(allMedia, data);
+
+  // Assert
+  expect(accepted).toBe(false);
+  expect(data.dropEffect).toBe("none");
+  expect(allMedia.getAttribute("data-drop-target")).toBeNull();
+  expect(post).not.toHaveBeenCalled();
+});
+
+it("asks for a name when an item is dropped onto New folder, and moves it in once created", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+  const data = dragTile("Brown boots");
+
+  // Act
+  dropOn(page.getByRole("button", { name: "New folder" }).element(), data);
+  await page.getByLabelText("Name").fill("Beach");
+  await page.getByRole("button", { name: "Create and move" }).click();
+
+  // Assert
+  await expect.element(page.getByText("Brown boots is moved into it.")).toBeVisible();
+  expect(post).toHaveBeenCalledWith(
+    "/admin/media/1/move-to-new-folder",
+    { name: "Beach", parent_id: 10 },
+    expect.anything(),
+  );
+});
+
+it("creates no folder and moves nothing when the new folder dialog is canceled", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+  dropOn(page.getByRole("button", { name: "New folder" }).element(), dragTile("Brown boots"));
+
+  // Act
+  await page.getByRole("button", { name: "Cancel" }).click();
+
+  // Assert
+  await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+  expect(post).not.toHaveBeenCalled();
+});
+
+it("says the folder no longer exists when it was deleted before the drop", async () => {
+  // Arrange
+  vi.spyOn(router, "post").mockImplementation((_url, _data, options) => {
+    options?.onError?.({ folder: "The folder no longer exists." });
+  });
+  await renderIndex(inCampaigns());
+
+  // Act
+  dropOn(page.getByRole("link", { name: /Summer/ }).element(), dragTile("Brown boots"));
+
+  // Assert
+  await expect.element(page.getByText("The folder no longer exists.")).toBeVisible();
+});
+
+it("moves an item with Move to…, without dragging", async () => {
+  // Arrange
+  const post = vi.spyOn(router, "post").mockImplementation(() => {});
+  await renderIndex(inCampaigns());
+
+  // Act
+  await page.getByRole("button", { name: "Actions for Brown boots" }).click();
+  await page.getByRole("menuitem", { name: "Move to…" }).click();
+  await page.getByRole("combobox", { name: "Folder" }).click();
+  await page.getByRole("option", { name: "Campaigns / Summer" }).click();
+  await page.getByRole("button", { name: "Move", exact: true }).click();
+
+  // Assert
+  expect(post).toHaveBeenCalledWith("/admin/media/1/move", { folder_id: 11 }, expect.anything());
+});
+
+it("offers every folder but the current one in Move to…", async () => {
+  // Arrange
+  await renderIndex(inCampaigns());
+
+  // Act
+  await page.getByRole("button", { name: "Actions for Brown boots" }).click();
+  await page.getByRole("menuitem", { name: "Move to…" }).click();
+  await page.getByRole("combobox", { name: "Folder" }).click();
+
+  // Assert
+  await expect.element(page.getByRole("option", { name: "All media" })).toBeVisible();
+  await expect.element(page.getByRole("option", { name: "Campaigns / Summer" })).toBeVisible();
+  expect(page.getByRole("option", { name: "Campaigns", exact: true }).elements()).toHaveLength(0);
 });

@@ -18,21 +18,37 @@ import {
   FolderLine,
   More2Fill,
 } from "@larasell-dev/ui/icons";
+import { cn } from "cn";
 import { fbs } from "fbtee";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
+import { useMediaDropTarget } from "./mediaDrag";
 
 type Folder = Larasell.Admin.Media.Data.MediaFolderData;
 type Node = Larasell.Admin.Media.Data.MediaFolderNodeData;
 
-/** The folders from the top level down to the one shown, each a link; the top level is "Media". */
+/** Classes of a drop target while a dragged media item is over it. */
+export const dropTargetOver =
+  "bg-state-selected-accent-default outline-2 outline-state-selected-accent";
+
+/** Where a dragged media item goes when dropped: a folder's ID, or null for the top level. */
+type DropMedia = (mediaId: number, folderId: number | null) => void;
+
+/**
+ * The folders from the top level down to the one shown, each a link; the top level is "All media".
+ * A media item dropped onto a link moves to that folder; the current one is no target.
+ */
 export function FolderBreadcrumb({
   tree,
   folderId,
   rootUrl,
+  onDropMedia,
+  dropEnabled,
 }: {
   tree: Node[];
   folderId: number | null;
   rootUrl: string;
+  onDropMedia: DropMedia;
+  dropEnabled: boolean;
 }) {
   const path: Node[] = [];
   const byId = new Map(tree.map((node) => [node.id, node]));
@@ -47,9 +63,13 @@ export function FolderBreadcrumb({
       aria-label={fbs("Folders", "Media library: accessible name of the breadcrumb of folders")}
       className="flex min-w-0 flex-wrap items-center gap-1 type-body-md text-base-secondary"
     >
-      <Link href={rootUrl} className="hover:text-base-primary focus-visible:focus-ring">
+      <BreadcrumbLink
+        href={rootUrl}
+        onDrop={(mediaId) => onDropMedia(mediaId, null)}
+        dropEnabled={dropEnabled}
+      >
         <fbt desc="Media library breadcrumb: link to the top level of the library">All media</fbt>
-      </Link>
+      </BreadcrumbLink>
       {path.map((node, index) => (
         <span key={node.id} className="flex min-w-0 items-center gap-1">
           <Icon icon={ArrowRightSLine} />
@@ -58,12 +78,13 @@ export function FolderBreadcrumb({
               {node.name}
             </span>
           ) : (
-            <Link
+            <BreadcrumbLink
               href={node.url}
-              className="truncate hover:text-base-primary focus-visible:focus-ring"
+              onDrop={(mediaId) => onDropMedia(mediaId, node.id)}
+              dropEnabled={dropEnabled}
             >
               {node.name}
-            </Link>
+            </BreadcrumbLink>
           )}
         </span>
       ))}
@@ -71,20 +92,59 @@ export function FolderBreadcrumb({
   );
 }
 
-/** The folders in the grid. */
+function BreadcrumbLink({
+  href,
+  onDrop,
+  dropEnabled,
+  children,
+}: {
+  href: string;
+  onDrop: (mediaId: number) => void;
+  dropEnabled: boolean;
+  children: ReactNode;
+}) {
+  const { over, dropProps } = useMediaDropTarget(onDrop, dropEnabled);
+
+  return (
+    <Link
+      href={href}
+      {...dropProps}
+      data-drop-target={over ? "over" : undefined}
+      className={cn(
+        "truncate px-1 hover:text-base-primary focus-visible:focus-ring",
+        over && [dropTargetOver, "text-base-primary"],
+      )}
+    >
+      {children}
+    </Link>
+  );
+}
+
+/** The folders in the grid. A media item dropped onto one moves into it. */
 export function FolderGrid({
   folders,
   onRename,
   onDelete,
+  onDropMedia,
+  dropEnabled,
 }: {
   folders: Folder[];
   onRename: (folder: Folder) => void;
   onDelete: (folder: Folder) => void;
+  onDropMedia: DropMedia;
+  dropEnabled: boolean;
 }) {
   return (
     <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
       {folders.map((folder) => (
-        <FolderTile key={folder.id} folder={folder} onRename={onRename} onDelete={onDelete} />
+        <FolderTile
+          key={folder.id}
+          folder={folder}
+          onRename={onRename}
+          onDelete={onDelete}
+          onDropMedia={onDropMedia}
+          dropEnabled={dropEnabled}
+        />
       ))}
     </ul>
   );
@@ -188,7 +248,7 @@ export function useFolderDeletion() {
     </AlertDialog.Root>
   );
 
-  return { askToDelete, dialog };
+  return { askToDelete, dialog, open };
 }
 
 /**
@@ -215,7 +275,7 @@ export function useFolderRename() {
     />
   );
 
-  return { askToRename, dialog };
+  return { askToRename, dialog, open };
 }
 
 /** A folder in the grid: opens it, with a menu to rename or delete it. */
@@ -223,25 +283,46 @@ function FolderTile({
   folder,
   onRename,
   onDelete,
+  onDropMedia,
+  dropEnabled,
 }: {
   folder: Folder;
   onRename: (folder: Folder) => void;
   onDelete: (folder: Folder) => void;
+  onDropMedia: DropMedia;
+  dropEnabled: boolean;
 }) {
+  const { over, dropProps } = useMediaDropTarget(
+    (mediaId) => onDropMedia(mediaId, folder.id),
+    dropEnabled,
+  );
+
   return (
     <li className="relative">
       <Link
         href={folder.url}
-        className="flex aspect-square flex-col items-center justify-center gap-2 bg-base-section p-3 text-center focus-visible:focus-ring"
+        {...dropProps}
+        data-drop-target={over ? "over" : undefined}
+        className={cn(
+          "flex aspect-square flex-col items-center justify-center gap-2 bg-base-section p-3 text-center focus-visible:focus-ring",
+          over && dropTargetOver,
+        )}
       >
         <Icon icon={FolderLine} />
         <span className="w-full truncate type-body-md text-base-primary">{folder.name}</span>
         <span className="type-body-sm text-base-secondary">
-          <fbt desc="Media library: what a folder tile holds, e.g. '3 items'">
-            <fbt:plural count={folder.mediaCount + folder.folderCount} showCount="yes">
-              item
-            </fbt:plural>
-          </fbt>
+          {over ? (
+            fbs(
+              ["Move into ", fbs.param("folderName", folder.name)],
+              "Media library: shown on a folder tile while a media item is dragged over it, e.g. 'Move into Summer'",
+            )
+          ) : (
+            <fbt desc="Media library: what a folder tile holds, e.g. '3 items'">
+              <fbt:plural count={folder.mediaCount + folder.folderCount} showCount="yes">
+                item
+              </fbt:plural>
+            </fbt>
+          )}
         </span>
       </Link>
       <div className="absolute top-1 right-1">
@@ -282,6 +363,8 @@ export function FolderNameDialog({
   method,
   initialName,
   parentId,
+  description,
+  submitLabel,
 }: {
   open: boolean;
   onClose: () => void;
@@ -289,7 +372,11 @@ export function FolderNameDialog({
   method: "post" | "put";
   initialName: string;
   parentId: number | null;
+  /** Says what else creating it does, e.g. that a dropped item is moved in. */
+  description?: string;
+  submitLabel?: string;
 }) {
+  const toast = useToast();
   const form = useForm({ name: initialName, parent_id: parentId });
 
   return (
@@ -300,6 +387,7 @@ export function FolderNameDialog({
             ? fbs("New folder", "Media library: title of the dialog that creates a folder")
             : fbs("Rename folder", "Media library: title of the dialog that renames a folder")
         }
+        description={description}
       >
         <form
           className="flex flex-col gap-4"
@@ -310,6 +398,12 @@ export function FolderNameDialog({
               onSuccess: () => {
                 form.reset();
                 onClose();
+              },
+              // The folder to create it in, or move into, was deleted meanwhile: nothing to fix here.
+              onError: (errors) => {
+                if (!("folder" in errors)) return;
+                onClose();
+                toast.add({ children: <ErrorToast message={errors.folder} /> });
               },
             });
           }}
@@ -331,15 +425,25 @@ export function FolderNameDialog({
               <fbt desc="Media library folder dialog: closes it without saving">Cancel</fbt>
             </Button>
             <Button type="submit" variant="primary" loading={form.processing}>
-              {method === "post" ? (
-                <fbt desc="Media library folder dialog: creates the folder">Create</fbt>
-              ) : (
-                <fbt desc="Media library folder dialog: saves the new name">Rename</fbt>
-              )}
+              {submitLabel ??
+                (method === "post" ? (
+                  <fbt desc="Media library folder dialog: creates the folder">Create</fbt>
+                ) : (
+                  <fbt desc="Media library folder dialog: saves the new name">Rename</fbt>
+                ))}
             </Button>
           </Dialog.Actions>
         </form>
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+/** A toast with one line of text, e.g. why a move failed. */
+export function ErrorToast({ message }: { message: string }) {
+  return (
+    <Inset>
+      <p className="type-body-md text-base-primary">{message}</p>
+    </Inset>
   );
 }

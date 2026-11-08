@@ -11,6 +11,7 @@ use Larasell\Admin\Media\Console\GeneratePlaceholdersCommand;
 use Larasell\Admin\Media\Events\MediaLibraryChanged;
 use Larasell\Admin\Media\Http\Controllers\MediaController;
 use Larasell\Admin\Media\Http\Controllers\MediaFolderController;
+use Larasell\Admin\Media\Http\Controllers\MediaMoveController;
 use Larasell\Admin\Media\Jobs\GeneratePlaceholder;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
@@ -84,6 +85,8 @@ class MediaServiceProvider extends ServiceProvider
             Route::put('media/{media}', [MediaController::class, 'update'])->whereNumber('media')->name('media.update');
             // Private files reach the browser only through here, behind the panel's sign-in.
             Route::get('media/{media}/file/{role?}', [MediaController::class, 'file'])->whereNumber('media')->whereIn('role', [MediaAsset::ORIGINAL, MediaAsset::THUMBNAIL])->name('media.file');
+            Route::post('media/{media}/move', [MediaMoveController::class, 'move'])->whereNumber('media')->name('media.move');
+            Route::post('media/{media}/move-to-new-folder', [MediaMoveController::class, 'moveToNewFolder'])->whereNumber('media')->name('media.move-to-new-folder');
             Route::delete('media/{media}', [MediaController::class, 'destroy'])->whereNumber('media')->name('media.destroy');
         });
 

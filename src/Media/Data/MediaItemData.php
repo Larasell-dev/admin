@@ -32,6 +32,10 @@ class MediaItemData extends Data
         #[LiteralTypeScriptType('"public" | "private"')]
         public AssetVisibility $visibility,
         public string $showUrl,
+        /** Moves it into the posted folder_id, or to the top level without one. */
+        public string $moveUrl,
+        /** Creates a folder from the posted name and parent_id and moves it in. */
+        public string $moveToNewFolderUrl,
     ) {}
 
     public static function fromModel(Media $media, Locale $locale, ?string $thumbHash = null): self
@@ -47,6 +51,8 @@ class MediaItemData extends Data
             title: self::inLocale($media->title, $locale),
             alt: self::inLocale($media->alt, $locale),
             showUrl: route('larasell.admin.media.show', $media),
+            moveUrl: route('larasell.admin.media.move', $media),
+            moveToNewFolderUrl: route('larasell.admin.media.move-to-new-folder', $media),
         );
     }
 

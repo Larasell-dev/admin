@@ -129,6 +129,7 @@
   "The default currency must be one the channel sells in.": "Die Standardwährung muss eine der Währungen des Kanals sein.",
   "The default language must be one the channel sells in.": "Die Standardsprache muss eine der Sprachen des Kanals sein.",
   "The file is too large to upload.": "Die Datei ist zu groß zum Hochladen.",
+  "The folder no longer exists.": "Den Ordner gibt es nicht mehr.",
   "The folder to create it in was deleted.": "Der Ordner, in dem er erstellt werden sollte, wurde gelöscht.",
   "The folder was deleted, so the file was not uploaded.": "Der Ordner wurde gelöscht, deshalb wurde die Datei nicht hochgeladen.",
   "The last sales channel can't be deleted.": "Der letzte Verkaufskanal kann nicht gelöscht werden.",
