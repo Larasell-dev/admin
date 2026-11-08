@@ -90,6 +90,57 @@ declare namespace Larasell.Admin.Customer.Data {
     orders: import("./index").TableResource;
   };
 }
+declare namespace Larasell.Admin.Media.Data {
+  export type MediaAssetData = {
+    role: string;
+    visibility: "public" | "private";
+    fileName: string;
+    mimeType: string;
+    size: number;
+    width: number | null;
+    height: number | null;
+    url: string;
+  };
+  export type MediaDetailData = {
+    id: number;
+    type: "image" | "video";
+    fileName: string;
+    url: string;
+    title: string | null;
+    description: string | null;
+    alt: string | null;
+    visibility: "public" | "private";
+    assets: Array<Larasell.Admin.Media.Data.MediaAssetData>;
+  };
+  export type MediaIndexPageData = {
+    media: Array<Larasell.Admin.Media.Data.MediaItemData>;
+    pagination: Larasell.Admin.Media.Data.PaginationData;
+    storeUrl: string;
+  };
+  export type MediaItemData = {
+    id: number;
+    type: "image" | "video";
+    fileName: string;
+    url: string;
+    thumbnailUrl: string | null;
+    thumbHash: string | null;
+    title: string | null;
+    alt: string | null;
+    visibility: "public" | "private";
+    showUrl: string;
+  };
+  export type MediaShowPageData = {
+    media: Larasell.Admin.Media.Data.MediaDetailData;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type PaginationData = {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
 declare namespace Larasell.Admin.Order.Data {
   export type AddressData = {
     name: string;

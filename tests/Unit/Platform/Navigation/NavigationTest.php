@@ -215,6 +215,7 @@ it('places built-in navigation items at their NavItem position', function () {
         'larasell.admin.notes',
         'larasell.admin.products.index',
         'larasell.admin.categories.index',
+        'larasell.admin.media.index',
         'larasell.admin.orders.index',
         'larasell.admin.customers.index',
         'larasell.admin.settings',

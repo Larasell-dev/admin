@@ -7,6 +7,7 @@ import MobileNav from "../Components/Shell/MobileNav";
 import SessionExpiredDialog from "../Components/Shell/SessionExpiredDialog";
 import Sidebar from "../Components/Shell/Sidebar";
 import { SkipLink } from "../Components/Shell/SkipLink";
+import UploadToast from "../../../Media/Components/UploadToast";
 import { UnsavedChangesToastHost } from "../Components/UnsavedChangesToast";
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
@@ -41,6 +42,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       </main>
       {/* Outside the page, so a toast can animate out after its page is gone. */}
       <UnsavedChangesToastHost />
+      <UploadToast />
       <SessionExpiredDialog />
       {/* Outside the page too, so it stays open while the page changes underneath. */}
       <CommandMenu />

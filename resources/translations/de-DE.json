@@ -4180,6 +4180,606 @@
         }
       ],
       "types": []
+    },
+    "5xeF3SZGQUcl3L1dpDKvfw==": {
+      "description": "Media library: page title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Media",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "36uXBwsCokMS7wiBwU9MnA==": {
+      "description": "Media library: shown instead of the grid when nothing was uploaded",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No media yet",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ll/JLByWiko7R3u9s38NpQ==": {
+      "description": "Media library: below 'No media yet'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Images and videos you upload show up here.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s+MspsfOHR8rz/Kp7jZyow==": {
+      "description": "Media library: accessible name of the file picker that uploads media",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Upload",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HPo0tPOOuTHzRbX4yAHkVg==": {
+      "description": "Media library: button in the header that picks files to upload",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Upload",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7iCJAMASjSxNmkPIttDs7g==": {
+      "description": "Media page: accessible name of the button that closes the full-screen media view and returns to the library",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Close",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2Zr0Y+9WJPH3Olp/wcMV2A==": {
+      "description": "Media page: accessible name of the group of zoom out, fit to screen and zoom in buttons",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zoom",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oQhWViHsdPy/LicEc8O/bQ==": {
+      "description": "Media page: accessible name of the button that makes the image smaller",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zoom out",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PNRYEh+VqqBDxCXcA9Fu4Q==": {
+      "description": "Media page: accessible name of the button that resets the zoom so the whole image fits",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fit to screen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oiSeReEgvRTO7FX82ssjKA==": {
+      "description": "Media page: accessible name of the button that makes the image larger",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zoom in",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SVtt/pCSOtAkJ0pm1w8QaA==": {
+      "description": "Media page: accessible name of the toggle button that shows a checkerboard behind the media, so its transparent parts stand out",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Checkerboard background",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rXaD/NfZijs0APhgw3Gi6w==": {
+      "description": "Media page: label of the field for the media's short name, shown in the library and as a caption",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Title",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nmsDcdaViTHOku7JqyjrRw==": {
+      "description": "Media page: label of the field for longer text about the media, e.g. a caption or notes on its use",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Description",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TdppywDk4VC1CiNOR7ccEg==": {
+      "description": "Media page: label of the field for the media's alternative text, read to people who can't see it",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alt text",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7WRr9FJEUNofhhhaP1KGRw==": {
+      "description": "Media page: hint below the alt text field",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Describes the media to those who can't see it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5kkRiEsEkzkTf4k3CosmkA==": {
+      "description": "Media page: label of the select that makes the media's files public or private",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Visibility",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pzxSvAx/1tKfw5csnTfE6Q==": {
+      "description": "Media page: hint below the visibility select",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Private files only open for signed-in admins.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "msRig7EpRBXCRCN0NBsoTQ==": {
+      "description": "Media page: button in the sidebar that asks to delete the media",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QAXJLI+hSj7T8IZRAOyNtg==": {
+      "description": "Media page: title of the dialog that asks to confirm deleting the media",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete media",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WDcAesCMgkdbMyUsSOkAtw==": {
+      "description": "Media page: explains what deleting the media does",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Its files are removed from the store. This can't be undone.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fDo1AQS2u/5BdNVrkiD4ow==": {
+      "description": "Media page: label of the field in the delete dialog that the admin types the given text into to confirm, e.g. 'Type \"delete media\" to confirm'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Type \"{confirmationText}\" to confirm",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xS0HcpIx/Y86VwZ5t/DBPQ==": {
+      "description": "Media page: button that closes the delete dialog without deleting",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Cancel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S9m1K+JXfte0ajliGGXWEw==": {
+      "description": "Media page: button in the dialog that deletes the media",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+6KBEZo8DNKsdevYBSGg9g==": {
+      "description": "Media page: name of the media's asset that is the file as uploaded",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Original",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qeWBIX9yQmYVwTm/vVfhcw==": {
+      "description": "Media page: name of the media's asset that is the small copy shown in the library's grid",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Thumbnail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hkDKGFDj09GNpmlXiOBWXw==": {
+      "description": "Media page: visibility of a file anyone with its link can open, e.g. product images",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Public",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yhHifyPAbW9QZnjR5L3jYw==": {
+      "description": "Media page: visibility of a file only signed-in admins and code that checked access can open",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Private",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v01O9KHJHQjICXUPgx95jw==": {
+      "description": "Media page: heading of the sidebar's list of the media's files",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Assets",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e8BzSnGNoO5ti+KjWGDfFg==": {
+      "description": "Upload toast: title while files upload, e.g. 'Uploading 2 of 5'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uploading {done} of {total}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UdyA0peyFJ/k36C3BZ3IFQ==": {
+      "description": "Upload toast: title once uploads ended and some failed, e.g. '4 uploaded, 1 failed'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{done} uploaded, {failed} failed",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lvEbiioP9SN1cteReKRLUw==": {
+      "description": "Upload toast: title once every file uploaded, e.g. '5 uploaded'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{done} uploaded",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "T8J+gF544cm6eTmUySlCqQ==": {
+      "description": "Upload toast: accessible name of the box listing uploads",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uploads",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+1c7fC29mOKL6elREmTtKQ==": {
+      "description": "Upload toast: accessible name of the group of retry, show files and close buttons",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Upload actions",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0kOVLYZFb+fJegfy8mCs4g==": {
+      "description": "Upload toast: button that uploads every failed file again",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Retry failed",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JjsEFFrrm+g46EzndQ+OYw==": {
+      "description": "Upload toast: accessible name of the button that collapses the file list",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hide files",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZPMDXUXJIKfuXLfwFQUtVQ==": {
+      "description": "Upload toast: accessible name of the button that expands the file list",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Show files",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7dO1SMKIrlfFVIfef8vckg==": {
+      "description": "Upload toast: accessible name of the button that closes it",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Close",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lHpcLuPSgySet44elWyP9g==": {
+      "description": "Upload toast: status of a file waiting for its turn to upload",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Waiting",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JKCJL86nUVfhLdSiqhXdrA==": {
+      "description": "Upload toast: status of a file that uploaded",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uploaded",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ezy9jq5yfFju8UIpeQo+uA==": {
+      "description": "Upload toast: accessible name of the button that uploads one failed file again",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Retry {file}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wbReeJKT8eVraBKFUpYzxw==": {
+      "description": "Media page: accessible name of the button that starts the video",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Play",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZexbeG5F/cIxQ5GFG6gOtw==": {
+      "description": "Media page: accessible name of the button that pauses the video",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Pause",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0dq1GbyvKoM7IhGB/XYpxw==": {
+      "description": "Media page: accessible name of the video's timeline slider",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Seek",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7YYVVtW2uFIlyhI76HcZJQ==": {
+      "description": "Media page: accessible name of the button that turns the video's sound on",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unmute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fQF+jvRK10xDd/dRj0btIw==": {
+      "description": "Media page: accessible name of the button that turns the video's sound off",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L1vvJzv++Zc4TiwOMuSWbA==": {
+      "description": "Media page: accessible name of the button that leaves fullscreen video",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Exit fullscreen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Icwhm5PX9G1DZq6sdX6dEQ==": {
+      "description": "Media page: accessible name of the button that shows the video fullscreen",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Enter fullscreen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "39lMMvsca0Hbipd8Ka1VAA==": {
+      "description": "Upload toast: error of a file whose upload stopped because the connection dropped",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "The upload was interrupted. Check your connection and try again.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FUcX3wkdHYtpJ2YaUMxr6A==": {
+      "description": "Upload toast: error of a file larger than the server takes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "The file is too large to upload.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "66SGgrOl3QGcRcOTQj1Lgg==": {
+      "description": "Upload toast: error of a file the server failed to store",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Something went wrong while uploading. Try again.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

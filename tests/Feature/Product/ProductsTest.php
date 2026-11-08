@@ -841,7 +841,7 @@ it('shows Products in the navigation between Home and Categories', function () {
     // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Media', 'Orders', 'Customers', 'Settings']));
 });
 
 it('turns the products off when disabled in the config', function () {

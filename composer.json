@@ -17,7 +17,8 @@
     "laravel/framework": "^13.23",
     "laravel/head": "^0.2",
     "laravel/pennant": "^1.26",
-    "spatie/laravel-data": "^4.23"
+    "spatie/laravel-data": "^4.23",
+    "srwiez/thumbhash": "^1.6"
   },
   "autoload": {
     "psr-4": {
