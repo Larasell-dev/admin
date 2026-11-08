@@ -112,10 +112,30 @@ declare namespace Larasell.Admin.Media.Data {
     visibility: "public" | "private";
     assets: Array<Larasell.Admin.Media.Data.MediaAssetData>;
   };
+  export type MediaFolderData = {
+    id: number;
+    name: string;
+    url: string;
+    mediaCount: number;
+    folderCount: number;
+    renameUrl: string;
+    destroyUrl: string;
+  };
+  export type MediaFolderNodeData = {
+    id: number;
+    name: string;
+    parentId: number | null;
+    url: string;
+  };
   export type MediaIndexPageData = {
+    folderId: number | null;
+    folders: Array<Larasell.Admin.Media.Data.MediaFolderData>;
+    tree: Array<Larasell.Admin.Media.Data.MediaFolderNodeData>;
     media: Array<Larasell.Admin.Media.Data.MediaItemData>;
     pagination: Larasell.Admin.Media.Data.PaginationData;
     storeUrl: string;
+    rootUrl: string;
+    createFolderUrl: string;
   };
   export type MediaItemData = {
     id: number;

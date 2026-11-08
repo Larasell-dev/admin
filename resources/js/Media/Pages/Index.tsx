@@ -1,9 +1,16 @@
 import { thumbHashToDataURL } from "thumbhash";
 import { Link, router } from "@inertiajs/react";
 import { Button, EmptyState, Icon, Pagination, type PaginationChange } from "@larasell-dev/ui";
-import { ImageLine, UploadLine, VideoLine } from "@larasell-dev/ui/icons";
+import { FolderAddLine, ImageLine, UploadLine, VideoLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import { useEffect, useId, useState } from "react";
+import {
+  FolderBreadcrumb,
+  FolderGrid,
+  FolderNameDialog,
+  useFolderDeletion,
+  useFolderRename,
+} from "../Components/Folders";
 import { uploadQueue } from "../Components/uploadQueue";
 import { Page } from "../../Platform/Panel/Components/Page";
 import SidebarLayout from "../../Platform/Panel/Layouts/SidebarLayout";
@@ -11,14 +18,53 @@ import SidebarLayout from "../../Platform/Panel/Layouts/SidebarLayout";
 type Props = Larasell.Admin.Media.Data.MediaIndexPageData;
 
 /** The media library: a grid of images and videos, a page at a time, with an upload button. */
-export default function Index({ media, pagination, storeUrl }: Props) {
+export default function Index({
+  folderId,
+  folders,
+  tree,
+  media,
+  pagination,
+  storeUrl,
+  rootUrl,
+  createFolderUrl,
+}: Props) {
   const [paginating, setPaginating] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const { askToDelete, dialog: deleteFolderDialog } = useFolderDeletion();
+  const { askToRename, dialog: renameFolderDialog } = useFolderRename();
   return (
     <>
       <Page.Header
         title={fbs("Media", "Media library: page title")}
-        actions={<UploadButton storeUrl={storeUrl} />}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={() => setCreating(true)}>
+              <Icon icon={FolderAddLine} />
+              <fbt desc="Media library: header button that creates a folder">New folder</fbt>
+            </Button>
+            <UploadButton storeUrl={storeUrl} />
+          </div>
+        }
       />
+      <FolderNameDialog
+        key={`new-${folderId}`}
+        open={creating}
+        onClose={() => setCreating(false)}
+        url={createFolderUrl}
+        method="post"
+        initialName=""
+        parentId={folderId}
+      />
+      {deleteFolderDialog}
+      {renameFolderDialog}
+      {(folderId !== null || folders.length > 0) && (
+        <div className="flex flex-col gap-4 px-6 pt-4">
+          <FolderBreadcrumb tree={tree} folderId={folderId} rootUrl={rootUrl} />
+          {folders.length > 0 && (
+            <FolderGrid folders={folders} onRename={askToRename} onDelete={askToDelete} />
+          )}
+        </div>
+      )}
       {media.length === 0 ? (
         // Fills everything below the header, like an empty table page, so it sits in the middle.
         <div className="flex flex-1 items-center justify-center px-6 py-12">
@@ -103,7 +149,7 @@ function UploadButton({ storeUrl }: { storeUrl: string }) {
   // Each file goes to the upload queue, which sends them a few at a time and shows the toast;
   // page 1 picks up each one as it lands.
   useEffect(() => {
-    uploadQueue.onSucceeded = () => router.reload({ only: ["media"] });
+    uploadQueue.onSucceeded = () => router.reload({ only: ["media", "pagination", "folders"] });
     return () => {
       uploadQueue.onSucceeded = () => {};
     };

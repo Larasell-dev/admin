@@ -5,7 +5,12 @@ const file = (name: string) => new File(["x"], name, { type: "image/png" });
 const added = (...names: string[]) =>
   reduce([], {
     type: "ADDED",
-    uploads: names.map((name) => ({ id: name, file: file(name), previewUrl: null })),
+    uploads: names.map((name) => ({
+      id: name,
+      url: "/admin/media",
+      file: file(name),
+      previewUrl: null,
+    })),
   });
 
 it("queues added files in the order they were picked", () => {
@@ -155,6 +160,34 @@ it("sends each file once, even when starting one schedules again", async () => {
   // Assert
   expect(sent).toEqual(["a.png", "b.png", "c.png"]);
   await Promise.resolve();
+  uploadQueue.state = [];
+});
+
+it("sends each file to the folder it was picked in, even after the admin moved on", async () => {
+  // Arrange
+  const sent: string[] = [];
+  const pending: (() => void)[] = [];
+  uploadQueue.send = (url, upload) => {
+    sent.push(`${upload.file.name} -> ${url}`);
+    return new Promise((resolve) => pending.push(() => resolve({ ok: true, mediaId: 1 })));
+  };
+  uploadQueue.add("/admin/media?folder=1", ["a.png", "b.png", "c.png", "d.png"].map(file));
+
+  // Act
+  uploadQueue.add("/admin/media?folder=2", [file("e.png")]);
+  pending.splice(0).forEach((finish) => finish());
+  await new Promise((resolve) => setTimeout(resolve));
+
+  // Assert
+  expect(sent).toEqual([
+    "a.png -> /admin/media?folder=1",
+    "b.png -> /admin/media?folder=1",
+    "c.png -> /admin/media?folder=1",
+    "d.png -> /admin/media?folder=1",
+    "e.png -> /admin/media?folder=2",
+  ]);
+  pending.splice(0).forEach((finish) => finish());
+  await new Promise((resolve) => setTimeout(resolve));
   uploadQueue.state = [];
 });
 

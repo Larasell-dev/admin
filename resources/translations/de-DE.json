@@ -4780,6 +4780,215 @@
         }
       ],
       "types": []
+    },
+    "d8tRQCRRxqnvwNiREstjnw==": {
+      "description": "Media library: header button that creates a folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w1bkYBJBtX+YuxIm+I6AKw==": {
+      "description": "Media library: accessible name of the breadcrumb of folders",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qBFJrgM4+dnur8mpkLS2kw==": {
+      "description": "Media library breadcrumb: link to the top level of the library",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Medien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IRPjHmRKS6aT9gCIKg8rgA==": {
+      "description": "Media library: what a folder tile holds, e.g. '3 items'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number} Elemente",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Xh+FyEeNx7/q02FXwZIcVA==": {
+      "description": "Media library: what a folder tile holds, e.g. '3 items'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 Element",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O68K8ClYB3UzNM/Y6Phe0g==": {
+      "description": "Media library: accessible name of the button that opens a folder's menu, e.g. 'Actions for Summer'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {folderName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wf6LQp3cmw0C2ysG2WLXfQ==": {
+      "description": "Media library folder menu: renames the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Umbenennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tYcDqB7w8R3U52dNK9LQ4A==": {
+      "description": "Media library: title of the dialog that creates a folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Em1RPDSdV/I0m5E7MXHSsw==": {
+      "description": "Media library: title of the dialog that renames a folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ordner umbenennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "APeAuBcYgpvzcL+LwjLojw==": {
+      "description": "Media library folder dialog: label of the folder name field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rg3s3iZevpBJTH1oClH3ZQ==": {
+      "description": "Media library folder dialog: closes it without saving",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P6bwtFp8InGBEPY4RQuxWg==": {
+      "description": "Media library folder dialog: creates the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "42mseCpst9KvfoIc5heVnw==": {
+      "description": "Media library folder dialog: saves the new name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Umbenennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/h9i0d3/GpW/71uTRtpv0A==": {
+      "description": "Media library folder menu: deletes the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sbrm+lbb2ZaslYo1U77VkA==": {
+      "description": "Media library: title of the dialog that confirms deleting an empty folder, e.g. 'Delete Summer'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{folderName} löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/yPR30XiTCpDQW6YEGVqxQ==": {
+      "description": "Media library: explains what deleting an empty folder does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Ordner ist leer, es werden also keine Dateien gelöscht. Das lässt sich nicht rückgängig machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UGuRePNUIYHi25qCurPMBg==": {
+      "description": "Media library: closes the delete folder dialog without deleting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wy2InqpZPRQ0/ndpoAG4Qw==": {
+      "description": "Media library: button in the dialog that deletes the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lS2dCKV1ak/qmoVcMxqn7A==": {
+      "description": "Media library: label of the field in the delete folder dialog that the admin types the folder's name into to confirm, e.g. 'Type \"Summer\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zum Bestätigen „{folderName}“ eingeben",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

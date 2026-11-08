@@ -5,6 +5,7 @@ namespace Larasell\Admin\Media\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Larasell\Larasell\Media\Actions\UploadMediaPayload;
+use Larasell\Larasell\Media\MediaFolderId;
 use Larasell\Larasell\Media\MediaType;
 
 /** Uploads images and videos into the media library, several at once. */
@@ -24,6 +25,8 @@ class UploadMediaRequest extends FormRequest
         return [
             'files' => ['required', 'array', 'min:1', 'max:'.($this->expectsJson() ? 1 : self::MAX_FILES)],
             // Checked against the file's content, as the core's UploadMedia does.
+            // In the URL, so each queued file keeps the folder it was picked in.
+            'folder' => ['nullable', 'integer', 'min:1'],
             'files.*' => ['required', 'file', 'mimetypes:'.implode(',', MediaType::mimeTypes()), 'max:'.self::MAX_SIZE],
         ];
     }
@@ -47,6 +50,8 @@ class UploadMediaRequest extends FormRequest
         /** @var list<UploadedFile> $files */
         $files = $this->validated('files');
 
-        return array_map(fn (UploadedFile $file): UploadMediaPayload => new UploadMediaPayload($file), $files);
+        $folderId = $this->filled('folder') ? new MediaFolderId($this->integer('folder')) : null;
+
+        return array_map(fn (UploadedFile $file): UploadMediaPayload => new UploadMediaPayload($file, folderId: $folderId), $files);
     }
 }

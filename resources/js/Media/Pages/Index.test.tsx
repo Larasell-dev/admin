@@ -44,9 +44,14 @@ const unboxing: Media = {
 
 function props(overrides: Partial<Props> = {}): Props {
   return {
+    folderId: null,
+    folders: [],
+    tree: [],
     media: [boots, unboxing],
     pagination: { page: 1, pageSize: 24, total: 2 },
     storeUrl: "/admin/media",
+    rootUrl: "/admin/media",
+    createFolderUrl: "/admin/media/folders",
     ...overrides,
   };
 }

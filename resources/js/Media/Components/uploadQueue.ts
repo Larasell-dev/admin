@@ -1,7 +1,8 @@
 import { fbs } from "fbtee";
 import { useSyncExternalStore } from "react";
 
-type Base = { id: string; file: File; previewUrl: string | null };
+/** `url` is where the file goes, with the folder it was picked in, so switching folders mid-queue changes nothing. */
+type Base = { id: string; url: string; file: File; previewUrl: string | null };
 
 /** One file on its way to the server. Each state carries only the fields it has. */
 export type Upload =
@@ -76,8 +77,8 @@ function transition(upload: Upload, event: UploadEvent): Upload {
   return upload;
 }
 
-function base({ id, file, previewUrl }: Upload): Base {
-  return { id, file, previewUrl };
+function base({ id, url, file, previewUrl }: Upload): Base {
+  return { id, url, file, previewUrl };
 }
 
 /** Applies `change` to the matching uploads, keeping the same array when nothing changed. */
@@ -141,7 +142,6 @@ const LIMIT = 3;
  */
 export const uploadQueue = {
   state: [] as Upload[],
-  url: "",
   listeners: new Set<() => void>(),
   /** Replaced in tests. */
   send: sendWithXhr as Send,
@@ -161,10 +161,10 @@ export const uploadQueue = {
 
   /** Picked files join the queue; images get a small preview once it's made. */
   add(url: string, files: File[]) {
-    uploadQueue.url = url;
     const uploads = files.map((file) => ({
       // Also the request's Idempotency-Key, so a retry can't upload the file twice.
       id: crypto.randomUUID(),
+      url,
       file,
       previewUrl: null,
     }));
@@ -201,7 +201,7 @@ export const uploadQueue = {
       if (!upload) continue;
       const started = id;
       void uploadQueue
-        .send(uploadQueue.url, upload, (progress) =>
+        .send(upload.url, upload, (progress) =>
           uploadQueue.dispatch({ type: "PROGRESS", id: started, progress }),
         )
         .then((result) =>

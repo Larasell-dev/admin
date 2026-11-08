@@ -12,10 +12,13 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Media\Data\MediaDetailData;
+use Larasell\Admin\Media\Data\MediaFolderData;
+use Larasell\Admin\Media\Data\MediaFolderNodeData;
 use Larasell\Admin\Media\Data\MediaIndexPageData;
 use Larasell\Admin\Media\Data\MediaItemData;
 use Larasell\Admin\Media\Data\MediaShowPageData;
 use Larasell\Admin\Media\Data\PaginationData;
+use Larasell\Admin\Media\Events\MediaLibraryChanged;
 use Larasell\Admin\Media\Http\Requests\UpdateMediaRequest;
 use Larasell\Admin\Media\Http\Requests\UploadMediaRequest;
 use Larasell\Admin\Media\Models\MediaPlaceholder;
@@ -25,9 +28,11 @@ use Larasell\Larasell\Media\Actions\DeleteMedia;
 use Larasell\Larasell\Media\Actions\UpdateMedia;
 use Larasell\Larasell\Media\Actions\UploadMedia;
 use Larasell\Larasell\Media\Contracts\MediaStorage;
+use Larasell\Larasell\Media\Exceptions\MediaFolderNotFound;
 use Larasell\Larasell\Media\MediaId;
 use Larasell\Larasell\Media\Models\Media;
 use Larasell\Larasell\Media\Models\MediaAsset;
+use Larasell\Larasell\Media\Models\MediaFolder;
 use Laravel\Head\Facades\Head;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -41,21 +46,39 @@ class MediaController
     {
         // Multiples of the grid's 2, 4 and 6 columns, so full pages fill whole rows.
         $pageSize = in_array($request->integer('per_page'), self::PAGE_SIZES, true) ? $request->integer('per_page') : self::PAGE_SIZES[0];
-        $query = Media::query()->with('original', 'thumbnail')->latest('id');
-        $page = $query->paginate($pageSize)->withPath(route('larasell.admin.media.index'));
+        // A folder that no longer exists, e.g. deleted by someone else, shows the top level instead.
+        $folder = $request->filled('folder') ? MediaFolder::query()->find($request->integer('folder')) : null;
+        $query = Media::query()->with('original', 'thumbnail')->where('folder_id', $folder?->id)->latest('id');
+        $path = route('larasell.admin.media.index', array_filter(['folder' => $folder?->id]));
+        $page = $query->paginate($pageSize)->withPath($path)->appends(array_filter(['folder' => $folder?->id]));
 
         // Past the last page, e.g. after deleting its only item, show the last page instead.
         if ($page->isEmpty() && $page->currentPage() > $page->lastPage()) {
-            $page = $query->paginate($pageSize, page: $page->lastPage())->withPath(route('larasell.admin.media.index'));
+            $page = $query->paginate($pageSize, page: $page->lastPage())->withPath($path);
         }
 
         $placeholders = MediaPlaceholder::query()->whereIn('media_id', $page->getCollection()->modelKeys())->pluck('thumbhash', 'media_id');
 
-        return Inertia::render('Media/Pages/Index', new MediaIndexPageData(
+        $data = new MediaIndexPageData(
+            folderId: $folder?->id,
+            folders: MediaFolder::query()->where('parent_id', $folder?->id)->withCount(['media', 'children'])
+                ->orderBy('name_key')->orderBy('id')->get()->map(MediaFolderData::fromModel(...))->all(),
+            tree: MediaFolder::query()->orderBy('name_key')->orderBy('id')->get(['id', 'name', 'parent_id'])
+                ->map(MediaFolderNodeData::fromModel(...))->all(),
             media: $page->getCollection()->map(fn (Media $media): MediaItemData => MediaItemData::fromModel($media, $locale, $placeholders[$media->id] ?? null))->all(),
             pagination: new PaginationData($page->currentPage(), $page->perPage(), $page->total()),
-            storeUrl: route('larasell.admin.media.store'),
-        ));
+            storeUrl: route('larasell.admin.media.store', array_filter(['folder' => $folder?->id])),
+            rootUrl: route('larasell.admin.media.index'),
+            createFolderUrl: route('larasell.admin.media.folders.store'),
+        );
+
+        // Reloaded in every other admin's browser when the library changes, by MediaLibraryChanged.
+        return Inertia::render('Media/Pages/Index', [
+            ...$data->toArray(),
+            ...collect(['folders', 'tree', 'media', 'pagination'])->mapWithKeys(fn (string $prop): array => [
+                $prop => Inertia::live(fn (): mixed => $data->toArray()[$prop], on: MediaLibraryChanged::class),
+            ])->all(),
+        ]);
     }
 
     public function store(UploadMediaRequest $request, UploadMedia $upload): RedirectResponse|JsonResponse
@@ -69,7 +92,12 @@ class MediaController
             $cacheKey = "larasell-admin:media-upload:{$request->user('larasell-admin')?->getAuthIdentifier()}:{$key}";
 
             // Locked, so a retry sent while the first request still runs waits for it.
-            $id = $this->storeOnce($cacheKey, $request, $upload);
+            try {
+                $id = $this->storeOnce($cacheKey, $request, $upload);
+            } catch (MediaFolderNotFound) {
+                // Not retryable: the queue shows a 422 as final.
+                throw ValidationException::withMessages(['folder' => __('The folder was deleted, so the file was not uploaded.')]);
+            }
 
             return response()->json(['id' => $id], 201);
         }
@@ -78,7 +106,7 @@ class MediaController
             $upload->handle($payload);
         }
 
-        return redirect()->route('larasell.admin.media.index');
+        return redirect()->route('larasell.admin.media.index', array_filter(['folder' => $request->integer('folder') ?: null]));
     }
 
     private function storeOnce(string $cacheKey, UploadMediaRequest $request, UploadMedia $upload): int

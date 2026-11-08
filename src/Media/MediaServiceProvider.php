@@ -2,18 +2,29 @@
 
 namespace Larasell\Admin\Media;
 
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Media\Console\GeneratePlaceholdersCommand;
+use Larasell\Admin\Media\Events\MediaLibraryChanged;
 use Larasell\Admin\Media\Http\Controllers\MediaController;
+use Larasell\Admin\Media\Http\Controllers\MediaFolderController;
 use Larasell\Admin\Media\Jobs\GeneratePlaceholder;
+use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Larasell\Media\Events\MediaDeleted;
+use Larasell\Larasell\Media\Events\MediaFolderCreated;
+use Larasell\Larasell\Media\Events\MediaFolderDeleted;
+use Larasell\Larasell\Media\Events\MediaFolderMoved;
+use Larasell\Larasell\Media\Events\MediaFolderRenamed;
+use Larasell\Larasell\Media\Events\MediaMoved;
 use Larasell\Larasell\Media\Events\MediaThumbnailGenerated;
+use Larasell\Larasell\Media\Events\MediaUpdated;
 use Larasell\Larasell\Media\Events\MediaUploaded;
 use Larasell\Larasell\Media\MediaType;
 use Larasell\Larasell\Media\Models\Media;
@@ -56,7 +67,17 @@ class MediaServiceProvider extends ServiceProvider
             }
         });
 
+        // Live updates are the panel's own: the core's events say what changed, this tells the browsers.
+        Event::listen([
+            MediaUploaded::class, MediaUpdated::class, MediaDeleted::class, MediaMoved::class, MediaThumbnailGenerated::class,
+            MediaFolderCreated::class, MediaFolderRenamed::class, MediaFolderMoved::class, MediaFolderDeleted::class,
+        ], fn () => MediaLibraryChanged::dispatch());
+        Broadcast::channel(MediaLibraryChanged::CHANNEL, fn (mixed $user): bool => $user instanceof Admin, ['guards' => ['larasell-admin']]);
+
         AdminPanel::resolve()->routes(function (): void {
+            Route::post('media/folders', [MediaFolderController::class, 'store'])->name('media.folders.store');
+            Route::put('media/folders/{folder}', [MediaFolderController::class, 'update'])->whereNumber('folder')->name('media.folders.update');
+            Route::delete('media/folders/{folder}', [MediaFolderController::class, 'destroy'])->whereNumber('folder')->name('media.folders.destroy');
             Route::get('media', [MediaController::class, 'index'])->name('media.index')->withHead(title: Translate::later('Media'));
             Route::post('media', [MediaController::class, 'store'])->name('media.store');
             Route::get('media/{media}', [MediaController::class, 'show'])->whereNumber('media')->name('media.show');
