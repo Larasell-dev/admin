@@ -1,80 +1,33 @@
-import { AlertDialog, Field, Input } from "@larasell-dev/ui";
-import { HotkeysProvider } from "@tanstack/react-hotkeys";
-import { useState } from "react";
 import type { TableRowAction } from "../../../types";
-import { overlayExclusive } from "../../Support/hotkeys";
+import ConfirmDialog from "./ConfirmDialog";
 import Freeze from "./Freeze";
-import { fbs } from "fbtee";
 
 type Props = {
   /** The action waiting for confirmation, or null when the dialog is closed. */
   action: TableRowAction | null;
-  processing: boolean;
-  error?: string;
-  onConfirm: (typed: string) => void;
-  onCancel: () => void;
+  onClose: () => void;
 };
 
-/** Asks the admin to confirm a table action, optionally by typing a given text. */
-export default function ConfirmActionDialog({ action, ...props }: Props) {
+/**
+ * Asks the admin to confirm a table action. It lives beside the table rather than in the row, so
+ * it still animates out once the row it acts on is gone.
+ */
+export default function ConfirmActionDialog({ action, onClose }: Props) {
   return (
-    <AlertDialog.Root open={action !== null} onOpenChange={(open) => !open && props.onCancel()}>
-      {/* Keeps the last action and its state while the dialog animates out, so its copy does not
-          go blank once the action is cleared, nor its button stop loading once the request ends. */}
-      {/* Enabled by the action rather than mounting, since the frozen content stays mounted. */}
-      <HotkeysProvider
-        scope="confirm-action-dialog"
-        exclusive={overlayExclusive}
-        enabled={action !== null}
-      >
-        <Freeze frozen={action === null}>
-          {action?.confirm && (
-            // Keyed by the action, so the typed text starts empty for each one.
-            <Confirmation key={action.url} action={action} {...props} />
-          )}
-        </Freeze>
-      </HotkeysProvider>
-    </AlertDialog.Root>
-  );
-}
-
-function Confirmation({
-  action,
-  processing,
-  error,
-  onConfirm,
-}: Omit<Props, "action" | "onCancel"> & { action: TableRowAction }) {
-  const [typed, setTyped] = useState("");
-  const confirm = action.confirm!;
-
-  return (
-    <AlertDialog.Popup title={confirm.title} description={confirm.message}>
-      {confirm.confirmationText !== null && (
-        <Field
-          label={fbs(
-            ['Type "', fbs.param("confirmationText", confirm.confirmationText), '" to confirm'],
-            "Confirmation dialog of a table action, e.g. deleting: label of the field the admin types the given text into to confirm, e.g. 'Type \"DELETE\" to confirm'",
-          )}
-          name="confirmation"
-          error={error}
-        >
-          <Input
-            autoComplete="off"
-            value={typed}
-            onChange={(event) => setTyped(event.currentTarget.value)}
+    <ConfirmDialog.Root open={action !== null} onOpenChange={(open) => !open && onClose()}>
+      {/* Keeps the last action while the dialog animates out, so its copy does not go blank. */}
+      <Freeze frozen={action === null}>
+        {action?.confirm && (
+          <ConfirmDialog.Popup
+            title={action.confirm.title}
+            description={action.confirm.message}
+            action={action.url}
+            method={action.method}
+            confirmationText={action.confirm.confirmationText}
+            confirmButton={action.confirm.confirmButton}
           />
-        </Field>
-      )}
-      <AlertDialog.Actions>
-        <AlertDialog.Cancel>{confirm.cancelButton}</AlertDialog.Cancel>
-        <AlertDialog.Confirm
-          variant={action.destructive ? "destructive" : "primary"}
-          loading={processing}
-          onClick={() => onConfirm(typed)}
-        >
-          {confirm.confirmButton}
-        </AlertDialog.Confirm>
-      </AlertDialog.Actions>
-    </AlertDialog.Popup>
+        )}
+      </Freeze>
+    </ConfirmDialog.Root>
   );
 }

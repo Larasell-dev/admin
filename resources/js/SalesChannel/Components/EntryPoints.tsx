@@ -1,7 +1,6 @@
 import { Field as BaseField } from "@base-ui/react/field";
-import { Form, router } from "@inertiajs/react";
+import { Form } from "@inertiajs/react";
 import {
-  AlertDialog,
   Badge,
   Button,
   Checkbox,
@@ -18,6 +17,7 @@ import { AddLine, DeleteBinLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import { useState } from "react";
 import FormCheckbox from "../../Platform/Panel/Components/FormCheckbox";
+import ConfirmDialog from "../../Platform/Panel/Components/ConfirmDialog";
 import Freeze from "../../Platform/Panel/Components/Freeze";
 
 type Channel = Larasell.Admin.SalesChannel.Data.SalesChannelData;
@@ -48,23 +48,6 @@ export default function EntryPoints({
 }) {
   // The domain the delete dialog asks about, or null while it is closed.
   const [deleting, setDeleting] = useState<EntryPoint | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-
-  const close = () => {
-    setDeleting(null);
-    setError(undefined);
-  };
-
-  const confirmDelete = (entryPoint: EntryPoint, typed: string) =>
-    router.delete(entryPoint.destroyUrl, {
-      data: { confirmation: typed },
-      preserveScroll: true,
-      onStart: () => setProcessing(true),
-      onFinish: () => setProcessing(false),
-      onSuccess: close,
-      onError: (errors) => setError(errors.confirmation),
-    });
 
   return (
     <Section.Root>
@@ -143,13 +126,33 @@ export default function EntryPoints({
         </div>
       </Stack>
       {/* One dialog outside the list, so it outlives the row it deletes and can animate out. */}
-      <DeleteEntryPointDialog
-        entryPoint={deleting}
-        processing={processing}
-        error={error}
-        onConfirm={confirmDelete}
-        onCancel={close}
-      />
+      <ConfirmDialog.Root
+        open={deleting !== null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+      >
+        {/* Keeps the deleted domain while the dialog animates out, so its text does not go blank. */}
+        <Freeze frozen={deleting === null}>
+          {deleting && (
+            <ConfirmDialog.Popup
+              title={fbs(
+                "Delete domain",
+                "Sales channel page: title of the dialog that asks to confirm deleting a domain",
+              )}
+              description={fbs(
+                [
+                  "Customers can no longer open the storefront at ",
+                  fbs.param("url", deleting.url),
+                  ".",
+                ],
+                "Sales channel page: explains what deleting a domain does, e.g. 'Customers can no longer open the storefront at https://shop.example/de.'",
+              )}
+              action={deleting.destroyUrl}
+              // Without its scheme, e.g. "shop.example/de"; the server checks it too.
+              confirmationText={deleting.domain}
+            />
+          )}
+        </Freeze>
+      </ConfirmDialog.Root>
     </Section.Root>
   );
 }
@@ -299,89 +302,5 @@ function AddEntryPoint({
         )}
       </Dialog.Popup>
     </Dialog.Root>
-  );
-}
-
-/**
- * Asks to delete a domain once the admin typed it, without its scheme, e.g. "shop.example/de";
- * customers can no longer open the storefront there. The server checks the typed text too.
- */
-function DeleteEntryPointDialog({
-  entryPoint,
-  ...props
-}: {
-  /** The domain to delete, or null when the dialog is closed. */
-  entryPoint: EntryPoint | null;
-  processing: boolean;
-  error?: string;
-  onConfirm: (entryPoint: EntryPoint, typed: string) => void;
-  onCancel: () => void;
-}) {
-  return (
-    <AlertDialog.Root open={entryPoint !== null} onOpenChange={(open) => !open && props.onCancel()}>
-      {/* Keeps the deleted domain and the dialog's state while it animates out, so its text does
-          not go blank once the domain is gone, nor its button stop loading once the request ends. */}
-      <Freeze frozen={entryPoint === null}>
-        {entryPoint && (
-          // Keyed by the domain, so the typed text starts empty for each one.
-          <Confirmation key={entryPoint.id} entryPoint={entryPoint} {...props} />
-        )}
-      </Freeze>
-    </AlertDialog.Root>
-  );
-}
-
-function Confirmation({
-  entryPoint,
-  processing,
-  error,
-  onConfirm,
-}: {
-  entryPoint: EntryPoint;
-  processing: boolean;
-  error?: string;
-  onConfirm: (entryPoint: EntryPoint, typed: string) => void;
-}) {
-  const [typed, setTyped] = useState("");
-
-  return (
-    <AlertDialog.Popup
-      title={fbs(
-        "Delete domain",
-        "Sales channel page: title of the dialog that asks to confirm deleting a domain",
-      )}
-      description={fbs(
-        ["Customers can no longer open the storefront at ", fbs.param("url", entryPoint.url), "."],
-        "Sales channel page: explains what deleting a domain does, e.g. 'Customers can no longer open the storefront at https://shop.example/de.'",
-      )}
-    >
-      <Field
-        label={fbs(
-          ['Type "', fbs.param("domain", entryPoint.domain), '" to confirm'],
-          "Delete domain dialog: label of the field the admin types the domain into, without https://, to confirm, e.g. 'Type \"shop.example/de\" to confirm'",
-        )}
-        name="confirmation"
-        error={error}
-      >
-        <Input
-          autoComplete="off"
-          spellCheck={false}
-          value={typed}
-          onChange={(event) => setTyped(event.currentTarget.value)}
-        />
-      </Field>
-      <AlertDialog.Actions>
-        <AlertDialog.Cancel>
-          <fbt desc="Delete domain dialog: button that closes it without deleting">Cancel</fbt>
-        </AlertDialog.Cancel>
-        <AlertDialog.Confirm
-          variant="destructive"
-          loading={processing}
-          onClick={() => onConfirm(entryPoint, typed)}
-        >
-          <fbt desc="Delete domain dialog: button that deletes the domain">Delete</fbt>
-        </AlertDialog.Confirm>
-      </AlertDialog.Actions>
-    </AlertDialog.Popup>
   );
 }

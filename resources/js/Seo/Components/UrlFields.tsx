@@ -18,8 +18,8 @@ import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { fbs } from "fbtee";
 import { useMemo, useState, type ReactNode } from "react";
 import type { SectionComponentProps } from "../../extensions";
-import type { TableRowAction } from "../../types";
-import ConfirmActionDialog from "../../Platform/Panel/Components/ConfirmActionDialog";
+import ConfirmDialog from "../../Platform/Panel/Components/ConfirmDialog";
+import Freeze from "../../Platform/Panel/Components/Freeze";
 import { overlayExclusive } from "../../Platform/Support/hotkeys";
 import { useStorage } from "../../Platform/Support/useStorage";
 
@@ -171,61 +171,8 @@ function withPage(channelId: number, page: number, pageSize: number): string {
 function OldUrls({ url }: { url: Larasell.Admin.Seo.Data.SeoUrlData }) {
   // Keeps the scroll position and what the admin typed elsewhere on the page.
   const options = { preserveScroll: true, preserveState: true } as const;
-  const [removing, setRemoving] = useState<TableRowAction | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string>();
-
-  // The shared confirmation dialog of table actions; the server checks the typed text.
-  const askToRemove = (old: Larasell.Admin.Seo.Data.OldUrlData) => {
-    setError(undefined);
-    setRemoving({
-      name: "remove",
-      label: "",
-      method: "post",
-      url: old.removeUrl,
-      destructive: true,
-      disabled: false,
-      icon: null,
-      confirm: {
-        title: fbs(
-          "Delete this redirect?",
-          "Product and category forms, URLs section: title of the dialog that confirms removing an old URL",
-        ),
-        message: fbs(
-          [
-            "/",
-            fbs.param("path", old.path),
-            " will no longer lead to this page, and another page can use it.",
-          ],
-          "Product and category forms, URLs section: text of the dialog that confirms removing an old URL, naming its path",
-        ),
-        confirmButton: fbs(
-          "Delete redirect",
-          "Product and category forms, URLs section: button in the dialog that removes an old URL",
-        ),
-        cancelButton: fbs(
-          "Cancel",
-          "Product and category forms, URLs section: button that closes the dialog without removing the old URL",
-        ),
-        // Must match the server's __('Delete redirect'), which is in the same interface language.
-        confirmationText: fbs(
-          "Delete redirect",
-          "Product and category forms, URLs section: text the admin types to confirm removing an old URL",
-        ),
-      },
-    });
-  };
-
-  const remove = (confirmation: string) =>
-    removing &&
-    router.delete(removing.url, {
-      ...options,
-      data: { confirmation },
-      onStart: () => setProcessing(true),
-      onFinish: () => setProcessing(false),
-      onSuccess: () => setRemoving(null),
-      onError: (errors) => setError(errors.confirmation),
-    });
+  const [removing, setRemoving] = useState<Larasell.Admin.Seo.Data.OldUrlData | null>(null);
+  const askToRemove = setRemoving;
 
   return (
     <Section.Card>
@@ -311,13 +258,35 @@ function OldUrls({ url }: { url: Larasell.Admin.Seo.Data.SeoUrlData }) {
           />
         </div>
       )}
-      <ConfirmActionDialog
-        action={removing}
-        processing={processing}
-        error={error}
-        onConfirm={remove}
-        onCancel={() => setRemoving(null)}
-      />
+      <ConfirmDialog.Root
+        open={removing !== null}
+        onOpenChange={(open) => !open && setRemoving(null)}
+      >
+        <Freeze frozen={removing === null}>
+          {removing && (
+            <ConfirmDialog.Popup
+              title={fbs(
+                "Delete redirect",
+                "Product and category forms, URLs section: title of the dialog that confirms deleting an old URL's redirect",
+              )}
+              description={fbs(
+                [
+                  "/",
+                  fbs.param("path", removing.path),
+                  " will no longer lead to this page, and another page can use it.",
+                ],
+                "Product and category forms, URLs section: text of the dialog that confirms deleting an old URL's redirect, naming its path",
+              )}
+              action={removing.removeUrl}
+              // Must match the server's __('Delete redirect'), which is in the same interface language.
+              confirmationText={fbs(
+                "Delete redirect",
+                "Product and category forms, URLs section: text the admin types to confirm deleting an old URL's redirect",
+              )}
+            />
+          )}
+        </Freeze>
+      </ConfirmDialog.Root>
     </Section.Card>
   );
 }

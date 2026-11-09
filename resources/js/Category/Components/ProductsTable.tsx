@@ -53,28 +53,18 @@ type Props = (
 export default function ProductsTable(props: Props) {
   const [adding, setAdding] = useState(false);
   const [pending, setPending] = useState<TableRowAction | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string>();
 
-  const perform = (action: TableRowAction, confirmation?: string) => {
+  const perform = (action: TableRowAction) => {
     if (action.method === "get") {
       setPending(null);
       router.visit(action.url);
       return;
     }
 
-    router.post(action.url, confirmation ? { confirmation } : {}, {
-      preserveScroll: true,
-      onStart: () => setProcessing(true),
-      onFinish: () => setProcessing(false),
-      onSuccess: () => setPending(null),
-      onError: (errors) => setError(errors.confirmation),
-    });
+    router.post(action.url, {}, { preserveScroll: true });
   };
 
   const choose = (action: TableRowAction) => {
-    setError(undefined);
-
     if (action.confirm) {
       setPending(action);
     } else {
@@ -306,13 +296,7 @@ export default function ProductsTable(props: Props) {
         </Section.Card>
       )}
 
-      <ConfirmActionDialog
-        action={pending}
-        processing={processing}
-        error={error}
-        onConfirm={(typed) => pending && perform(pending, typed)}
-        onCancel={() => setPending(null)}
-      />
+      <ConfirmActionDialog action={pending} onClose={() => setPending(null)} />
     </Section.Root>
   );
 }

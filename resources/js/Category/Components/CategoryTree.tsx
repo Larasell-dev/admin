@@ -29,10 +29,10 @@ import {
   useRef,
   useState,
 } from "react";
-import type { TableRowAction } from "../../types";
 import { plugins, sensors } from "../../Platform/Support/dragAndDrop";
 import { overlayExclusive } from "../../Platform/Support/hotkeys";
-import ConfirmActionDialog from "../../Platform/Panel/Components/ConfirmActionDialog";
+import ConfirmDialog from "../../Platform/Panel/Components/ConfirmDialog";
+import Freeze from "../../Platform/Panel/Components/Freeze";
 import Tree, { TreeItem } from "../../Platform/Panel/Components/Tree";
 import { cn } from "cn";
 import { fbs } from "fbtee";
@@ -560,68 +560,39 @@ const DeleteContext = createContext<(category: Category) => void>(() => {});
  */
 export function CategoryDeletion({ children }: { children: ReactNode }) {
   const [deleting, setDeleting] = useState<Category | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string>();
-
-  // The admin types the name to confirm; the server checks it again.
-  const deletion: TableRowAction | null = deleting && {
-    name: "delete",
-    label: fbs("Delete", "Category tree: name of the action that deletes a category"),
-    method: "post",
-    url: deleting.deleteUrl,
-    confirm: {
-      title: fbs(
-        "Delete category",
-        "Category tree: title of the dialog that asks the admin to confirm deleting a category",
-      ),
-      message: fbs(
-        [
-          'This also deletes all categories inside "',
-          fbs.param("categoryName", deleting.name),
-          '". Their products stay in the store.',
-        ],
-        "Category tree: text of the dialog that asks the admin to confirm deleting a category, with the category's name",
-      ),
-      confirmButton: fbs(
-        "Delete",
-        "Category tree: button in the confirmation dialog that deletes the category",
-      ),
-      cancelButton: fbs(
-        "Cancel",
-        "Category tree: button in the confirmation dialog that keeps the category and closes the dialog",
-      ),
-      confirmationText: deleting.name,
-    },
-    destructive: true,
-    disabled: false,
-    icon: null,
-  };
-
-  const destroy = (confirmation: string) =>
-    router.delete(deleting!.deleteUrl, {
-      data: { confirmation },
-      preserveScroll: true,
-      onStart: () => setProcessing(true),
-      onFinish: () => setProcessing(false),
-      onSuccess: () => setDeleting(null),
-      onError: (errors) => setError(errors.confirmation),
-    });
-
   const askToDelete = useCallback((category: Category) => {
-    setError(undefined);
     setDeleting(category);
   }, []);
 
   return (
     <DeleteContext value={askToDelete}>
       {children}
-      <ConfirmActionDialog
-        action={deletion}
-        processing={processing}
-        error={error}
-        onConfirm={destroy}
-        onCancel={() => setDeleting(null)}
-      />
+      <ConfirmDialog.Root
+        open={deleting !== null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+      >
+        <Freeze frozen={deleting === null}>
+          {deleting && (
+            <ConfirmDialog.Popup
+              title={fbs(
+                "Delete category",
+                "Category tree: title of the dialog that asks the admin to confirm deleting a category",
+              )}
+              description={fbs(
+                [
+                  'This also deletes all categories inside "',
+                  fbs.param("categoryName", deleting.name),
+                  "\". Their products stay in the store. This can't be undone.",
+                ],
+                "Category tree: text of the dialog that asks the admin to confirm deleting a category, with the category's name",
+              )}
+              action={deleting.deleteUrl}
+              // The server checks the typed name again.
+              confirmationText={deleting.name}
+            />
+          )}
+        </Freeze>
+      </ConfirmDialog.Root>
     </DeleteContext>
   );
 }

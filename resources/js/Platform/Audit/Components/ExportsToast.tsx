@@ -10,10 +10,9 @@ import {
 } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { router } from "@inertiajs/react";
-import { type ReactNode, useReducer, useState } from "react";
-import ConfirmActionDialog from "../../Panel/Components/ConfirmActionDialog";
-import type { TableRowAction } from "../../../types";
+import { type ReactNode, useState } from "react";
+import ConfirmDialog from "../../Panel/Components/ConfirmDialog";
+import Freeze from "../../Panel/Components/Freeze";
 import { createPortal } from "react-dom";
 
 type Export = Larasell.Admin.Platform.Audit.Export.Data.AuditLogExportData;
@@ -162,76 +161,36 @@ function Header({
   );
 }
 
-/** The delete dialog: closed, asking to confirm (after a refused attempt, with why), or deleting. */
-type Deletion =
-  | { step: "closed" }
-  | { step: "confirming"; item: Export; error?: string }
-  | { step: "deleting"; item: Export };
-
-type DeletionEvent =
-  | { type: "open"; item: Export }
-  | { type: "submit" }
-  | { type: "refuse"; error: string }
-  // A request that neither succeeded nor was refused, e.g. a server error, lets them try again.
-  | { type: "settle" }
-  | { type: "close" };
-
-type Step = Deletion["step"];
-type Transitions<S extends Step> = {
-  [E in DeletionEvent["type"]]?: (
-    state: Extract<Deletion, { step: S }>,
-    event: Extract<DeletionEvent, { type: E }>,
-  ) => Deletion;
-};
-
-/** Each step's allowed events. Any other event leaves the state as it is. */
-const machine: { [S in Step]: Transitions<S> } = {
-  closed: {
-    open: (_, { item }) => ({ step: "confirming", item }),
-  },
-  confirming: {
-    submit: ({ item }) => ({ step: "deleting", item }),
-    close: () => ({ step: "closed" }),
-  },
-  deleting: {
-    refuse: ({ item }, { error }) => ({ step: "confirming", item, error }),
-    settle: ({ item }) => ({ step: "confirming", item }),
-    close: () => ({ step: "closed" }),
-  },
-};
-
-function deletion(state: Deletion, event: DeletionEvent): Deletion {
-  const transition = (machine[state.step] as Transitions<Step>)[event.type] as
-    | ((state: Deletion, event: DeletionEvent) => Deletion)
-    | undefined;
-
-  return transition ? transition(state, event) : state;
-}
-
 /** Newest first, as the page sends them; scrolls once there are more than five. */
 function ExportList({ exports }: { exports: Export[] }) {
-  const [state, dispatch] = useReducer(deletion, { step: "closed" });
-  const item = state.step === "closed" ? null : state.item;
+  const [deleting, setDeleting] = useState<Export | null>(null);
 
   return (
     <>
-      <ConfirmActionDialog
-        action={item && deleteAction(item)}
-        processing={state.step === "deleting"}
-        error={state.step === "confirming" ? state.error : undefined}
-        onCancel={() => dispatch({ type: "close" })}
-        onConfirm={(typed) =>
-          item &&
-          router.delete(item.deleteUrl, {
-            data: { confirmation: typed },
-            preserveScroll: true,
-            onStart: () => dispatch({ type: "submit" }),
-            onSuccess: () => dispatch({ type: "close" }),
-            onFinish: () => dispatch({ type: "settle" }),
-            onError: (errors) => dispatch({ type: "refuse", error: errors.confirmation ?? "" }),
-          })
-        }
-      />
+      <ConfirmDialog.Root
+        open={deleting !== null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+      >
+        <Freeze frozen={deleting === null}>
+          {deleting && (
+            <ConfirmDialog.Popup
+              title={fbs(
+                "Delete export",
+                "Audit log exports toast: title of the dialog that confirms deleting an export",
+              )}
+              description={fbs(
+                "The file can't be downloaded anymore. The audit log keeps a record that it was deleted.",
+                "Audit log exports toast: message of the dialog that confirms deleting an export",
+              )}
+              action={deleting.deleteUrl}
+              confirmationText={fbs(
+                "Delete export",
+                "Audit log exports toast: the text the admin types to confirm deleting an export; must match the server's 'Delete export'",
+              )}
+            />
+          )}
+        </Freeze>
+      </ConfirmDialog.Root>
       <ul className="max-h-70 overflow-y-auto border-b border-base-subtle">
         {exports.map((item) => (
           <li key={item.id} className="flex h-14 items-center justify-between gap-3 pr-1.5 pl-4">
@@ -269,7 +228,7 @@ function ExportList({ exports }: { exports: Export[] }) {
                     "Delete export",
                     "Audit log exports toast: accessible name of the icon button that deletes an export before it expires",
                   )}
-                  onClick={() => dispatch({ type: "open", item })}
+                  onClick={() => setDeleting(item)}
                 >
                   <Icon icon={DeleteBinLine} />
                 </IconButton>
@@ -291,41 +250,4 @@ function ExportList({ exports }: { exports: Export[] }) {
       </ul>
     </>
   );
-}
-
-/** The delete as a table action, so it uses the panel's type-to-confirm dialog. */
-function deleteAction(item: Export): TableRowAction {
-  const text = fbs(
-    "Delete export",
-    "Audit log exports toast: the text the admin types to confirm deleting an export; must match the server's 'Delete export'",
-  );
-
-  return {
-    name: "delete",
-    label: text,
-    method: "post",
-    url: item.deleteUrl,
-    destructive: true,
-    disabled: false,
-    icon: null,
-    confirm: {
-      title: fbs(
-        "Delete export?",
-        "Audit log exports toast: title of the dialog that confirms deleting an export",
-      ),
-      message: fbs(
-        "The file can't be downloaded anymore. The audit log keeps a record that it was deleted.",
-        "Audit log exports toast: message of the dialog that confirms deleting an export",
-      ),
-      confirmationText: text,
-      confirmButton: fbs(
-        "Delete",
-        "Audit log exports toast: button in the dialog that deletes the export",
-      ),
-      cancelButton: fbs(
-        "Cancel",
-        "Audit log exports toast: button in the dialog that keeps the export",
-      ),
-    },
-  };
 }

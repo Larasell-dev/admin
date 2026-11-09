@@ -48,8 +48,6 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
   const hasActions = resource.rows.some((row) => row._actions.length > 0);
 
   const [pending, setPending] = useState<TableRowAction | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string>();
   const [isPaginating, setIsPaginating] = useState(false);
 
   const pagination = {
@@ -73,25 +71,17 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
       ),
   };
 
-  const perform = (action: TableRowAction, confirmation?: string) => {
+  const perform = (action: TableRowAction) => {
     if (action.method === "get") {
       setPending(null);
       visit(action.url);
       return;
     }
 
-    router.post(action.url, confirmation ? { confirmation } : {}, {
-      preserveScroll: true,
-      onStart: () => setProcessing(true),
-      onFinish: () => setProcessing(false),
-      onSuccess: () => setPending(null),
-      onError: (errors) => setError(errors.confirmation),
-    });
+    router.post(action.url, {}, { preserveScroll: true });
   };
 
   const choose = (action: TableRowAction) => {
-    setError(undefined);
-
     if (action.confirm) {
       setPending(action);
     } else {
@@ -203,13 +193,7 @@ export default function ResourceTable({ resource, "aria-label": ariaLabel }: Pro
         </Table.Root>
       </div>
 
-      <ConfirmActionDialog
-        action={pending}
-        processing={processing}
-        error={error}
-        onConfirm={(typed) => pending && perform(pending, typed)}
-        onCancel={() => setPending(null)}
-      />
+      <ConfirmActionDialog action={pending} onClose={() => setPending(null)} />
     </>
   );
 }
