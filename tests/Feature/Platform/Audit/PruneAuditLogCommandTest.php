@@ -2,95 +2,130 @@
 
 declare(strict_types=1);
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Larasell\Admin\Platform\Audit\Actors\SystemActor;
+use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\AuditRecord;
+use Larasell\Admin\Platform\Audit\Chain\AuditChain;
+use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Subject;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
 });
 
 /**
- * Stores a record of the category that happened the given time ago, and returns its ID.
+ * Records an action that happened the given time ago, and returns its place in the chain.
  */
-function storedRecord(string $category, int $daysAgo, int $andSeconds = 0): string
+function storedRecord(int $daysAgo, int $andSeconds = 0): int
 {
-    $id = (string) Str::ulid();
+    $at = now()->subDays($daysAgo)->subSeconds($andSeconds);
 
-    DB::table('larasell_audit_log')->insert([
-        'id' => $id,
-        'event' => 'book.archived',
-        'event_version' => 1,
-        'category' => $category,
-        'actor_type' => 'system',
-        'actor_id' => 'tests',
-        'properties' => '{}',
-        'source' => 'cli',
-        'occurred_at' => now()->utc()->subDays($daysAgo)->subSeconds($andSeconds)->format('Y-m-d H:i:s.u'),
-        'created_at' => now()->utc()->format('Y-m-d H:i:s.u'),
-    ]);
+    DB::transaction(fn () => app(Auditor::class)->record(new class($at) extends AuditRecord
+    {
+        public function __construct(private readonly CarbonInterface $at) {}
 
-    return $id;
+        public function event(): string
+        {
+            return 'book.archived';
+        }
+
+        public function category(): AuditCategory
+        {
+            return AuditCategory::Security;
+        }
+
+        public function subject(): ?Subject
+        {
+            return null;
+        }
+
+        public function properties(): array
+        {
+            return [];
+        }
+
+        public function occurredAt(): CarbonInterface
+        {
+            return $this->at;
+        }
+    }, new SystemActor('tests')));
+
+    return (int) DB::table('larasell_audit_log')->max('seq');
 }
 
 /**
- * @return list<string>
+ * @return list<int>
  */
 function remainingRecords(): array
 {
-    return DB::table('larasell_audit_log')->where('event', 'book.archived')->orderBy('id')->pluck('id')->all();
+    return DB::table('larasell_audit_log')->where('event', 'book.archived')->orderBy('seq')->pluck('seq')->map(fn ($seq) => (int) $seq)->all();
 }
 
 /**
+ * The newest prune record's properties.
+ *
  * @return array<string, mixed>
  */
-function pruneRecord(): array
+function pruneProperties(): array
 {
-    $records = DB::table('larasell_audit_log')->where('event', 'audit_log.pruned')->get();
-
-    expect($records)->toHaveCount(1);
-
-    return [...(array) $records->first(), 'properties' => json_decode($records->first()->properties, true)];
+    return json_decode(DB::table('larasell_audit_log')->where('event', 'audit_log.pruned')->orderByDesc('seq')->value('properties'), true);
 }
 
 it('keeps every record by default', function () {
     // Arrange
-    $old = storedRecord('security', 5000);
+    $old = storedRecord(5000);
 
     // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
     expect(remainingRecords())->toBe([$old])
-        ->and(pruneRecord()['properties'])->toBe([
-            'legal_hold' => false,
-            'retention_days' => ['security' => null, 'business_critical' => null, 'audit_access' => null],
-            'deleted' => ['security' => 0, 'business_critical' => 0, 'audit_access' => 0],
-        ]);
+        ->and(pruneProperties())->toBe(['legal_hold' => false, 'retention_days' => null, 'deleted' => 0, 'starts_after' => null]);
 });
 
-it('deletes records older than the default retention period', function () {
+it('deletes the oldest records older than the retention period, and the chain still verifies', function () {
     // Arrange
-    config(['larasell.admin.audit.retention.default_days' => 30]);
+    config(['larasell.admin.audit.retention.days' => 30]);
 
-    storedRecord('security', 31);
-    $kept = storedRecord('security', 29);
-    storedRecord('audit_access', 400);
+    storedRecord(400);
+    storedRecord(31);
+    $kept = storedRecord(29);
+    $deletedHash = DB::table('larasell_audit_log')->where('seq', 2)->value('hash');
 
     // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
     expect(remainingRecords())->toBe([$kept])
-        ->and(pruneRecord()['properties']['deleted'])->toBe(['security' => 1, 'business_critical' => 0, 'audit_access' => 1]);
+        ->and(pruneProperties())->toBe(['legal_hold' => false, 'retention_days' => 30, 'deleted' => 2, 'starts_after' => ['seq' => 2, 'sha256' => $deletedHash]])
+        ->and(app(AuditChain::class)->verify()->passed)->toBeTrue();
+});
+
+it('only deletes from the start, keeping an old record behind a newer one', function () {
+    // Arrange
+    config(['larasell.admin.audit.retention.days' => 30]);
+
+    storedRecord(400);
+    $newer = storedRecord(1);
+    $backdated = storedRecord(400);
+
+    // Act
+    $this->artisan('larasell:prune-audit-log')->assertSuccessful();
+
+    // Assert
+    expect(remainingRecords())->toBe([$newer, $backdated])
+        ->and(app(AuditChain::class)->verify()->passed)->toBeTrue();
 });
 
 it('keeps a record until it is older than the retention period, to the second', function () {
     // Arrange
-    config(['larasell.admin.audit.retention.default_days' => 30]);
+    config(['larasell.admin.audit.retention.days' => 30]);
 
-    $exactly = storedRecord('security', 30);
-    storedRecord('security', 30, andSeconds: 1);
+    storedRecord(30, andSeconds: 1);
+    $exactly = storedRecord(30);
 
     // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
@@ -99,49 +134,48 @@ it('keeps a record until it is older than the retention period, to the second', 
     expect(remainingRecords())->toBe([$exactly]);
 });
 
-it('keeps each category for its own period, falling back to the default', function () {
+it('keeps where the chain starts when a later run deletes nothing, or everything', function () {
     // Arrange
-    config(['larasell.admin.audit.retention' => [
-        'default_days' => 30,
-        'categories' => ['security' => 730, 'audit_access' => null],
-    ]]);
+    config(['larasell.admin.audit.retention.days' => 30]);
 
-    $security = storedRecord('security', 400);
-    storedRecord('security', 731);
-    storedRecord('business_critical', 31);
-    $auditAccess = storedRecord('audit_access', 5000);
+    storedRecord(400);
+    storedRecord(10);
+    $this->artisan('larasell:prune-audit-log')->assertSuccessful();
+    $anchor = pruneProperties()['starts_after'];
 
-    // Act
+    // Act & Assert
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
-    // Assert
-    expect(remainingRecords())->toEqualCanonicalizing([$security, $auditAccess])
-        ->and(pruneRecord()['properties'])->toBe([
-            'legal_hold' => false,
-            'retention_days' => ['security' => 730, 'business_critical' => 30, 'audit_access' => null],
-            'deleted' => ['security' => 1, 'business_critical' => 1, 'audit_access' => 0],
-        ]);
+    expect(pruneProperties()['starts_after'])->toBe($anchor)
+        ->and(app(AuditChain::class)->verify()->passed)->toBeTrue();
+
+    $this->travel(400)->days();
+    $this->artisan('larasell:prune-audit-log')->assertSuccessful();
+
+    expect(DB::table('larasell_audit_log')->count())->toBe(1)
+        ->and(pruneProperties()['starts_after']['seq'])->toBe(4)
+        ->and(app(AuditChain::class)->verify()->passed)->toBeTrue();
 });
 
-it('reads periods set as strings, as env() returns them', function () {
+it('reads a period set as a string, as env() returns it', function () {
     // Arrange
-    config(['larasell.admin.audit.retention.default_days' => '30']);
+    config(['larasell.admin.audit.retention.days' => '30']);
 
-    storedRecord('security', 31);
+    storedRecord(31);
 
     // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
     expect(remainingRecords())->toBe([])
-        ->and(pruneRecord()['properties']['retention_days']['security'])->toBe(30);
+        ->and(pruneProperties()['retention_days'])->toBe(30);
 });
 
 it('deletes nothing under a legal hold, and records that it was held', function () {
     // Arrange
-    config(['larasell.admin.audit.retention.default_days' => 30, 'larasell.admin.audit.legal_hold' => true]);
+    config(['larasell.admin.audit.retention.days' => 30, 'larasell.admin.audit.legal_hold' => true]);
 
-    $old = storedRecord('security', 400);
+    $old = storedRecord(400);
 
     // Act
     $this->artisan('larasell:prune-audit-log')
@@ -150,21 +184,15 @@ it('deletes nothing under a legal hold, and records that it was held', function 
 
     // Assert
     expect(remainingRecords())->toBe([$old])
-        ->and(pruneRecord()['properties'])->toMatchArray([
-            'legal_hold' => true,
-            'deleted' => ['security' => 0, 'business_critical' => 0, 'audit_access' => 0],
-        ]);
+        ->and(pruneProperties())->toMatchArray(['legal_hold' => true, 'deleted' => 0]);
 });
 
-it('records each run as the command, so the retention settings it applied are in the log', function () {
-    // Arrange
-    config(['larasell.admin.audit.retention.default_days' => 30]);
-
+it('records each run as the command', function () {
     // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
-    expect(pruneRecord())->toMatchArray([
+    expect(DB::table('larasell_audit_log')->where('event', 'audit_log.pruned')->sole())->toMatchArray([
         'category' => 'audit_access',
         'actor_type' => 'system',
         'actor_id' => 'larasell:prune-audit-log',
@@ -173,11 +201,11 @@ it('records each run as the command, so the retention settings it applied are in
     ]);
 });
 
-it('refuses invalid retention settings without deleting anything', function (array $retention) {
+it('refuses an invalid retention period without deleting anything', function (mixed $days) {
     // Arrange
-    config(['larasell.admin.audit.retention' => $retention]);
+    config(['larasell.admin.audit.retention.days' => $days]);
 
-    $old = storedRecord('security', 400);
+    $old = storedRecord(400);
 
     // Act
     $this->artisan('larasell:prune-audit-log')->assertFailed();
@@ -186,10 +214,8 @@ it('refuses invalid retention settings without deleting anything', function (arr
     expect(remainingRecords())->toBe([$old])
         ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.pruned')->exists())->toBeFalse();
 })->with([
-    'zero days' => [['default_days' => 0]],
-    'negative days' => [['default_days' => -30]],
-    'not a number' => [['default_days' => 'a year']],
-    'a fraction' => [['default_days' => 30.5]],
-    'an unknown category' => [['default_days' => 30, 'categories' => ['securty' => 730]]],
-    'an invalid category period' => [['categories' => ['security' => '0']]],
+    'zero days' => [0],
+    'negative days' => [-30],
+    'not a number' => ['a year'],
+    'a fraction' => [30.5],
 ]);

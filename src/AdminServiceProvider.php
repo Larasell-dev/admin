@@ -20,7 +20,9 @@ use Larasell\Admin\Category\CategoryServiceProvider;
 use Larasell\Admin\Customer\CustomerServiceProvider;
 use Larasell\Admin\Order\OrderServiceProvider;
 use Larasell\Admin\Platform\Audit\AuditServiceProvider;
+use Larasell\Admin\Platform\Audit\Chain\Console\VerifyAuditLogCommand;
 use Larasell\Admin\Platform\Audit\Console\MakeAuditRecordCommand;
+use Larasell\Admin\Platform\Audit\Export\Console\ExportAuditLogCommand;
 use Larasell\Admin\Platform\Audit\Log\Console\PruneAuditLogCommand;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\ContentLocale\Locales\AvailableLocales;
@@ -135,11 +137,13 @@ class AdminServiceProvider extends ServiceProvider
 
             $this->commands([
                 CreateAdminUserCommand::class,
+                ExportAuditLogCommand::class,
                 LinkAdminAssetsCommand::class,
                 ListAdminsCommand::class,
                 MakeAuditRecordCommand::class,
                 MakeTableCommand::class,
                 PruneAuditLogCommand::class,
+                VerifyAuditLogCommand::class,
                 RemoveAdminCommand::class,
             ]);
         }

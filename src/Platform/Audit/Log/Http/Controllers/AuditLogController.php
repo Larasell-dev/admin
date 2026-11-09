@@ -2,46 +2,33 @@
 
 namespace Larasell\Admin\Platform\Audit\Log\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\Export\Data\AuditLogExportData;
+use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
+use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
 use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogSearched;
 use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogViewed;
 use Larasell\Admin\Platform\Audit\Log\Data\AuditLogFiltersData;
 use Larasell\Admin\Platform\Audit\Log\Data\AuditLogPageData;
+use Larasell\Admin\Platform\Audit\Log\Http\Requests\AuditLogFiltersRequest;
 use Larasell\Admin\Platform\Audit\Log\Models\AuditLogEntry;
 use Larasell\Admin\Platform\Audit\Log\Tables\AuditLog;
-use Laravel\Pennant\Feature;
 
 /**
  * @internal The audit log page in the settings.
  */
 class AuditLogController
 {
-    public function index(Request $request, Auditor $auditor): Response
+    public function index(AuditLogFiltersRequest $request, Auditor $auditor): Response
     {
-        $gate = Gate::forUser($request->user('larasell-admin'));
-        $gate->authorize('larasell.admin.view-audit-log');
-
-        $filtersEnabled = Feature::for($request->user('larasell-admin'))->active('audit-log-filters');
-
-        /** @var array{event?: string, actor_type?: string, actor_id?: string, subject_type?: string, subject_id?: string, from?: string, until?: string} $filters */
-        $filters = ! $filtersEnabled ? [] : array_filter($request->validate([
-            'event' => ['nullable', 'string', 'max:255'],
-            'actor_type' => ['nullable', 'string', 'max:255', 'required_with:actor_id'],
-            'actor_id' => ['nullable', 'string', 'max:255'],
-            'subject_type' => ['nullable', 'string', 'max:255', 'required_with:subject_id'],
-            'subject_id' => ['nullable', 'string', 'max:255'],
-            'from' => ['nullable', 'date_format:Y-m-d'],
-            'until' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:from'],
-        ]), fn (mixed $value): bool => $value !== null);
-
-        if ($filters !== []) {
-            $gate->authorize('larasell.admin.search-audit-log');
-        }
+        $admin = $request->user('larasell-admin');
+        $gate = Gate::forUser($admin);
+        $filters = $request->filters();
 
         $page = max(1, $request->integer('page', 1));
 
@@ -61,7 +48,19 @@ class AuditLogController
             eventOptions: $options('event'),
             actorTypeOptions: $options('actor_type'),
             subjectTypeOptions: $options('subject_type'),
-            canSearch: $filtersEnabled && $gate->allows('larasell.admin.search-audit-log'),
+            canSearch: $request->filtersEnabled() && $gate->allows('larasell.admin.search-audit-log'),
+            exportUrl: $gate->allows('larasell.admin.export-audit-log') ? route('larasell.admin.settings.audit-log.exports.store') : null,
+        ))->with('exports', Inertia::live(
+            // The admin's own, newest first. Reloaded when one finishes, in every browser they have the page open in.
+            fn (): array => AuditLogExport::query()
+                ->where('admin_id', $admin?->getAuthIdentifier())
+                ->where('expires_at', '>', Date::now()->utc())
+                ->latest('created_at')
+                ->get()
+                ->map(AuditLogExportData::fromExport(...))
+                ->all(),
+            on: AuditLogExportFinished::class,
+            channel: AuditLogExportFinished::channel((string) $admin?->getAuthIdentifier()),
         ));
     }
 }

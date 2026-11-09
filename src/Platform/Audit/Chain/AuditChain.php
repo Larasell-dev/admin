@@ -1,0 +1,241 @@
+<?php
+
+namespace Larasell\Admin\Platform\Audit\Chain;
+
+use Carbon\CarbonImmutable;
+use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Facades\DB;
+use JsonException;
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
+use Larasell\Chronicle\Exceptions\StructuredLogicException;
+use stdClass;
+
+/**
+ * Chains the audit log's records, so a record changed or deleted outside the app shows. Each
+ * record's hash covers its own columns and the hash of the record before it. README.md next to
+ * this class is the spec: how a record is encoded and hashed, so anyone can check the chain
+ * without this code.
+ *
+ * @internal The Auditor appends to it; larasell:verify-audit-log and the prune command use the rest.
+ */
+class AuditChain
+{
+    public const string TABLE = 'larasell_audit_log';
+
+    /**
+     * One row with the last record's seq and hash. Appending updates it first, so it holds the
+     * lock that keeps writers in line until the transaction ends, on every database.
+     */
+    public const string HEAD = 'larasell_audit_log_head';
+
+    /**
+     * The columns encoded for a record's hash. Its previous_hash goes in front of them instead.
+     */
+    private const array COLUMNS = ['id', 'seq', 'event', 'event_version', 'category', 'actor_type', 'actor_id', 'unknown_actor_reason', 'subject_type', 'subject_id', 'properties', 'source', 'correlation_id', 'occurred_at', 'created_at'];
+
+    private const int JSON_FLAGS = JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS;
+
+    /**
+     * Stores the record as the next in the chain, waiting for any other writer to commit first.
+     *
+     * @param  array<string, mixed>  $record  Every column but seq, previous_hash and hash, as stored.
+     */
+    public function append(array $record): void
+    {
+        DB::transaction(function () use ($record): void {
+            DB::table(self::HEAD)->where('id', 1)->increment('seq');
+            $head = DB::table(self::HEAD)->where('id', 1)->first();
+
+            if ($head === null) {
+                throw new StructuredLogicException(
+                    errorCode: 'larasell-admin.audit.missing-head',
+                    message: 'The audit log has no chain head.',
+                    why: 'The migration that adds the chain creates it, so the audit log tables are out of date.',
+                    fix: 'Run php artisan migrate.',
+                );
+            }
+
+            $record = [...$record, 'seq' => (int) $head->seq, 'previous_hash' => $head->hash];
+            $record['hash'] = $this->hash($record);
+
+            DB::table(self::TABLE)->insert($record);
+
+            // Read back, so a column the database truncated or rewrote fails now, rolling back the
+            // change, instead of showing up as a broken chain later.
+            $stored = DB::table(self::TABLE)->where('id', $record['id'])->first();
+
+            if ($stored === null || ! $this->readable($stored) || ! hash_equals($record['hash'], $this->hash($stored))) {
+                throw AuditFailed::storedDifferently((string) $record['event']);
+            }
+
+            DB::table(self::HEAD)->where('id', 1)->update(['hash' => $record['hash']]);
+        });
+    }
+
+    /**
+     * The hash of a stored record, from its columns as the database returns them.
+     *
+     * @param  array<string, mixed>|object  $record
+     */
+    public function hash(array|object $record): string
+    {
+        return hash('sha256', (((array) $record)['previous_hash'] ?? '').$this->canonical($record));
+    }
+
+    /**
+     * Checks every stored record against its hash and the record before it, from the start of the
+     * chain, or where the newest prune record says it starts, to the head.
+     */
+    public function verify(): Verification
+    {
+        $start = $this->start();
+        $previous = null;
+        $count = 0;
+
+        foreach (DB::table(self::TABLE)->orderBy('seq')->lazyById(1000, 'seq') as $record) {
+            $seq = (int) $record->seq;
+            $expectedSeq = $previous === null ? ($start['seq'] ?? 0) + 1 : (int) $previous->seq + 1;
+            $expectedLink = $previous === null ? $start['sha256'] ?? null : $previous->hash;
+
+            if ($seq !== $expectedSeq) {
+                return Verification::broken($seq, 'missing_event', $count);
+            }
+
+            // Unreadable JSON or dates can't have been written by the Auditor, so they were changed.
+            if (! $this->readable($record)) {
+                return Verification::broken($seq, 'unreadable_record', $count);
+            }
+
+            if (! hash_equals($this->hash($record), (string) $record->hash)) {
+                return Verification::broken($seq, 'hash_mismatch', $count);
+            }
+
+            if ($record->previous_hash !== $expectedLink) {
+                return Verification::broken($seq, 'link_mismatch', $count);
+            }
+
+            $previous = $record;
+            $count++;
+        }
+
+        $head = DB::table(self::HEAD)->where('id', 1)->first();
+        $lastSeq = $previous === null ? $start['seq'] ?? 0 : (int) $previous->seq;
+        $lastHash = $previous === null ? $start['sha256'] ?? null : $previous->hash;
+
+        if ($head === null || (int) $head->seq !== $lastSeq || $head->hash !== $lastHash) {
+            return Verification::broken($head === null ? $lastSeq : (int) $head->seq, 'head_mismatch', $count);
+        }
+
+        return Verification::passed($previous === null ? null : $lastSeq, $lastHash, $count);
+    }
+
+    /**
+     * The last deleted record the chain starts after, for the prune record to carry: the record
+     * before the oldest one stored, or the head when every record was deleted.
+     *
+     * @return array{seq: int, sha256: string}|null
+     */
+    public function startsAfter(): ?array
+    {
+        $first = DB::table(self::TABLE)->orderBy('seq')->first(['seq', 'previous_hash']);
+
+        if ($first !== null) {
+            return $first->previous_hash === null ? null : ['seq' => (int) $first->seq - 1, 'sha256' => $first->previous_hash];
+        }
+
+        return $this->head();
+    }
+
+    /**
+     * Where the newest prune record says the chain starts, or null for its very first record.
+     *
+     * @return array{seq: int, sha256: string}|null
+     */
+    private function start(): ?array
+    {
+        $properties = DB::table(self::TABLE)->where('event', 'audit_log.pruned')->orderByDesc('seq')->value('properties');
+        $startsAfter = is_string($properties) ? json_decode($properties, true)['starts_after'] ?? null : null;
+
+        return is_array($startsAfter) && is_int($startsAfter['seq'] ?? null) && is_string($startsAfter['sha256'] ?? null) ? $startsAfter : null;
+    }
+
+    /**
+     * A stored record's columns as the spec reads them, whatever form the database returned them
+     * in, with its previous_hash and hash after them. Exports write records like this.
+     *
+     * @param  array<string, mixed>|object  $record
+     * @return array<string, mixed>
+     */
+    public function normalize(array|object $record): array
+    {
+        $record = (array) $record;
+        $fields = [];
+
+        foreach (self::COLUMNS as $column) {
+            $value = $record[$column] ?? null;
+
+            $fields[$column] = match ($column) {
+                'seq', 'event_version' => (int) $value,
+                'properties' => json_decode((string) $value, false, flags: JSON_THROW_ON_ERROR),
+                'occurred_at', 'created_at' => CarbonImmutable::parse((string) $value, 'UTC')->format('Y-m-d H:i:s.u'),
+                default => $value === null ? null : (string) $value,
+            };
+        }
+
+        return [...$fields, 'previous_hash' => $record['previous_hash'] ?? null, 'hash' => $record['hash'] ?? null];
+    }
+
+    /**
+     * Whether the stored record's properties and dates can be read, so it can be hashed.
+     */
+    public function readable(object $record): bool
+    {
+        try {
+            $this->normalize($record);
+
+            return true;
+        } catch (JsonException|InvalidFormatException) {
+            return false;
+        }
+    }
+
+    /**
+     * The newest record's seq and hash, or null before the first.
+     *
+     * @return array{seq: int, sha256: string}|null
+     */
+    public function head(): ?array
+    {
+        $head = DB::table(self::HEAD)->where('id', 1)->first();
+
+        return $head === null || $head->hash === null ? null : ['seq' => (int) $head->seq, 'sha256' => $head->hash];
+    }
+
+    /**
+     * @param  array<string, mixed>|object  $record
+     */
+    private function canonical(array|object $record): string
+    {
+        return $this->encode(array_diff_key($this->normalize($record), ['previous_hash' => true, 'hash' => true]));
+    }
+
+    private function encode(mixed $value): string
+    {
+        if ($value instanceof stdClass || is_array($value) && ! array_is_list($value)) {
+            $value = (array) $value;
+            ksort($value, SORT_STRING);
+
+            return '{'.implode(',', array_map(
+                fn (string|int $key, mixed $item): string => json_encode((string) $key, self::JSON_FLAGS).':'.$this->encode($item),
+                array_keys($value),
+                $value,
+            )).'}';
+        }
+
+        if (is_array($value)) {
+            return '['.implode(',', array_map($this->encode(...), $value)).']';
+        }
+
+        return json_encode($value, self::JSON_FLAGS);
+    }
+}

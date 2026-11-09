@@ -24,11 +24,12 @@ class UpdateAdmin
      */
     public function handle(Admin $admin, array $attributes, Actor|UnknownActor $actor): void
     {
+        $emailFrom = $admin->email;
         $admin->fill($attributes);
-        $record = new AdminUpdated($admin);
 
-        DB::transaction(function () use ($admin, $record, $actor): void {
+        DB::transaction(function () use ($admin, $emailFrom, $actor): void {
             $admin->save();
+            $record = new AdminUpdated($admin, $emailFrom);
 
             if ($record->changed !== []) {
                 $this->auditor->record($record, $actor);

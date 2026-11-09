@@ -27,5 +27,6 @@ class AuditLogPageData extends Data
         public array $actorTypeOptions,
         public array $subjectTypeOptions,
         public bool $canSearch,
+        public ?string $exportUrl,
     ) {}
 }

@@ -62,8 +62,21 @@ class AuditFailed extends RuntimeException implements StructuredException
         return static::structured(
             errorCode: 'larasell-admin.audit.invalid-property',
             message: "Audit record [{$event}] has property [{$property}] of type [{$type}].",
-            why: 'Properties are stored as JSON, and an object would be stored however it happens to serialize, possibly with more data than intended.',
-            fix: "Return a string, number, boolean, null or array for [{$property}], e.g. a date formatted in UTC.",
+            why: 'Properties are stored as JSON and hashed into the audit log\'s chain. An object would be stored however it happens to serialize, possibly with more data than intended, and a fraction has no single way to be written.',
+            fix: "Return a string, integer, boolean, null or array for [{$property}], e.g. a date formatted in UTC, or an amount in cents or as a string.",
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public static function storedDifferently(string $event): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.stored-differently',
+            message: "Audit record [{$event}] was stored differently from how it was hashed.",
+            why: 'The database truncated or rewrote a column, e.g. a string longer than the column, so the record would break the chain.',
+            fix: 'Check the larasell_audit_log columns and the database mode, e.g. MySQL strict mode, then try again.',
         );
     }
 

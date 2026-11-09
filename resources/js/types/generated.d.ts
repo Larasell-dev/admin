@@ -145,6 +145,17 @@ declare namespace Larasell.Admin.Order.Data {
     amount: string;
   };
 }
+declare namespace Larasell.Admin.Platform.Audit.Export.Data {
+  export type AuditLogExportData = {
+    id: string;
+    status: "pending" | "ready" | "failed";
+    records: number | null;
+    createdAt: string;
+    expiresAt: string;
+    downloadUrl: string | null;
+    deleteUrl: string;
+  };
+}
 declare namespace Larasell.Admin.Platform.Audit.Log.Data {
   export type AuditLogFiltersData = {
     event: string | null;
@@ -163,6 +174,7 @@ declare namespace Larasell.Admin.Platform.Audit.Log.Data {
     actorTypeOptions: Array<any>;
     subjectTypeOptions: Array<any>;
     canSearch: boolean;
+    exportUrl: string | null;
   };
 }
 declare namespace Larasell.Admin.Platform.Auth.Data {

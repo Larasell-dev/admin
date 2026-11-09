@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Larasell\Admin\Platform\Audit\Actors\Actor;
 use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
+use Larasell\Admin\Platform\Audit\Chain\AuditChain;
 use Larasell\Admin\Platform\Audit\Enums\AuditSource;
 use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 
 /**
  * Writes audit records to the shop's database, the audit log's source of truth. Records can only
- * be added, never changed through the app.
+ * be added, never changed through the app, and each is chained to the one before it, so changing
+ * or deleting one outside the app shows when the log is verified.
  *
  * Record in the transaction of the change, so both commit or neither does. Records of actions
  * that change nothing, such as a failed sign-in, opt out with requiresTransaction().
@@ -52,6 +54,8 @@ class Auditor
      */
     private array $actorTypes = [];
 
+    public function __construct(private readonly AuditChain $chain) {}
+
     /**
      * Stores the record, failing rather than losing it, so the change it describes rolls back too.
      *
@@ -76,7 +80,7 @@ class Auditor
         $this->validate($event, $properties);
         $subject = $record->subject();
 
-        DB::table('larasell_audit_log')->insert([
+        $this->chain->append([
             'id' => (string) Str::ulid(),
             'event' => $event,
             'event_version' => $record->version(),
@@ -94,6 +98,28 @@ class Auditor
             'occurred_at' => $record->occurredAt()->copy()->utc()->format('Y-m-d H:i:s.u'),
             'created_at' => Date::now()->utc()->format('Y-m-d H:i:s.u'),
         ]);
+    }
+
+    /**
+     * Records an audit record for an event the core dispatches, which may come from a request, a
+     * job or a command. Outside requests the actor can't be known, so it is recorded as unknown with
+     * the reason, rather than failing the change the event describes.
+     *
+     * @public For listeners of core events.
+     *
+     * @throws AuditFailed
+     */
+    public function recordForEvent(AuditRecord $record, string $unknownReason): void
+    {
+        $source = $this->source();
+
+        try {
+            $actor = $this->resolveActor($record->event(), $source);
+        } catch (AuditFailed) {
+            $actor = new UnknownActor($unknownReason);
+        }
+
+        $this->record($record, $actor);
     }
 
     /**
@@ -191,7 +217,7 @@ class Auditor
 
             if (is_array($value)) {
                 $this->validate($event, $value, $keyPath);
-            } elseif (! is_scalar($value) && $value !== null) {
+            } elseif (is_float($value) || ! is_scalar($value) && $value !== null) {
                 throw AuditFailed::invalidProperty($event, $keyPath, get_debug_type($value));
             }
         }
