@@ -148,13 +148,16 @@ declare namespace Larasell.Admin.Order.Data {
 declare namespace Larasell.Admin.Platform.Audit.Export.Data {
   export type AuditLogExportData = {
     id: string;
-    status: "pending" | "ready" | "failed";
+    status: Larasell.Admin.Platform.Audit.Export.Enums.AuditLogExportStatus;
     records: number | null;
     createdAt: string;
     expiresAt: string;
     downloadUrl: string | null;
     deleteUrl: string;
   };
+}
+declare namespace Larasell.Admin.Platform.Audit.Export.Enums {
+  export type AuditLogExportStatus = "pending" | "ready" | "failed";
 }
 declare namespace Larasell.Admin.Platform.Audit.Log.Data {
   export type AuditLogFiltersData = {

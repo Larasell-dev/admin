@@ -15,6 +15,7 @@ use Larasell\Admin\Platform\Audit\Export\AuditLogExporter;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportDeleted;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExported;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportRequested;
+use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
@@ -41,7 +42,7 @@ class AuditLogExportController
             $export = AuditLogExport::query()->create([
                 'admin_id' => Auth::guard('larasell-admin')->id(),
                 'format' => $exporter->format->extension(),
-                'status' => 'pending',
+                'status' => AuditLogExportStatus::Pending,
                 'created_at' => Date::now()->utc(),
                 'expires_at' => Date::now()->utc()->addHours(self::HOURS_KEPT),
             ]);
@@ -63,7 +64,7 @@ class AuditLogExportController
     {
         $admin = $request->user('larasell-admin');
 
-        abort_unless($export->admin_id === Auth::guard('larasell-admin')->id() && $export->status === 'ready' && $export->expires_at->isFuture(), 403);
+        abort_unless($export->admin_id === Auth::guard('larasell-admin')->id() && $export->status === AuditLogExportStatus::Ready && $export->expires_at->isFuture(), 403);
         Gate::forUser($admin)->authorize('larasell.admin.export-audit-log');
 
         // Opened first, so a file that is gone records no download; recorded before any byte leaves.

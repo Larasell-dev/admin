@@ -22,6 +22,7 @@ use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
 use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
+use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
 use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
@@ -340,7 +341,7 @@ it('tells the admin\'s browsers when their export is ready, or failed', function
     Event::assertDispatched(AuditLogExportFinished::class, fn (AuditLogExportFinished $event) => $event->broadcastOn() == new PrivateChannel('larasell-admin.audit-log-exports.'.$this->ada->id));
     Event::assertDispatched(AuditLogExportFinished::class, fn (AuditLogExportFinished $event) => $event->broadcastOn() == new PrivateChannel('larasell-admin.audit-log-exports.'.$this->alan->id));
 
-    expect($failing->fresh()->status)->toBe('failed');
+    expect($failing->fresh()->status)->toBe(AuditLogExportStatus::Failed);
 });
 
 it('reloads the exports live, on the admin\'s own channel', function () {
@@ -479,7 +480,7 @@ it('writes an export only once, even when the job runs twice', function () {
     app()->call([new ExportAuditLog($export->id), 'handle']);
 
     // Assert
-    expect($export->fresh()->status)->toBe('pending')
+    expect($export->fresh()->status)->toBe(AuditLogExportStatus::Pending)
         ->and(Storage::disk('local')->allFiles())->toBe([]);
 });
 
@@ -496,7 +497,7 @@ it('fails exports that never finished, when the log is pruned', function () {
     // Assert
     $record = DB::table('larasell_audit_log')->where('event', 'audit_log.export_failed')->sole();
 
-    expect(AuditLogExport::query()->sole()->status)->toBe('failed')
+    expect(AuditLogExport::query()->sole()->status)->toBe(AuditLogExportStatus::Failed)
         ->and(json_decode($record->properties, true))->toBe(['format' => 'json', 'error' => 'The export didn\'t finish within an hour.']);
     Event::assertDispatched(AuditLogExportFinished::class);
 });

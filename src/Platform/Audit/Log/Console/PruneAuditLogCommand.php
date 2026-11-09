@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\Chain\AuditChain;
+use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
@@ -91,7 +92,7 @@ class PruneAuditLogCommand extends Command
         });
 
         AuditLogExport::query()
-            ->where('status', 'pending')
+            ->where('status', AuditLogExportStatus::Pending)
             ->where('created_at', '<=', Date::now()->utc()->subHour())
             ->each(fn (AuditLogExport $export) => ExportAuditLog::markFailed($export, "The export didn't finish within an hour."));
     }

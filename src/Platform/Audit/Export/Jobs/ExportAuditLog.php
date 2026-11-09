@@ -12,6 +12,7 @@ use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\Export\AuditLogExporter;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportFailed;
+use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
 use Throwable;
@@ -54,7 +55,7 @@ class ExportAuditLog implements ShouldQueue
             $path = Storage::disk(config('larasell.admin.audit.export.disk'))
                 ->putFileAs('larasell/audit-log-exports', new File($file), "{$export->id}.zip");
 
-            $export->update(['status' => 'ready', 'path' => $path, 'records' => $records]);
+            $export->update(['status' => AuditLogExportStatus::Ready, 'path' => $path, 'records' => $records]);
             AuditLogExportFinished::dispatch($export->admin_id);
         } finally {
             @unlink($file);
@@ -76,7 +77,7 @@ class ExportAuditLog implements ShouldQueue
     public static function markFailed(AuditLogExport $export, string $error): void
     {
         DB::transaction(function () use ($export, $error): void {
-            $export->update(['status' => 'failed']);
+            $export->update(['status' => AuditLogExportStatus::Failed]);
             app(Auditor::class)->record(new AuditLogExportFailed($export->id, $export->format, $error), new SystemActor('audit-log-export'));
         });
         AuditLogExportFinished::dispatch($export->admin_id);
