@@ -1882,17 +1882,6 @@
       ],
       "types": []
     },
-    "urGPK/OG6vAgiPDoPxL9SA==": {
-      "description": "Confirmation dialog of a table action, e.g. deleting: label of the field the admin types the given text into to confirm, e.g. 'Type \"DELETE\" to confirm'",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Gib „{confirmationText}“ zur Bestätigung ein",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "utFb54tg4zWqSDbuA+sLiw==": {
       "description": "Heading shown when the page the admin opened doesn't exist",
       "tokens": [],
@@ -2696,56 +2685,12 @@
       ],
       "types": []
     },
-    "HIOC1ALCgDGOkc/Qf3lwng==": {
-      "description": "Category tree: name of the action that deletes a category",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "v2L0j5qdOzGw6Nb+aXkNGw==": {
       "description": "Category tree: title of the dialog that asks the admin to confirm deleting a category",
       "tokens": [],
       "translations": [
         {
           "translation": "Kategorie löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "a0HpS7SVAZkilZ+4SKjTBA==": {
-      "description": "Category tree: text of the dialog that asks the admin to confirm deleting a category, with the category's name",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Dadurch werden auch alle Kategorien in „{categoryName}“ gelöscht. Ihre Produkte bleiben im Shop.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "F8eDXdltJfQYWa2ky5T7HQ==": {
-      "description": "Category tree: button in the confirmation dialog that deletes the category",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "OKnPoBOgJshR9fNd0QSiwQ==": {
-      "description": "Category tree: button in the confirmation dialog that keeps the category and closes the dialog",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Abbrechen",
           "variations": {}
         }
       ],
@@ -3037,39 +2982,6 @@
       ],
       "types": []
     },
-    "0HmnWwjsXn2OWXHx+htyAA==": {
-      "description": "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Gib „{channelName}“ zur Bestätigung ein",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Wh5V3qDNWBDNDvjAAL0Ynw==": {
-      "description": "Sales channel page: button that closes the delete dialog without deleting",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Abbrechen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "yvYz3C5KR6D7D++qSDgFxA==": {
-      "description": "Sales channel page: button in the dialog that deletes the channel",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "tQwXx11mb6YPeowtpL5iow==": {
       "description": "Sidebar: header of the section that lists the shop's sales channels, such as its storefronts",
       "tokens": [],
@@ -3307,39 +3219,6 @@
       "translations": [
         {
           "translation": "Kunden können die Storefront unter {url} nicht mehr öffnen.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "GUk6gQ7epBCU5jcbs5SXfQ==": {
-      "description": "Delete domain dialog: label of the field the admin types the domain into, without https://, to confirm, e.g. 'Type \"shop.example/de\" to confirm'",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Gib „{domain}“ zur Bestätigung ein",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "sqY389Erq+vgDPYalTLe+g==": {
-      "description": "Delete domain dialog: button that closes it without deleting",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Abbrechen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "OXN6IdvFehvYbZ6U7NH2Tw==": {
-      "description": "Delete domain dialog: button that deletes the domain",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Löschen",
           "variations": {}
         }
       ],
@@ -3906,61 +3785,6 @@
       ],
       "types": []
     },
-    "JUqBumenNUlZS8y1cRmY1g==": {
-      "description": "Product and category forms, URLs section: title of the dialog that confirms removing an old URL",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Diese Weiterleitung löschen?",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "f1/Wpeo1tb53s9+BR3An+A==": {
-      "description": "Product and category forms, URLs section: text of the dialog that confirms removing an old URL, naming its path",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "/{path} führt dann nicht mehr zu dieser Seite, und eine andere Seite kann sie verwenden.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "B6NAed40TnuGPl+e+TqH+Q==": {
-      "description": "Product and category forms, URLs section: button in the dialog that removes an old URL",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Weiterleitung löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "dM4f1fo2RKTG/d9WrpsADA==": {
-      "description": "Product and category forms, URLs section: button that closes the dialog without removing the old URL",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Abbrechen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "cv6QM2ARW40S96fVuHwSuQ==": {
-      "description": "Product and category forms, URLs section: text the admin types to confirm removing an old URL",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Weiterleitung löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "774um5jLdh1Itl/gunUXhg==": {
       "description": "Add domain dialog: placeholder of the search field in the list of languages",
       "tokens": [],
@@ -4214,17 +4038,6 @@
       ],
       "types": []
     },
-    "hNi5LCLgwdhuj112iVLL0g==": {
-      "description": "Audit log exports toast: title of the dialog that confirms deleting an export",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Export löschen?",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "ShlFvPSj0PDYNxMMA/hfeQ==": {
       "description": "Audit log exports toast: message of the dialog that confirms deleting an export",
       "tokens": [],
@@ -4236,8 +4049,63 @@
       ],
       "types": []
     },
-    "sjYw8kyywAyqrsDcqOwLRQ==": {
-      "description": "Audit log exports toast: button in the dialog that deletes the export",
+    "Ato776NuRLlxGTYp7r44RQ==": {
+      "description": "Product and category forms, URLs section: title of the dialog that confirms deleting an old URL's redirect",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weiterleitung löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4OTTixJlQtJiE57whuF8Sg==": {
+      "description": "Product and category forms, URLs section: text of the dialog that confirms deleting an old URL's redirect, naming its path",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "/{path} führt dann nicht mehr auf diese Seite und kann von einer anderen Seite verwendet werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "E7DcPdso84VRo/2I/toU4A==": {
+      "description": "Product and category forms, URLs section: text the admin types to confirm deleting an old URL's redirect",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weiterleitung löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yRTsCvlrI4r/Fr43aoXw8w==": {
+      "description": "Confirmation dialog, e.g. deleting: label of the field the admin types the given text into to confirm, e.g. 'Type \"DELETE\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib „{confirmationText}“ ein, um zu bestätigen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e+m7kT9ZL/2Pjthvx/3clw==": {
+      "description": "Confirmation dialog, e.g. deleting: button that closes it without doing anything",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vzr1BxHcDn/5m+eTErwAAw==": {
+      "description": "Confirmation dialog: button that deletes what the dialog asks about",
       "tokens": [],
       "translations": [
         {
@@ -4247,12 +4115,23 @@
       ],
       "types": []
     },
-    "sc4IVB2WbaxAZ0grcw65xw==": {
-      "description": "Audit log exports toast: button in the dialog that keeps the export",
+    "axFqzcRThaIzAPUyohmneA==": {
+      "description": "Audit log exports toast: title of the dialog that confirms deleting an export",
       "tokens": [],
       "translations": [
         {
-          "translation": "Abbrechen",
+          "translation": "Export löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jvV00ZEPELCpkt8G9LSrnA==": {
+      "description": "Category tree: text of the dialog that asks the admin to confirm deleting a category, with the category's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Damit werden auch alle Kategorien in „{categoryName}“ gelöscht. Ihre Produkte bleiben im Shop. Das kann nicht rückgängig gemacht werden.",
           "variations": {}
         }
       ],

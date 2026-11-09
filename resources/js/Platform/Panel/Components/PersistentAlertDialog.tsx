@@ -124,6 +124,14 @@ function Popup(popup: PopupProps) {
 }
 
 /**
+ * The popup for the dialog it's in: the persistent one inside a PersistentAlertDialog.Root,
+ * otherwise `AlertDialog.Popup`. Lets content such as ConfirmDialog.Popup work in either root.
+ */
+export function AnyAlertDialogPopup(props: PopupProps) {
+  return use(RootContext) ? <Popup {...props} /> : <AlertDialog.Popup {...props} />;
+}
+
+/**
  * An alert dialog that animates out even when confirming it visits another page. Use it like
  * `AlertDialog`: the same parts, with Root, Trigger and Popup swapped for ones that hand the popup
  * to the layout.
