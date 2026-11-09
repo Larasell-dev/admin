@@ -17,6 +17,8 @@ const boots: Media = {
   type: "image",
   fileName: "boots.png",
   url: swatch,
+  status: "ready",
+  failure: null,
   title: "Front",
   description: null,
   alt: "Boots from the front",
@@ -30,6 +32,7 @@ const boots: Media = {
       size: 245_760,
       width: 1600,
       height: 1200,
+      status: "ready",
       url: swatch,
     },
   ],
@@ -113,6 +116,41 @@ it("shows the image over the whole viewport, named after its file", async () => 
   expect(title.left).toBeLessThan(window.innerWidth / 4);
   expect(close.right).toBeGreaterThan(window.innerWidth * 0.9);
   expect(Math.abs(title.top - close.top)).toBeLessThan(24);
+});
+
+it("says a video is still processing instead of playing it", async () => {
+  // Act
+  await renderShow(props({ ...boots, type: "video", url: null, status: "processing" }));
+
+  // Assert
+  await expect.element(dialog().getByText("Still processing")).toBeVisible();
+  expect(dialog().element().querySelector("video, img[alt='Boots from the front']")).toBeNull();
+});
+
+it("says why a file failed instead of showing it", async () => {
+  // Act
+  await renderShow(
+    props({ ...boots, url: null, status: "failed", failure: "The file is not a video." }),
+  );
+
+  // Assert
+  await expect.element(dialog().getByText("This file could not be processed")).toBeVisible();
+  await expect.element(dialog().getByText("The file is not a video.")).toBeVisible();
+});
+
+it("shows a spinner instead of an image that is slow to load", async () => {
+  // Arrange
+  // A server that never answers, so the image keeps loading.
+  const slow = { ...boots, url: "http://10.255.255.1/boots.png" };
+
+  // Act
+  await renderShow(props(slow));
+
+  // Assert
+  await expect.element(dialog().getByRole("status", { name: "Loading image" })).toBeVisible();
+  // Hidden, so out of the accessibility tree, but there and loading.
+  const img = dialog().element().querySelector('img[alt="Boots from the front"]')!;
+  expect(getComputedStyle(img).visibility).toBe("hidden");
 });
 
 it("switches the background between solid and a checkerboard", async () => {
@@ -472,4 +510,30 @@ it("dims the media behind the delete dialog", async () => {
   // Assert
   await expect.element(page.getByRole("alertdialog")).toBeVisible();
   await vi.waitFor(() => expect(document.querySelectorAll("[data-overlay]").length).toBe(1));
+});
+
+it("groups the sidebar in sections that start open and stay closed for the next media", async () => {
+  // Arrange
+  localStorage.clear();
+  const first = await renderShow(props());
+  const general = dialog().getByRole("button", { name: "General" });
+  const assets = dialog().getByRole("button", { name: "Assets" });
+  await expect.element(general).toHaveAttribute("aria-expanded", "true");
+  await expect.element(assets).toHaveAttribute("aria-expanded", "true");
+  await expect.element(dialog().getByLabelText("Alt text")).toBeVisible();
+
+  // Act
+  await assets.click();
+  await first.unmount();
+  await renderShow(props());
+
+  // Assert
+  await expect
+    .element(dialog().getByRole("button", { name: "Assets" }))
+    .toHaveAttribute("aria-expanded", "false");
+  await expect
+    .element(dialog().getByRole("button", { name: "General" }))
+    .toHaveAttribute("aria-expanded", "true");
+  await expect.element(dialog().getByRole("button", { name: "Delete" })).toBeVisible();
+  localStorage.clear();
 });

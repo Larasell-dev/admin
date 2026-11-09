@@ -2,34 +2,36 @@
 
 namespace Larasell\Admin\Media\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Media\Data\MediaDetailData;
-use Larasell\Admin\Media\Data\MediaFolderData;
 use Larasell\Admin\Media\Data\MediaFolderNodeData;
 use Larasell\Admin\Media\Data\MediaIndexPageData;
-use Larasell\Admin\Media\Data\MediaItemData;
+use Larasell\Admin\Media\Data\MediaLibraryEntryData;
 use Larasell\Admin\Media\Data\MediaShowPageData;
-use Larasell\Admin\Media\Data\PaginationData;
 use Larasell\Admin\Media\Events\MediaLibraryChanged;
 use Larasell\Admin\Media\Http\Requests\UpdateMediaRequest;
 use Larasell\Admin\Media\Http\Requests\UploadMediaRequest;
+use Larasell\Admin\Media\Models\MediaLibraryEntry;
 use Larasell\Admin\Media\Models\MediaPlaceholder;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Media\Actions\DeleteMedia;
 use Larasell\Larasell\Media\Actions\UpdateMedia;
 use Larasell\Larasell\Media\Actions\UploadMedia;
-use Larasell\Larasell\Media\Contracts\MediaStorage;
+use Larasell\Larasell\Media\AssetStatus;
 use Larasell\Larasell\Media\Exceptions\MediaFolderNotFound;
 use Larasell\Larasell\Media\MediaId;
+use Larasell\Larasell\Media\MediaProviders;
 use Larasell\Larasell\Media\Models\Media;
 use Larasell\Larasell\Media\Models\MediaAsset;
 use Larasell\Larasell\Media\Models\MediaFolder;
@@ -38,47 +40,55 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MediaController
 {
-    /** A grid of four, six or eight columns stays full. */
-    /** @var list<int> */
-    private const PAGE_SIZES = [24, 48, 96];
+    /** Entries per page; a multiple of the grid's 2, 4 and 6 columns. */
+    private const PAGE_SIZE = 48;
 
     public function index(Request $request, #[CurrentContentLocale] Locale $locale): Response
     {
-        // Multiples of the grid's 2, 4 and 6 columns, so full pages fill whole rows.
-        $pageSize = in_array($request->integer('per_page'), self::PAGE_SIZES, true) ? $request->integer('per_page') : self::PAGE_SIZES[0];
         // A folder that no longer exists, e.g. deleted by someone else, shows the top level instead.
         $folder = $request->filled('folder') ? MediaFolder::query()->find($request->integer('folder')) : null;
-        $query = Media::query()->with('original', 'thumbnail')->where('folder_id', $folder?->id)->latest('id');
-        $path = route('larasell.admin.media.index', array_filter(['folder' => $folder?->id]));
-        $page = $query->paginate($pageSize)->withPath($path)->appends(array_filter(['folder' => $folder?->id]));
-
-        // Past the last page, e.g. after deleting its only item, show the last page instead.
-        if ($page->isEmpty() && $page->currentPage() > $page->lastPage()) {
-            $page = $query->paginate($pageSize, page: $page->lastPage())->withPath($path);
-        }
-
-        $placeholders = MediaPlaceholder::query()->whereIn('media_id', $page->getCollection()->modelKeys())->pluck('thumbhash', 'media_id');
 
         $data = new MediaIndexPageData(
             folderId: $folder?->id,
-            folders: MediaFolder::query()->where('parent_id', $folder?->id)->withCount(['media', 'children'])
-                ->orderBy('name_key')->orderBy('id')->get()->map(MediaFolderData::fromModel(...))->all(),
             tree: MediaFolder::query()->orderBy('name_key')->orderBy('id')->get(['id', 'name', 'parent_id'])
                 ->map(MediaFolderNodeData::fromModel(...))->all(),
-            media: $page->getCollection()->map(fn (Media $media): MediaItemData => MediaItemData::fromModel($media, $locale, $placeholders[$media->id] ?? null))->all(),
-            pagination: new PaginationData($page->currentPage(), $page->perPage(), $page->total()),
             storeUrl: route('larasell.admin.media.store', array_filter(['folder' => $folder?->id])),
             rootUrl: route('larasell.admin.media.index'),
             createFolderUrl: route('larasell.admin.media.folders.store'),
         );
 
-        // Reloaded in every other admin's browser when the library changes, by MediaLibraryChanged.
         return Inertia::render('Media/Pages/Index', [
             ...$data->toArray(),
-            ...collect(['folders', 'tree', 'media', 'pagination'])->mapWithKeys(fn (string $prop): array => [
-                $prop => Inertia::live(fn (): mixed => $data->toArray()[$prop], on: MediaLibraryChanged::class),
-            ])->all(),
+            // Reloaded in every other admin's browser when the library changes, by
+            // MediaLibraryChanged; the page then loads its entries again from the start.
+            'tree' => Inertia::live(fn (): array => $data->toArray()['tree'], on: MediaLibraryChanged::class),
+            'entries' => Inertia::scroll(fn (): LengthAwarePaginator => $this->entries($folder, $locale)),
         ]);
+    }
+
+    /** @return LengthAwarePaginator<int, MediaLibraryEntryData> */
+    private function entries(?MediaFolder $folder, Locale $locale): LengthAwarePaginator
+    {
+        $query = MediaLibraryEntry::inFolder($folder)->with([
+            'folder' => fn (BelongsTo $query) => $query->withCount(['media', 'children']),
+            'media' => fn (BelongsTo $query) => $query->with('original', 'thumbnail'),
+        ]);
+        $page = $query->paginate(self::PAGE_SIZE)->appends(array_filter(['folder' => $folder?->id]));
+
+        // Past the last page, e.g. after moving its only item away, show the last page instead.
+        if ($page->isEmpty() && $page->currentPage() > $page->lastPage()) {
+            $page = $query->paginate(self::PAGE_SIZE, page: $page->lastPage())->appends(array_filter(['folder' => $folder?->id]));
+        }
+
+        $placeholders = MediaPlaceholder::query()
+            ->whereIn('media_id', $page->getCollection()->pluck('media_id')->filter())
+            ->pluck('thumbhash', 'media_id');
+
+        return $page->through(fn (MediaLibraryEntry $entry): MediaLibraryEntryData => MediaLibraryEntryData::fromModel(
+            $entry,
+            $locale,
+            $entry->media_id === null ? null : ($placeholders[$entry->media_id] ?? null),
+        ));
     }
 
     public function store(UploadMediaRequest $request, UploadMedia $upload): RedirectResponse|JsonResponse
@@ -134,7 +144,8 @@ class MediaController
             media: MediaDetailData::fromModel($media, $locale),
             updateUrl: route('larasell.admin.media.update', $media),
             destroyUrl: route('larasell.admin.media.destroy', $media),
-            indexUrl: route('larasell.admin.media.index'),
+            // Its folder, where the admin most likely came from.
+            indexUrl: route('larasell.admin.media.index', array_filter(['folder' => $media->folder_id])),
         ));
     }
 
@@ -149,9 +160,17 @@ class MediaController
     public const DELETE_CONFIRMATION = 'Delete media';
 
     /** Streams one of the media's files; never cached, as private files must not outlive the session. */
-    public function file(Request $request, Media $media, MediaStorage $storage, string $role = MediaAsset::ORIGINAL): StreamedResponse|HttpResponse
+    public function file(Request $request, Media $media, MediaProviders $providers, string $role = MediaAsset::ORIGINAL): StreamedResponse|HttpResponse|RedirectResponse
     {
         $asset = $media->assets()->where('role', $role)->first() ?? abort(404);
+        abort_unless($asset->status === AssetStatus::Ready, 404);
+        $storage = $providers->provider($asset->provider);
+
+        // A provider that keeps its bytes to itself, e.g. Mux, plays the file from a URL that expires.
+        if (! $storage->readable()) {
+            return redirect()->away($asset->temporaryUrl(now()->addHours(6)));
+        }
+
         $headers = [
             'Content-Type' => $asset->mime_type,
             'Accept-Ranges' => 'bytes',
@@ -201,8 +220,13 @@ class MediaController
             ]);
         }
 
+        $from = url()->previous();
+        $folder = route('larasell.admin.media.index', array_filter(['folder' => $media->folder_id]));
         $delete->handle(MediaId::of($media));
 
-        return redirect()->route('larasell.admin.media.index');
+        // Back to the library page it was deleted from; its own page is gone, so that leads to its folder.
+        return str_starts_with($from, route('larasell.admin.media.index').'?') || $from === route('larasell.admin.media.index')
+            ? redirect()->to($from)
+            : redirect()->to($folder);
     }
 }

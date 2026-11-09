@@ -50,14 +50,15 @@ it('shows a folder\'s subfolders and only its own media, with the whole tree for
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('folderId', $campaigns->id)
-            ->where('folders.0.name', 'Summer')
-            ->where('folders.0.folderCount', 1)
-            ->where('folders.0.mediaCount', 0)
-            ->has('folders', 1)
+            ->where('entries.data.0.key', "folder-{$summer->id}")
+            ->where('entries.data.0.media', null)
+            ->where('entries.data.0.folder.name', 'Summer')
+            ->where('entries.data.0.folder.folderCount', 1)
+            ->where('entries.data.0.folder.mediaCount', 0)
+            ->where('entries.data.1.folder', null)
+            ->where('entries.data.1.media.id', $inCampaigns->id)
+            ->has('entries.data', 2)
             ->has('tree', 3)
-            ->where('media.0.id', $inCampaigns->id)
-            ->has('media', 1)
-            ->where('pagination.total', 1)
             ->where('storeUrl', route('larasell.admin.media.store', ['folder' => $campaigns->id])));
 });
 
@@ -68,7 +69,7 @@ it('shows the top level for a folder that no longer exists', function () {
     // Act & Assert
     $this->get(route('larasell.admin.media.index', ['folder' => 999]))
         ->assertOk()
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('folderId', null)->has('folders', 1));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('folderId', null)->has('entries.data', 1));
 });
 
 it('uploads into the folder in the URL', function () {
@@ -218,13 +219,13 @@ it('broadcasts library changes on a private channel that lets only admins in', f
         ->and($authorize(new stdClass))->toBeFalse();
 });
 
-it('makes the folders and the grid live props, reloaded by MediaLibraryChanged', function () {
+it('makes the tree a live prop, reloaded by MediaLibraryChanged, and loads the entries as the admin scrolls', function () {
     // Act
     $response = $this->get(route('larasell.admin.media.index'), ['X-Inertia' => 'true']);
 
     // Assert
     $listener = ['channel' => ['name' => 'larasell-admin.media', 'type' => 'private'], 'events' => ['media.changed']];
-    foreach (['folders', 'tree', 'media', 'pagination'] as $prop) {
-        expect($response->json("liveProps.{$prop}.listeners"))->toBe([$listener]);
-    }
+    expect($response->json('liveProps.tree.listeners'))->toBe([$listener])
+        ->and($response->json('liveProps.entries'))->toBeNull()
+        ->and($response->json('scrollProps.entries.pageName'))->toBe('page');
 });

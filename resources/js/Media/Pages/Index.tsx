@@ -1,78 +1,112 @@
 import { cn } from "cn";
 import { thumbHashToDataURL } from "thumbhash";
-import { Link, router } from "@inertiajs/react";
+import { DragDropProvider } from "@dnd-kit/react";
+import { InfiniteScroll, Link, router } from "@inertiajs/react";
 import {
+  Badge,
   Button,
+  ButtonGroup,
   EmptyState,
   Icon,
   IconButton,
   Menu,
-  Pagination,
-  type PaginationChange,
+  Spinner,
   useToast,
 } from "@larasell-dev/ui";
 import {
   FolderAddLine,
-  FolderTransferLine,
+  DeleteBinLine,
   ImageLine,
+  LayoutGridLine,
+  ListUnordered,
   More2Fill,
   UploadLine,
   VideoLine,
 } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
-import { useEffect, useId, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 import {
-  dropTargetOver,
   ErrorToast,
   FolderBreadcrumb,
-  FolderGrid,
+  FolderTile,
   FolderNameDialog,
   useFolderDeletion,
   useFolderRename,
 } from "../Components/Folders";
-import {
-  mediaDragSource,
-  useMediaDropTarget,
-  usePreventStrayMediaDrops,
-} from "../Components/mediaDrag";
-import { MoveMediaDialog } from "../Components/MoveMediaDialog";
+import { dropMedia, useMediaDraggable, useMediaDropTarget } from "../Components/mediaDrag";
+import { plugins, sensors } from "../../Platform/Support/dragAndDrop";
+import { DeleteMediaDialog } from "../Components/DeleteMediaDialog";
 import { uploadQueue } from "../Components/uploadQueue";
 import { Page } from "../../Platform/Panel/Components/Page";
 import SidebarLayout from "../../Platform/Panel/Layouts/SidebarLayout";
 
-type Props = Larasell.Admin.Media.Data.MediaIndexPageData;
+type Props = Larasell.Admin.Media.Data.MediaIndexPageData & {
+  /** A page at a time, merged by Inertia's infinite scroll. */
+  entries: { data: Larasell.Admin.Media.Data.MediaLibraryEntryData[] };
+};
 type Media = Larasell.Admin.Media.Data.MediaItemData;
+/** How the library shows its entries: tiles, or rows with their names. */
+export type LibraryView = "grid" | "list";
 
-/** How the library names a media item, e.g. in its link and the move dialog. */
+const VIEW_STORAGE_KEY = "larasell-admin.media.view";
+
+/** The view toggle's picked button looks selected, as the UI library has no toggle button. */
+const pressedClassName = "aria-pressed:bg-state-selected-neutral-default";
+
+/** The view the admin picked last, kept in the browser. */
+function useLibraryView() {
+  const [view, setView] = useState<LibraryView>(() =>
+    localStorage.getItem(VIEW_STORAGE_KEY) === "list" ? "list" : "grid",
+  );
+  const change = (next: LibraryView) => {
+    localStorage.setItem(VIEW_STORAGE_KEY, next);
+    setView(next);
+  };
+  return [view, change] as const;
+}
+
+/** Loads the entries again from the start, e.g. after an upload or another admin's change. */
+function reloadEntries() {
+  router.reload({ only: ["entries"], reset: ["entries"] });
+}
+
+/** How the library names a media item, e.g. in its link and the new folder dialog. */
 function itemName(item: Media): string {
   return item.title ?? item.alt ?? item.fileName;
 }
 
-/** The media library: a grid of images and videos, a page at a time, with an upload button. */
+/**
+ * The media library: a folder's subfolders, then its images and videos, in a grid or a list that
+ * loads more as the admin scrolls, with buttons to make a folder and upload.
+ */
 export default function Index({
   folderId,
-  folders,
   tree,
-  media,
-  pagination,
+  entries,
   storeUrl,
   rootUrl,
   createFolderUrl,
 }: Props) {
-  const [paginating, setPaginating] = useState(false);
+  const [view, setView] = useLibraryView();
   const [creating, setCreating] = useState(false);
   const { askToDelete, dialog: deleteFolderDialog, open: deletingFolder } = useFolderDeletion();
   const { askToRename, dialog: renameFolderDialog, open: renamingFolder } = useFolderRename();
   const toast = useToast();
   // The item dropped onto "New folder", moved in once the admin creates it.
+  // Each dialog keeps its last item after closing, so it still shows it while it animates out.
   const [intoNewFolder, setIntoNewFolder] = useState<Media | null>(null);
-  const [moving, setMoving] = useState<Media | null>(null);
-  const [movingOpen, setMovingOpen] = useState(false);
+  const [intoNewFolderOpen, setIntoNewFolderOpen] = useState(false);
+  const [deleting, setDeleting] = useState<Media | null>(null);
+  const [deletingOpen, setDeletingOpen] = useState(false);
   const dialogOpen =
-    creating || intoNewFolder !== null || movingOpen || deletingFolder || renamingFolder;
-  usePreventStrayMediaDrops();
+    creating || intoNewFolderOpen || deletingOpen || deletingFolder || renamingFolder;
 
-  const byId = (mediaId: number) => media.find((item) => item.id === mediaId);
+  // The tree reloads itself when another admin changes the library; the entries, loaded a page
+  // at a time, can't be live props, so they start over then.
+  useEffect(() => router.on("live", reloadEntries), []);
+
+  const byId = (mediaId: number) =>
+    entries.data.find((entry) => entry.media?.id === mediaId)?.media ?? undefined;
   // Back on the same page, without the item: the server takes it off the grid.
   const move = (item: Media, target: number | null) => {
     if (target === folderId) return;
@@ -88,30 +122,55 @@ export default function Index({
       },
     );
   };
-  const dropMedia = (mediaId: number, target: number | null) => {
+  const dropInto = (mediaId: number, target: number | null) => {
     const item = byId(mediaId);
     if (item) move(item, target);
   };
-  const newFolderDrop = useMediaDropTarget((mediaId) => {
-    setIntoNewFolder(byId(mediaId) ?? null);
-  }, !dialogOpen);
 
   return (
-    <>
+    <DragDropProvider sensors={sensors} plugins={plugins} onDragEnd={dropMedia}>
       <Page.Header
         title={fbs("Media", "Media library: page title")}
         actions={
           <div className="flex items-center gap-2">
-            <span
-              {...newFolderDrop.dropProps}
-              data-drop-target={newFolderDrop.over ? "over" : undefined}
-              className={cn("flex rounded-md", newFolderDrop.over && dropTargetOver)}
+            <ButtonGroup
+              label={fbs(
+                "View",
+                "Media library: accessible name of the buttons that show the library as a grid or a list",
+              )}
             >
-              <Button variant="secondary" onClick={() => setCreating(true)}>
-                <Icon icon={FolderAddLine} />
-                <fbt desc="Media library: header button that creates a folder">New folder</fbt>
-              </Button>
-            </span>
+              <IconButton
+                variant="secondary"
+                aria-label={fbs("Grid view", "Media library: shows the entries as tiles")}
+                aria-pressed={view === "grid"}
+                DANGEROUS_className={pressedClassName}
+                onClick={() => setView("grid")}
+              >
+                <Icon icon={LayoutGridLine} />
+              </IconButton>
+              <IconButton
+                variant="secondary"
+                aria-label={fbs(
+                  "List view",
+                  "Media library: shows the entries as rows with their names",
+                )}
+                aria-pressed={view === "list"}
+                DANGEROUS_className={pressedClassName}
+                onClick={() => setView("list")}
+              >
+                <Icon icon={ListUnordered} />
+              </IconButton>
+            </ButtonGroup>
+            <NewFolderButton
+              onClick={() => setCreating(true)}
+              onDropMedia={(mediaId) => {
+                const item = byId(mediaId);
+                if (!item) return;
+                setIntoNewFolder(item);
+                setIntoNewFolderOpen(true);
+              }}
+              dropEnabled={!dialogOpen}
+            />
             <UploadButton storeUrl={storeUrl} />
           </div>
         }
@@ -125,59 +184,46 @@ export default function Index({
         initialName=""
         parentId={folderId}
       />
-      {intoNewFolder && (
-        <FolderNameDialog
-          key={`move-${intoNewFolder.id}`}
-          open
-          onClose={() => setIntoNewFolder(null)}
-          url={intoNewFolder.moveToNewFolderUrl}
-          method="post"
-          initialName=""
-          parentId={folderId}
-          description={fbs(
-            [fbs.param("itemName", itemName(intoNewFolder)), " is moved into it."],
-            "Media library: in the new folder dialog opened by dropping a media item onto 'New folder', e.g. 'boots.png is moved into it.'",
-          )}
-          submitLabel={fbs(
-            "Create and move",
-            "Media library: button in the new folder dialog that creates the folder and moves the dropped item into it",
-          )}
-        />
-      )}
-      {moving && (
-        <MoveMediaDialog
-          key={moving.id}
-          open={movingOpen}
-          onClose={() => setMovingOpen(false)}
-          itemName={itemName(moving)}
-          tree={tree}
-          folderId={folderId}
-          onMove={(target) => move(moving, target)}
-        />
-      )}
+      {/* Always mounted, so it starts closed and animates in when an item is dropped. */}
+      <FolderNameDialog
+        open={intoNewFolderOpen}
+        onClose={() => setIntoNewFolderOpen(false)}
+        url={intoNewFolder?.moveToNewFolderUrl ?? ""}
+        method="post"
+        initialName=""
+        parentId={folderId}
+        description={
+          intoNewFolder
+            ? fbs(
+                [fbs.param("itemName", itemName(intoNewFolder)), " is moved into it."],
+                "Media library: in the new folder dialog opened by dropping a media item onto 'New folder', e.g. 'boots.png is moved into it.'",
+              )
+            : undefined
+        }
+        submitLabel={fbs(
+          "Create and move",
+          "Media library: button in the new folder dialog that creates the folder and moves the dropped item into it",
+        )}
+      />
+      <DeleteMediaDialog
+        destroyUrl={deleting?.destroyUrl ?? ""}
+        open={deletingOpen}
+        onOpenChange={setDeletingOpen}
+      />
       {deleteFolderDialog}
       {renameFolderDialog}
-      {(folderId !== null || folders.length > 0) && (
-        <div className="flex flex-col gap-4 px-6 pt-4">
+      {folderId !== null && (
+        <div className="px-6 pt-4">
           <FolderBreadcrumb
             tree={tree}
             folderId={folderId}
             rootUrl={rootUrl}
-            onDropMedia={dropMedia}
+            onDropMedia={dropInto}
             dropEnabled={!dialogOpen}
           />
-          {folders.length > 0 && (
-            <FolderGrid
-              folders={folders}
-              onRename={askToRename}
-              onDelete={askToDelete}
-              onDropMedia={dropMedia}
-              dropEnabled={!dialogOpen}
-            />
-          )}
         </div>
       )}
-      {media.length === 0 ? (
+      {entries.data.length === 0 ? (
         // Fills everything below the header, like an empty table page, so it sits in the middle.
         <div className="flex flex-1 items-center justify-center px-6 py-12">
           <EmptyState
@@ -193,99 +239,55 @@ export default function Index({
           />
         </div>
       ) : (
-        <Page.Body width="wide">
-          <div className="flex flex-col gap-6">
-            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-              {media.map((item) => (
-                <li key={item.id} className="relative">
-                  <Link
-                    href={item.showUrl}
-                    {...mediaDragSource(item.id)}
-                    aria-label={itemName(item)}
-                    className="block aspect-square overflow-hidden bg-base-section bg-cover bg-center focus-visible:focus-ring"
-                    style={
-                      item.thumbHash && !item.thumbnailUrl
-                        ? { backgroundImage: `url("${placeholderUrl(item.thumbHash)}")` }
-                        : undefined
-                    }
-                  >
-                    {item.thumbnailUrl ? (
-                      // A WebP the queue made, of the image or a frame of the video.
-                      <TileImage
-                        src={item.thumbnailUrl}
-                        alt={item.alt ?? ""}
-                        thumbHash={item.thumbHash}
-                      />
-                    ) : (
-                      // Never the original: a library of large photos and videos would load
-                      // slowly. The queue makes the thumbnail shortly.
-                      <span className="flex size-full items-center justify-center text-base-secondary">
-                        <Icon icon={item.type === "video" ? VideoLine : ImageLine} />
-                      </span>
-                    )}
-                  </Link>
-                  {(tree.length > 0 || folderId !== null) && (
-                    <div className="absolute top-1 right-1">
-                      <Menu.Root>
-                        <Menu.Trigger
-                          render={
-                            <IconButton
-                              variant="tertiary"
-                              size="sm"
-                              aria-label={fbs(
-                                ["Actions for ", fbs.param("itemName", itemName(item))],
-                                "Media library: accessible name of the button that opens a media item's menu, e.g. 'Actions for boots.png'",
-                              )}
-                            >
-                              <Icon icon={More2Fill} />
-                            </IconButton>
-                          }
-                        />
-                        <Menu.Popup>
-                          <Menu.Item
-                            icon={FolderTransferLine}
-                            onClick={() => {
-                              setMoving(item);
-                              setMovingOpen(true);
-                            }}
-                          >
-                            <fbt desc="Media library item menu: opens a dialog that moves the item to another folder">
-                              Move to…
-                            </fbt>
-                          </Menu.Item>
-                        </Menu.Popup>
-                      </Menu.Root>
-                    </div>
+        <LibraryBody view={view}>
+          <InfiniteScroll
+            data="entries"
+            as="ul"
+            buffer={600}
+            className={cn(
+              view === "grid"
+                ? "grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6"
+                : "flex flex-col divide-y divide-base-subtle",
+            )}
+            loading={() => (
+              <li className="col-span-full flex justify-center py-6 text-base-secondary">
+                <Spinner
+                  size={6}
+                  aria-label={fbs(
+                    "Loading more",
+                    "Media library: spinner below the entries while the next ones load",
                   )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Page.Body>
+                />
+              </li>
+            )}
+          >
+            {entries.data.map((entry) =>
+              entry.folder ? (
+                <FolderTile
+                  key={entry.key}
+                  folder={entry.folder}
+                  view={view}
+                  onRename={askToRename}
+                  onDelete={askToDelete}
+                  onDropMedia={dropInto}
+                  dropEnabled={!dialogOpen}
+                />
+              ) : entry.media ? (
+                <MediaTile
+                  key={entry.key}
+                  item={entry.media}
+                  view={view}
+                  onDelete={() => {
+                    setDeleting(entry.media);
+                    setDeletingOpen(true);
+                  }}
+                />
+              ) : null,
+            )}
+          </InfiniteScroll>
+        </LibraryBody>
       )}
-      {/* Across the whole page below the grid, always there, like a table's. */}
-      <div
-        data-testid="media-pagination"
-        className="shrink-0 border-t border-base-subtle px-6 py-3"
-      >
-        <Pagination
-          {...pagination}
-          pageSizeOptions={[24, 48, 96]}
-          disabled={paginating}
-          onPaginationChange={({ page, pageSize }: PaginationChange) =>
-            router.get(
-              window.location.pathname,
-              { page, per_page: pageSize },
-              {
-                preserveScroll: true,
-                onStart: () => setPaginating(true),
-                onFinish: () => setPaginating(false),
-              },
-            )
-          }
-        />
-      </div>
-    </>
+    </DragDropProvider>
   );
 }
 
@@ -295,7 +297,7 @@ function UploadButton({ storeUrl }: { storeUrl: string }) {
   // Each file goes to the upload queue, which sends them a few at a time and shows the toast;
   // page 1 picks up each one as it lands.
   useEffect(() => {
-    uploadQueue.onSucceeded = () => router.reload({ only: ["media", "pagination", "folders"] });
+    uploadQueue.onSucceeded = reloadEntries;
     return () => {
       uploadQueue.onSucceeded = () => {};
     };
@@ -324,6 +326,175 @@ function UploadButton({ storeUrl }: { storeUrl: string }) {
         <fbt desc="Media library: button in the header that picks files to upload">Upload</fbt>
       </Button>
     </>
+  );
+}
+
+/**
+ * A media item: a tile in the grid, a row with its name in the list. Opens it, drags onto a
+ * folder, with a menu to delete it.
+ */
+function MediaTile({
+  item,
+  view,
+  onDelete,
+}: {
+  item: Media;
+  view: LibraryView;
+  onDelete: () => void;
+}) {
+  const { ref, dragging } = useMediaDraggable(item.id);
+  const preview = (
+    <span
+      className={cn(
+        "block shrink-0 overflow-hidden bg-base-section bg-cover bg-center",
+        view === "grid" ? "aspect-square w-full" : "size-10",
+      )}
+      style={
+        item.thumbHash && !item.thumbnailUrl
+          ? { backgroundImage: `url("${placeholderUrl(item.thumbHash)}")` }
+          : undefined
+      }
+    >
+      {item.thumbnailUrl ? (
+        // A WebP the queue made, of the image or a frame of the video.
+        <TileImage src={item.thumbnailUrl} alt={item.alt ?? ""} thumbHash={item.thumbHash} />
+      ) : (
+        // Never the original: a library of large photos and videos would load slowly. The queue
+        // makes the thumbnail shortly.
+        <span className="flex size-full items-center justify-center text-base-secondary">
+          <Icon icon={item.type === "video" ? VideoLine : ImageLine} />
+        </span>
+      )}
+    </span>
+  );
+
+  return (
+    <li className="relative">
+      <Link
+        href={item.showUrl}
+        ref={ref}
+        // A native link drag would take over the pointer before dnd-kit's starts.
+        draggable={false}
+        // dnd-kit makes a draggable a button unless it has a role; this one stays a link.
+        role="link"
+        data-dragging={dragging || undefined}
+        aria-label={itemName(item)}
+        // No text selection or iOS link callout on a long press, which starts a drag instead.
+        className={cn(
+          "block select-none [-webkit-touch-callout:none] focus-visible:focus-ring data-dragging:opacity-60",
+          view === "list" && "flex items-center gap-3 py-2 pr-14 pl-6 hover:bg-state-hover",
+        )}
+      >
+        {view === "grid" ? (
+          <span className="relative block">
+            {preview}
+            {item.status !== "ready" && (
+              <span className="absolute bottom-1 left-1">
+                <StatusBadge status={item.status} />
+              </span>
+            )}
+          </span>
+        ) : (
+          preview
+        )}
+        {view === "list" && (
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate type-body-md text-base-primary">{itemName(item)}</span>
+            <span className="truncate type-body-sm text-base-secondary">
+              {item.status !== "ready" ? (
+                <StatusBadge status={item.status} />
+              ) : itemName(item) !== item.fileName ? (
+                item.fileName
+              ) : item.type === "video" ? (
+                fbs("Video", "Media library list: what a row is, for a video")
+              ) : (
+                fbs("Image", "Media library list: what a row is, for an image")
+              )}
+            </span>
+          </span>
+        )}
+      </Link>
+      <div
+        className={cn(
+          "absolute",
+          view === "grid" ? "top-1 right-1" : "top-1/2 right-4 -translate-y-1/2",
+        )}
+      >
+        <Menu.Root>
+          <Menu.Trigger
+            render={
+              <IconButton
+                variant="tertiary"
+                size="sm"
+                aria-label={fbs(
+                  ["Actions for ", fbs.param("itemName", itemName(item))],
+                  "Media library: accessible name of the button that opens a media item's menu, e.g. 'Actions for boots.png'",
+                )}
+              >
+                <Icon icon={More2Fill} />
+              </IconButton>
+            }
+          />
+          <Menu.Popup>
+            <Menu.Item icon={DeleteBinLine} variant="destructive" onClick={onDelete}>
+              <fbt desc="Media library item menu: asks to delete the media item">Delete</fbt>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Root>
+      </div>
+    </li>
+  );
+}
+
+/** Creates a folder; a media item dropped onto it asks for the name and is moved in. */
+function NewFolderButton({
+  onClick,
+  onDropMedia,
+  dropEnabled,
+}: {
+  onClick: () => void;
+  onDropMedia: (mediaId: number) => void;
+  dropEnabled: boolean;
+}) {
+  const { ref, over } = useMediaDropTarget(onDropMedia, dropEnabled);
+
+  return (
+    <span
+      ref={ref}
+      data-drop-target={over ? "over" : undefined}
+      className={cn("flex", over && "focus-ring")}
+    >
+      <Button variant="secondary" onClick={onClick}>
+        <Icon icon={FolderAddLine} />
+        <fbt desc="Media library: header button that creates a folder">New folder</fbt>
+      </Button>
+    </span>
+  );
+}
+
+/**
+ * Scrolls the entries. The grid sits in the page's padded body; the list, like a table, runs
+ * from edge to edge, its rows padded instead.
+ */
+function LibraryBody({ view, children }: { view: LibraryView; children: ReactNode }) {
+  if (view === "grid") return <Page.Body width="wide">{children}</Page.Body>;
+  return <div className="min-h-0 flex-1 overflow-y-auto pt-4 pb-28">{children}</div>;
+}
+
+/** Says that a media item isn't ready yet, e.g. while Mux transcodes it, or that it failed. */
+function StatusBadge({ status }: { status: Media["status"] }) {
+  return status === "failed" ? (
+    <Badge variant="danger">
+      <fbt desc="Media library: badge on an item its provider, e.g. Mux, failed to process">
+        Failed
+      </fbt>
+    </Badge>
+  ) : (
+    <Badge variant="info">
+      <fbt desc="Media library: badge on an item its provider, e.g. Mux, still works on">
+        Processing
+      </fbt>
+    </Badge>
   );
 }
 

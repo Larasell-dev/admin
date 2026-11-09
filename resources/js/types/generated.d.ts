@@ -99,13 +99,16 @@ declare namespace Larasell.Admin.Media.Data {
     size: number;
     width: number | null;
     height: number | null;
-    url: string;
+    status: "pending" | "processing" | "ready" | "failed";
+    url: string | null;
   };
   export type MediaDetailData = {
     id: number;
     type: "image" | "video";
     fileName: string;
-    url: string;
+    url: string | null;
+    status: "pending" | "processing" | "ready" | "failed";
+    failure: string | null;
     title: string | null;
     description: string | null;
     alt: string | null;
@@ -129,10 +132,7 @@ declare namespace Larasell.Admin.Media.Data {
   };
   export type MediaIndexPageData = {
     folderId: number | null;
-    folders: Array<Larasell.Admin.Media.Data.MediaFolderData>;
     tree: Array<Larasell.Admin.Media.Data.MediaFolderNodeData>;
-    media: Array<Larasell.Admin.Media.Data.MediaItemData>;
-    pagination: Larasell.Admin.Media.Data.PaginationData;
     storeUrl: string;
     rootUrl: string;
     createFolderUrl: string;
@@ -141,7 +141,8 @@ declare namespace Larasell.Admin.Media.Data {
     id: number;
     type: "image" | "video";
     fileName: string;
-    url: string;
+    url: string | null;
+    status: "pending" | "processing" | "ready" | "failed";
     thumbnailUrl: string | null;
     thumbHash: string | null;
     title: string | null;
@@ -150,6 +151,12 @@ declare namespace Larasell.Admin.Media.Data {
     showUrl: string;
     moveUrl: string;
     moveToNewFolderUrl: string;
+    destroyUrl: string;
+  };
+  export type MediaLibraryEntryData = {
+    key: string;
+    folder: Larasell.Admin.Media.Data.MediaFolderData | null;
+    media: Larasell.Admin.Media.Data.MediaItemData | null;
   };
   export type MediaShowPageData = {
     media: Larasell.Admin.Media.Data.MediaDetailData;
@@ -157,10 +164,15 @@ declare namespace Larasell.Admin.Media.Data {
     destroyUrl: string;
     indexUrl: string;
   };
-  export type PaginationData = {
-    page: number;
-    pageSize: number;
-    total: number;
+  export type MuxSettingsData = {
+    tokenId: string | null;
+    hasTokenSecret: boolean;
+    hasWebhookSecret: boolean;
+    signingKeyId: string | null;
+    hasSigningKey: boolean;
+    useForVideos: boolean;
+    webhookUrl: string;
+    updateUrl: string;
   };
 }
 declare namespace Larasell.Admin.Order.Data {

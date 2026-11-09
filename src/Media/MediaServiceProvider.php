@@ -12,12 +12,17 @@ use Larasell\Admin\Media\Events\MediaLibraryChanged;
 use Larasell\Admin\Media\Http\Controllers\MediaController;
 use Larasell\Admin\Media\Http\Controllers\MediaFolderController;
 use Larasell\Admin\Media\Http\Controllers\MediaMoveController;
+use Larasell\Admin\Media\Http\Controllers\MuxSettingsController;
+use Larasell\Admin\Media\Http\Controllers\MuxWebhookController;
 use Larasell\Admin\Media\Jobs\GeneratePlaceholder;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Navigation\Facades\Navigation;
 use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Settings\Facades\Settings;
+use Larasell\Larasell\Media\AssetStatus;
+use Larasell\Larasell\Media\Events\MediaAssetStatusChanged;
 use Larasell\Larasell\Media\Events\MediaDeleted;
 use Larasell\Larasell\Media\Events\MediaFolderCreated;
 use Larasell\Larasell\Media\Events\MediaFolderDeleted;
@@ -61,6 +66,13 @@ class MediaServiceProvider extends ServiceProvider
             }
         });
 
+        // A registered image's comes once its provider checked it.
+        Event::listen(MediaAssetStatusChanged::class, function (MediaAssetStatusChanged $event): void {
+            if ($event->status === AssetStatus::Ready && Media::query()->whereKey($event->mediaId->value)->value('type') === MediaType::Image) {
+                GeneratePlaceholder::dispatch($event->mediaId)->afterCommit();
+            }
+        });
+
         // A video's comes from its poster, so it waits until the core made one.
         Event::listen(MediaThumbnailGenerated::class, function (MediaThumbnailGenerated $event): void {
             if (Media::query()->whereKey($event->mediaId->value)->value('type') === MediaType::Video) {
@@ -70,7 +82,7 @@ class MediaServiceProvider extends ServiceProvider
 
         // Live updates are the panel's own: the core's events say what changed, this tells the browsers.
         Event::listen([
-            MediaUploaded::class, MediaUpdated::class, MediaDeleted::class, MediaMoved::class, MediaThumbnailGenerated::class,
+            MediaUploaded::class, MediaUpdated::class, MediaDeleted::class, MediaMoved::class, MediaThumbnailGenerated::class, MediaAssetStatusChanged::class,
             MediaFolderCreated::class, MediaFolderRenamed::class, MediaFolderMoved::class, MediaFolderDeleted::class,
         ], fn () => MediaLibraryChanged::dispatch());
         Broadcast::channel(MediaLibraryChanged::CHANNEL, fn (mixed $user): bool => $user instanceof Admin, ['guards' => ['larasell-admin']]);
@@ -88,9 +100,22 @@ class MediaServiceProvider extends ServiceProvider
             Route::post('media/{media}/move', [MediaMoveController::class, 'move'])->whereNumber('media')->name('media.move');
             Route::post('media/{media}/move-to-new-folder', [MediaMoveController::class, 'moveToNewFolder'])->whereNumber('media')->name('media.move-to-new-folder');
             Route::delete('media/{media}', [MediaController::class, 'destroy'])->whereNumber('media')->name('media.destroy');
+            Route::get('settings/mux', [MuxSettingsController::class, 'edit'])->name('settings.mux.edit')->withHead(title: Translate::later('Mux'));
+            Route::put('settings/mux', [MuxSettingsController::class, 'update'])->name('settings.mux.update');
         });
+
+        // Mux signs its requests instead of signing in, so this sits outside the panel's group.
+        Route::post(config('larasell.admin.panel.path').'/media/webhooks/mux/{provider}', MuxWebhookController::class)
+            ->name('larasell.admin.media.webhooks.mux');
 
         // Between Categories and Orders, like an app's own item; the built-in positions stay 1000 apart.
         Navigation::add(Translate::later('Media'), 'larasell.admin.media.index', Icon::Image)->position(NavItem::Categories->position() + 500);
+
+        Settings::add('mux')
+            ->label(Translate::later('Mux'))
+            ->description(Translate::later('The video service the media library streams videos from'))
+            ->icon(Icon::Video)
+            ->route('larasell.admin.settings.mux.edit')
+            ->after('team');
     }
 }

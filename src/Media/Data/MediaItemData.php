@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Media\Data;
 
 use Larasell\Larasell\Enums\Locale;
+use Larasell\Larasell\Media\AssetStatus;
 use Larasell\Larasell\Media\AssetVisibility;
 use Larasell\Larasell\Media\MediaType;
 use Larasell\Larasell\Media\Models\Media;
@@ -20,7 +21,10 @@ class MediaItemData extends Data
         #[LiteralTypeScriptType('"image" | "video"')]
         public MediaType $type,
         public string $fileName,
-        public string $url,
+        /** Null until its original is ready. */
+        public ?string $url,
+        #[LiteralTypeScriptType('"pending" | "processing" | "ready" | "failed"')]
+        public AssetStatus $status,
         /** A small WebP for the grid; null for videos, and for images until the queue made it. */
         public ?string $thumbnailUrl,
         /** A ThumbHash, base64, shown while the image loads; null for videos and until the queue made it. */
@@ -36,6 +40,8 @@ class MediaItemData extends Data
         public string $moveUrl,
         /** Creates a folder from the posted name and parent_id and moves it in. */
         public string $moveToNewFolderUrl,
+        /** Deletes it once the posted confirmation is "Delete media". */
+        public string $destroyUrl,
     ) {}
 
     public static function fromModel(Media $media, Locale $locale, ?string $thumbHash = null): self
@@ -45,6 +51,7 @@ class MediaItemData extends Data
             type: $media->type,
             fileName: $media->original->file_name,
             url: MediaAssetData::url($media->original),
+            status: $media->original->status,
             thumbnailUrl: $media->thumbnail === null ? null : MediaAssetData::url($media->thumbnail),
             thumbHash: $thumbHash,
             visibility: $media->original->visibility,
@@ -53,6 +60,7 @@ class MediaItemData extends Data
             showUrl: route('larasell.admin.media.show', $media),
             moveUrl: route('larasell.admin.media.move', $media),
             moveToNewFolderUrl: route('larasell.admin.media.move-to-new-folder', $media),
+            destroyUrl: route('larasell.admin.media.destroy', $media),
         );
     }
 

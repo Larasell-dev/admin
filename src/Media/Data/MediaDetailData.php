@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Media\Data;
 
 use Larasell\Larasell\Enums\Locale;
+use Larasell\Larasell\Media\AssetStatus;
 use Larasell\Larasell\Media\AssetVisibility;
 use Larasell\Larasell\Media\MediaType;
 use Larasell\Larasell\Media\Models\Media;
@@ -19,8 +20,12 @@ class MediaDetailData extends Data
         #[LiteralTypeScriptType('"image" | "video"')]
         public MediaType $type,
         public string $fileName,
-        /** The original file's. */
-        public string $url,
+        /** The original file's; null until it is ready. */
+        public ?string $url,
+        #[LiteralTypeScriptType('"pending" | "processing" | "ready" | "failed"')]
+        public AssetStatus $status,
+        /** Why the original failed, when it did, e.g. Mux's reason. */
+        public ?string $failure,
         /** In the content locale; null when it has none there. */
         public ?string $title,
         /** In the content locale; null when it has none there. */
@@ -40,6 +45,8 @@ class MediaDetailData extends Data
             type: $media->type,
             fileName: $media->original->file_name,
             url: MediaAssetData::url($media->original),
+            status: $media->original->status,
+            failure: $media->original->failure,
             visibility: $media->original->visibility,
             title: MediaItemData::inLocale($media->title, $locale),
             description: MediaItemData::inLocale($media->description, $locale),

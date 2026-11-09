@@ -8,6 +8,7 @@ import {
   TimeSlider,
 } from "@videojs/react";
 import { Video, videoFeatures } from "@videojs/react/video";
+import { HlsVideo } from "@videojs/react/media/hls-video";
 import { Icon, IconButton } from "@larasell-dev/ui";
 import {
   FullscreenExitLine,
@@ -18,6 +19,7 @@ import {
   VolumeUpLine,
 } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
+import type { ComponentProps } from "react";
 
 const { Player } = createPlayer({ features: videoFeatures });
 
@@ -44,7 +46,8 @@ export default function VideoPlayer({ src, width, height }: Props) {
             className="relative overflow-hidden"
             style={{ aspectRatio: ratio, width: `min(100cqw, calc(100cqh * ${ratio}))` }}
           >
-            <Video
+            {/* Mux streams as HLS, which only Safari plays on its own. */}
+            <VideoElement
               src={src}
               playsInline // "auto", so every browser, Safari too, draws the first frame before playing.
               preload="auto"
@@ -130,5 +133,14 @@ export default function VideoPlayer({ src, width, height }: Props) {
         </div>
       </Container>
     </Player>
+  );
+}
+
+function VideoElement(props: ComponentProps<typeof Video>) {
+  return typeof props.src === "string" &&
+    new URL(props.src, location.href).pathname.endsWith(".m3u8") ? (
+    <HlsVideo {...(props as ComponentProps<typeof HlsVideo>)} />
+  ) : (
+    <Video {...props} />
   );
 }

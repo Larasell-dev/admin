@@ -103,12 +103,12 @@ function BreadcrumbLink({
   dropEnabled: boolean;
   children: ReactNode;
 }) {
-  const { over, dropProps } = useMediaDropTarget(onDrop, dropEnabled);
+  const { over, ref } = useMediaDropTarget(onDrop, dropEnabled);
 
   return (
     <Link
       href={href}
-      {...dropProps}
+      ref={ref}
       data-drop-target={over ? "over" : undefined}
       className={cn(
         "truncate px-1 hover:text-base-primary focus-visible:focus-ring",
@@ -117,36 +117,6 @@ function BreadcrumbLink({
     >
       {children}
     </Link>
-  );
-}
-
-/** The folders in the grid. A media item dropped onto one moves into it. */
-export function FolderGrid({
-  folders,
-  onRename,
-  onDelete,
-  onDropMedia,
-  dropEnabled,
-}: {
-  folders: Folder[];
-  onRename: (folder: Folder) => void;
-  onDelete: (folder: Folder) => void;
-  onDropMedia: DropMedia;
-  dropEnabled: boolean;
-}) {
-  return (
-    <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-      {folders.map((folder) => (
-        <FolderTile
-          key={folder.id}
-          folder={folder}
-          onRename={onRename}
-          onDelete={onDelete}
-          onDropMedia={onDropMedia}
-          dropEnabled={dropEnabled}
-        />
-      ))}
-    </ul>
   );
 }
 
@@ -237,7 +207,6 @@ export function useFolderDeletion() {
             <AlertDialog.Confirm
               variant="destructive"
               loading={deleting}
-              disabled={typed !== target.name}
               onClick={() => destroy(target, typed)}
             >
               <fbt desc="Media library: button in the dialog that deletes the folder">Delete</fbt>
@@ -262,15 +231,14 @@ export function useFolderRename() {
     setTarget(folder);
     setOpen(true);
   };
-  const dialog = target && (
-    // Keyed by the folder, so each one starts with its own name.
+  // Always mounted, so even the first rename starts closed and animates in.
+  const dialog = (
     <FolderNameDialog
-      key={target.id}
       open={open}
       onClose={() => setOpen(false)}
-      url={target.renameUrl}
+      url={target?.renameUrl ?? ""}
       method="put"
-      initialName={target.name}
+      initialName={target?.name ?? ""}
       parentId={null}
     />
   );
@@ -278,54 +246,75 @@ export function useFolderRename() {
   return { askToRename, dialog, open };
 }
 
-/** A folder in the grid: opens it, with a menu to rename or delete it. */
-function FolderTile({
+/**
+ * A folder: a tile in the grid, a row in the list. Opens it, with a menu to rename or delete it.
+ * The whole of it, its menu button too, takes a dropped media item.
+ */
+export function FolderTile({
   folder,
+  view,
   onRename,
   onDelete,
   onDropMedia,
   dropEnabled,
 }: {
   folder: Folder;
+  /** A tile in the grid, or a row in the list. */
+  view: "grid" | "list";
   onRename: (folder: Folder) => void;
   onDelete: (folder: Folder) => void;
   onDropMedia: DropMedia;
   dropEnabled: boolean;
 }) {
-  const { over, dropProps } = useMediaDropTarget(
+  const { over, ref } = useMediaDropTarget(
     (mediaId) => onDropMedia(mediaId, folder.id),
     dropEnabled,
   );
 
   return (
-    <li className="relative">
+    <li ref={ref} className="relative">
       <Link
         href={folder.url}
-        {...dropProps}
         data-drop-target={over ? "over" : undefined}
         className={cn(
-          "flex aspect-square flex-col items-center justify-center gap-2 bg-base-section p-3 text-center focus-visible:focus-ring",
+          "focus-visible:focus-ring",
+          view === "grid"
+            ? "flex aspect-square flex-col items-center justify-center gap-2 bg-base-section p-3 text-center"
+            : "flex items-center gap-3 py-2 pr-14 pl-6 hover:bg-state-hover",
           over && dropTargetOver,
         )}
       >
-        <Icon icon={FolderLine} />
-        <span className="w-full truncate type-body-md text-base-primary">{folder.name}</span>
-        <span className="type-body-sm text-base-secondary">
-          {over ? (
-            fbs(
-              ["Move into ", fbs.param("folderName", folder.name)],
-              "Media library: shown on a folder tile while a media item is dragged over it, e.g. 'Move into Summer'",
-            )
-          ) : (
-            <fbt desc="Media library: what a folder tile holds, e.g. '3 items'">
-              <fbt:plural count={folder.mediaCount + folder.folderCount} showCount="yes">
-                item
-              </fbt:plural>
-            </fbt>
-          )}
+        {view === "grid" ? (
+          <Icon icon={FolderLine} />
+        ) : (
+          <span className="flex size-10 shrink-0 items-center justify-center bg-base-section">
+            <Icon icon={FolderLine} />
+          </span>
+        )}
+        <span className={cn("flex min-w-0 flex-col", view === "grid" && "w-full items-center")}>
+          <span className="w-full truncate type-body-md text-base-primary">{folder.name}</span>
+          <span className="type-body-sm text-base-secondary">
+            {over ? (
+              fbs(
+                ["Move into ", fbs.param("folderName", folder.name)],
+                "Media library: shown on a folder tile while a media item is dragged over it, e.g. 'Move into Summer'",
+              )
+            ) : (
+              <fbt desc="Media library: what a folder tile holds, e.g. '3 items'">
+                <fbt:plural count={folder.mediaCount + folder.folderCount} showCount="yes">
+                  item
+                </fbt:plural>
+              </fbt>
+            )}
+          </span>
         </span>
       </Link>
-      <div className="absolute top-1 right-1">
+      <div
+        className={cn(
+          "absolute",
+          view === "grid" ? "top-1 right-1" : "top-1/2 right-4 -translate-y-1/2",
+        )}
+      >
         <Menu.Root>
           <Menu.Trigger
             render={
@@ -355,87 +344,99 @@ function FolderTile({
   );
 }
 
-/** Names a new folder, or renames one. */
-export function FolderNameDialog({
-  open,
-  onClose,
-  url,
-  method,
-  initialName,
-  parentId,
-  description,
-  submitLabel,
-}: {
-  open: boolean;
+type FolderNameFormProps = {
   onClose: () => void;
   url: string;
   method: "post" | "put";
   initialName: string;
   parentId: number | null;
+  submitLabel?: string;
+};
+
+/**
+ * Names a new folder, or renames one. Keep it mounted and toggle `open`, so it animates in and
+ * out; its form starts over with `initialName` each time it opens.
+ */
+export function FolderNameDialog({
+  open,
+  description,
+  ...form
+}: FolderNameFormProps & {
+  open: boolean;
   /** Says what else creating it does, e.g. that a dropped item is moved in. */
   description?: string;
-  submitLabel?: string;
 }) {
-  const toast = useToast();
-  const form = useForm({ name: initialName, parent_id: parentId });
-
   return (
-    <Dialog.Root open={open} onOpenChange={(next) => !next && onClose()}>
+    <Dialog.Root open={open} onOpenChange={(next) => !next && form.onClose()}>
       <Dialog.Popup
         title={
-          method === "post"
+          form.method === "post"
             ? fbs("New folder", "Media library: title of the dialog that creates a folder")
             : fbs("Rename folder", "Media library: title of the dialog that renames a folder")
         }
         description={description}
       >
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            form.submit(method, url, {
-              preserveScroll: true,
-              onSuccess: () => {
-                form.reset();
-                onClose();
-              },
-              // The folder to create it in, or move into, was deleted meanwhile: nothing to fix here.
-              onError: (errors) => {
-                if (!("folder" in errors)) return;
-                onClose();
-                toast.add({ children: <ErrorToast message={errors.folder} /> });
-              },
-            });
-          }}
-        >
-          <Field
-            label={fbs("Name", "Media library folder dialog: label of the folder name field")}
-            name="name"
-            error={form.errors.name}
-          >
-            <Input
-              autoFocus
-              autoComplete="off"
-              value={form.data.name}
-              onChange={(event) => form.setData("name", event.currentTarget.value)}
-            />
-          </Field>
-          <Dialog.Actions>
-            <Button type="button" variant="secondary" onClick={onClose}>
-              <fbt desc="Media library folder dialog: closes it without saving">Cancel</fbt>
-            </Button>
-            <Button type="submit" variant="primary" loading={form.processing}>
-              {submitLabel ??
-                (method === "post" ? (
-                  <fbt desc="Media library folder dialog: creates the folder">Create</fbt>
-                ) : (
-                  <fbt desc="Media library folder dialog: saves the new name">Rename</fbt>
-                ))}
-            </Button>
-          </Dialog.Actions>
-        </form>
+        {/* Mounted with the popup, so each opening starts with its own name. */}
+        <FolderNameForm {...form} />
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+function FolderNameForm({
+  onClose,
+  url,
+  method,
+  initialName,
+  parentId,
+  submitLabel,
+}: FolderNameFormProps) {
+  const toast = useToast();
+  const form = useForm({ name: initialName, parent_id: parentId });
+
+  return (
+    <form
+      className="flex flex-col gap-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        form.submit(method, url, {
+          preserveScroll: true,
+          onSuccess: onClose,
+          // The folder to create it in, or move into, was deleted meanwhile: nothing to fix here.
+          onError: (errors) => {
+            if (!("folder" in errors)) return;
+            onClose();
+            toast.add({ children: <ErrorToast message={errors.folder} /> });
+          },
+        });
+      }}
+    >
+      <Field
+        label={fbs("Name", "Media library folder dialog: label of the folder name field")}
+        name="name"
+        error={form.errors.name}
+      >
+        <Input
+          autoFocus
+          autoComplete="off"
+          value={form.data.name}
+          onChange={(event) => form.setData("name", event.currentTarget.value)}
+        />
+      </Field>
+      <Dialog.Actions>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          <fbt desc="Media library folder dialog: closes it without saving">Cancel</fbt>
+        </Button>
+        <Button type="submit" variant="primary" loading={form.processing}>
+          {submitLabel ??
+            (method === "post" ? (
+              <fbt desc="Media library folder dialog: creates the folder">Create</fbt>
+            ) : (
+              <fbt desc="Media library folder dialog: saves the new name">Rename</fbt>
+            ))}
+        </Button>
+      </Dialog.Actions>
+    </form>
   );
 }
 

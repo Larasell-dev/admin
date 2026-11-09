@@ -7,9 +7,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Larasell\Admin\Media\Models\MediaPlaceholder;
-use Larasell\Larasell\Media\Contracts\MediaStorage;
+use Larasell\Larasell\Media\AssetStatus;
 use Larasell\Larasell\Media\Exceptions\MediaNotShared;
 use Larasell\Larasell\Media\MediaId;
+use Larasell\Larasell\Media\MediaProviders;
 use Larasell\Larasell\Media\MediaType;
 use Larasell\Larasell\Media\Models\Media;
 use Thumbhash\Thumbhash;
@@ -34,7 +35,7 @@ final class GeneratePlaceholder implements ShouldQueue
     /**
      * @throws MediaNotShared when this worker can't read the original
      */
-    public function handle(MediaStorage $storage): void
+    public function handle(MediaProviders $providers): void
     {
         $media = Media::query()->with(['original', 'thumbnail'])->find($this->mediaId->value);
         // A video's placeholder comes from its poster, the frame the core's thumbnail job took.
@@ -45,7 +46,14 @@ final class GeneratePlaceholder implements ShouldQueue
             return;
         }
 
-        $stream = $storage->readStream($source->file()) ?? throw MediaNotShared::original($source->disk, $source->path);
+        $storage = $providers->provider($source->provider);
+
+        // Not checked by its provider yet, or at one that keeps its bytes to itself, e.g. Mux.
+        if ($source->status !== AssetStatus::Ready || ! $storage->readable()) {
+            return;
+        }
+
+        $stream = $storage->readStream($source->file()) ?? throw MediaNotShared::original((string) $source->disk, $source->path);
         $image = imagecreatefromstring((string) stream_get_contents($stream));
         fclose($stream);
 

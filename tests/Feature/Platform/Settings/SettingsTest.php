@@ -43,7 +43,7 @@ it('lists the settings pages on the settings index', function () {
                 'icon' => 'Team',
                 'url' => route('larasell.admin.settings.team.index'),
             ])
-            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'api-tokens', 'audit-log']));
+            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'api-tokens', 'audit-log', 'mux']));
 });
 
 it('places an extension\'s settings page relative to the panel\'s own', function () {
@@ -54,7 +54,7 @@ it('places an extension\'s settings page relative to the panel\'s own', function
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'acme-wishlists', 'api-tokens', 'audit-log'])
+            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'acme-wishlists', 'api-tokens', 'audit-log', 'mux'])
             ->where('settingsPages.1.url', route('acme.wishlists.settings')));
 });
 
@@ -68,7 +68,7 @@ it('puts an unplaced settings page last', function () {
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'api-tokens', 'audit-log', 'acme-wishlists']));
+            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'api-tokens', 'audit-log', 'mux', 'acme-wishlists']));
 });
 
 it('leaves API tokens off the settings when they are turned off', function () {
@@ -80,7 +80,7 @@ it('leaves API tokens off the settings when they are turned off', function () {
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.settings'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'audit-log']));
+            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('id')->all() === ['team', 'mux', 'audit-log']));
 });
 
 it('shows Settings in the sidebar without nested items', function () {
@@ -96,7 +96,7 @@ it('shares the settings pages on every page for the command menu', function () {
     $this->actingAs($this->ada, 'larasell-admin')
         ->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('label')->all() === ['Team', 'API tokens', 'Audit log'])
+            ->where('settingsPages', fn ($pages) => collect($pages)->pluck('label')->all() === ['Team', 'API tokens', 'Audit log', 'Mux'])
             ->where('settingsUrl', route('larasell.admin.settings')));
 });
 

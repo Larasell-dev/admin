@@ -9,9 +9,12 @@ use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Media\Models\MediaPlaceholder;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Larasell\Enums\Locale;
+use Larasell\Larasell\Media\Actions\CreateMediaFolder;
+use Larasell\Larasell\Media\Actions\CreateMediaFolderPayload;
 use Larasell\Larasell\Media\Actions\UploadMedia;
 use Larasell\Larasell\Media\Actions\UploadMediaPayload;
 use Larasell\Larasell\Media\AssetVisibility;
+use Larasell\Larasell\Media\MediaFolderName;
 use Larasell\Larasell\Media\Models\Media;
 use Larasell\Larasell\Translatable;
 
@@ -42,7 +45,7 @@ it('sends guests to the sign-in page', function () {
         ->assertRedirect(route('larasell.admin.login'));
 });
 
-it('lists the media newest first, with what the browser needs to show each', function () {
+it('lists the media newest first as library entries, with what the browser needs to show each', function () {
     // Arrange
     signInMediaAdmin();
     $boots = mediaFile(UploadedFile::fake()->image('boots.png'), ['en' => 'Boots', 'de' => 'Stiefel']);
@@ -54,12 +57,13 @@ it('lists the media newest first, with what the browser needs to show each', fun
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Media/Pages/Index')
             ->where('storeUrl', route('larasell.admin.media.store'))
-            ->where('media', [
-                [
+            ->where('entries.data', [
+                ['key' => "media-{$unboxing->id}", 'folder' => null, 'media' => [
                     'id' => $unboxing->id,
                     'type' => 'video',
                     'fileName' => 'unboxing.mp4',
                     'url' => $unboxing->original->url(),
+                    'status' => 'ready',
                     'thumbnailUrl' => null,
                     'thumbHash' => null,
                     'title' => null,
@@ -68,12 +72,14 @@ it('lists the media newest first, with what the browser needs to show each', fun
                     'showUrl' => route('larasell.admin.media.show', $unboxing),
                     'moveUrl' => route('larasell.admin.media.move', $unboxing),
                     'moveToNewFolderUrl' => route('larasell.admin.media.move-to-new-folder', $unboxing),
-                ],
-                [
+                    'destroyUrl' => route('larasell.admin.media.destroy', $unboxing),
+                ]],
+                ['key' => "media-{$boots->id}", 'folder' => null, 'media' => [
                     'id' => $boots->id,
                     'type' => 'image',
                     'fileName' => 'boots.png',
                     'url' => $boots->original->url(),
+                    'status' => 'ready',
                     // Made right away, as the tests' queue is sync.
                     'thumbnailUrl' => $boots->thumbnail()->sole()->url(),
                     'thumbHash' => MediaPlaceholder::query()->where('media_id', $boots->id)->value('thumbhash'),
@@ -83,48 +89,34 @@ it('lists the media newest first, with what the browser needs to show each', fun
                     'showUrl' => route('larasell.admin.media.show', $boots),
                     'moveUrl' => route('larasell.admin.media.move', $boots),
                     'moveToNewFolderUrl' => route('larasell.admin.media.move-to-new-folder', $boots),
-                ],
-            ])
-            ->where('pagination', ['page' => 1, 'pageSize' => 24, 'total' => 2]));
+                    'destroyUrl' => route('larasell.admin.media.destroy', $boots),
+                ]],
+            ]));
 });
 
-it('pages through the media, newest first, with the total for the page numbers', function () {
+it('loads the library 48 entries at a time, its folders first by name, then its media newest first', function () {
     // Arrange
     signInMediaAdmin();
     $oldest = mediaFile(UploadedFile::fake()->image('oldest.png'));
-    foreach (range(1, 24) as $number) {
+    foreach (range(1, 47) as $number) {
         mediaFile(UploadedFile::fake()->image("{$number}.png"));
     }
+    app(CreateMediaFolder::class)->handle(new CreateMediaFolderPayload(new MediaFolderName('Summer')));
+    app(CreateMediaFolder::class)->handle(new CreateMediaFolderPayload(new MediaFolderName('Autumn')));
 
     // Act & Assert
     $this->get(route('larasell.admin.media.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('media', 24)
-            ->where('media.0.fileName', '24.png')
-            ->where('pagination', ['page' => 1, 'pageSize' => 24, 'total' => 25]));
+            ->has('entries.data', 48)
+            ->where('entries.data.0.folder.name', 'Autumn')
+            ->where('entries.data.1.folder.name', 'Summer')
+            ->where('entries.data.2.media.fileName', '47.png')
+            ->where('entries.data.47.media.fileName', '2.png'));
 
-    $this->get(route('larasell.admin.media.index', ['page' => 2]))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('media', fn ($media) => collect($media)->pluck('id')->all() === [$oldest->id])
-            ->where('pagination', ['page' => 2, 'pageSize' => 24, 'total' => 25]));
+    $this->get(route('larasell.admin.media.index', ['page' => 2]), ['X-Inertia' => 'true'])
+        ->assertJsonPath('props.entries.data', fn (array $entries) => collect($entries)->pluck('media.fileName')->all() === ['1.png', 'oldest.png'])
+        ->assertJsonPath('scrollProps.entries', ['pageName' => 'page', 'previousPage' => 1, 'nextPage' => null, 'currentPage' => 2, 'reset' => false]);
 });
-
-it('shows as many per page as asked, out of the sizes it offers', function (int $asked, int $shown) {
-    // Arrange
-    signInMediaAdmin();
-    foreach (range(1, 50) as $number) {
-        mediaFile(UploadedFile::fake()->image("{$number}.png"));
-    }
-
-    // Act & Assert
-    $this->get(route('larasell.admin.media.index', ['per_page' => $asked]))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('media', $shown)
-            ->where('pagination.pageSize', $shown));
-})->with([
-    'an offered size' => [48, 48],
-    'one it does not offer' => [1000, 24],
-]);
 
 it('shows the last page when asked for one past it', function () {
     // Arrange
@@ -134,8 +126,7 @@ it('shows the last page when asked for one past it', function () {
     // Act & Assert
     $this->get(route('larasell.admin.media.index', ['page' => 5]))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('media.0.id', $only->id)
-            ->where('pagination.page', 1));
+            ->where('entries.data.0.media.id', $only->id));
 });
 
 it('uploads images and videos into the library, privately', function () {
@@ -200,6 +191,8 @@ it('shows a media item with its alt text in the content locale and its assets', 
                 'type' => 'image',
                 'fileName' => 'boots.png',
                 'url' => $original->url(),
+                'status' => 'ready',
+                'failure' => null,
                 'title' => null,
                 'description' => null,
                 'alt' => 'Boots',
@@ -213,6 +206,7 @@ it('shows a media item with its alt text in the content locale and its assets', 
                         'size' => $original->size,
                         'width' => 640,
                         'height' => 480,
+                        'status' => 'ready',
                         'url' => $original->url(),
                     ],
                     [
@@ -223,6 +217,7 @@ it('shows a media item with its alt text in the content locale and its assets', 
                         'size' => $thumbnail->size,
                         'width' => 400,
                         'height' => 300,
+                        'status' => 'ready',
                         'url' => $thumbnail->url(),
                     ],
                 ],
@@ -230,6 +225,22 @@ it('shows a media item with its alt text in the content locale and its assets', 
             ->where('updateUrl', route('larasell.admin.media.update', $boots))
             ->where('destroyUrl', route('larasell.admin.media.destroy', $boots))
             ->where('indexUrl', route('larasell.admin.media.index')));
+});
+
+it('goes back to the folder the media item is in when its page is closed or it is deleted there', function () {
+    // Arrange
+    signInMediaAdmin();
+    $summer = app(CreateMediaFolder::class)->handle(new CreateMediaFolderPayload(new MediaFolderName('Summer')));
+    $boots = mediaFile(UploadedFile::fake()->image('boots.png'));
+    $boots->update(['folder_id' => $summer->id]);
+    $inSummer = route('larasell.admin.media.index', ['folder' => $summer->id]);
+
+    // Act & Assert
+    $this->get(route('larasell.admin.media.show', $boots))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('indexUrl', $inSummer));
+    $this->from(route('larasell.admin.media.show', $boots))
+        ->delete(route('larasell.admin.media.destroy', $boots), ['confirmation' => 'Delete media'])
+        ->assertRedirect($inSummer);
 });
 
 it('changes the alt text in the content locale and keeps its other translations', function () {
@@ -273,6 +284,22 @@ it('deletes a media item and its file', function () {
     Storage::disk('media')->assertMissing($path);
 });
 
+it('returns to the library page it was deleted from, but leaves its own page for the library', function () {
+    // Arrange
+    signInMediaAdmin();
+    $boots = mediaFile(UploadedFile::fake()->image('boots.png'));
+    $socks = mediaFile(UploadedFile::fake()->image('socks.png'));
+    $library = route('larasell.admin.media.index', ['folder' => 7, 'page' => 2]);
+
+    // Act & Assert
+    $this->from($library)
+        ->delete(route('larasell.admin.media.destroy', $boots), ['confirmation' => 'Delete media'])
+        ->assertRedirect($library);
+    $this->from(route('larasell.admin.media.show', $socks))
+        ->delete(route('larasell.admin.media.destroy', $socks), ['confirmation' => 'Delete media'])
+        ->assertRedirect(route('larasell.admin.media.index'));
+});
+
 it('adds the media library to the navigation', function () {
     // Arrange
     signInMediaAdmin();
@@ -308,9 +335,9 @@ it('shows private media through the panel, never by the file\'s own URL', functi
     // Act & Assert
     $this->get(route('larasell.admin.media.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('media.0.url', $fileUrl)
-            ->where('media.0.thumbnailUrl', route('larasell.admin.media.file', [$invoice, 'thumbnail']))
-            ->where('media.0.visibility', 'private'));
+            ->where('entries.data.0.media.url', $fileUrl)
+            ->where('entries.data.0.media.thumbnailUrl', route('larasell.admin.media.file', [$invoice, 'thumbnail']))
+            ->where('entries.data.0.media.visibility', 'private'));
     $this->get(route('larasell.admin.media.show', $invoice))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('media.url', $fileUrl)
@@ -510,7 +537,7 @@ it('shows the title and description in the content locale, in the grid and on th
 
     // Act & Assert
     $this->get(route('larasell.admin.media.index'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('media.0.title', 'Vorne'));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('entries.data.0.media.title', 'Vorne'));
     $this->get(route('larasell.admin.media.show', $boots))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('media.title', 'Vorne')

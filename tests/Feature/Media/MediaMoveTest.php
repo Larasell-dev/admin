@@ -55,8 +55,9 @@ it('moves an item into a folder, and back to the top level', function () {
 
 it('takes a moved item off the page it was on, and shows the last page when that one empties', function () {
     // Arrange
+    // With the folder, 49 entries: the oldest item is alone on page 2.
     $summer = moveFolder('Summer');
-    $items = collect(range(1, 25))->map(fn () => moveMediaIn(null));
+    $items = collect(range(1, 48))->map(fn () => moveMediaIn(null));
     $oldest = $items->first();
 
     // Act
@@ -67,10 +68,9 @@ it('takes a moved item off the page it was on, and shows the last page when that
     $response->assertRedirect(route('larasell.admin.media.index', ['page' => 2]));
     $this->get(route('larasell.admin.media.index', ['page' => 2]))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('pagination.page', 1)
-            ->where('pagination.total', 24)
-            ->has('media', 24)
-            ->where('folders.0.mediaCount', 1));
+            ->has('entries.data', 48)
+            ->where('entries.data.0.folder.mediaCount', 1)
+            ->where('entries.data.47.media.id', $items[1]->id));
 });
 
 it('says the folder no longer exists when it was deleted meanwhile, and moves nothing', function () {

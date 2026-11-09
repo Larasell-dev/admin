@@ -168,9 +168,9 @@ it('hands the grid each item\'s placeholder', function () {
     expect($hash)->toBeString()->not->toBe('');
     $this->get(route('larasell.admin.media.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('media.0.id', $video->id)
-            ->where('media.0.thumbHash', null)
-            ->where('media.1.thumbHash', $hash));
+            ->where('entries.data.0.media.id', $video->id)
+            ->where('entries.data.0.media.thumbHash', null)
+            ->where('entries.data.1.media.thumbHash', $hash));
 });
 
 it('queues placeholders for the images that have none yet', function () {

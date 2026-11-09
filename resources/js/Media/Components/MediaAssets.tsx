@@ -1,7 +1,6 @@
 import { Icon } from "@larasell-dev/ui";
 import { FileVideoLine, ImageLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
-import { useId } from "react";
 
 type Asset = Larasell.Admin.Media.Data.MediaAssetData;
 
@@ -41,22 +40,20 @@ function dimensions(asset: Asset): string | null {
 }
 
 /**
- * The media's files, e.g. its original and thumbnail, as tiles in the sidebar. Each previews with
- * the thumbnail, which is the same picture, so the sidebar never downloads an original; the link
- * opens the file itself.
+ * The media's files, e.g. its original and thumbnail, stacked: a small preview on the left, the
+ * file's details on the right. Each previews with the thumbnail, which is the same picture, so the
+ * sidebar never downloads an original; the link opens the file itself.
  */
-export default function MediaAssets({ assets }: { assets: Asset[] }) {
-  const heading = useId();
+export default function MediaAssets({
+  assets,
+  labelledBy,
+}: {
+  assets: Asset[];
+  labelledBy: string;
+}) {
   const preview = assets.find((asset) => asset.role === "thumbnail")?.url ?? null;
 
-  return (
-    <section className="flex flex-col gap-2">
-      <h2 id={heading} className="type-body-md text-base-primary">
-        <fbt desc="Media page: heading of the sidebar's list of the media's files">Assets</fbt>
-      </h2>
-      <Tiles assets={assets} labelledBy={heading} preview={preview} />
-    </section>
-  );
+  return <Tiles assets={assets} labelledBy={labelledBy} preview={preview} />;
 }
 
 function Tiles({
@@ -69,23 +66,23 @@ function Tiles({
   preview: string | null;
 }) {
   return (
-    <ul aria-labelledby={labelledBy} className="grid grid-cols-2 gap-2">
+    <ul aria-labelledby={labelledBy} className="flex flex-col gap-2">
       {assets.map((asset) => (
         <li key={asset.role}>
           <a
-            href={asset.url}
+            href={asset.url ?? undefined}
             target="_blank"
             rel="noreferrer"
-            className="group flex flex-col overflow-hidden border border-base-subtle type-body-sm focus-visible:focus-ring"
+            className="group flex items-start gap-3 border border-base-subtle type-body-sm focus-visible:focus-ring"
           >
-            <span className="flex aspect-square items-center justify-center bg-base-section">
+            <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden bg-base-section">
               {asset.mimeType.startsWith("image/") && preview ? (
                 <img src={preview} alt="" loading="lazy" className="size-full object-cover" />
               ) : (
                 <Icon icon={asset.mimeType.startsWith("image/") ? ImageLine : FileVideoLine} />
               )}
             </span>
-            <span className="flex flex-col p-2">
+            <span className="flex min-w-0 flex-col py-2 pr-2">
               <span className="text-base-primary group-hover:underline">{roleLabel(asset)}</span>
               <span className="text-base-secondary">{asset.mimeType}</span>
               {dimensions(asset) && (
