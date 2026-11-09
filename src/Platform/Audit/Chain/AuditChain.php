@@ -12,9 +12,10 @@ use stdClass;
 
 /**
  * Chains the audit log's records, so a record changed or deleted outside the app shows. Each
- * record's hash covers its own columns and the hash of the record before it. README.md next to
- * this class is the spec: how a record is encoded and hashed, so anyone can check the chain
- * without this code.
+ * record's hash is the SHA-256 of the previous record's hash (empty for the first) followed by its
+ * columns as one JSON object: keys sorted at every level, no whitespace, slashes and Unicode
+ * unescaped, seq and event_version as integers, properties as stored, and dates in UTC as
+ * Y-m-d H:i:s.u.
  *
  * @internal The Auditor appends to it; larasell:verify-audit-log and the prune command use the rest.
  */

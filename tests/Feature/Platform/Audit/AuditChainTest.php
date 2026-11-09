@@ -89,7 +89,7 @@ it('hashes each record with the one before it, as the canonical form in the spec
     // Assert
     $rows = chainRows();
 
-    // Written out from src/Platform/Audit/Chain/README.md rather than built by the code under test.
+    // Written out by hand rather than built by the code under test.
     $first = '{"actor_id":"librarian","actor_type":"system","category":"business_critical","correlation_id":"'.$rows[1]->correlation_id.'","created_at":"2026-10-30 12:00:00.250000","event":"book.shelved","event_version":1,"id":"'.$rows[1]->id.'","occurred_at":"2026-10-30 12:00:00.250000","properties":{"author":{"first":"Frank","last":"Herbert"},"lent":null,"new":true,"note":"Ünïcode / \"quoted\"\n","shelf":3,"tags":["b","a"],"title":"Dune"},"seq":1,"source":"cli","subject_id":"42","subject_type":"book","unknown_actor_reason":null}';
     $second = '{"actor_id":null,"actor_type":"unknown","category":"business_critical","correlation_id":"'.$rows[2]->correlation_id.'","created_at":"2026-10-30 12:00:00.250000","event":"book.shelved","event_version":1,"id":"'.$rows[2]->id.'","occurred_at":"2026-10-30 12:00:00.250000","properties":{},"seq":2,"source":"cli","subject_id":"42","subject_type":"book","unknown_actor_reason":"Imported."}';
 
