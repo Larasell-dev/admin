@@ -106,10 +106,10 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
                     "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
                   )}
                   name="confirmation"
-                  // Also why the channel can't be deleted at all, which the field then locks.
+                  // Also why the channel can't be deleted at all.
                   error={errors.confirmation ?? errors.channel}
                 >
-                  <Input autoComplete="off" disabled={errors.channel !== undefined} />
+                  <Input autoComplete="off" />
                 </Field>
                 <AlertDialog.Actions>
                   <AlertDialog.Cancel>
@@ -117,12 +117,7 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
                       Cancel
                     </fbt>
                   </AlertDialog.Cancel>
-                  <AlertDialog.Confirm
-                    type="submit"
-                    variant="destructive"
-                    loading={processing}
-                    disabled={errors.channel !== undefined}
-                  >
+                  <AlertDialog.Confirm type="submit" variant="destructive" loading={processing}>
                     <fbt desc="Sales channel page: button in the dialog that deletes the channel">
                       Delete
                     </fbt>
