@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Platform\Panel\Exceptions\InvalidExtension;
 
 beforeEach(function () {
     $this->panelHot = dirname(__DIR__, 4).'/public/hot';
@@ -81,4 +82,33 @@ it('fails when an extension is not built', function () {
     $this->artisan('larasell:link')
         ->expectsOutputToContain('Assets of [acme-wishlists] are not built.')
         ->assertFailed();
+});
+
+it('rejects an extension name that is not a plain slug', function (string $name) {
+    // Act & Assert
+    expect(fn () => AdminPanel::resolve()->vite($name, $this->extensionPublic, ['resources/js/admin.ts']))
+        ->toThrow(InvalidExtension::class);
+})->with(['../../storage', 'acme/wishlists', '.', '..', '']);
+
+it('refuses to link an extension outside public/vendor without deleting anything', function () {
+    // Arrange
+    $outside = public_path('acme-escape');
+    File::ensureDirectoryExists($outside);
+    file_put_contents("{$outside}/keep.txt", 'keep');
+    mkdir("{$this->extensionPublic}/vendor");
+    mkdir("{$this->extensionPublic}/acme-escape");
+    // Registered past vite()'s check, as production does when that check only reports.
+    (fn (string $publicPath) => $this->extensions['../acme-escape'] = ['publicPath' => $publicPath, 'entries' => []])
+        ->call(AdminPanel::resolve(), $this->extensionPublic);
+
+    // Act
+    $run = fn () => $this->artisan('larasell:link')->run();
+
+    // Assert
+    try {
+        expect($run)->toThrow(InvalidExtension::class);
+        expect("{$outside}/keep.txt")->toBeReadableFile();
+    } finally {
+        is_link($outside) ? File::delete($outside) : File::deleteDirectory($outside);
+    }
 });

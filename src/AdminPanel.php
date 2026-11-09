@@ -11,6 +11,7 @@ use Larasell\Admin\Platform\Navigation\Navigation;
 use Larasell\Admin\Platform\Panel\Exceptions\InvalidExtension;
 use Larasell\Admin\Platform\Panel\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Platform\Panel\Http\Middleware\LogLicensingPlan;
+use Larasell\Admin\Platform\Support\Assert;
 
 class AdminPanel
 {
@@ -100,6 +101,12 @@ class AdminPanel
      */
     public function vite(string $name, string $publicPath, array $entries): void
     {
+        // The name becomes public/vendor/{$name}, which larasell:link deletes before linking. In
+        // production an extension with a broken name is left off the panel.
+        if (! Assert::that(preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*$/', $name) === 1, fn () => InvalidExtension::invalidName($name))) {
+            return;
+        }
+
         $this->extensions[$name] = ['publicPath' => rtrim($publicPath, '/'), 'entries' => $entries];
     }
 
