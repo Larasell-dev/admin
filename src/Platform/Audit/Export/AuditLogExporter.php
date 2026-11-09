@@ -4,9 +4,9 @@ namespace Larasell\Admin\Platform\Audit\Export;
 
 use Illuminate\Support\Facades\Date;
 use Larasell\Admin\Platform\Audit\Chain\AuditChain;
+use Larasell\Admin\Platform\Audit\Export\Exceptions\AuditLogExportUnwritable;
 use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Log\Models\AuditLogEntry;
-use Larasell\Chronicle\Exceptions\StructuredLogicException;
 use ZipArchive;
 
 /**
@@ -30,12 +30,7 @@ class AuditLogExporter
         $stream = fopen($file, 'wb');
 
         if ($stream === false) {
-            throw new StructuredLogicException(
-                errorCode: 'larasell-admin.audit.export-unwritable',
-                message: "The audit log export couldn't open [{$path}] for writing.",
-                why: "The directory doesn't exist or the app may not write to it.",
-                fix: 'Pass a path in a directory the app can write to.',
-            );
+            throw AuditLogExportUnwritable::cannotOpen($path);
         }
 
         $records = 0;
@@ -83,15 +78,14 @@ class AuditLogExporter
     {
         $archive = new ZipArchive;
 
-        if ($archive->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true
-            || ! $archive->addFile($file, 'audit-log.'.$this->format->extension())
-            || ! $archive->close()) {
-            throw new StructuredLogicException(
-                errorCode: 'larasell-admin.audit.export-unwritable',
-                message: "The audit log export couldn't write the zip archive [{$path}].",
-                why: "The directory doesn't exist or the app may not write to it.",
-                fix: 'Pass a path in a directory the app can write to.',
-            );
+        $written = $archive->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true
+            && $archive->addFile($file, 'audit-log.'.$this->format->extension())
+            && $archive->close();
+
+        if ($written) {
+            return;
         }
+
+        throw AuditLogExportUnwritable::cannotZip($path);
     }
 }
