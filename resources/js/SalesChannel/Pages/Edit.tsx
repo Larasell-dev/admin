@@ -1,8 +1,7 @@
-import { Form, router } from "@inertiajs/react";
-import { AlertDialog, Button, Field, Icon, Input, Section, SectionStack } from "@larasell-dev/ui";
+import { Form } from "@inertiajs/react";
+import { Button, Field, Icon, Input, Section, SectionStack } from "@larasell-dev/ui";
 import { DeleteBinLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
-import { useState } from "react";
 import { Page } from "../../Platform/Panel/Components/Page";
 import PersistentAlertDialog from "../../Platform/Panel/Components/PersistentAlertDialog";
 import EntryPoints from "../Components/EntryPoints";
@@ -70,88 +69,67 @@ export default function Edit({
 
 /** Deletes the channel after asking; the server refuses it when carts or orders were made in it. */
 function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string }) {
-  const [open, setOpen] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [typed, setTyped] = useState("");
-  // Why the server refused: the typed name didn't match, or the channel can't be deleted at all.
-  const [errors, setErrors] = useState<{ confirmation?: string; channel?: string }>({});
-
-  const confirm = () =>
-    router.delete(destroyUrl, {
-      data: { confirmation: typed },
-      onStart: () => setProcessing(true),
-      onFinish: () => setProcessing(false),
-      onSuccess: () => setOpen(false),
-      onError: setErrors,
-    });
-
   return (
     // Persistent, since deleting leads to the dashboard and the dialog animates out over it.
-    <PersistentAlertDialog
-      open={open}
-      onOpenChange={(next) => {
-        setOpen(next);
-        setTyped("");
-        setErrors({});
-      }}
-    >
-      <Button variant="destructive" onClick={() => setOpen(true)}>
+    <PersistentAlertDialog.Root>
+      <PersistentAlertDialog.Trigger render={<Button variant="destructive" />}>
         <Icon icon={DeleteBinLine} />
         <fbt desc="Sales channel page: button in the delete section, below the currencies, that asks to delete the channel">
           Delete
         </fbt>
-      </Button>
-      <AlertDialog.Popup
+      </PersistentAlertDialog.Trigger>
+      <PersistentAlertDialog.Popup
         title={fbs(
           "Delete sales channel",
           "Sales channel page: title of the dialog that asks to confirm deleting the channel",
         )}
-        description={
-          errors.channel ??
-          fbs(
-            [
-              "Customers can no longer reach ",
-              fbs.param("channelName", name),
-              ". This can't be undone.",
-            ],
-            "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
-          )
-        }
+        description={fbs(
+          [
+            "Customers can no longer reach ",
+            fbs.param("channelName", name),
+            ". This can't be undone.",
+          ],
+          "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
+        )}
       >
-        <Field
-          label={fbs(
-            ['Type "', fbs.param("channelName", name), '" to confirm'],
-            "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
-          )}
-          name="confirmation"
-          error={errors.confirmation}
-        >
-          <Input
-            autoComplete="off"
-            value={typed}
-            disabled={errors.channel !== undefined}
-            onChange={(event) => setTyped(event.currentTarget.value)}
-          />
-        </Field>
-        <AlertDialog.Actions>
-          <AlertDialog.Cancel>
-            <fbt desc="Sales channel page: button that closes the delete dialog without deleting">
-              Cancel
-            </fbt>
-          </AlertDialog.Cancel>
-          <AlertDialog.Confirm
-            variant="destructive"
-            loading={processing}
-            disabled={errors.channel !== undefined}
-            onClick={confirm}
-          >
-            <fbt desc="Sales channel page: button in the dialog that deletes the channel">
-              Delete
-            </fbt>
-          </AlertDialog.Confirm>
-        </AlertDialog.Actions>
-      </AlertDialog.Popup>
-    </PersistentAlertDialog>
+        {({ close }) => (
+          // The popup unmounts once closed, so the form starts empty each time it opens.
+          <Form action={destroyUrl} method="delete" onSuccess={close}>
+            {({ errors, processing }) => (
+              <>
+                <Field
+                  label={fbs(
+                    ['Type "', fbs.param("channelName", name), '" to confirm'],
+                    "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
+                  )}
+                  name="confirmation"
+                  // Also why the channel can't be deleted at all.
+                  error={errors.confirmation ?? errors.channel}
+                >
+                  <Input autoComplete="off" />
+                </Field>
+                <PersistentAlertDialog.Actions>
+                  <PersistentAlertDialog.Cancel>
+                    <fbt desc="Sales channel page: button that closes the delete dialog without deleting">
+                      Cancel
+                    </fbt>
+                  </PersistentAlertDialog.Cancel>
+                  <PersistentAlertDialog.Confirm
+                    type="submit"
+                    variant="destructive"
+                    loading={processing}
+                  >
+                    <fbt desc="Sales channel page: button in the dialog that deletes the channel">
+                      Delete
+                    </fbt>
+                  </PersistentAlertDialog.Confirm>
+                </PersistentAlertDialog.Actions>
+              </>
+            )}
+          </Form>
+        )}
+      </PersistentAlertDialog.Popup>
+    </PersistentAlertDialog.Root>
   );
 }
 
