@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Team\Exceptions\InvalidAvatarPath;
 
 /**
  * The admins table rows as the signed-in admin sees them.
@@ -226,3 +227,20 @@ it('requires a signed-in admin', function (string $uri) {
     // Act & Assert
     $this->get($uri)->assertRedirect(route('larasell.admin.login'));
 })->with(['/admin/settings', '/admin/settings/team', '/admin/settings/team/create', '/admin/settings/team/1/edit']);
+
+it('keeps a file outside avatars/ that an admin\'s avatar path points to', function () {
+    // Arrange
+    $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+    $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+    $disk = Storage::fake(config('larasell.admin.panel.disk'));
+    $disk->put('invoices/2026.pdf', 'invoice');
+    $ada->update(['avatar_path' => 'invoices/2026.pdf']);
+    $delete = adminRows($alan)[0]['_actions'][0]['url'];
+
+    // Act
+    $delete = fn () => $this->withoutExceptionHandling()->post($delete, ['confirmation' => 'ada@example.com']);
+
+    // Assert
+    expect($delete)->toThrow(InvalidAvatarPath::class);
+    $disk->assertExists('invoices/2026.pdf');
+});

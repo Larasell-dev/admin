@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Team\Actions\UpdateAdmin;
 use Larasell\Admin\Team\Data\AdminData;
 use Larasell\Admin\Team\Data\ProfilePageData;
+use Larasell\Admin\Team\Exceptions\InvalidAvatarPath;
 use Larasell\Admin\Team\Http\Requests\ProfileRequest;
 
 class ProfileController
@@ -39,7 +41,9 @@ class ProfileController
 
         $updateAdmin->handle($admin, $attributes, $admin);
 
-        if ($previousAvatar !== null && $previousAvatar !== $admin->avatar_path) {
+        // In production an avatar path outside avatars/ is reported and its file kept.
+        if ($previousAvatar !== null && $previousAvatar !== $admin->avatar_path
+            && Assert::that(AvatarController::isAvatar($previousAvatar), fn () => InvalidAvatarPath::outsideAvatars($previousAvatar))) {
             $disk->delete($previousAvatar);
         }
 

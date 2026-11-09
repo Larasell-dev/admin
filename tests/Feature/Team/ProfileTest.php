@@ -6,6 +6,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Team\Exceptions\InvalidAvatarPath;
+use Larasell\Admin\Team\Http\Controllers\AvatarController;
 
 function profileAdmin(array $attributes = []): Admin
 {
@@ -355,4 +357,19 @@ it('rate limits avatar uploads', function () {
     $this->actingAs($admin, 'larasell-admin')
         ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 128, 128)])
         ->assertTooManyRequests();
+});
+
+it('keeps a file outside avatars/ that the previous avatar path points to', function () {
+    // Arrange
+    Storage::fake('public');
+    Storage::disk('public')->put('invoices/2026.pdf', 'invoice');
+    $admin = profileAdmin(['avatar_path' => 'invoices/2026.pdf']);
+
+    // Act
+    $update = fn () => $this->withoutExceptionHandling()->actingAs($admin, 'larasell-admin')
+        ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'remove_avatar' => true]);
+
+    // Assert
+    expect($update)->toThrow(InvalidAvatarPath::class);
+    Storage::disk('public')->assertExists('invoices/2026.pdf');
 });

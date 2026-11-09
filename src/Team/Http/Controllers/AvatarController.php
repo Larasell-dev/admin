@@ -14,6 +14,15 @@ class AvatarController
      */
     public const PENDING_SESSION_KEY = 'larasell-admin.pending-avatar';
 
+    /**
+     * Whether the path is a file directly in avatars/, the folder uploads are stored in. Only
+     * those are deleted, so a path that was changed can't delete another file on the disk.
+     */
+    public static function isAvatar(string $path): bool
+    {
+        return preg_match('#^avatars/[A-Za-z0-9][A-Za-z0-9._-]*$#', $path) === 1;
+    }
+
     public function store(AvatarRequest $request): JsonResponse
     {
         $disk = Storage::disk(config('larasell.admin.panel.disk'));
