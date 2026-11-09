@@ -96,6 +96,21 @@ class AuditFailed extends RuntimeException implements StructuredException
     /**
      * @internal
      */
+    public static function prunedOverGap(int $from, int $until, int $stored): static
+    {
+        $expected = $until - $from + 1;
+
+        return static::structured(
+            errorCode: 'larasell-admin.audit.pruned-over-gap',
+            message: "Pruning would delete records {$from} to {$until}, {$expected} records, but only {$stored} are stored.",
+            why: 'A record in the oldest stretch was already deleted outside the app. Pruning over it would hide that it is missing.',
+            fix: 'Run php artisan larasell:verify-audit-log, and find out who deleted the record before pruning again.',
+        );
+    }
+
+    /**
+     * @internal
+     */
     public static function headOutOfStep(string $event): static
     {
         return static::structured(

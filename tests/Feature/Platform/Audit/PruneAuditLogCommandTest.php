@@ -10,6 +10,7 @@ use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Chain\AuditChain;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 use Larasell\Admin\Platform\Audit\Subject;
 
 beforeEach(function () {
@@ -219,3 +220,20 @@ it('refuses an invalid retention period without deleting anything', function (mi
     'not a number' => ['a year'],
     'a fraction' => [30.5],
 ]);
+
+it('refuses to prune over a gap, so pruning can\'t hide a record deleted outside the app', function () {
+    // Arrange
+    config(['larasell.admin.audit.retention.days' => 30]);
+
+    storedRecord(400);
+    storedRecord(300);
+    storedRecord(31);
+    storedRecord(29);
+    DB::table('larasell_audit_log')->where('seq', 2)->delete();
+
+    // Act & Assert
+    expect(fn () => $this->artisan('larasell:prune-audit-log')->run())->toThrow(AuditFailed::class);
+
+    expect(remainingRecords())->toBe([1, 3, 4])
+        ->and(app(AuditChain::class)->verify()->reason)->toBe('missing_event');
+});
