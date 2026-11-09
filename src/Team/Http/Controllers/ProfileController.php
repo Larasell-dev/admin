@@ -8,11 +8,9 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Platform\Auth\Models\Admin;
-use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Team\Actions\UpdateAdmin;
 use Larasell\Admin\Team\Data\AdminData;
 use Larasell\Admin\Team\Data\ProfilePageData;
-use Larasell\Admin\Team\Exceptions\InvalidAvatarPath;
 use Larasell\Admin\Team\Http\Requests\ProfileRequest;
 
 class ProfileController
@@ -30,6 +28,7 @@ class ProfileController
     {
         $attributes = $request->safe()->only(['name', 'email']);
         $disk = Storage::disk(config('larasell.admin.panel.disk'));
+        // Read before anything is saved: a stored path outside avatars/ throws here.
         $previousAvatar = $admin->avatar_path;
 
         if ($request->filled('avatar')) {
@@ -41,10 +40,8 @@ class ProfileController
 
         $updateAdmin->handle($admin, $attributes, $admin);
 
-        // In production an avatar path outside avatars/ is reported and its file kept.
-        if ($previousAvatar !== null && $previousAvatar !== $admin->avatar_path
-            && Assert::that(AvatarController::isAvatar($previousAvatar), fn () => InvalidAvatarPath::outsideAvatars($previousAvatar))) {
-            $disk->delete($previousAvatar);
+        if ($previousAvatar !== null && $previousAvatar->path !== $admin->avatar_path?->path) {
+            $disk->delete($previousAvatar->path);
         }
 
         return redirect()->route('larasell.admin.profile');
