@@ -11,9 +11,11 @@ use Larasell\Admin\Platform\Audit\Export\Actions\DeleteAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Actions\RequestAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Actions\RequestAuditLogExportPayload;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExported;
+use Larasell\Admin\Platform\Audit\Export\Exceptions\InvalidAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Http\Requests\DeleteAuditLogExportRequest;
 use Larasell\Admin\Platform\Audit\Export\Http\Requests\DownloadAuditLogExportRequest;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
+use Larasell\Admin\Platform\Support\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -35,12 +37,20 @@ class AuditLogExportController
 
     public function show(DownloadAuditLogExportRequest $request, AuditLogExport $export, Auditor $auditor): StreamedResponse
     {
+        // The job sets both when it marks the export ready; without them there's nothing to send.
+        $path = $export->path;
+        $records = $export->records;
+
+        if (! Assert::that($path !== null && $records !== null, fn () => InvalidAuditLogExport::readyWithoutFile($export->id)) || $path === null || $records === null) {
+            abort(404);
+        }
+
         // Opened first, so a file that is gone records no download; recorded before any byte leaves.
-        $stream = Storage::disk(config('larasell.admin.audit.export.disk'))->readStream((string) $export->path);
+        $stream = Storage::disk(config('larasell.admin.audit.export.disk'))->readStream($path);
         abort_if($stream === null, 404);
 
         try {
-            $auditor->record(new AuditLogExported($export->id, $export->format, (int) $export->records));
+            $auditor->record(new AuditLogExported($export->id, $export->format, $records));
         } catch (\Throwable $exception) {
             fclose($stream);
 

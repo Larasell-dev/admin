@@ -20,6 +20,7 @@ use Larasell\Admin\Platform\Audit\Chain\AuditChain;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
+use Larasell\Admin\Platform\Audit\Export\Exceptions\InvalidAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
@@ -536,4 +537,15 @@ it('keeps other admins from deleting an export', function () {
     $this->actingAs($this->alan, 'larasell-admin')->delete($deleteUrl, ['confirmation' => 'Delete export'])->assertForbidden();
 
     expect(AuditLogExport::query()->exists())->toBeTrue();
+});
+
+it('refuses to download a ready export without a file, instead of reading another one', function () {
+    // Arrange
+    $url = exportAs($this->ada)[0]['downloadUrl'];
+    AuditLogExport::query()->sole()->update(['path' => null]);
+
+    // Act & Assert
+    expect(fn () => $this->withoutExceptionHandling()->get($url))->toThrow(InvalidAuditLogExport::class);
+
+    expect(DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->exists())->toBeFalse();
 });
