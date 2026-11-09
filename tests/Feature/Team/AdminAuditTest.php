@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Larasell\Admin\Platform\Audit\Actors\SystemActor;
+use Larasell\Admin\Platform\Audit\Facades\Audit;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\Actions\CreateAdmin;
 use Larasell\Admin\Team\Actions\DeleteAdmin;
@@ -85,7 +85,7 @@ it('audits a failed sign-in to an unknown email with the email that was tried', 
 
 it('signs no one in when the sign-in can\'t be audited', function () {
     // Arrange
-    Schema::drop('larasell_audit_log');
+    Audit::fake()->failing();
 
     // Act
     $this->post(route('larasell.admin.login.store'), ['email' => 'ada@example.com', 'password' => 'Correct-Horse-9'])
@@ -226,7 +226,7 @@ it('does not audit saving an admin without changes, or changing only an avatar',
 
 it('changes no admin when the change can\'t be audited', function () {
     // Arrange
-    Schema::drop('larasell_audit_log');
+    Audit::fake()->failing();
     $this->actingAs($this->ada, 'larasell-admin');
 
     // Act
@@ -243,7 +243,7 @@ it('keeps an admin and their avatar when their deletion can\'t be audited', func
     $disk = Storage::fake(config('larasell.admin.panel.disk'));
     $disk->put('avatars/ada.png', 'ada');
     $this->ada->update(['avatar_path' => 'avatars/ada.png']);
-    Schema::drop('larasell_audit_log');
+    Audit::fake()->failing();
 
     // Act & Assert
     expect(fn () => app(DeleteAdmin::class)->handle($this->ada, new SystemActor('offboarding')))->toThrow(Exception::class);

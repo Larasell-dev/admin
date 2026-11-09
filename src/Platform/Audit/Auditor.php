@@ -27,7 +27,8 @@ use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
  *         $auditor->record(new ApiTokenCreated($apiToken));
  *     });
  *
- * @public Inject it and call record(); its other methods are internal.
+ * @public Inject it, or use the Audit facade, and call record(); its other methods are internal.
+ * Tests fake it with Audit::fake().
  */
 class Auditor
 {
@@ -42,19 +43,19 @@ class Auditor
      */
     private const string CORRELATION_ID = 'correlation_id';
 
-    private int $runningJobs = 0;
+    protected int $runningJobs = 0;
 
     /** The guard that authenticates API requests, once a module registers one. */
-    private ?string $apiGuard = null;
+    protected ?string $apiGuard = null;
 
     /**
      * What the audit log calls actors other than admins, by actor type.
      *
      * @var array<string, array{label: string, model: class-string<Model>}>
      */
-    private array $actorTypes = [];
+    protected array $actorTypes = [];
 
-    public function __construct(private readonly AuditChain $chain) {}
+    public function __construct(protected readonly AuditChain $chain) {}
 
     /**
      * Stores the record, failing rather than losing it, so the change it describes rolls back too.
@@ -80,7 +81,7 @@ class Auditor
         $this->validate($event, $properties);
         $subject = $record->subject();
 
-        $this->chain->append([
+        $this->store($record, $actor, $source, [
             'id' => (string) Str::ulid(),
             'event' => $event,
             'event_version' => $record->version(),
@@ -167,6 +168,16 @@ class Auditor
     public function findActorType(string $type): ?array
     {
         return $this->actorTypes[$type] ?? null;
+    }
+
+    /**
+     * Appends the checked record to the chain. AuditFake keeps it in memory instead.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    protected function store(AuditRecord $record, Actor|UnknownActor $actor, AuditSource $source, array $row): void
+    {
+        $this->chain->append($row);
     }
 
     private function source(): AuditSource
