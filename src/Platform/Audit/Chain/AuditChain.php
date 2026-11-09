@@ -43,17 +43,10 @@ class AuditChain
     public function append(array $record): void
     {
         DB::transaction(function () use ($record): void {
+            // Created on the first append, rather than by a migration.
+            DB::table(self::HEAD)->insertOrIgnore(['id' => 1, 'seq' => 0, 'hash' => null]);
             DB::table(self::HEAD)->where('id', 1)->increment('seq');
-            $head = DB::table(self::HEAD)->where('id', 1)->first();
-
-            if ($head === null) {
-                throw new StructuredLogicException(
-                    errorCode: 'larasell-admin.audit.missing-head',
-                    message: 'The audit log has no chain head.',
-                    why: 'The migration that adds the chain creates it, so the audit log tables are out of date.',
-                    fix: 'Run php artisan migrate.',
-                );
-            }
+            $head = DB::table(self::HEAD)->where('id', 1)->sole();
 
             $record = [...$record, 'seq' => (int) $head->seq, 'previous_hash' => $head->hash];
             $record['hash'] = $this->hash($record);
@@ -122,8 +115,12 @@ class AuditChain
         $lastSeq = $previous === null ? $start['seq'] ?? 0 : (int) $previous->seq;
         $lastHash = $previous === null ? $start['sha256'] ?? null : $previous->hash;
 
-        if ($head === null || (int) $head->seq !== $lastSeq || $head->hash !== $lastHash) {
-            return Verification::broken($head === null ? $lastSeq : (int) $head->seq, 'head_mismatch', $count);
+        // No head row means nothing was ever appended.
+        $headSeq = $head === null ? 0 : (int) $head->seq;
+        $headHash = $head?->hash;
+
+        if ($headSeq !== $lastSeq || $headHash !== $lastHash) {
+            return Verification::broken($headSeq, 'head_mismatch', $count);
         }
 
         return Verification::passed($previous === null ? null : $lastSeq, $lastHash, $count);
