@@ -5,12 +5,17 @@ declare(strict_types=1);
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
 use Larasell\Admin\Platform\Audit\Actors\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Chain\AuditChain;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Enums\AuditSource;
 use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
+use Larasell\Admin\Platform\Audit\Facades\Audit;
+use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogPruned;
 use Larasell\Admin\Platform\Audit\Subject;
 
 beforeEach(function () {
@@ -189,17 +194,16 @@ it('deletes nothing under a legal hold, and records that it was held', function 
 });
 
 it('records each run as the command', function () {
+    // Arrange
+    Audit::fake([AuditLogPruned::class]);
+
     // Act
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
-    expect(DB::table('larasell_audit_log')->where('event', 'audit_log.pruned')->sole())->toMatchArray([
-        'category' => 'audit_access',
-        'actor_type' => 'system',
-        'actor_id' => 'larasell:prune-audit-log',
-        'source' => 'cli',
-        'subject_type' => null,
-    ]);
+    Audit::assertRecorded(AuditLogPruned::class, fn (AuditLogPruned $record, Actor|UnknownActor $actor, AuditSource $source) => $actor == new SystemActor('larasell:prune-audit-log')
+        && $source === AuditSource::Cli
+        && $record->subject() === null);
 });
 
 it('refuses an invalid retention period without deleting anything', function (mixed $days) {

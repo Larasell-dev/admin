@@ -2,85 +2,76 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
 use Larasell\Admin\Platform\Audit\Actors\SystemActor;
+use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
+use Larasell\Admin\Platform\Audit\Enums\AuditSource;
 use Larasell\Admin\Platform\Audit\Facades\Audit;
+use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Admin\Platform\Auth\AuditRecords\AdminSignedIn;
+use Larasell\Admin\Platform\Auth\AuditRecords\AdminSignedOut;
+use Larasell\Admin\Platform\Auth\AuditRecords\AdminSignInFailed;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\Actions\CreateAdmin;
 use Larasell\Admin\Team\Actions\DeleteAdmin;
+use Larasell\Admin\Team\AuditRecords\AdminCreated;
+use Larasell\Admin\Team\AuditRecords\AdminDeleted;
+use Larasell\Admin\Team\AuditRecords\AdminUpdated;
 
 beforeEach(function () {
     $this->ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'Correct-Horse-9']);
     $this->alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'Correct-Horse-9']);
 });
 
-/**
- * The one audit record with this event.
- */
-function auditRecord(string $event): object
+function isAdmin(Actor|UnknownActor $actor, Admin $admin): bool
 {
-    return DB::table('larasell_audit_log')->where('event', $event)->sole();
-}
-
-/**
- * @return array<string, mixed>
- */
-function propertiesOf(object $record): array
-{
-    return json_decode($record->properties, true);
+    return $actor instanceof Admin && $actor->is($admin);
 }
 
 it('audits signing in as the admin who did', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->post(route('larasell.admin.login.store'), ['email' => 'ada@example.com', 'password' => 'Correct-Horse-9'])
         ->assertRedirect(route('larasell.admin.home'));
 
     // Assert
-    $record = auditRecord('admin.signed_in');
-
-    expect($record)->toMatchArray([
-        'category' => 'security',
-        'actor_type' => 'admin',
-        'actor_id' => (string) $this->ada->id,
-        'subject_type' => 'admin',
-        'subject_id' => (string) $this->ada->id,
-        'source' => 'web',
-    ])
-        ->and(propertiesOf($record))->toBe([]);
+    Audit::assertRecorded(AdminSignedIn::class, fn (AdminSignedIn $record, Actor|UnknownActor $actor, AuditSource $source) => isAdmin($actor, $this->ada)
+        && $record->subject() == new Subject('admin', $this->ada->id)
+        && $record->properties() === []
+        && $source === AuditSource::Web);
 });
 
 it('audits a failed sign-in to an admin\'s email against that admin, without the password', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])
         ->post(route('larasell.admin.login.store'), ['email' => 'ada@example.com', 'password' => 'Wrong-Horse-1'])
         ->assertSessionHasErrors('email');
 
     // Assert
-    $record = auditRecord('admin.sign_in_failed');
-
-    expect($record)->toMatchArray([
-        'category' => 'security',
-        'actor_type' => 'unknown',
-        'unknown_actor_reason' => 'No one was signed in: the sign-in failed.',
-        'subject_type' => 'admin',
-        'subject_id' => (string) $this->ada->id,
-    ])
-        ->and(propertiesOf($record))->toBe(['ip' => '203.0.113.7'])
-        ->and($record->properties)->not->toContain('Wrong-Horse-1');
+    Audit::assertRecorded(AdminSignInFailed::class, fn (AdminSignInFailed $record, Actor|UnknownActor $actor) => $actor instanceof UnknownActor
+        && $actor->reason === 'No one was signed in: the sign-in failed.'
+        && $record->subject() == new Subject('admin', $this->ada->id)
+        && $record->properties() === ['ip' => '203.0.113.7']);
 });
 
 it('audits a failed sign-in to an unknown email with the email that was tried', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])
         ->post(route('larasell.admin.login.store'), ['email' => 'mallory@example.com', 'password' => 'Wrong-Horse-1'])
         ->assertSessionHasErrors('email');
 
     // Assert
-    $record = auditRecord('admin.sign_in_failed');
-
-    expect($record->subject_type)->toBeNull()
-        ->and(propertiesOf($record))->toBe(['email' => 'mallory@example.com', 'ip' => '203.0.113.7']);
+    Audit::assertRecorded(AdminSignInFailed::class, fn (AdminSignInFailed $record) => $record->subject() === null
+        && $record->properties() === ['email' => 'mallory@example.com', 'ip' => '203.0.113.7']);
 });
 
 it('signs no one in when the sign-in can\'t be audited', function () {
@@ -96,22 +87,23 @@ it('signs no one in when the sign-in can\'t be audited', function () {
 });
 
 it('audits signing out as the admin who did', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->actingAs($this->ada, 'larasell-admin')
         ->post(route('larasell.admin.logout'))
         ->assertRedirect(route('larasell.admin.login'));
 
     // Assert
-    expect(auditRecord('admin.signed_out'))->toMatchArray([
-        'category' => 'security',
-        'actor_type' => 'admin',
-        'actor_id' => (string) $this->ada->id,
-        'subject_type' => 'admin',
-        'subject_id' => (string) $this->ada->id,
-    ]);
+    Audit::assertRecorded(AdminSignedOut::class, fn (AdminSignedOut $record, Actor|UnknownActor $actor) => isAdmin($actor, $this->ada)
+        && $record->subject() == new Subject('admin', $this->ada->id));
 });
 
 it('audits adding an admin as the admin who did, without their password', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->actingAs($this->ada, 'larasell-admin')
         ->post(route('larasell.admin.settings.team.store'), ['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'])
@@ -119,21 +111,15 @@ it('audits adding an admin as the admin who did, without their password', functi
 
     // Assert
     $grace = Admin::query()->where('email', 'grace@example.com')->sole();
-    $record = auditRecord('admin.created');
 
-    expect($record)->toMatchArray([
-        'category' => 'security',
-        'actor_type' => 'admin',
-        'actor_id' => (string) $this->ada->id,
-        'subject_type' => 'admin',
-        'subject_id' => (string) $grace->id,
-    ])
-        ->and(propertiesOf($record))->toBe(['email' => 'grace@example.com'])
-        ->and($record->properties)->not->toContain('Correct-Horse-9');
+    Audit::assertRecorded(AdminCreated::class, fn (AdminCreated $record, Actor|UnknownActor $actor) => isAdmin($actor, $this->ada)
+        && $record->subject() == new Subject('admin', $grace->id)
+        && $record->properties() === ['email' => 'grace@example.com']);
 });
 
 it('audits deleting an admin, keeping their email once they are gone', function () {
     // Arrange
+    Audit::fake();
     Storage::fake(config('larasell.admin.panel.disk'));
     $delete = $this->actingAs($this->alan, 'larasell-admin')
         ->get(route('larasell.admin.settings.team.index'))
@@ -143,41 +129,32 @@ it('audits deleting an admin, keeping their email once they are gone', function 
     $this->post($delete, ['confirmation' => 'ada@example.com'])->assertRedirect();
 
     // Assert
-    $record = auditRecord('admin.deleted');
-
-    expect($record)->toMatchArray([
-        'actor_type' => 'admin',
-        'actor_id' => (string) $this->alan->id,
-        'subject_type' => 'admin',
-        'subject_id' => (string) $this->ada->id,
-    ])
-        ->and(propertiesOf($record))->toBe(['email' => 'ada@example.com']);
+    Audit::assertRecorded(AdminDeleted::class, fn (AdminDeleted $record, Actor|UnknownActor $actor) => isAdmin($actor, $this->alan)
+        && $record->subject() == new Subject('admin', $this->ada->id)
+        && $record->properties() === ['email' => 'ada@example.com']);
 });
 
 it('audits which of an admin\'s fields changed in the settings, with the email before and after', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->actingAs($this->ada, 'larasell-admin')
         ->put(route('larasell.admin.settings.team.update', $this->alan), ['name' => 'Alan M. Turing', 'email' => 'turing@example.com', 'password' => 'Brand-New-Pass-2'])
         ->assertRedirect();
 
     // Assert
-    $record = auditRecord('admin.updated');
-
-    expect($record)->toMatchArray([
-        'actor_type' => 'admin',
-        'actor_id' => (string) $this->ada->id,
-        'subject_type' => 'admin',
-        'subject_id' => (string) $this->alan->id,
-    ])
-        ->and(propertiesOf($record))->toBe([
+    Audit::assertRecorded(AdminUpdated::class, fn (AdminUpdated $record, Actor|UnknownActor $actor) => isAdmin($actor, $this->ada)
+        && $record->subject() == new Subject('admin', $this->alan->id)
+        && $record->properties() === [
             'changed' => ['name', 'email', 'password'],
             'email' => ['from' => 'alan@example.com', 'to' => 'turing@example.com'],
-        ])
-        ->and($record->properties)->not->toContain('Brand-New-Pass-2');
+        ]);
 });
 
 it('audits what was saved, not what was asked for', function () {
     // Arrange
+    Audit::fake();
     // As an app's observer might, keep the email from changing.
     Admin::saving(fn (Admin $admin) => $admin->email = $admin->getOriginal('email'));
 
@@ -187,28 +164,28 @@ it('audits what was saved, not what was asked for', function () {
         ->assertRedirect();
 
     // Assert
-    expect($this->alan->fresh()->email)->toBe('alan@example.com')
-        ->and(propertiesOf(auditRecord('admin.updated')))->toBe(['changed' => ['name']]);
+    expect($this->alan->fresh()->email)->toBe('alan@example.com');
+    Audit::assertRecorded(AdminUpdated::class, fn (AdminUpdated $record) => $record->properties() === ['changed' => ['name']]);
 });
 
 it('audits an admin changing their own profile', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->actingAs($this->ada, 'larasell-admin')
         ->put(route('larasell.admin.profile.update'), ['name' => 'Ada King', 'email' => 'ada@example.com'])
         ->assertRedirect();
 
     // Assert
-    $record = auditRecord('admin.updated');
-
-    expect($record)->toMatchArray([
-        'actor_id' => (string) $this->ada->id,
-        'subject_id' => (string) $this->ada->id,
-    ])
-        ->and(propertiesOf($record))->toBe(['changed' => ['name']]);
+    Audit::assertRecorded(AdminUpdated::class, fn (AdminUpdated $record, Actor|UnknownActor $actor) => isAdmin($actor, $this->ada)
+        && $record->subject() == new Subject('admin', $this->ada->id)
+        && $record->properties() === ['changed' => ['name']]);
 });
 
 it('does not audit saving an admin without changes, or changing only an avatar', function () {
     // Arrange
+    Audit::fake();
     Storage::fake(config('larasell.admin.panel.disk'));
     $this->ada->update(['avatar_path' => 'avatars/ada.png']);
 
@@ -220,8 +197,8 @@ it('does not audit saving an admin without changes, or changing only an avatar',
         ->assertRedirect();
 
     // Assert
-    expect($this->ada->fresh()->avatar_path)->toBeNull()
-        ->and(DB::table('larasell_audit_log')->count())->toBe(0);
+    expect($this->ada->fresh()->avatar_path)->toBeNull();
+    Audit::assertNothingRecorded();
 });
 
 it('changes no admin when the change can\'t be audited', function () {
@@ -253,20 +230,28 @@ it('keeps an admin and their avatar when their deletion can\'t be audited', func
 });
 
 it('audits the admin commands as themselves', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->artisan('larasell:create-admin', ['--name' => 'Grace Hopper', '--email' => 'grace@example.com', '--password' => 'Correct-Horse-9'])->assertSuccessful();
     $this->artisan('larasell:remove-admin', ['email' => 'grace@example.com', '--force' => true])->assertSuccessful();
 
     // Assert
-    expect(auditRecord('admin.created'))->toMatchArray(['actor_type' => 'system', 'actor_id' => 'larasell:create-admin', 'source' => 'cli'])
-        ->and(auditRecord('admin.deleted'))->toMatchArray(['actor_type' => 'system', 'actor_id' => 'larasell:remove-admin', 'source' => 'cli']);
+    Audit::assertRecorded(AdminCreated::class, fn (AdminCreated $record, Actor|UnknownActor $actor, AuditSource $source) => $actor == new SystemActor('larasell:create-admin') && $source === AuditSource::Cli);
+    Audit::assertRecorded(AdminDeleted::class, fn (AdminDeleted $record, Actor|UnknownActor $actor, AuditSource $source) => $actor == new SystemActor('larasell:remove-admin') && $source === AuditSource::Cli);
 });
 
 it('records the actor callers of the actions pass', function () {
+    // Arrange
+    Audit::fake();
+    $actor = new SystemActor('sso-sync');
+
     // Act
-    $grace = app(CreateAdmin::class)->handle(['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'], new SystemActor('sso-sync'));
-    app(DeleteAdmin::class)->handle($grace, new SystemActor('sso-sync'));
+    $grace = app(CreateAdmin::class)->handle(['name' => 'Grace Hopper', 'email' => 'grace@example.com', 'password' => 'Correct-Horse-9'], $actor);
+    app(DeleteAdmin::class)->handle($grace, $actor);
 
     // Assert
-    expect(DB::table('larasell_audit_log')->orderBy('id')->pluck('actor_id')->all())->toBe(['sso-sync', 'sso-sync']);
+    Audit::assertRecorded(AdminCreated::class, fn (AdminCreated $record, Actor|UnknownActor $recordedBy) => $recordedBy === $actor);
+    Audit::assertRecorded(AdminDeleted::class, fn (AdminDeleted $record, Actor|UnknownActor $recordedBy) => $recordedBy === $actor);
 });
