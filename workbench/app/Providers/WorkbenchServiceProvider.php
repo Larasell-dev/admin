@@ -11,6 +11,7 @@ use Larasell\Larasell\Enums\Locale;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\TypeScriptTransformer\Transformers\EnumTransformer;
 use Spatie\TypeScriptTransformer\Writers\TypeDefinitionWriter;
+use Workbench\App\AuditLog\FakeAuditLogCommand;
 use Workbench\App\TypeScript\ConcreteDataCollector;
 use Workbench\App\TypeScript\TypeScriptEnumCollector;
 
@@ -43,6 +44,8 @@ class WorkbenchServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->commands([FakeAuditLogCommand::class]);
+
         // Amp orb portals terminate TLS and forward over HTTP; trusting the proxy
         // makes generated asset URLs use https instead of being blocked as mixed content.
         TrustProxies::at('*');
