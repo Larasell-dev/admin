@@ -5,6 +5,7 @@ namespace Larasell\Admin\Seo\AuditRecords;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Seo\Events\SeoUrlReleased as CoreEvent;
 
 /**
  * An old or gone URL was deleted: an admin removed it, or another page claimed its path.
@@ -13,10 +14,7 @@ use Larasell\Admin\Platform\Audit\Subject;
  */
 class SeoUrlReleased extends AuditRecord
 {
-    /**
-     * @param  array<string, mixed>  $properties
-     */
-    public function __construct(private readonly Subject $subject, private readonly array $properties) {}
+    public function __construct(private readonly CoreEvent $event) {}
 
     public function event(): string
     {
@@ -30,12 +28,17 @@ class SeoUrlReleased extends AuditRecord
 
     public function subject(): Subject
     {
-        return $this->subject;
+        return new Subject($this->event->resourceType, $this->event->resourceId);
     }
 
     public function properties(): array
     {
-        return $this->properties;
+        return [
+            'sales_channel_id' => $this->event->salesChannelId->value,
+            'locale' => $this->event->locale,
+            'path' => $this->event->path,
+            'status' => $this->event->status->value,
+        ];
     }
 
     /**

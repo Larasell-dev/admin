@@ -3,7 +3,6 @@
 namespace Larasell\Admin\Product\Listeners;
 
 use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Product\AuditRecords\ProductCreated as Created;
 use Larasell\Admin\Product\AuditRecords\ProductDeleted as Deleted;
 use Larasell\Admin\Product\AuditRecords\ProductUpdated as Updated;
@@ -29,7 +28,7 @@ class AuditProductChanges
         // Read back, so the record says what was stored.
         $name = Product::query()->findOrFail($event->productId->value)->name;
 
-        $this->auditor->recordForEvent(new Created(new Subject('product', $event->productId->value), ['name' => $name->all()]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new Created($event, $name->all()), self::UNKNOWN);
     }
 
     public function updated(ProductUpdated $event): void
@@ -38,11 +37,11 @@ class AuditProductChanges
             return;
         }
 
-        $this->auditor->recordForEvent(new Updated(new Subject('product', $event->productId->value), ['changed' => $event->changed]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new Updated($event), self::UNKNOWN);
     }
 
     public function deleted(ProductDeleted $event): void
     {
-        $this->auditor->recordForEvent(new Deleted(new Subject('product', $event->productId->value), ['name' => $event->name->all()]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new Deleted($event), self::UNKNOWN);
     }
 }

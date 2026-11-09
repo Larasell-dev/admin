@@ -5,6 +5,7 @@ namespace Larasell\Admin\Product\AuditRecords;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Catalog\Events\ProductDeleted as CoreEvent;
 
 /**
  * A product was deleted, with the name it had, since the row is gone.
@@ -13,10 +14,7 @@ use Larasell\Admin\Platform\Audit\Subject;
  */
 class ProductDeleted extends AuditRecord
 {
-    /**
-     * @param  array<string, mixed>  $properties
-     */
-    public function __construct(private readonly Subject $subject, private readonly array $properties) {}
+    public function __construct(private readonly CoreEvent $event) {}
 
     public function event(): string
     {
@@ -30,11 +28,11 @@ class ProductDeleted extends AuditRecord
 
     public function subject(): Subject
     {
-        return $this->subject;
+        return new Subject('product', $this->event->productId->value);
     }
 
     public function properties(): array
     {
-        return $this->properties;
+        return ['name' => $this->event->name->all()];
     }
 }

@@ -5,6 +5,7 @@ namespace Larasell\Admin\SalesChannel\AuditRecords;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
 use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Storefront\Events\EntryPointCreated as CoreEvent;
 
 /**
  * A sales channel got an entry point, with its locale and default currency.
@@ -13,10 +14,7 @@ use Larasell\Admin\Platform\Audit\Subject;
  */
 class EntryPointAdded extends AuditRecord
 {
-    /**
-     * @param  array<string, mixed>  $properties
-     */
-    public function __construct(private readonly Subject $subject, private readonly array $properties) {}
+    public function __construct(private readonly CoreEvent $event) {}
 
     public function event(): string
     {
@@ -30,11 +28,15 @@ class EntryPointAdded extends AuditRecord
 
     public function subject(): Subject
     {
-        return $this->subject;
+        return new Subject('sales_channel', $this->event->channelId->value);
     }
 
     public function properties(): array
     {
-        return $this->properties;
+        return [
+            'entry_point_id' => $this->event->entryPointId->value,
+            'locale' => $this->event->locale->value,
+            'default_currency' => $this->event->defaultCurrency?->value,
+        ];
     }
 }

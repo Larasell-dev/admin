@@ -3,7 +3,6 @@
 namespace Larasell\Admin\SalesChannel\Listeners;
 
 use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\SalesChannel\AuditRecords\EntryPointAdded;
 use Larasell\Admin\SalesChannel\AuditRecords\EntryPointDeleted as EntryPointDeletedRecord;
 use Larasell\Admin\SalesChannel\AuditRecords\SalesChannelCreated as Created;
@@ -28,35 +27,26 @@ class AuditSalesChannelChanges
 
     public function created(SalesChannelCreated $event): void
     {
-        $this->auditor->recordForEvent(new Created($this->subject($event->channelId->value), ['key' => $event->key, 'type' => $event->type]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new Created($event), self::UNKNOWN);
     }
 
     public function updated(SalesChannelUpdated $event): void
     {
-        $this->auditor->recordForEvent(new Updated($this->subject($event->channelId->value), ['changed' => $event->changed]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new Updated($event), self::UNKNOWN);
     }
 
     public function deleted(SalesChannelDeleted $event): void
     {
-        $this->auditor->recordForEvent(new Deleted($this->subject($event->channelId->value), ['key' => $event->key, 'type' => $event->type]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new Deleted($event), self::UNKNOWN);
     }
 
     public function entryPointCreated(EntryPointCreated $event): void
     {
-        $this->auditor->recordForEvent(new EntryPointAdded($this->subject($event->channelId->value), [
-            'entry_point_id' => $event->entryPointId->value,
-            'locale' => $event->locale->value,
-            'default_currency' => $event->defaultCurrency?->value,
-        ]), self::UNKNOWN);
+        $this->auditor->recordForEvent(new EntryPointAdded($event), self::UNKNOWN);
     }
 
     public function entryPointDeleted(EntryPointDeleted $event): void
     {
-        $this->auditor->recordForEvent(new EntryPointDeletedRecord($this->subject($event->channelId->value), ['entry_point_id' => $event->entryPointId->value]), self::UNKNOWN);
-    }
-
-    private function subject(int $id): Subject
-    {
-        return new Subject('sales_channel', $id);
+        $this->auditor->recordForEvent(new EntryPointDeletedRecord($event), self::UNKNOWN);
     }
 }
