@@ -73,23 +73,6 @@ declare namespace Larasell.Admin.Category.Data {
 declare namespace Larasell.Admin.Category.Enums {
   export type CategorySection = "general" | "products";
 }
-declare namespace Larasell.Admin.Customer.Data {
-  export type CreateCustomerPageData = {
-    storeUrl: string;
-    indexUrl: string;
-  };
-  export type CustomerDetailData = {
-    name: string;
-    firstName: string;
-    lastName: string;
-  };
-  export type EditCustomerPageData = {
-    customer: Larasell.Admin.Customer.Data.CustomerDetailData;
-    updateUrl: string;
-    indexUrl: string;
-    orders: import("./index").TableResource;
-  };
-}
 declare namespace Larasell.Admin.Order.Data {
   export type AddressData = {
     name: string;
@@ -136,7 +119,6 @@ declare namespace Larasell.Admin.Order.Data {
   export type OrderPageData = {
     order: Larasell.Admin.Order.Data.OrderDetailData;
     indexUrl: string;
-    customerUrl: string | null;
   };
   export type PaymentData = {
     method: string;

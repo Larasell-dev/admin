@@ -21,9 +21,6 @@ class OrderController
         return Inertia::render('Order/Pages/Show', new OrderPageData(
             order: OrderDetailData::fromModel($order),
             indexUrl: route('larasell.admin.orders.index'),
-            customerUrl: $order->customer_id !== null && config('larasell.admin.customers.enabled')
-                ? route('larasell.admin.customers.edit', $order->customer_id)
-                : null,
         ));
     }
 }
