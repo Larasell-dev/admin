@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { ErrorBoundary } from "../Components/ErrorBoundary";
 import CommandMenu from "../Components/CommandMenu/CommandMenu";
 import { SearchCommands } from "../Components/CommandMenu/searchCommands";
+import { PersistentAlertDialogHost } from "../Components/PersistentAlertDialog";
 import MobileNav from "../Components/Shell/MobileNav";
 import SessionExpiredDialog from "../Components/Shell/SessionExpiredDialog";
 import Sidebar from "../Components/Shell/Sidebar";
@@ -42,6 +43,8 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       {/* Outside the page, so a toast can animate out after its page is gone. */}
       <UnsavedChangesToastHost />
       <SessionExpiredDialog />
+      {/* Outside the page, so a dialog can animate out after confirming it leaves the page. */}
+      <PersistentAlertDialogHost />
       {/* Outside the page too, so it stays open while the page changes underneath. */}
       <CommandMenu />
       <SearchCommands />
