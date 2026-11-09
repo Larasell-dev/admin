@@ -3,8 +3,8 @@
 namespace Larasell\Admin\Platform\Audit\Export\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
+use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 
 /**
  * Only the admin who asked for an export may delete it, once they typed the confirmation.
@@ -22,24 +22,10 @@ class DeleteAuditLogExportRequest extends FormRequest
     }
 
     /**
-     * @return array<string, list<string>>
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
-        return ['confirmation' => ['nullable', 'string']];
-    }
-
-    /**
-     * @return array<int, callable(Validator): void>
-     */
-    public function after(): array
-    {
-        return [function (Validator $validator): void {
-            $expected = __('Delete export');
-
-            if ($this->string('confirmation')->trim()->value() !== $expected) {
-                $validator->errors()->add('confirmation', __('Type ":text" to confirm.', ['text' => $expected]));
-            }
-        }];
+        return ['confirmation' => [new Confirmation(__('Delete export'))]];
     }
 }

@@ -4,7 +4,7 @@ namespace Larasell\Admin\Platform\Tables\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 use Larasell\Admin\Platform\Tables\Table;
 
 class TableActionController
@@ -30,10 +30,8 @@ class TableActionController
 
         $expected = $action->confirmationTextFor($model);
 
-        if ($expected !== null && $request->input('confirmation') !== $expected) {
-            throw ValidationException::withMessages([
-                'confirmation' => __('Type ":text" to confirm.', ['text' => $expected]),
-            ]);
+        if ($expected !== null) {
+            $request->validate(['confirmation' => [new Confirmation($expected)]]);
         }
 
         $action->run($model);

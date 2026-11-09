@@ -11,7 +11,7 @@ class RemoveOldUrlController
     /** Removes an old URL of a product or category and goes back to its page. */
     public function __invoke(RemoveOldUrlRequest $request, RemoveOldUrl $remove): RedirectResponse
     {
-        $remove->handle($request->payload());
+        $remove->handle($request->seoUrl());
 
         return back();
     }
