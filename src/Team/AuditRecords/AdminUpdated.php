@@ -23,12 +23,13 @@ class AdminUpdated extends AuditRecord
     private readonly string $emailFrom;
 
     /**
-     * Takes the admin before it is saved, while it still knows what changed.
+     * Takes the admin just after it was saved, so it describes what changed in the database
+     * rather than what was asked for.
      */
-    public function __construct(private readonly Admin $admin)
+    public function __construct(private readonly Admin $admin, string $emailFrom)
     {
-        $this->changed = array_values(array_filter(['name', 'email', 'password'], fn (string $field): bool => $admin->isDirty($field)));
-        $this->emailFrom = $admin->getOriginal('email');
+        $this->changed = array_values(array_filter(['name', 'email', 'password'], fn (string $field): bool => $admin->wasChanged($field)));
+        $this->emailFrom = $emailFrom;
     }
 
     public function event(): string

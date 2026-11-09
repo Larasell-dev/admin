@@ -3,102 +3,46 @@
 namespace Larasell\Admin\Platform\Audit\Log\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Platform\Audit\Actors\SystemActor;
-use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogPruned;
+use Larasell\Admin\Platform\Audit\Log\Actions\PruneAuditLog;
+use Larasell\Admin\Platform\Audit\Log\Actions\PruneAuditLogPayload;
+use Larasell\Admin\Platform\Audit\Log\Exceptions\InvalidRetentionPeriod;
+use Larasell\Admin\Platform\Audit\Log\RetentionPeriod;
 
 /**
- * Deletes audit records older than their category's retention period, set in
- * config/larasell/admin/audit.php, and records that it ran.
+ * Prunes the audit log with the retention period and legal hold set in
+ * config/larasell/admin/audit.php.
  */
 class PruneAuditLogCommand extends Command
 {
     protected $signature = 'larasell:prune-audit-log';
 
-    protected $description = 'Delete audit records older than their retention period.';
+    protected $description = 'Delete the oldest audit records once they are older than the retention period.';
 
-    public function handle(Auditor $auditor): int
+    public function handle(PruneAuditLog $prune): int
     {
-        $retentionDays = $this->retentionDays();
+        try {
+            $retention = RetentionPeriod::fromConfig(config('larasell.admin.audit.retention.days'));
+        } catch (InvalidRetentionPeriod $exception) {
+            $this->components->error($exception->getMessage());
 
-        if ($retentionDays === null) {
             return self::FAILURE;
         }
 
-        $legalHold = (bool) config('larasell.admin.audit.legal_hold');
-        $now = Date::now()->utc();
+        $payload = new PruneAuditLogPayload($retention, (bool) config('larasell.admin.audit.legal_hold'));
+        $result = $prune->handle($payload);
 
-        $deleted = DB::transaction(function () use ($auditor, $retentionDays, $legalHold, $now): array {
-            $deleted = [];
+        foreach ($result->undeletedExports as $id => $error) {
+            $this->components->warn("Export {$id} wasn't deleted: {$error}");
+        }
 
-            foreach ($retentionDays as $category => $days) {
-                $deleted[$category] = $legalHold || $days === null ? 0 : DB::table('larasell_audit_log')
-                    ->where('category', $category)
-                    ->where('occurred_at', '<', $now->copy()->subDays($days)->format('Y-m-d H:i:s.u'))
-                    ->delete();
-            }
-
-            $auditor->record(new AuditLogPruned($legalHold, $retentionDays, $deleted), new SystemActor('larasell:prune-audit-log'));
-
-            return $deleted;
-        });
-
-        if ($legalHold) {
+        if ($payload->legalHold) {
             $this->components->warn('No audit records were deleted, since they are under a legal hold.');
-
-            return self::SUCCESS;
-        }
-
-        if (array_filter($retentionDays) === []) {
+        } elseif ($retention === null) {
             $this->components->info('No retention period is set in config/larasell/admin/audit.php, so every audit record was kept.');
-
-            return self::SUCCESS;
+        } else {
+            $this->components->info("{$result->deleted} audit records deleted.");
         }
-
-        $this->components->info(array_sum($deleted).' audit records deleted.');
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Each category's retention period in days, or null after reporting why the settings are invalid.
-     *
-     * @return ?array<string, ?int>
-     */
-    private function retentionDays(): ?array
-    {
-        $categories = array_map(fn (AuditCategory $category): string => $category->value, AuditCategory::cases());
-        /** @var array<array-key, mixed> $overrides */
-        $overrides = config('larasell.admin.audit.retention.categories') ?? [];
-        $unknown = array_diff(array_keys($overrides), $categories);
-
-        if ($unknown !== []) {
-            $this->components->error('Unknown audit categories in larasell.admin.audit.retention.categories: '.implode(', ', $unknown).'. Use '.implode(', ', $categories).'.');
-
-            return null;
-        }
-
-        $retentionDays = [];
-
-        foreach ($categories as $category) {
-            [$key, $days] = array_key_exists($category, $overrides)
-                ? ["categories.{$category}", $overrides[$category]]
-                : ['default_days', config('larasell.admin.audit.retention.default_days')];
-
-            if ($days === null || $days === '') {
-                $retentionDays[$category] = null;
-            } elseif (is_int($days) && $days > 0 || is_string($days) && preg_match('/^[1-9][0-9]*$/', $days) === 1) {
-                $retentionDays[$category] = (int) $days;
-            } else {
-                $this->components->error("larasell.admin.audit.retention.{$key} must be a whole number of days above 0, or null to keep records forever.");
-
-                return null;
-            }
-        }
-
-        return $retentionDays;
     }
 }

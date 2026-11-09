@@ -25,7 +25,7 @@ class AuditLog extends Table
     private array $names = [];
 
     /**
-     * Validated by AuditLogController. Days are in the app's time zone.
+     * Validated by AuditLogFiltersRequest. Days are in the app's time zone.
      *
      * @param  array{event?: string, actor_type?: string, actor_id?: string, subject_type?: string, subject_id?: string, from?: string, until?: string}  $filters
      */
@@ -36,19 +36,7 @@ class AuditLog extends Table
      */
     protected function model(): Builder
     {
-        $timezone = config('app.timezone');
-        $day = fn (string $date): CarbonImmutable => CarbonImmutable::parse($date, $timezone)->startOfDay();
-        $utc = fn (CarbonImmutable $time): string => $time->utc()->format('Y-m-d H:i:s.u');
-
-        return AuditLogEntry::query()
-            ->latest('occurred_at')
-            ->when($this->filters['event'] ?? null, fn (Builder $query, string $event) => $query->where('event', $event))
-            ->when($this->filters['actor_type'] ?? null, fn (Builder $query, string $type) => $query->where('actor_type', $type))
-            ->when($this->filters['actor_id'] ?? null, fn (Builder $query, string $id) => $query->where('actor_id', $id))
-            ->when($this->filters['subject_type'] ?? null, fn (Builder $query, string $type) => $query->where('subject_type', $type))
-            ->when($this->filters['subject_id'] ?? null, fn (Builder $query, string $id) => $query->where('subject_id', $id))
-            ->when($this->filters['from'] ?? null, fn (Builder $query, string $from) => $query->where('occurred_at', '>=', $utc($day($from))))
-            ->when($this->filters['until'] ?? null, fn (Builder $query, string $until) => $query->where('occurred_at', '<', $utc($day($until)->addDay())));
+        return AuditLogEntry::query()->filtered($this->filters)->latest('occurred_at');
     }
 
     public function title(): string
@@ -67,7 +55,10 @@ class AuditLog extends Table
             // The stable type, as the subject filter offers it.
             TextColumn::make('subject', __('Subject'))->map(fn (mixed $value, AuditLogEntry $entry): ?string => $entry->subject_type === null ? null : $entry->subject_type.' #'.$entry->subject_id),
             TextColumn::make('source', __('Source'))->map(fn (string $source): string => in_array($source, ['api', 'cli'], true) ? Str::upper($source) : Str::ucfirst($source)),
-            TextColumn::make('details', __('Details'))->map(fn (mixed $value, AuditLogEntry $entry): ?string => $this->details($entry->properties)),
+            TextColumn::make('details', __('Details'))->map(fn (mixed $value, AuditLogEntry $entry): ?string => is_array($entry->properties)
+                ? $this->details($entry->properties)
+                // Unreadable, so changed outside the app: shown as stored, for whoever looks into it.
+                : (string) $entry->getRawOriginal('properties')),
         ];
     }
 

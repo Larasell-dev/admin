@@ -3,13 +3,16 @@ import { Button, EmptyState, Field, Input } from "@larasell-dev/ui";
 import { FileShieldLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import type { FormEvent, ReactNode } from "react";
+import ExportsToast from "../Components/ExportsToast";
 import { Page } from "../../Panel/Components/Page";
 import ResourceTable from "../../Tables/Components/ResourceTable";
 import SidebarLayout from "../../Panel/Layouts/SidebarLayout";
 import { useSettingsBackLink } from "../../Support/useSettingsBackLink";
 
-type Props = Larasell.Admin.Platform.Audit.Log.Data.AuditLogPageData;
+// exports is a live prop, given next to the page's data.
+type Props = Larasell.Admin.Platform.Audit.Log.Data.AuditLogPageData & { exports: Export[] };
 type Filters = Larasell.Admin.Platform.Audit.Log.Data.AuditLogFiltersData;
+type Export = Larasell.Admin.Platform.Audit.Export.Data.AuditLogExportData;
 
 export default function Index({
   indexUrl,
@@ -19,12 +22,30 @@ export default function Index({
   actorTypeOptions,
   subjectTypeOptions,
   canSearch,
+  exportUrl,
+  exports,
 }: Props) {
   const filtered = Object.values(filters).some((value) => value !== null);
 
   return (
     <>
-      <Page.Header title={auditLog.title} backLink={useSettingsBackLink()} />
+      <Page.Header
+        title={auditLog.title}
+        backLink={useSettingsBackLink()}
+        actions={
+          exportUrl && (
+            <Button
+              variant="secondary"
+              onClick={() => router.post(exportUrl, {}, { preserveScroll: true })}
+            >
+              <fbt desc="Audit log page: header button that exports every record to a file">
+                Export
+              </fbt>
+            </Button>
+          )
+        }
+      />
+      <ExportsToast exports={exports} />
       {canSearch && (
         <FilterBar
           // A new form for new filters, e.g. after clearing them.

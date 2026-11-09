@@ -4048,6 +4048,215 @@
         }
       ],
       "types": []
+    },
+    "kGE4wUcjFWmA/YfXsTAVDw==": {
+      "description": "Audit log page: header button that exports every record to a file",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Exportieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/nfAYvzLim2QonGlIgNteQ==": {
+      "description": "Audit log exports toast: accessible name of the box at the bottom of the audit log page with the admin's exports of the log",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Exporte",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i07pSAOjJlrvdq0Q3zJW2g==": {
+      "description": "Audit log exports toast: summary once every export can be downloaded, e.g. '2 exports ready'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number} Exporte bereit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LQM1g38gVIyduWrZRjFn1w==": {
+      "description": "Audit log exports toast: summary once every export can be downloaded, e.g. '2 exports ready'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 Export bereit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IyCI8gok5T+uwzvGnTp1Lw==": {
+      "description": "Audit log exports toast: button that collapses the list of exports",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Exporte ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bsa6sloVMW8QlNmM88iTSQ==": {
+      "description": "Audit log exports toast: button that expands the list of exports",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Exporte anzeigen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "58t3kCIMq26rGbeec5nOZA==": {
+      "description": "Audit log exports toast: summary while some exports are still being written, e.g. '2 of 3 exports in progress'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{pending} von {number} Exporten in Arbeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i5DpjncFMdJkZMckv9bvOA==": {
+      "description": "Audit log exports toast: summary while some exports are still being written, e.g. '2 of 3 exports in progress'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{pending} von 1 Export in Arbeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "epCWeJVVEcgeFAy+zB3rZw==": {
+      "description": "Audit log exports toast: summary once no export is being written and some failed, e.g. '1 of 3 exports failed'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{failed} von {number} Exporten fehlgeschlagen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v+oMXESXY2DiO4KDg7eiGA==": {
+      "description": "Audit log exports toast: summary once no export is being written and some failed, e.g. '1 of 3 exports failed'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{failed} von 1 Export fehlgeschlagen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7e/+brN12EjqubpaX1H2tA==": {
+      "description": "Audit log exports toast: accessible name of the spinner shown for an export still being written",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Export wird vorbereitet",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d7afWlyBt5fJ6Jg1XkBfDw==": {
+      "description": "Audit log exports toast: accessible name of the warning icon shown for an export that couldn't be written",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Export fehlgeschlagen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xTgUQMXQMrbx7/bMKdvpOA==": {
+      "description": "Audit log exports toast: accessible name of the icon button that downloads an export, with how many records it holds",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{count} Einträge herunterladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cqOX1VJ4H1VsA/OL/cJyxQ==": {
+      "description": "Audit log exports toast: accessible name of the icon button that deletes an export before it expires",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Export löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "K+7/0JxGl3Ch2VFuKULV/A==": {
+      "description": "Audit log exports toast: the text the admin types to confirm deleting an export; must match the server's 'Delete export'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Export löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hNi5LCLgwdhuj112iVLL0g==": {
+      "description": "Audit log exports toast: title of the dialog that confirms deleting an export",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Export löschen?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ShlFvPSj0PDYNxMMA/hfeQ==": {
+      "description": "Audit log exports toast: message of the dialog that confirms deleting an export",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Datei kann nicht mehr heruntergeladen werden. Das Audit-Log hält fest, dass sie gelöscht wurde.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sjYw8kyywAyqrsDcqOwLRQ==": {
+      "description": "Audit log exports toast: button in the dialog that deletes the export",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sc4IVB2WbaxAZ0grcw65xw==": {
+      "description": "Audit log exports toast: button in the dialog that keeps the export",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

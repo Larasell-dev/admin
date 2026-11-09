@@ -2,7 +2,10 @@
 
 namespace Larasell\Admin\Platform\Audit\Log\Models;
 
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Larasell\Chronicle\Exceptions\StructuredLogicException;
@@ -22,11 +25,14 @@ use Larasell\Chronicle\Exceptions\StructuredLogicException;
  * @property ?string $unknown_actor_reason
  * @property ?string $subject_type
  * @property ?string $subject_id
- * @property array<string, mixed> $properties
+ * @property ?array<string, mixed> $properties Null when the stored JSON is unreadable.
  * @property string $source
  * @property ?string $correlation_id
  * @property CarbonInterface $occurred_at
  * @property CarbonInterface $created_at
+ * @property int $seq
+ * @property ?string $previous_hash
+ * @property string $hash
  */
 class AuditLogEntry extends Model
 {
@@ -40,10 +46,34 @@ class AuditLogEntry extends Model
     {
         return [
             'event_version' => 'integer',
+            'seq' => 'integer',
             'properties' => 'array',
             'occurred_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',
         ];
+    }
+
+    /**
+     * The records matching the audit log page's filters. Days are in the app's time zone.
+     *
+     * @param  Builder<self>  $query
+     * @param  array{event?: string, actor_type?: string, actor_id?: string, subject_type?: string, subject_id?: string, from?: string, until?: string}  $filters  Validated by AuditLogFiltersRequest.
+     */
+    #[Scope]
+    protected function filtered(Builder $query, array $filters): void
+    {
+        $timezone = config('app.timezone');
+        $day = fn (string $date): CarbonImmutable => CarbonImmutable::parse($date, $timezone)->startOfDay();
+        $utc = fn (CarbonImmutable $time): string => $time->utc()->format('Y-m-d H:i:s.u');
+
+        $query
+            ->when($filters['event'] ?? null, fn (Builder $query, string $event) => $query->where('event', $event))
+            ->when($filters['actor_type'] ?? null, fn (Builder $query, string $type) => $query->where('actor_type', $type))
+            ->when($filters['actor_id'] ?? null, fn (Builder $query, string $id) => $query->where('actor_id', $id))
+            ->when($filters['subject_type'] ?? null, fn (Builder $query, string $type) => $query->where('subject_type', $type))
+            ->when($filters['subject_id'] ?? null, fn (Builder $query, string $id) => $query->where('subject_id', $id))
+            ->when($filters['from'] ?? null, fn (Builder $query, string $from) => $query->where('occurred_at', '>=', $utc($day($from))))
+            ->when($filters['until'] ?? null, fn (Builder $query, string $until) => $query->where('occurred_at', '<', $utc($day($until)->addDay())));
     }
 
     protected static function booted(): void

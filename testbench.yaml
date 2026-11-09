@@ -18,8 +18,8 @@ env:
   - DB_CONNECTION=sqlite
   - SESSION_DRIVER=file
   - CACHE_STORE=file
-  # No queue worker runs in the playground, e.g. for the SEO URLs a new product gets.
-  - QUEUE_CONNECTION=sync
+  # Jobs, e.g. audit log exports and the SEO URLs a new product gets, run on the `queue` service.
+  - QUEUE_CONNECTION=database
   # Live props, e.g. the sidebar's sales channels, over the `reverb` service; development-only credentials.
   - BROADCAST_CONNECTION=reverb
   - REVERB_APP_ID=larasell-admin

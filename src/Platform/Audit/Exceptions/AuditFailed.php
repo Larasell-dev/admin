@@ -62,8 +62,62 @@ class AuditFailed extends RuntimeException implements StructuredException
         return static::structured(
             errorCode: 'larasell-admin.audit.invalid-property',
             message: "Audit record [{$event}] has property [{$property}] of type [{$type}].",
-            why: 'Properties are stored as JSON, and an object would be stored however it happens to serialize, possibly with more data than intended.',
-            fix: "Return a string, number, boolean, null or array for [{$property}], e.g. a date formatted in UTC.",
+            why: 'Properties are stored as JSON and hashed into the audit log\'s chain. An object would be stored however it happens to serialize, possibly with more data than intended, and a fraction has no single way to be written.',
+            fix: "Return a string, integer, boolean, null or array for [{$property}], e.g. a date formatted in UTC, or an amount in cents or as a string.",
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public static function storedDifferently(string $event): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.stored-differently',
+            message: "Audit record [{$event}] was stored differently from how it was hashed.",
+            why: 'The database truncated or rewrote a column, e.g. a string longer than the column, so the record would break the chain.',
+            fix: 'Check the larasell_audit_log columns and the database mode, e.g. MySQL strict mode, then try again.',
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public static function alreadyChained(string $event, string $column): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.already-chained',
+            message: "Audit record [{$event}] was appended with its own [{$column}].",
+            why: 'The chain gives each record its seq, previous_hash and hash while appending, so one passed in would be overwritten.',
+            fix: "Leave [{$column}] out of the record passed to AuditChain::append().",
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public static function prunedOverGap(int $from, int $until, int $stored): static
+    {
+        $expected = $until - $from + 1;
+
+        return static::structured(
+            errorCode: 'larasell-admin.audit.pruned-over-gap',
+            message: "Pruning would delete records {$from} to {$until}, {$expected} records, but only {$stored} are stored.",
+            why: 'A record in the oldest stretch was already deleted outside the app. Pruning over it would hide that it is missing.',
+            fix: 'Run php artisan larasell:verify-audit-log, and find out who deleted the record before pruning again.',
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public static function headOutOfStep(string $event): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.head-out-of-step',
+            message: "Audit record [{$event}] couldn't move the chain's head along with it.",
+            why: 'The larasell_audit_log_head table has no single head row, or another writer changed it without its lock.',
+            fix: 'Check that larasell_audit_log_head holds exactly one row with id 1, and that nothing but AuditChain writes to it.',
         );
     }
 

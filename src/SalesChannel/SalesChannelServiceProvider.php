@@ -17,11 +17,14 @@ use Larasell\Admin\SalesChannel\Events\SalesChannelsChanged;
 use Larasell\Admin\SalesChannel\Http\Controllers\EntryPointController;
 use Larasell\Admin\SalesChannel\Http\Controllers\SalesChannelController;
 use Larasell\Admin\SalesChannel\Http\Controllers\SearchSalesChannelsController;
+use Larasell\Admin\SalesChannel\Listeners\AuditSalesChannelChanges;
 use Larasell\Admin\SalesChannel\Search\DatabaseSalesChannelSearch;
 use Larasell\Admin\SalesChannel\Search\SalesChannelSearch;
 use Larasell\Larasell\SalesChannels\Events\SalesChannelCreated;
 use Larasell\Larasell\SalesChannels\Events\SalesChannelDeleted;
 use Larasell\Larasell\SalesChannels\Events\SalesChannelUpdated;
+use Larasell\Larasell\Storefront\Events\EntryPointCreated;
+use Larasell\Larasell\Storefront\Events\EntryPointDeleted;
 
 /**
  * The sales channels module: the sidebar section that lists the channels, and the pages to add,
@@ -36,6 +39,13 @@ class SalesChannelServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Audited from the core's events, wherever the change came from.
+        Event::listen(SalesChannelCreated::class, [AuditSalesChannelChanges::class, 'created']);
+        Event::listen(SalesChannelUpdated::class, [AuditSalesChannelChanges::class, 'updated']);
+        Event::listen(SalesChannelDeleted::class, [AuditSalesChannelChanges::class, 'deleted']);
+        Event::listen(EntryPointCreated::class, [AuditSalesChannelChanges::class, 'entryPointCreated']);
+        Event::listen(EntryPointDeleted::class, [AuditSalesChannelChanges::class, 'entryPointDeleted']);
+
         // A closure, so the session is read per request; guests on the sign-in page get none.
         AdminPanel::resolve()->share('salesChannels', fn (): ?OnceProp => auth('larasell-admin')->check() ? SalesChannelNavigationData::prop() : null);
 

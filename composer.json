@@ -11,6 +11,7 @@
   ],
   "require": {
     "php": "^8.4",
+    "ext-zip": "*",
     "inertiajs/inertia-laravel": "^3.7",
     "larasell-dev/chronicle": "^0.4",
     "larasell-dev/larasell": "^1.25.0",

@@ -176,6 +176,21 @@ it('audits which of an admin\'s fields changed in the settings, with the email b
         ->and($record->properties)->not->toContain('Brand-New-Pass-2');
 });
 
+it('audits what was saved, not what was asked for', function () {
+    // Arrange
+    // As an app's observer might, keep the email from changing.
+    Admin::saving(fn (Admin $admin) => $admin->email = $admin->getOriginal('email'));
+
+    // Act
+    $this->actingAs($this->ada, 'larasell-admin')
+        ->put(route('larasell.admin.settings.team.update', $this->alan), ['name' => 'Alan M. Turing', 'email' => 'turing@example.com'])
+        ->assertRedirect();
+
+    // Assert
+    expect($this->alan->fresh()->email)->toBe('alan@example.com')
+        ->and(propertiesOf(auditRecord('admin.updated')))->toBe(['changed' => ['name']]);
+});
+
 it('audits an admin changing their own profile', function () {
     // Act
     $this->actingAs($this->ada, 'larasell-admin')

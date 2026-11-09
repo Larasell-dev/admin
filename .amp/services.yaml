@@ -12,3 +12,6 @@ services:
   reverb:
     command: vendor/bin/testbench reverb:start --host=127.0.0.1 --port=8080
     port: 8080
+  # Runs the playground's jobs, e.g. audit log exports, so pages answer before they're done.
+  queue:
+    command: vendor/bin/testbench queue:work --tries=1
