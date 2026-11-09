@@ -1,5 +1,4 @@
 import "../../../../css/app.css";
-import { AlertDialog } from "@larasell-dev/ui";
 import { expect, it } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
@@ -9,7 +8,9 @@ function Panel({ pageShown }: { pageShown: boolean }) {
   return (
     <>
       {pageShown && (
-        <PersistentAlertDialog open popup={<AlertDialog.Popup title="Delete channel?" />} />
+        <PersistentAlertDialog.Root defaultOpen>
+          <PersistentAlertDialog.Popup title="Delete channel?" />
+        </PersistentAlertDialog.Root>
       )}
       {/* SidebarLayout renders the host in the panel. */}
       <PersistentAlertDialogHost />
