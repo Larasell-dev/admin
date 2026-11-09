@@ -4,7 +4,6 @@ namespace Larasell\Admin\Platform\Audit\Export\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Larasell\Admin\Platform\Audit\Auditor;
@@ -41,7 +40,7 @@ class AuditLogExportController
         abort_if($stream === null, 404);
 
         try {
-            DB::transaction(fn () => $auditor->record(new AuditLogExported($export->id, $export->format, (int) $export->records)));
+            $auditor->record(new AuditLogExported($export->id, $export->format, (int) $export->records));
         } catch (\Throwable $exception) {
             fclose($stream);
 

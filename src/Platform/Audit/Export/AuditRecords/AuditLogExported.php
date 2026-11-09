@@ -39,4 +39,12 @@ class AuditLogExported extends AuditRecord
     {
         return ['format' => $this->format, 'record_count' => $this->recordCount];
     }
+
+    /**
+     * A download or a file written changes nothing in the database, so there is nothing to commit with.
+     */
+    public function requiresTransaction(): bool
+    {
+        return false;
+    }
 }
