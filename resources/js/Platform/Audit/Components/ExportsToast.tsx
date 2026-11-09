@@ -11,12 +11,30 @@ import {
 import { fbs } from "fbtee";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { router } from "@inertiajs/react";
-import { useState } from "react";
+import { type ReactNode, useReducer, useState } from "react";
 import ConfirmActionDialog from "../../Panel/Components/ConfirmActionDialog";
 import type { TableRowAction } from "../../../types";
 import { createPortal } from "react-dom";
 
 type Export = Larasell.Admin.Platform.Audit.Export.Data.AuditLogExportData;
+type Status = Larasell.Admin.Platform.Audit.Export.Enums.AuditLogExportStatus;
+
+/** What the header sums up: any export still being written, else any failed, else all ready. */
+function overallStatus(exports: Export[]): Status {
+  if (exports.some((item) => item.status === "pending")) {
+    return "pending";
+  }
+
+  if (exports.some((item) => item.status === "failed")) {
+    return "failed";
+  }
+
+  return "ready";
+}
+
+function count(exports: Export[], status: Status): number {
+  return exports.filter((item) => item.status === status).length;
+}
 
 /**
  * The admin's exports of the audit log, floating at the bottom center like the unsaved changes
@@ -76,41 +94,50 @@ function Header({
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const pending = exports.filter((item) => item.status === "pending").length;
-  const failed = exports.filter((item) => item.status === "failed").length;
+  const status = overallStatus(exports);
+  const pending = count(exports, "pending");
+  const failed = count(exports, "failed");
+
+  const icon = {
+    pending: <Spinner aria-hidden size={4} />,
+    failed: <Icon icon={FileDamageLine} />,
+    ready: <Icon icon={FileCheckLine} />,
+  } satisfies Record<Status, ReactNode>;
+
+  const summary = {
+    pending: (
+      <fbt desc="Audit log exports toast: summary while some exports are still being written, e.g. '2 of 3 exports in progress'">
+        <fbt:param name="pending">{pending}</fbt:param> of{" "}
+        <fbt:plural count={exports.length} many="exports" showCount="yes">
+          export
+        </fbt:plural>{" "}
+        in progress
+      </fbt>
+    ),
+    failed: (
+      <fbt desc="Audit log exports toast: summary once no export is being written and some failed, e.g. '1 of 3 exports failed'">
+        <fbt:param name="failed">{failed}</fbt:param> of{" "}
+        <fbt:plural count={exports.length} many="exports" showCount="yes">
+          export
+        </fbt:plural>{" "}
+        failed
+      </fbt>
+    ),
+    ready: (
+      <fbt desc="Audit log exports toast: summary once every export can be downloaded, e.g. '2 exports ready'">
+        <fbt:plural count={exports.length} many="exports" showCount="yes">
+          export
+        </fbt:plural>{" "}
+        ready
+      </fbt>
+    ),
+  } satisfies Record<Status, ReactNode>;
 
   return (
     <div className="flex items-center gap-3 py-1.5 pr-1.5 pl-4">
-      {pending > 0 ? (
-        <Spinner aria-hidden size={4} />
-      ) : (
-        <Icon icon={failed > 0 ? FileDamageLine : FileCheckLine} />
-      )}
+      {icon[status]}
       <p aria-live="polite" className="type-body-md flex-1 py-2 text-base-primary">
-        {pending > 0 ? (
-          <fbt desc="Audit log exports toast: summary while some exports are still being written, e.g. '2 of 3 exports in progress'">
-            <fbt:param name="pending">{pending}</fbt:param> of{" "}
-            <fbt:plural count={exports.length} many="exports" showCount="yes">
-              export
-            </fbt:plural>{" "}
-            in progress
-          </fbt>
-        ) : failed > 0 ? (
-          <fbt desc="Audit log exports toast: summary once no export is being written and some failed, e.g. '1 of 3 exports failed'">
-            <fbt:param name="failed">{failed}</fbt:param> of{" "}
-            <fbt:plural count={exports.length} many="exports" showCount="yes">
-              export
-            </fbt:plural>{" "}
-            failed
-          </fbt>
-        ) : (
-          <fbt desc="Audit log exports toast: summary once every export can be downloaded, e.g. '2 exports ready'">
-            <fbt:plural count={exports.length} many="exports" showCount="yes">
-              export
-            </fbt:plural>{" "}
-            ready
-          </fbt>
-        )}
+        {summary[status]}
       </p>
       <IconButton
         variant="tertiary"
@@ -135,32 +162,58 @@ function Header({
   );
 }
 
+/** The delete dialog: closed, asking to confirm (after a refused attempt, with why), or deleting. */
+type Deletion =
+  | { step: "closed" }
+  | { step: "confirming"; item: Export; error?: string }
+  | { step: "deleting"; item: Export };
+
+type DeletionEvent =
+  | { type: "open"; item: Export }
+  | { type: "submit" }
+  | { type: "refuse"; error: string }
+  | { type: "settle" }
+  | { type: "close" };
+
+function deletion(state: Deletion, event: DeletionEvent): Deletion {
+  switch (event.type) {
+    case "open":
+      return { step: "confirming", item: event.item };
+    case "submit":
+      return state.step === "confirming" ? { step: "deleting", item: state.item } : state;
+    case "refuse":
+      return state.step === "deleting"
+        ? { step: "confirming", item: state.item, error: event.error }
+        : state;
+    // A request that neither succeeded nor was refused, e.g. a server error, lets them try again.
+    case "settle":
+      return state.step === "deleting" ? { step: "confirming", item: state.item } : state;
+    case "close":
+      return { step: "closed" };
+  }
+}
+
 /** Newest first, as the page sends them; scrolls once there are more than five. */
 function ExportList({ exports }: { exports: Export[] }) {
-  const [deleting, setDeleting] = useState<Export | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string>();
-  const onDelete = (item: Export) => {
-    setError(undefined);
-    setDeleting(item);
-  };
+  const [state, dispatch] = useReducer(deletion, { step: "closed" });
+  const item = state.step === "closed" ? null : state.item;
 
   return (
     <>
       <ConfirmActionDialog
-        action={deleting && deleteAction(deleting)}
-        processing={processing}
-        error={error}
-        onCancel={() => setDeleting(null)}
+        action={item && deleteAction(item)}
+        processing={state.step === "deleting"}
+        error={state.step === "confirming" ? state.error : undefined}
+        onCancel={() => dispatch({ type: "close" })}
         onConfirm={(typed) =>
-          deleting &&
-          router.delete(deleting.deleteUrl, {
+          item &&
+          router.delete(item.deleteUrl, {
             data: { confirmation: typed },
             preserveScroll: true,
-            onStart: () => setProcessing(true),
-            onFinish: () => setProcessing(false),
-            onSuccess: () => setDeleting(null),
-            onError: (errors) => setError(errors.confirmation),
+            onStart: () => dispatch({ type: "submit" }),
+            onSuccess: () => dispatch({ type: "close" }),
+            onFinish: () => dispatch({ type: "settle" }),
+            onError: (errors) => dispatch({ type: "refuse", error: errors.confirmation ?? "" }),
           })
         }
       />
@@ -201,7 +254,7 @@ function ExportList({ exports }: { exports: Export[] }) {
                     "Delete export",
                     "Audit log exports toast: accessible name of the icon button that deletes an export before it expires",
                   )}
-                  onClick={() => onDelete(item)}
+                  onClick={() => dispatch({ type: "open", item })}
                 >
                   <Icon icon={DeleteBinLine} />
                 </IconButton>
