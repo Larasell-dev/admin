@@ -81,53 +81,57 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
         </fbt>
       </Button>
       {/* Persistent, since deleting leads to the dashboard and the dialog animates out over it. */}
-      <PersistentAlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialog.Popup
-          title={fbs(
-            "Delete sales channel",
-            "Sales channel page: title of the dialog that asks to confirm deleting the channel",
-          )}
-          description={fbs(
-            [
-              "Customers can no longer reach ",
-              fbs.param("channelName", name),
-              ". This can't be undone.",
-            ],
-            "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
-          )}
-        >
-          {/* The popup unmounts once closed, so the form starts empty each time it opens. */}
-          <Form action={destroyUrl} method="delete" onSuccess={() => setOpen(false)}>
-            {({ errors, processing }) => (
-              <>
-                <Field
-                  label={fbs(
-                    ['Type "', fbs.param("channelName", name), '" to confirm'],
-                    "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
-                  )}
-                  name="confirmation"
-                  // Also why the channel can't be deleted at all.
-                  error={errors.confirmation ?? errors.channel}
-                >
-                  <Input autoComplete="off" />
-                </Field>
-                <AlertDialog.Actions>
-                  <AlertDialog.Cancel>
-                    <fbt desc="Sales channel page: button that closes the delete dialog without deleting">
-                      Cancel
-                    </fbt>
-                  </AlertDialog.Cancel>
-                  <AlertDialog.Confirm type="submit" variant="destructive" loading={processing}>
-                    <fbt desc="Sales channel page: button in the dialog that deletes the channel">
-                      Delete
-                    </fbt>
-                  </AlertDialog.Confirm>
-                </AlertDialog.Actions>
-              </>
+      <PersistentAlertDialog
+        open={open}
+        onOpenChange={setOpen}
+        popup={
+          <AlertDialog.Popup
+            title={fbs(
+              "Delete sales channel",
+              "Sales channel page: title of the dialog that asks to confirm deleting the channel",
             )}
-          </Form>
-        </AlertDialog.Popup>
-      </PersistentAlertDialog>
+            description={fbs(
+              [
+                "Customers can no longer reach ",
+                fbs.param("channelName", name),
+                ". This can't be undone.",
+              ],
+              "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
+            )}
+          >
+            {/* The popup unmounts once closed, so the form starts empty each time it opens. */}
+            <Form action={destroyUrl} method="delete" onSuccess={() => setOpen(false)}>
+              {({ errors, processing }) => (
+                <>
+                  <Field
+                    label={fbs(
+                      ['Type "', fbs.param("channelName", name), '" to confirm'],
+                      "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
+                    )}
+                    name="confirmation"
+                    // Also why the channel can't be deleted at all.
+                    error={errors.confirmation ?? errors.channel}
+                  >
+                    <Input autoComplete="off" />
+                  </Field>
+                  <AlertDialog.Actions>
+                    <AlertDialog.Cancel>
+                      <fbt desc="Sales channel page: button that closes the delete dialog without deleting">
+                        Cancel
+                      </fbt>
+                    </AlertDialog.Cancel>
+                    <AlertDialog.Confirm type="submit" variant="destructive" loading={processing}>
+                      <fbt desc="Sales channel page: button in the dialog that deletes the channel">
+                        Delete
+                      </fbt>
+                    </AlertDialog.Confirm>
+                  </AlertDialog.Actions>
+                </>
+              )}
+            </Form>
+          </AlertDialog.Popup>
+        }
+      />
     </>
   );
 }

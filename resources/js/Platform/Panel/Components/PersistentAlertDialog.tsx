@@ -2,14 +2,20 @@ import { AlertDialog } from "@larasell-dev/ui";
 import {
   type ComponentProps,
   Fragment,
+  type ReactNode,
   useLayoutEffect,
   useState,
   useSyncExternalStore,
 } from "react";
 
-type RootProps = ComponentProps<typeof AlertDialog.Root>;
+type Props = Omit<ComponentProps<typeof AlertDialog.Root>, "children"> & {
+  /** The `<AlertDialog.Popup>`, which the layout draws. */
+  popup: ReactNode;
+  /** Nothing renders in place, so the trigger goes beside it, in the page. */
+  children?: never;
+};
 
-type Entry = RootProps & {
+type Entry = Props & {
   /** Set once the page that rendered the dialog has unmounted. */
   left: boolean;
   key: number;
@@ -35,11 +41,12 @@ const store = {
 };
 
 /**
- * An `AlertDialog.Root` that the layout renders instead of the page, so it animates out even when
- * confirming it visits another page. Its children render in the layout: they read the layout's
- * context, not the page's, and show outside the page, so keep the trigger out of it. A PersistentAlertDialogHost, which SidebarLayout renders, draws it.
+ * An alert dialog that the layout draws instead of the page, so it animates out even when
+ * confirming it visits another page. It takes its popup as a prop rather than children, since the
+ * popup reads the layout's context, not the page's; its trigger is a sibling that opens it with
+ * `open`. A PersistentAlertDialogHost, which SidebarLayout renders, draws it.
  */
-export default function PersistentAlertDialog(props: RootProps) {
+export default function PersistentAlertDialog(props: Props) {
   const [owner] = useState(() => ({}));
 
   // Republished on every render, before paint, so typing into the dialog doesn't lag a frame.
@@ -71,9 +78,9 @@ export default function PersistentAlertDialog(props: RootProps) {
 export function PersistentAlertDialogHost() {
   const entries = useSyncExternalStore(store.subscribe, () => store.snapshot);
 
-  return entries.map(({ left: _left, key, ...props }) => (
+  return entries.map(({ left: _left, key, popup, ...props }) => (
     <Fragment key={key}>
-      <AlertDialog.Root {...props} />
+      <AlertDialog.Root {...props}>{popup}</AlertDialog.Root>
     </Fragment>
   ));
 }

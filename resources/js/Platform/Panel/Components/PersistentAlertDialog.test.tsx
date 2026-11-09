@@ -9,9 +9,7 @@ function Panel({ pageShown }: { pageShown: boolean }) {
   return (
     <>
       {pageShown && (
-        <PersistentAlertDialog open>
-          <AlertDialog.Popup title="Delete channel?" />
-        </PersistentAlertDialog>
+        <PersistentAlertDialog open popup={<AlertDialog.Popup title="Delete channel?" />} />
       )}
       {/* SidebarLayout renders the host in the panel. */}
       <PersistentAlertDialogHost />
