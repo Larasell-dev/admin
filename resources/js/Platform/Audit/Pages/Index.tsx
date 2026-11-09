@@ -6,6 +6,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Page } from "../../Panel/Components/Page";
 import ResourceTable from "../../Tables/Components/ResourceTable";
 import SidebarLayout from "../../Panel/Layouts/SidebarLayout";
+import { useSettingsBackLink } from "../../Support/useSettingsBackLink";
 
 type Props = Larasell.Admin.Platform.Audit.Log.Data.AuditLogPageData;
 type Filters = Larasell.Admin.Platform.Audit.Log.Data.AuditLogFiltersData;
@@ -23,7 +24,7 @@ export default function Index({
 
   return (
     <>
-      <Page.Header title={auditLog.title} />
+      <Page.Header title={auditLog.title} backLink={useSettingsBackLink()} />
       {canSearch && (
         <FilterBar
           // A new form for new filters, e.g. after clearing them.

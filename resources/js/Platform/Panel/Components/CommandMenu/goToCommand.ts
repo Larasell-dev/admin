@@ -11,11 +11,14 @@ type NavigationItem = Larasell.Admin.Platform.Navigation.Data.NavigationItemData
 const pages = (item: NavigationItem): NavigationItem[] =>
   item.children.length > 0 ? item.children.flatMap(pages) : [item];
 
-/** Goes to a page of the navigation, so it offers the same pages, plugins' included, or the profile. */
+/**
+ * Goes to a page of the navigation, a settings page, or the profile, so it offers the same pages
+ * as the sidebar and the settings index, plugins' included.
+ */
 export const goToCommand = defineCommand({
   id: "go-to",
   use() {
-    const { navigation, profileUrl } = usePage<SharedProps>().props;
+    const { navigation, settingsPages, profileUrl } = usePage<SharedProps>().props;
 
     return {
       label: fbs("Go to", "Command menu: opens the list of pages of the admin panel to go to"),
@@ -41,6 +44,20 @@ export const goToCommand = defineCommand({
               : undefined,
           run: () => router.visit(page.url),
         }))
+        .concat(
+          settingsPages.map((page) => ({
+            id: `settings-${page.id}`,
+            label: fbs(
+              ["Settings › ", fbs.param("settingsPage", page.label)],
+              "Command menu: goes to a settings page, e.g. 'Settings › Team'",
+            ),
+            icon: navigationIcon(page.icon, false),
+            keywords: [
+              fbs("settings", "Command menu: search keyword for going to a settings page"),
+            ],
+            run: () => router.visit(page.url),
+          })),
+        )
         .concat({
           id: "profile",
           label: fbs(

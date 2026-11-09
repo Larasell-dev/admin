@@ -10,9 +10,8 @@ use Larasell\Admin\ApiToken\Http\Middleware\AuthenticateApiToken;
 use Larasell\Admin\ApiToken\Models\ApiToken;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
-use Larasell\Admin\Platform\Navigation\Facades\Navigation;
-use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Settings\Facades\Settings;
 
 /**
  * The API tokens module: the settings pages to list, create and revoke tokens, their navigation
@@ -41,10 +40,12 @@ class ApiTokenServiceProvider extends ServiceProvider
             return;
         }
 
-        // After Team.
-        Navigation::add(Translate::later('API tokens'), 'larasell.admin.settings.api-tokens.index', Icon::Key)
-            ->under(NavItem::Settings)
-            ->after('larasell.admin.settings.team.index');
+        Settings::add('api-tokens')
+            ->label(Translate::later('API tokens'))
+            ->description(Translate::later('Keys that let other apps use the API'))
+            ->icon(Icon::Key)
+            ->route('larasell.admin.settings.api-tokens.index')
+            ->after('team');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])->name('settings.api-tokens.index')->withHead(title: Translate::later('API tokens'));

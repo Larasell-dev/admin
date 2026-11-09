@@ -6,9 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
-use Larasell\Admin\Platform\Navigation\Facades\Navigation;
-use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Settings\Facades\Settings;
 use Larasell\Admin\Team\Http\Controllers\AvatarController;
 use Larasell\Admin\Team\Http\Controllers\ProfileController;
 use Larasell\Admin\Team\Http\Controllers\TeamController;
@@ -22,7 +21,11 @@ class TeamServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Navigation::add(Translate::later('Team'), 'larasell.admin.settings.team.index', Icon::Team)->under(NavItem::Settings);
+        Settings::add('team')
+            ->label(Translate::later('Team'))
+            ->description(Translate::later('The admins who can sign in to the panel'))
+            ->icon(Icon::Team)
+            ->route('larasell.admin.settings.team.index');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team.index')->withHead(title: Translate::later('Team'));

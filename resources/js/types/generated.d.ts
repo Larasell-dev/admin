@@ -244,6 +244,15 @@ declare namespace Larasell.Admin.Platform.Sections.Data {
     after: string | null;
   };
 }
+declare namespace Larasell.Admin.Platform.Settings.Data {
+  export type SettingsPageData = {
+    id: string;
+    label: string;
+    description: string | null;
+    icon: string;
+    url: string;
+  };
+}
 declare namespace Larasell.Admin.Product.Data {
   export type CreateProductPageData = {
     storeUrl: string;

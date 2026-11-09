@@ -112,16 +112,6 @@ it('refuses to delete the signed-in admin', function () {
     expect(Admin::query()->count())->toBe(2);
 });
 
-it('opens the first settings page from Settings', function () {
-    // Arrange
-    $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
-
-    // Act & Assert
-    $this->actingAs($ada, 'larasell-admin')
-        ->get(route('larasell.admin.settings'))
-        ->assertRedirect(route('larasell.admin.settings.team.index'));
-});
-
 it('opens the new admin page in the settings', function () {
     // Arrange
     $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
