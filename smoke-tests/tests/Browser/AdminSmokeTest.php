@@ -70,7 +70,7 @@ it('sends guests to the login page', function () {
     // Assert
     expect(failedResources($page))->toBe([]);
 
-    visit(adminUrl('customers'))->assertPathIs(adminPath('login'));
+    visit(adminUrl('products'))->assertPathIs(adminPath('login'));
 });
 
 it('signs an admin in and renders the panel', function () {
@@ -82,7 +82,6 @@ it('signs an admin in and renders the panel', function () {
         ->assertVisible('#main-content')
         ->assertVisible('aside > nav')
         ->assertSeeIn('aside > nav', 'Categories')
-        ->assertSeeIn('aside > nav', 'Customers')
         // app.tsx defines window.LarasellAdmin; it is missing when the panel's bundle failed to load.
         ->assertScript("typeof window.LarasellAdmin === 'object'")
         ->assertNoSmoke();
@@ -101,17 +100,13 @@ it('signs an admin in and renders the panel', function () {
     expect($adminAssetTypes)->toContain('js', 'css');
 });
 
-it('opens Categories and Customers from the sidebar, Profile from the user menu and the dashboard from the logo, without errors or failed requests', function () {
+it('opens Categories from the sidebar, Profile from the user menu and the dashboard from the logo, without errors or failed requests', function () {
     // Act
     $page = signIn()
         ->click('aside > nav a[href$="/categories"]')
         ->assertPathIs(adminPath('categories'))
         ->assertTitle('Categories - Admin')
         ->assertSee('No categories yet')
-        ->click('aside > nav a[href$="/customers"]')
-        ->assertPathIs(adminPath('customers'))
-        ->assertTitle('Customers - Admin')
-        ->assertSee('No customers yet')
         ->click(smokeEnv('SMOKE_ADMIN_NAME'))
         ->click('Profile')
         ->assertPathIs(adminPath('profile'))

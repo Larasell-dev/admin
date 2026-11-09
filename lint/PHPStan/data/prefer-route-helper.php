@@ -40,7 +40,7 @@ it('requests a hard-coded URL', function () {
     $page->where('updateUrl', url("/admin/categories/{$category->id}"));
 
     // A path stored in a variable first
-    $path = '/admin/customers';
+    $path = '/admin/orders';
     $this->get($path);
 });
 

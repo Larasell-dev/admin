@@ -3,7 +3,7 @@
 ## Code layout
 
 The panel is a modular monolith. Each feature is a module at the top of `src/`:
-`ApiToken`, `Category`, `Customer`, `Order`, `Product`, `SalesChannel`, `Seo` and `Team`.
+`ApiToken`, `Category`, `Order`, `Product`, `SalesChannel`, `Seo` and `Team`.
 What modules and apps plug into lives under `src/Platform/`: `Panel`, `Auth`, `Navigation`,
 `Tables`, `Sections`, `Search`, `Audit`, `ContentLocale`, `InterfaceLocale` and `Support`.
 

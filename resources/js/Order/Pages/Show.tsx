@@ -1,4 +1,3 @@
-import { Link } from "@inertiajs/react";
 import { Badge, EmptyState, Inset, Section } from "@larasell-dev/ui";
 import { ShoppingBagLine } from "@larasell-dev/ui/icons";
 import { cn } from "cn";
@@ -13,7 +12,7 @@ type Order = Larasell.Admin.Order.Data.OrderDetailData;
 type AddressData = Larasell.Admin.Order.Data.AddressData;
 
 /** An order as it was placed. Read only: orders record what was bought, so they aren't edited. */
-export default function Show({ order, indexUrl, customerUrl }: Props) {
+export default function Show({ order, indexUrl }: Props) {
   return (
     <>
       <Page.Header
@@ -35,7 +34,7 @@ export default function Show({ order, indexUrl, customerUrl }: Props) {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <div className="flex min-w-0 flex-col gap-6">
               <Items order={order} />
-              <Customer order={order} customerUrl={customerUrl} />
+              <Customer order={order} />
               <div className="grid gap-6 sm:grid-cols-2">
                 <Address
                   title={fbs(
@@ -185,20 +184,14 @@ function Summary({ order }: { order: Order }) {
 }
 
 /** Each value under a label saying what it is, so long names and emails stay readable. */
-function Customer({ order, customerUrl }: { order: Order; customerUrl: string | null }) {
+function Customer({ order }: { order: Order }) {
   return (
     <Card title={fbs("Customer", "Order page: heading of the card with who placed the order")}>
       <Fields columns>
         <Field
           label={fbs("Name", "Order page: label of the name of the customer who placed the order")}
         >
-          {customerUrl ? (
-            <Link href={customerUrl} prefetch="hover" className="underline underline-offset-2">
-              {order.customerName}
-            </Link>
-          ) : (
-            order.customerName
-          )}
+          {order.customerName}
         </Field>
         <Field
           label={fbs(

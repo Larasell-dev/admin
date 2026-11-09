@@ -11,7 +11,6 @@ use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Tests\Fixtures\Book;
 use Larasell\Larasell\Catalog\Models\Category;
-use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\SalesChannels\SalesContext;
@@ -64,8 +63,6 @@ it('titles the signed-in pages', function (string $uri, string $title) {
     'categories without any' => ['/admin/categories', 'Categories - Admin'],
     'new category' => ['/admin/categories/create', 'New category - Admin'],
     'products' => ['/admin/products', 'Products - Admin'],
-    'customers' => ['/admin/customers', 'Customers - Admin'],
-    'new customer' => ['/admin/customers/create', 'New customer - Admin'],
     'profile' => ['/admin/profile', 'Profile - Admin'],
     'team' => ['/admin/settings/team', 'Team - Admin'],
     'new member' => ['/admin/settings/team/create', 'New member - Admin'],
@@ -79,16 +76,6 @@ it('titles an admin\'s page with their name', function () {
 
     // Act & Assert
     expect(pageTitle($this->get(route('larasell.admin.settings.team.edit', 1))))->toBe('Ada Lovelace - Admin');
-});
-
-it('titles a customer\'s page with their name', function () {
-    // Arrange
-    signedInAdmin();
-
-    $customer = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
-
-    // Act & Assert
-    expect(pageTitle($this->get(route('larasell.admin.customers.edit', $customer))))->toBe('Ada Lovelace - Admin');
 });
 
 it('titles an order\'s page with its number', function () {
@@ -140,6 +127,6 @@ it('shares the title with Inertia visits', function () {
     signedInAdmin();
 
     // Act & Assert
-    $this->get(route('larasell.admin.customers.index'), ['X-Inertia' => 'true'])
-        ->assertJsonPath('props.head', ['<title data-inertia="title">Customers - Admin</title>']);
+    $this->get(route('larasell.admin.products.index'), ['X-Inertia' => 'true'])
+        ->assertJsonPath('props.head', ['<title data-inertia="title">Products - Admin</title>']);
 });

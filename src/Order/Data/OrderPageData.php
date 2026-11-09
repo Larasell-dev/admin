@@ -11,7 +11,5 @@ class OrderPageData extends Data
     public function __construct(
         public OrderDetailData $order,
         public string $indexUrl,
-        /** The customer who placed the order, or null for a guest order or while the customers are turned off. */
-        public ?string $customerUrl,
     ) {}
 }

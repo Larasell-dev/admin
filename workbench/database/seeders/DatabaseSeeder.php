@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Visibility;
-use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 
@@ -38,13 +37,6 @@ class DatabaseSeeder extends Seeder
         ],
     ];
 
-    private const CUSTOMERS = [
-        ['Ada', 'Lovelace'],
-        ['Alan', 'Turing'],
-        ['Grace', 'Hopper'],
-        ['Margaret', 'Hamilton'],
-    ];
-
     public function run(): void
     {
         // Setup runs this on every orb start; seeding once keeps the playground's own edits.
@@ -66,10 +58,6 @@ class DatabaseSeeder extends Seeder
                     ])->categories()->attach($child);
                 }
             }
-        }
-
-        foreach (self::CUSTOMERS as [$firstName, $lastName]) {
-            Customer::create(['first_name' => $firstName, 'last_name' => $lastName]);
         }
     }
 

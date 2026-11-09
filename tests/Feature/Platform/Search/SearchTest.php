@@ -13,7 +13,6 @@ use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\SalesChannels\Actions\CreateSalesChannel;
@@ -214,22 +213,6 @@ it('finds orders by their number and their customer\'s name and email', function
         ->assertJsonPath('results.*.match', [['label' => 'Email', 'value' => 'alan@bletchley.example']]);
 });
 
-it('finds customers by their full name', function () {
-    // Arrange
-    signInSearchAdmin();
-    $ada = Customer::create(['first_name' => 'Ada', 'last_name' => 'Lovelace']);
-    Customer::create(['first_name' => 'Alan', 'last_name' => 'Turing']);
-
-    // Act & Assert
-    $this->getJson(route('larasell.admin.search.customers', ['q' => 'a lovel']))
-        ->assertExactJson(['results' => [[
-            'id' => $ada->id,
-            'label' => 'Ada Lovelace',
-            'url' => route('larasell.admin.customers.edit', $ada),
-            'match' => null,
-        ]]]);
-});
-
 it('finds categories by their name in any locale and shows the name in the content locale', function () {
     // Arrange
     signInSearchAdmin();
@@ -273,7 +256,6 @@ it('needs a search of at most 200 characters', function (string $route) {
 })->with([
     'products' => 'larasell.admin.search.products',
     'orders' => 'larasell.admin.search.orders',
-    'customers' => 'larasell.admin.search.customers',
     'categories' => 'larasell.admin.search.categories',
     'sales channels' => 'larasell.admin.search.sales-channels',
 ]);
@@ -287,7 +269,6 @@ it('searches only for signed-in admins', function (string $route) {
 })->with([
     'larasell.admin.search.products',
     'larasell.admin.search.orders',
-    'larasell.admin.search.customers',
     'larasell.admin.search.categories',
     'larasell.admin.search.sales-channels',
 ]);
@@ -323,7 +304,6 @@ it('shares the searches of the enabled modules with signed-in admins', function 
         ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', [
             ['id' => 'products', 'label' => 'Search products', 'icon' => 'ShoppingBag', 'placeholder' => 'Search by name, SKU or barcode', 'url' => route('larasell.admin.search.products')],
             ['id' => 'categories', 'label' => 'Search categories', 'icon' => 'Folders', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.categories')],
-            ['id' => 'customers', 'label' => 'Search customers', 'icon' => 'Group', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.customers')],
             ['id' => 'orders', 'label' => 'Search orders', 'icon' => 'Receipt', 'placeholder' => 'Search by number, customer or email', 'url' => route('larasell.admin.search.orders')],
             ['id' => 'sales-channels', 'label' => 'Search sales channels', 'icon' => 'Store', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.sales-channels')],
         ]));
@@ -332,7 +312,7 @@ it('shares the searches of the enabled modules with signed-in admins', function 
     signInSearchAdmin();
 
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'customers', 'sales-channels']));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'sales-channels']));
 });
 
 it('lets a plugin add its own search to the command menu', function () {
@@ -348,7 +328,7 @@ it('lets a plugin add its own search to the command menu', function () {
 
     // Act & Assert
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.5', [
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.4', [
             'id' => 'gift-cards',
             'label' => 'Search gift cards',
             'icon' => 'Gift',

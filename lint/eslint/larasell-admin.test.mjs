@@ -163,16 +163,16 @@ new RuleTester().run("module-boundaries", plugin.rules["module-boundaries"], {
     {
       ...at(
         "Order/Pages/Show.tsx",
-        `export { default } from "../../Customer/Components/CustomerForm";`,
+        `export { default } from "../../Category/Components/CategoryForm";`,
       ),
-      errors: [{ messageId: "module", data: { from: "Order", module: "Customer" } }],
+      errors: [{ messageId: "module", data: { from: "Order", module: "Category" } }],
     },
     {
       ...at(
         "Team/Pages/Index.tsx",
-        `const form = () => import("../../Customer/Components/CustomerForm");`,
+        `const form = () => import("../../Category/Components/CategoryForm");`,
       ),
-      errors: [{ messageId: "module", data: { from: "Team", module: "Customer" } }],
+      errors: [{ messageId: "module", data: { from: "Team", module: "Category" } }],
     },
   ],
 });

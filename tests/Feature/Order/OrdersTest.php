@@ -10,7 +10,6 @@ use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\OrderStatus;
 use Larasell\Larasell\Enums\PaymentStatus;
 use Larasell\Larasell\Enums\TaxPriceMode;
-use Larasell\Larasell\Models\Customer;
 use Larasell\Larasell\Models\Order;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\SalesChannels\SalesContext;
@@ -102,14 +101,14 @@ it('redirects guests away from the orders', function () {
     $this->get(route('larasell.admin.orders.index'))->assertRedirect(route('larasell.admin.login'));
 });
 
-it('shows Orders in the navigation between Categories and Customers', function () {
+it('shows Orders in the navigation between Categories and Settings', function () {
     // Arrange
     signInOrdersAdmin();
 
     // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Settings']));
 });
 
 it('turns the orders off when disabled in the config', function () {
@@ -127,7 +126,7 @@ it('turns the orders off when disabled in the config', function () {
     $this->get('/admin/orders/1')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Settings']));
 });
 
 /**
@@ -193,7 +192,6 @@ it('shows an order with its items, summary, customer, addresses, payments and sh
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Order/Pages/Show')
             ->where('indexUrl', route('larasell.admin.orders.index'))
-            ->where('customerUrl', null)
             ->where('order.number', '2026-000123')
             ->where('order.status', ['label' => 'Paid', 'variant' => 'success'])
             ->where('order.placedAt', 'Oct 28, 2026')
@@ -263,29 +261,6 @@ it('lists the order\'s payments, newest first', function () {
             ->where('order.payments.0.reference', null)
             ->where('order.payments.1.method', 'card')
             ->where('order.payments.1.status', ['label' => 'Failed', 'variant' => 'danger']));
-});
-
-it('links the order to its customer', function () {
-    // Arrange
-    signInOrdersAdmin();
-    $customer = Customer::create(['first_name' => 'Jane', 'last_name' => 'Doe']);
-    $order = createPlacedOrder(['customer_id' => $customer->id]);
-
-    // Act & Assert
-    $this->get(route('larasell.admin.orders.show', $order))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('customerUrl', route('larasell.admin.customers.edit', $customer)));
-});
-
-it('does not link the order to its customer while the customers are turned off', function () {
-    // Arrange
-    $this->bootingWith(fn () => config(['larasell.admin.customers.enabled' => false]));
-    signInOrdersAdmin();
-    $customer = Customer::create(['first_name' => 'Jane', 'last_name' => 'Doe']);
-    $order = createPlacedOrder(['customer_id' => $customer->id]);
-
-    // Act & Assert
-    $this->get(route('larasell.admin.orders.show', $order))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('customerUrl', null));
 });
 
 it('links each order in the table to its page', function () {
