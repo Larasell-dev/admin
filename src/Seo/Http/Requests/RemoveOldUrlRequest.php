@@ -3,10 +3,10 @@
 namespace Larasell\Admin\Seo\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Larasell\Admin\Seo\Actions\RemoveOldUrlPayload;
+use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 use Larasell\Admin\Seo\SeoUrlId;
 
-/** Removing an old URL: its ID from the route and the confirmation the admin typed. */
+/** Removing an old URL, once the admin typed "Delete redirect" in their language. */
 class RemoveOldUrlRequest extends FormRequest
 {
     /**
@@ -14,14 +14,11 @@ class RemoveOldUrlRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['confirmation' => ['nullable', 'string']];
+        return ['confirmation' => [new Confirmation(__('Delete redirect'))]];
     }
 
-    public function payload(): RemoveOldUrlPayload
+    public function seoUrl(): SeoUrlId
     {
-        return new RemoveOldUrlPayload(
-            url: SeoUrlId::fromString((string) $this->route('url')),
-            confirmation: $this->filled('confirmation') ? $this->string('confirmation')->value() : null,
-        );
+        return SeoUrlId::fromString((string) $this->route('url'));
     }
 }

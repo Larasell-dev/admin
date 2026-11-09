@@ -3,12 +3,11 @@
 namespace Larasell\Admin\SalesChannel\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Larasell\Admin\SalesChannel\Actions\AddEntryPoint;
 use Larasell\Admin\SalesChannel\Actions\DeleteEntryPoint;
 use Larasell\Admin\SalesChannel\Http\Requests\AddEntryPointRequest;
+use Larasell\Admin\SalesChannel\Http\Requests\DeleteEntryPointRequest;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
-use Larasell\Larasell\Storefront\Models\EntryPoint;
 
 /** The domains of a storefront channel, listed and added on the channel's page. */
 class EntryPointController
@@ -20,9 +19,9 @@ class EntryPointController
         return redirect()->route('larasell.admin.sales-channels.edit', $channel);
     }
 
-    public function destroy(Request $request, SalesChannel $channel, int $entryPoint, DeleteEntryPoint $delete): RedirectResponse
+    public function destroy(DeleteEntryPointRequest $request, SalesChannel $channel, DeleteEntryPoint $delete): RedirectResponse
     {
-        $delete->handle(EntryPoint::query()->where('sales_channel_id', $channel->id)->findOrFail($entryPoint), $request->string('confirmation')->value() ?: null);
+        $delete->handle($request->entryPoint());
 
         return redirect()->route('larasell.admin.sales-channels.edit', $channel);
     }

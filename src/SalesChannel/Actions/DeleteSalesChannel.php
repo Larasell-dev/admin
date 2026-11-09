@@ -14,20 +14,14 @@ class DeleteSalesChannel
     public function __construct(private readonly CoreDeleteSalesChannel $delete) {}
 
     /**
-     * Deletes the channel through the core's action, once the admin typed its name. The core
+     * Deletes the channel through the core's action. The core
      * refuses the last channel, and one that carts or orders were made in; the refusal comes back
      * as a validation error on the channel, in the interface's language.
      *
      * @throws ValidationException
      */
-    public function handle(SalesChannel $channel, ?string $confirmation): void
+    public function handle(SalesChannel $channel): void
     {
-        if ($confirmation !== $channel->name) {
-            throw ValidationException::withMessages([
-                'confirmation' => __('Type ":text" to confirm.', ['text' => $channel->name]),
-            ]);
-        }
-
         try {
             $this->delete->handle(SalesChannelId::of($channel));
         } catch (InvalidSalesChannel) {

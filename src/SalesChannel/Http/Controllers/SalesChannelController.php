@@ -3,7 +3,6 @@
 namespace Larasell\Admin\SalesChannel\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\SalesChannel\Actions\CreateSalesChannel;
@@ -16,6 +15,7 @@ use Larasell\Admin\SalesChannel\Data\SalesChannelData;
 use Larasell\Admin\SalesChannel\Data\SalesChannelNavigationData;
 use Larasell\Admin\SalesChannel\Data\SalesChannelOptionData;
 use Larasell\Admin\SalesChannel\Http\Requests\CreateSalesChannelRequest;
+use Larasell\Admin\SalesChannel\Http\Requests\DeleteSalesChannelRequest;
 use Larasell\Admin\SalesChannel\Http\Requests\UpdateSalesChannelRequest;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Larasell\Larasell\SalesChannels\SalesChannelTypes;
@@ -70,9 +70,9 @@ class SalesChannelController
         return redirect()->route('larasell.admin.sales-channels.edit', $channel);
     }
 
-    public function destroy(Request $request, SalesChannel $channel, DeleteSalesChannel $delete): RedirectResponse
+    public function destroy(DeleteSalesChannelRequest $request, SalesChannel $channel, DeleteSalesChannel $delete): RedirectResponse
     {
-        $delete->handle($channel, $request->string('confirmation')->value() ?: null);
+        $delete->handle($channel);
         SalesChannelNavigationData::refreshOnNextPage();
 
         return redirect()->route('larasell.admin.home');

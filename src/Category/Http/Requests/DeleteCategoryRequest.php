@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Category\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
+use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 use Larasell\Larasell\Catalog\Models\Category;
 
 /**
@@ -16,22 +16,9 @@ class DeleteCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['confirmation' => ['nullable', 'string']];
-    }
+        $category = $this->route('category');
+        assert($category instanceof Category);
 
-    /**
-     * @return array<int, callable(Validator): void>
-     */
-    public function after(): array
-    {
-        return [function (Validator $validator): void {
-            /** @var Category $category */
-            $category = $this->route('category');
-            $name = $category->name->get();
-
-            if ($this->string('confirmation')->value() !== $name) {
-                $validator->errors()->add('confirmation', __('Type ":text" to confirm.', ['text' => $name]));
-            }
-        }];
+        return ['confirmation' => [new Confirmation($category->name->get())]];
     }
 }
