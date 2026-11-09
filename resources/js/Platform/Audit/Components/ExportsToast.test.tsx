@@ -1,5 +1,6 @@
 import "../../../../css/app.css";
-import { describe, expect, it } from "vitest";
+import { router } from "@inertiajs/react";
+import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import ExportsToast from "./ExportsToast";
@@ -17,6 +18,27 @@ function anExport(overrides: Partial<Export>): Export {
     deleteUrl: "/admin/settings/audit-log/exports/01",
     ...overrides,
   };
+}
+
+let destroy: MockInstance<typeof router.delete>;
+
+beforeEach(() => {
+  destroy = vi.spyOn(router, "delete").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+/** The options the toast passed to its delete request, to answer it as the server would. */
+const request = () => destroy.mock.calls[0]![1]!;
+
+async function confirmDelete(typed: string) {
+  await render(<ExportsToast exports={[anExport({})]} />);
+  await toast().getByRole("button", { name: "Show exports" }).click();
+  await toast().getByRole("button", { name: "Delete export" }).click();
+  await page.getByRole("alertdialog").getByRole("textbox").fill(typed);
+  await page.getByRole("alertdialog").getByRole("button", { name: "Delete" }).click();
 }
 
 const toast = () => page.getByRole("region", { name: "Exports" });
@@ -97,5 +119,33 @@ it("asks to type a confirmation before deleting an export", async () => {
   // Assert
   const dialog = page.getByRole("alertdialog");
   await expect.element(dialog.getByLabelText('Type "Delete export" to confirm')).toBeVisible();
+  await expect.element(dialog.getByRole("button", { name: "Delete" })).toBeEnabled();
+});
+
+it("deletes an export once the admin confirms, with what they typed", async () => {
+  // Act
+  await confirmDelete("Delete export");
+  request().onStart?.({} as never);
+  request().onSuccess?.({} as never);
+  request().onFinish?.({} as never);
+
+  // Assert
+  expect(destroy).toHaveBeenCalledWith(
+    "/admin/settings/audit-log/exports/01",
+    expect.objectContaining({ data: { confirmation: "Delete export" } }),
+  );
+  await expect.element(page.getByRole("alertdialog")).not.toBeInTheDocument();
+});
+
+it("keeps the dialog open with why, when the server refuses the delete", async () => {
+  // Act
+  await confirmDelete("delete");
+  request().onStart?.({} as never);
+  request().onError?.({ confirmation: 'Type "Delete export" to confirm.' });
+  request().onFinish?.({} as never);
+
+  // Assert
+  const dialog = page.getByRole("alertdialog");
+  await expect.element(dialog.getByText('Type "Delete export" to confirm.')).toBeVisible();
   await expect.element(dialog.getByRole("button", { name: "Delete" })).toBeEnabled();
 });

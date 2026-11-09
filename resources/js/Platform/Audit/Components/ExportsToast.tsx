@@ -172,25 +172,40 @@ type DeletionEvent =
   | { type: "open"; item: Export }
   | { type: "submit" }
   | { type: "refuse"; error: string }
+  // A request that neither succeeded nor was refused, e.g. a server error, lets them try again.
   | { type: "settle" }
   | { type: "close" };
 
+type Step = Deletion["step"];
+type Transitions<S extends Step> = {
+  [E in DeletionEvent["type"]]?: (
+    state: Extract<Deletion, { step: S }>,
+    event: Extract<DeletionEvent, { type: E }>,
+  ) => Deletion;
+};
+
+/** Each step's allowed events. Any other event leaves the state as it is. */
+const machine: { [S in Step]: Transitions<S> } = {
+  closed: {
+    open: (_, { item }) => ({ step: "confirming", item }),
+  },
+  confirming: {
+    submit: ({ item }) => ({ step: "deleting", item }),
+    close: () => ({ step: "closed" }),
+  },
+  deleting: {
+    refuse: ({ item }, { error }) => ({ step: "confirming", item, error }),
+    settle: ({ item }) => ({ step: "confirming", item }),
+    close: () => ({ step: "closed" }),
+  },
+};
+
 function deletion(state: Deletion, event: DeletionEvent): Deletion {
-  switch (event.type) {
-    case "open":
-      return { step: "confirming", item: event.item };
-    case "submit":
-      return state.step === "confirming" ? { step: "deleting", item: state.item } : state;
-    case "refuse":
-      return state.step === "deleting"
-        ? { step: "confirming", item: state.item, error: event.error }
-        : state;
-    // A request that neither succeeded nor was refused, e.g. a server error, lets them try again.
-    case "settle":
-      return state.step === "deleting" ? { step: "confirming", item: state.item } : state;
-    case "close":
-      return { step: "closed" };
-  }
+  const transition = (machine[state.step] as Transitions<Step>)[event.type] as
+    | ((state: Deletion, event: DeletionEvent) => Deletion)
+    | undefined;
+
+  return transition ? transition(state, event) : state;
 }
 
 /** Newest first, as the page sends them; scrolls once there are more than five. */
