@@ -218,3 +218,29 @@ it('refuses a record the database stores differently from how it was hashed', fu
     expect(DB::table('larasell_audit_log')->count())->toBe(0)
         ->and(verifyChain()['passed'])->toBeTrue();
 });
+
+it('refuses a record that already has its place in the chain', function (string $column) {
+    // Arrange
+    shelve();
+    $record = (array) DB::table('larasell_audit_log')->sole();
+    unset($record['seq'], $record['previous_hash'], $record['hash']);
+    $record = [...$record, 'id' => (string) str()->ulid(), $column => $column === 'seq' ? 7 : str_repeat('a', 64)];
+
+    // Act & Assert
+    expect(fn () => DB::transaction(fn () => app(AuditChain::class)->append($record)))->toThrow(AuditFailed::class);
+
+    expect(DB::table('larasell_audit_log')->count())->toBe(1);
+})->with(['seq', 'previous_hash', 'hash']);
+
+it('refuses a fraction in a record\'s stored properties, which has no single way to be written', function () {
+    // Arrange
+    shelve();
+    $record = (array) DB::table('larasell_audit_log')->sole();
+    unset($record['seq'], $record['previous_hash'], $record['hash']);
+    $record = [...$record, 'id' => (string) str()->ulid(), 'properties' => '{"price":{"amount":9.99}}'];
+
+    // Act & Assert
+    expect(fn () => DB::transaction(fn () => app(AuditChain::class)->append($record)))->toThrow(AuditFailed::class, '[price.amount]');
+
+    expect(DB::table('larasell_audit_log')->count())->toBe(1);
+});

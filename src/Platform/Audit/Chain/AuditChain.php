@@ -42,11 +42,33 @@ class AuditChain
      */
     public function append(array $record): void
     {
-        DB::transaction(function () use ($record): void {
+        $event = (string) ($record['event'] ?? '');
+
+        foreach (['seq', 'previous_hash', 'hash'] as $column) {
+            if (array_key_exists($column, $record)) {
+                throw AuditFailed::alreadyChained($event, $column);
+            }
+        }
+
+        // Auditor rejects fractions before storing them; checked again on what is hashed, since
+        // a float has no single way to be written, so the hash couldn't be reproduced.
+        $fraction = $this->fraction(json_decode((string) ($record['properties'] ?? 'null'), true));
+
+        if ($fraction !== null) {
+            throw AuditFailed::invalidProperty($event, $fraction, 'float');
+        }
+
+        DB::transaction(function () use ($record, $event): void {
             // Created on the first append, rather than by a migration.
             DB::table(self::HEAD)->insertOrIgnore(['id' => 1, 'seq' => 0, 'hash' => null]);
+            $before = (int) DB::table(self::HEAD)->where('id', 1)->value('seq');
             DB::table(self::HEAD)->where('id', 1)->increment('seq');
             $head = DB::table(self::HEAD)->where('id', 1)->sole();
+
+            // The lock makes the increment ours alone, so the head moved by exactly one.
+            if ((int) $head->seq !== $before + 1) {
+                throw AuditFailed::headOutOfStep($event);
+            }
 
             $record = [...$record, 'seq' => (int) $head->seq, 'previous_hash' => $head->hash];
             $record['hash'] = $this->hash($record);
@@ -61,8 +83,30 @@ class AuditChain
                 throw AuditFailed::storedDifferently((string) $record['event']);
             }
 
-            DB::table(self::HEAD)->where('id', 1)->update(['hash' => $record['hash']]);
+            if (DB::table(self::HEAD)->where('id', 1)->update(['hash' => $record['hash']]) !== 1) {
+                throw AuditFailed::headOutOfStep($event);
+            }
         });
+    }
+
+    /**
+     * The path of the first fraction in decoded properties, e.g. price.amount, or null without one.
+     */
+    private function fraction(mixed $value, string $path = ''): ?string
+    {
+        if (is_float($value)) {
+            return $path;
+        }
+
+        foreach (is_array($value) ? $value : [] as $key => $item) {
+            $found = $this->fraction($item, ltrim("{$path}.{$key}", '.'));
+
+            if ($found !== null) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 
     /**

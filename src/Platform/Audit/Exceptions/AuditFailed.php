@@ -82,6 +82,32 @@ class AuditFailed extends RuntimeException implements StructuredException
 
     /**
      * @internal
+     */
+    public static function alreadyChained(string $event, string $column): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.already-chained',
+            message: "Audit record [{$event}] was appended with its own [{$column}].",
+            why: 'The chain gives each record its seq, previous_hash and hash while appending, so one passed in would be overwritten.',
+            fix: "Leave [{$column}] out of the record passed to AuditChain::append().",
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public static function headOutOfStep(string $event): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.head-out-of-step',
+            message: "Audit record [{$event}] couldn't move the chain's head along with it.",
+            why: 'The larasell_audit_log_head table has no single head row, or another writer changed it without its lock.',
+            fix: 'Check that larasell_audit_log_head holds exactly one row with id 1, and that nothing but AuditChain writes to it.',
+        );
+    }
+
+    /**
+     * @internal
      *
      * @param  class-string  $actor
      */
