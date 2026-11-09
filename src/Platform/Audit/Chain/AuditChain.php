@@ -7,7 +7,6 @@ use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
-use Larasell\Chronicle\Exceptions\StructuredLogicException;
 use stdClass;
 
 /**

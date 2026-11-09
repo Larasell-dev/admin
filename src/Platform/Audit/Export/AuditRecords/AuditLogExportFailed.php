@@ -13,6 +13,10 @@ use Larasell\Admin\Platform\Audit\Subject;
  */
 class AuditLogExportFailed extends AuditRecord
 {
+    /**
+     * @param  string  $format  The extension of the file in the zip archive, from the AuditLogExportFormat
+     *                          that writes it, e.g. json. A string, since apps can bind a format of their own.
+     */
     public function __construct(private readonly int $exportId, private readonly string $format, private readonly string $error) {}
 
     public function event(): string

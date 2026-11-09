@@ -13,7 +13,12 @@ use Larasell\Admin\Platform\Audit\Subject;
  */
 class AuditLogExported extends AuditRecord
 {
-    public function __construct(private readonly ?int $exportId, private readonly string $format, private readonly int $records) {}
+    /**
+     * @param  string  $format  The extension of the file in the zip archive, from the AuditLogExportFormat
+     *                          that writes it, e.g. json. A string, since apps can bind a format of their own.
+     * @param  int  $recordCount  How many audit records the export holds.
+     */
+    public function __construct(private readonly ?int $exportId, private readonly string $format, private readonly int $recordCount) {}
 
     public function event(): string
     {
@@ -32,6 +37,6 @@ class AuditLogExported extends AuditRecord
 
     public function properties(): array
     {
-        return ['format' => $this->format, 'records' => $this->records];
+        return ['format' => $this->format, 'record_count' => $this->recordCount];
     }
 }

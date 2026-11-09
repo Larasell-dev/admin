@@ -196,7 +196,7 @@ it('lets the admin who exported download it, and records the download', function
     $record = DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->sole();
 
     expect($record)->toMatchArray(['actor_id' => (string) $this->ada->id, 'subject_type' => 'audit_log_export', 'category' => 'audit_access'])
-        ->and(json_decode($record->properties, true))->toBe(['format' => 'json', 'records' => 2]);
+        ->and(json_decode($record->properties, true))->toBe(['format' => 'json', 'record_count' => 2]);
 });
 
 it('keeps the download from other admins, unsigned links and expired exports', function () {
