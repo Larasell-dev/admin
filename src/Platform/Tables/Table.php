@@ -50,7 +50,6 @@ abstract class Table implements JsonSerializable
         'larasell:' => 'Larasell\\Admin\\Team\\Tables\\',
         'larasell-product:' => 'Larasell\\Admin\\Product\\Tables\\',
         'larasell-categories:' => 'Larasell\\Admin\\Category\\Tables\\',
-        'larasell-customers:' => 'Larasell\\Admin\\Customer\\Tables\\',
         'larasell-orders:' => 'Larasell\\Admin\\Order\\Tables\\',
         'larasell-api-tokens:' => 'Larasell\\Admin\\ApiToken\\Tables\\',
     ];

@@ -1,10 +1,6 @@
 {
   "ApiToken": { "buildsOn": [] },
   "Category": { "buildsOn": [] },
-  "Customer": {
-    "buildsOn": ["Order"],
-    "why": "The customer page lists the customer's orders with the Order module's table."
-  },
   "Order": { "buildsOn": [] },
   "Product": {
     "buildsOn": ["Category"],

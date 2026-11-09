@@ -18,7 +18,7 @@ const item = (label: string, path: string, children: Item[] = []): Item => ({
 const defaultNavigation = [
   item("Home", "/admin"),
   item("Categories", "/admin/categories"),
-  item("Customers", "/admin/customers"),
+  item("Orders", "/admin/orders"),
   item("Settings", "/admin/settings", [
     item("Taxes", "/admin/settings/taxes"),
     item("Shipping", "/admin/settings/shipping"),
@@ -61,7 +61,7 @@ it.each([
   ["/admin", "Home"],
   ["/admin/categories", "Categories"],
   ["/admin/categories/12?tab=products", "Categories"],
-  ["/admin/customers", "Customers"],
+  ["/admin/orders", "Orders"],
   ["/admin/settings", "Settings"],
   ["/admin/settings/taxes", "Taxes"],
   ["/admin/settings/shipping/eu", "Shipping"],
@@ -89,9 +89,9 @@ it.each([
 });
 
 it.each([
-  ["/admin", ["Home", "Categories", "Customers", "Settings"]],
-  ["/admin/settings", ["Home", "Categories", "Customers", "Settings", "Taxes", "Shipping"]],
-  ["/admin/settings/taxes", ["Home", "Categories", "Customers", "Settings", "Taxes", "Shipping"]],
+  ["/admin", ["Home", "Categories", "Orders", "Settings"]],
+  ["/admin/settings", ["Home", "Categories", "Orders", "Settings", "Taxes", "Shipping"]],
+  ["/admin/settings/taxes", ["Home", "Categories", "Orders", "Settings", "Taxes", "Shipping"]],
 ])("shows a group's children only inside that group, at %s", async (url, labels) => {
   // Act
   await renderAt(url);
@@ -168,11 +168,11 @@ describe("expanding a group", () => {
 
     // Assert
     await expect.element(toggle("Close Settings")).toHaveAttribute("aria-expanded", "true");
-    expect(visible()).toEqual(["Home", "Categories", "Customers", "Settings", "Taxes", "Shipping"]);
+    expect(visible()).toEqual(["Home", "Categories", "Orders", "Settings", "Taxes", "Shipping"]);
 
     await toggle("Close Settings").click();
     await expect.element(toggle("Open Settings")).toHaveAttribute("aria-expanded", "false");
-    expect(visible()).toEqual(["Home", "Categories", "Customers", "Settings"]);
+    expect(visible()).toEqual(["Home", "Categories", "Orders", "Settings"]);
   });
 
   it("closes the group of the current page", async () => {
@@ -184,7 +184,7 @@ describe("expanding a group", () => {
 
     // Assert
     await expect.element(toggle("Open Settings")).toHaveAttribute("aria-expanded", "false");
-    expect(visible()).toEqual(["Home", "Categories", "Customers", "Settings"]);
+    expect(visible()).toEqual(["Home", "Categories", "Orders", "Settings"]);
   });
 
   it("points the toggle at the group it controls", async () => {
@@ -198,7 +198,7 @@ describe("expanding a group", () => {
 
   it("keeps the user on the current page when toggling", async () => {
     // Arrange
-    await renderAt("/admin/customers");
+    await renderAt("/admin/orders");
 
     // Act
     await toggle("Open Settings").click();
@@ -206,7 +206,7 @@ describe("expanding a group", () => {
 
     // Assert
     expect(visit).not.toHaveBeenCalled();
-    expect(current()).toEqual(["Customers"]);
+    expect(current()).toEqual(["Orders"]);
 
     // Control: the spy does see a navigation, so its silence above means something.
     await page.getByRole("link", { name: "Settings", exact: true }).click();

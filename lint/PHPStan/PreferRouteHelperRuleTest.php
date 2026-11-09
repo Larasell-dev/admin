@@ -39,7 +39,7 @@ final class PreferRouteHelperRuleTest extends RuleTestCase
             $error('"/admin/categories/{$category->id}"', 36),
             $error("'/admin/categories/create'", 39),
             $error('"/admin/categories/{$category->id}"', 40),
-            $error("'/admin/customers'", 44),
+            $error("'/admin/orders'", 44),
             $error("'/admin/login'", 67),
             $error("'/admin'", 68),
         ]);
