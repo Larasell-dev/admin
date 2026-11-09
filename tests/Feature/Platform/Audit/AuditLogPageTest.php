@@ -5,14 +5,18 @@ declare(strict_types=1);
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\Actors\Actor;
 use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Enums\AuditSource;
+use Larasell\Admin\Platform\Audit\Facades\Audit;
+use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogSearched;
+use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogViewed;
 use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Laravel\Pennant\Feature;
@@ -222,41 +226,38 @@ it('keeps the filters when paging', function () {
 });
 
 it('audits viewing the log, as the admin who did', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     auditLogPage();
 
     // Assert
-    $record = DB::table('larasell_audit_log')->sole();
-
-    expect($record)->toMatchArray([
-        'event' => 'audit_log.viewed',
-        'category' => 'audit_access',
-        'actor_type' => 'admin',
-        'actor_id' => (string) $this->ada->id,
-        'subject_type' => null,
-        'source' => 'web',
-    ])
-        ->and(json_decode($record->properties, true))->toBe(['page' => 1]);
+    Audit::assertRecorded(AuditLogViewed::class, fn (AuditLogViewed $record, Actor|UnknownActor $actor, AuditSource $source) => $actor instanceof Admin && $actor->is($this->ada)
+        && $record->subject() === null
+        && $record->properties() === ['page' => 1]
+        && $source === AuditSource::Web);
+    Audit::assertNotRecorded(AuditLogSearched::class);
 });
 
 it('audits searching the log with the filters used', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     auditLogPage(['event' => 'api_token.created', 'actor_type' => 'admin', 'actor_id' => '3', 'from' => '2026-10-01', 'page' => '2']);
 
     // Assert
-    $record = DB::table('larasell_audit_log')->sole();
-
-    expect($record->event)->toBe('audit_log.searched')
-        ->and($record->category)->toBe('audit_access')
-        ->and(json_decode($record->properties, true))->toBe([
-            'filters' => ['event' => 'api_token.created', 'actor_type' => 'admin', 'actor_id' => '3', 'from' => '2026-10-01'],
-            'page' => 2,
-        ]);
+    Audit::assertRecorded(AuditLogSearched::class, fn (AuditLogSearched $record) => $record->properties() === [
+        'filters' => ['event' => 'api_token.created', 'actor_type' => 'admin', 'actor_id' => '3', 'from' => '2026-10-01'],
+        'page' => 2,
+    ]);
+    Audit::assertNotRecorded(AuditLogViewed::class);
 });
 
 it('shows nothing when its access can\'t be audited', function () {
     // Arrange
-    Schema::drop('larasell_audit_log');
+    Audit::fake()->failing();
 
     // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
@@ -311,9 +312,12 @@ it('hides the filters and ignores them while the audit-log-filters feature is in
 });
 
 it('keeps the audit log out of reach for guests', function () {
+    // Arrange
+    Audit::fake();
+
     // Act
     $this->get(route('larasell.admin.settings.audit-log.index'))->assertRedirect(route('larasell.admin.login'));
 
     // Assert
-    expect(DB::table('larasell_audit_log')->count())->toBe(0);
+    Audit::assertNothingRecorded();
 });

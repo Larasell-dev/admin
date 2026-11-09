@@ -16,8 +16,12 @@ use Larasell\Admin\Platform\Audit\Actors\SystemActor;
 use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
 use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Chain\AuditChain;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
+use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportDeleted;
+use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExported;
+use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportFailed;
+use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportRequested;
 use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
 use Larasell\Admin\Platform\Audit\Export\Exceptions\InvalidAuditLogExport;
@@ -25,6 +29,7 @@ use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
+use Larasell\Admin\Platform\Audit\Facades\Audit;
 use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 
@@ -160,14 +165,15 @@ it('exports every record as a JSON file in a zip archive, with its place in the 
 });
 
 it('records starting an export, as the admin who did', function () {
+    // Arrange
+    Audit::fake([AuditLogExportRequested::class]);
+
     // Act
     exportAs($this->ada);
 
     // Assert
-    $record = DB::table('larasell_audit_log')->where('event', 'audit_log.export_requested')->sole();
-
-    expect($record)->toMatchArray(['actor_type' => 'admin', 'actor_id' => (string) $this->ada->id, 'category' => 'audit_access'])
-        ->and(json_decode($record->properties, true))->toBe(['format' => 'json']);
+    Audit::assertRecorded(AuditLogExportRequested::class, fn (AuditLogExportRequested $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+        && $record->properties() === ['format' => 'json']);
 });
 
 it('says in the summary when the chain is broken', function () {
@@ -185,6 +191,7 @@ it('says in the summary when the chain is broken', function () {
 
 it('lets the admin who exported download it, and records the download', function () {
     // Arrange
+    Audit::fake([AuditLogExported::class]);
     catalogued('book.shelved', 1);
     $url = exportAs($this->ada)[0]['downloadUrl'];
 
@@ -194,14 +201,14 @@ it('lets the admin who exported download it, and records the download', function
     // Assert
     $response->assertOk()->assertDownload('audit-log-2026-10-30-120000.zip');
 
-    $record = DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->sole();
-
-    expect($record)->toMatchArray(['actor_id' => (string) $this->ada->id, 'subject_type' => 'audit_log_export', 'category' => 'audit_access'])
-        ->and(json_decode($record->properties, true))->toBe(['format' => 'json', 'record_count' => 2]);
+    Audit::assertRecorded(AuditLogExported::class, fn (AuditLogExported $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+        && $record->subject()?->type === 'audit_log_export'
+        && $record->properties() === ['format' => 'json', 'record_count' => 2]);
 });
 
 it('keeps the download from other admins, unsigned links and expired exports', function () {
     // Arrange
+    Audit::fake([AuditLogExported::class]);
     $url = exportAs($this->ada)[0]['downloadUrl'];
 
     // Act & Assert
@@ -211,7 +218,7 @@ it('keeps the download from other admins, unsigned links and expired exports', f
     $this->travel(25)->hours();
     $this->get($url)->assertForbidden();
 
-    expect(DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->exists())->toBeFalse();
+    Audit::assertNotRecorded(AuditLogExported::class);
 });
 
 it('shows only the admin\'s own exports', function () {
@@ -294,6 +301,7 @@ it('deletes exports and their files once they expire, when the log is pruned', f
 
 it('exports on the command line to a file, recorded as the command', function () {
     // Arrange
+    Audit::fake([AuditLogExported::class]);
     catalogued('book.shelved', 1);
     $file = tempnam(sys_get_temp_dir(), 'audit').'.zip';
 
@@ -307,8 +315,8 @@ it('exports on the command line to a file, recorded as the command', function ()
         $export = exported($file);
 
         expect($export['records'][0]['event'])->toBe('book.shelved')
-            ->and($export['summary']['records'])->toBe(1)
-            ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->sole())->toMatchArray(['actor_type' => 'system', 'actor_id' => 'larasell:export-audit-log']);
+            ->and($export['summary']['records'])->toBe(1);
+        Audit::assertRecorded(AuditLogExported::class, fn (AuditLogExported $record, Actor|UnknownActor $actor) => $actor == new SystemActor('larasell:export-audit-log'));
     } finally {
         @unlink($file);
     }
@@ -369,6 +377,7 @@ it('lets only the admin listen on their exports\' channel', function () {
 
 it('records no download when the file can\'t be read', function () {
     // Arrange
+    Audit::fake([AuditLogExported::class]);
     $url = exportAs($this->ada)[0]['downloadUrl'];
     Storage::disk('local')->delete(exportPath());
 
@@ -378,11 +387,12 @@ it('records no download when the file can\'t be read', function () {
     // Assert
     $response->assertNotFound();
 
-    expect(DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->exists())->toBeFalse();
+    Audit::assertNotRecorded(AuditLogExported::class);
 });
 
 it('records a failed export, with why it failed', function () {
     // Arrange
+    Audit::fake([AuditLogExportFailed::class]);
     Queue::fake();
     exportAs($this->ada);
     $export = AuditLogExport::query()->sole();
@@ -391,25 +401,18 @@ it('records a failed export, with why it failed', function () {
     (new ExportAuditLog($export->id))->failed(new RuntimeException('Disk full'));
 
     // Assert
-    $record = DB::table('larasell_audit_log')->where('event', 'audit_log.export_failed')->sole();
-
-    expect($record)->toMatchArray(['subject_type' => 'audit_log_export', 'subject_id' => $export->id, 'actor_type' => 'system', 'category' => 'audit_access'])
-        ->and(json_decode($record->properties, true))->toBe(['format' => 'json', 'error' => 'Disk full']);
+    Audit::assertRecorded(AuditLogExportFailed::class, fn (AuditLogExportFailed $record, Actor|UnknownActor $actor) => $actor instanceof SystemActor
+        && $record->subject() == new Subject('audit_log_export', $export->id)
+        && $record->properties() === ['format' => 'json', 'error' => 'Disk full']);
 });
 
 it('writes no file on the command line when its record can\'t be stored', function () {
     // Arrange
     $file = sys_get_temp_dir().'/audit-'.uniqid().'.zip';
-    app()->instance(Auditor::class, new class(app(AuditChain::class)) extends Auditor
-    {
-        public function record(AuditRecord $record, Actor|UnknownActor|null $actor = null): void
-        {
-            throw new RuntimeException('The audit log is unavailable.');
-        }
-    });
+    Audit::fake()->failing();
 
     // Act & Assert
-    expect(fn () => $this->artisan('larasell:export-audit-log', ['path' => $file])->run())->toThrow(RuntimeException::class);
+    expect(fn () => $this->artisan('larasell:export-audit-log', ['path' => $file])->run())->toThrow(AuditFailed::class);
 
     expect(file_exists($file))->toBeFalse();
 });
@@ -487,6 +490,7 @@ it('writes an export only once, even when the job runs twice', function () {
 
 it('fails exports that never finished, when the log is pruned', function () {
     // Arrange
+    Audit::fake([AuditLogExportFailed::class]);
     Queue::fake();
     Event::fake([AuditLogExportFinished::class]);
     exportAs($this->ada);
@@ -496,10 +500,8 @@ it('fails exports that never finished, when the log is pruned', function () {
     $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
-    $record = DB::table('larasell_audit_log')->where('event', 'audit_log.export_failed')->sole();
-
-    expect(AuditLogExport::query()->sole()->status)->toBe(AuditLogExportStatus::Failed)
-        ->and(json_decode($record->properties, true))->toBe(['format' => 'json', 'error' => 'The export didn\'t finish within an hour.']);
+    expect(AuditLogExport::query()->sole()->status)->toBe(AuditLogExportStatus::Failed);
+    Audit::assertRecorded(AuditLogExportFailed::class, fn (AuditLogExportFailed $record) => $record->properties() === ['format' => 'json', 'error' => 'The export didn\'t finish within an hour.']);
     Event::assertDispatched(AuditLogExportFinished::class);
 });
 
@@ -513,6 +515,7 @@ it('gives up on an export that takes too long, instead of retrying it', function
 
 it('lets the admin delete their export once they type the confirmation, and records it', function () {
     // Arrange
+    Audit::fake([AuditLogExportDeleted::class]);
     $deleteUrl = exportAs($this->ada)[0]['deleteUrl'];
     $export = AuditLogExport::query()->sole();
     $path = $export->path;
@@ -524,9 +527,9 @@ it('lets the admin delete their export once they type the confirmation, and reco
     $this->delete($deleteUrl, ['confirmation' => 'Delete export'])->assertRedirect(route('larasell.admin.settings.audit-log.index'));
 
     expect(AuditLogExport::query()->whereKey($export->id)->exists())->toBeFalse()
-        ->and(Storage::disk('local')->exists($path))->toBeFalse()
-        ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.export_deleted')->sole())
-        ->toMatchArray(['subject_id' => $export->id, 'actor_id' => (string) $this->ada->id, 'category' => 'audit_access']);
+        ->and(Storage::disk('local')->exists($path))->toBeFalse();
+    Audit::assertRecorded(AuditLogExportDeleted::class, fn (AuditLogExportDeleted $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+        && $record->subject() == new Subject('audit_log_export', $export->id));
 });
 
 it('keeps other admins from deleting an export', function () {
@@ -541,17 +544,19 @@ it('keeps other admins from deleting an export', function () {
 
 it('refuses to download a ready export without a file, instead of reading another one', function () {
     // Arrange
+    Audit::fake([AuditLogExported::class]);
     $url = exportAs($this->ada)[0]['downloadUrl'];
     AuditLogExport::query()->sole()->update(['path' => null]);
 
     // Act & Assert
     expect(fn () => $this->withoutExceptionHandling()->get($url))->toThrow(InvalidAuditLogExport::class);
 
-    expect(DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->exists())->toBeFalse();
+    Audit::assertNotRecorded(AuditLogExported::class);
 });
 
 it('keeps a ready export ready when its job reports a failure late', function () {
     // Arrange
+    Audit::fake([AuditLogExportFailed::class]);
     exportAs($this->ada);
     $export = AuditLogExport::query()->sole();
 
@@ -559,8 +564,8 @@ it('keeps a ready export ready when its job reports a failure late', function ()
     (new ExportAuditLog($export->id))->failed(new RuntimeException('Broadcast failed'));
 
     // Assert
-    expect($export->fresh()->status)->toBe(AuditLogExportStatus::Ready)
-        ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.export_failed')->exists())->toBeFalse();
+    expect($export->fresh()->status)->toBe(AuditLogExportStatus::Ready);
+    Audit::assertNotRecorded(AuditLogExportFailed::class);
 });
 
 it('never deletes a file outside the exports folder, whatever the export\'s path says', function (string $path) {
