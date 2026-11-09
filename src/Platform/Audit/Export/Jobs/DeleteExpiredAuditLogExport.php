@@ -17,7 +17,7 @@ class DeleteExpiredAuditLogExport implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public readonly string $exportId) {}
+    public function __construct(public readonly int $exportId) {}
 
     public function handle(): void
     {

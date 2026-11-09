@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('larasell_audit_log_exports', function (Blueprint $table) {
-            $table->ulid('id')->primary();
+            $table->id();
             $table->foreignId('admin_id')->constrained('larasell_admin_users')->cascadeOnDelete();
             $table->string('format');
             $table->string('status');

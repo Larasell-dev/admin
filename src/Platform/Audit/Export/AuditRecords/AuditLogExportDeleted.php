@@ -13,7 +13,7 @@ use Larasell\Admin\Platform\Audit\Subject;
  */
 class AuditLogExportDeleted extends AuditRecord
 {
-    public function __construct(private readonly string $exportId, private readonly string $format) {}
+    public function __construct(private readonly int $exportId, private readonly string $format) {}
 
     public function event(): string
     {

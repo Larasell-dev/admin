@@ -147,7 +147,7 @@ declare namespace Larasell.Admin.Order.Data {
 }
 declare namespace Larasell.Admin.Platform.Audit.Export.Data {
   export type AuditLogExportData = {
-    id: string;
+    id: number;
     status: Larasell.Admin.Platform.Audit.Export.Enums.AuditLogExportStatus;
     records: number | null;
     createdAt: string;

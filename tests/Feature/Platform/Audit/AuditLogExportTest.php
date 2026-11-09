@@ -504,7 +504,7 @@ it('fails exports that never finished, when the log is pruned', function () {
 
 it('gives up on an export that takes too long, instead of retrying it', function () {
     // Act
-    $job = new ExportAuditLog('01');
+    $job = new ExportAuditLog(1);
 
     // Assert
     expect($job->tries)->toBe(1)->and($job->timeout)->toBe(600)->and($job->failOnTimeout)->toBeTrue();

@@ -15,7 +15,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 class AuditLogExportData extends Data
 {
     public function __construct(
-        public string $id,
+        public int $id,
         public AuditLogExportStatus $status,
         public ?int $records,
         public string $createdAt,

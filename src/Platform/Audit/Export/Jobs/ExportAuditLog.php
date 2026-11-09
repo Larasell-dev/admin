@@ -35,7 +35,7 @@ class ExportAuditLog implements ShouldQueue
 
     public bool $failOnTimeout = true;
 
-    public function __construct(public readonly string $exportId) {}
+    public function __construct(public readonly int $exportId) {}
 
     public function handle(AuditLogExporter $exporter): void
     {

@@ -3,7 +3,6 @@
 namespace Larasell\Admin\Platform\Audit\Export\Models;
 
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 
@@ -12,7 +11,7 @@ use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
  *
  * @internal
  *
- * @property string $id
+ * @property int $id
  * @property int $admin_id
  * @property string $format The extension of the file in the zip archive, e.g. json.
  * @property AuditLogExportStatus $status
@@ -24,8 +23,6 @@ use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
  */
 class AuditLogExport extends Model
 {
-    use HasUlids;
-
     protected $table = 'larasell_audit_log_exports';
 
     public $timestamps = false;

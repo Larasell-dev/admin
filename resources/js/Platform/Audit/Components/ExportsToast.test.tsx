@@ -8,7 +8,7 @@ type Export = Larasell.Admin.Platform.Audit.Export.Data.AuditLogExportData;
 
 function anExport(overrides: Partial<Export>): Export {
   return {
-    id: "01",
+    id: 1,
     status: "ready",
     records: 12,
     createdAt: "2026-11-09T14:00:00+00:00",
@@ -35,9 +35,9 @@ describe("ExportsToast", () => {
     await render(
       <ExportsToast
         exports={[
-          anExport({ id: "3", status: "pending", records: null, downloadUrl: null }),
-          anExport({ id: "2", status: "pending", records: null, downloadUrl: null }),
-          anExport({ id: "1" }),
+          anExport({ id: 3, status: "pending", records: null, downloadUrl: null }),
+          anExport({ id: 2, status: "pending", records: null, downloadUrl: null }),
+          anExport({ id: 1 }),
         ]}
       />,
     );
@@ -52,9 +52,9 @@ describe("ExportsToast", () => {
     await render(
       <ExportsToast
         exports={[
-          anExport({ id: "2", status: "pending", records: null, downloadUrl: null }),
-          anExport({ id: "1", records: 100018 }),
-          anExport({ id: "0", status: "failed", records: null, downloadUrl: null }),
+          anExport({ id: 2, status: "pending", records: null, downloadUrl: null }),
+          anExport({ id: 1, records: 100018 }),
+          anExport({ id: 0, status: "failed", records: null, downloadUrl: null }),
         ]}
       />,
     );
