@@ -60,7 +60,7 @@ class ExportAuditLog implements ShouldQueue
             $records = $exporter->export($file);
             // Streamed to the disk, so a large export never sits in memory.
             $path = Storage::disk(config('larasell.admin.audit.export.disk'))
-                ->putFileAs('larasell/audit-log-exports', new File($file), "{$export->id}.zip");
+                ->putFileAs(DeleteExpiredAuditLogExport::FOLDER, new File($file), "{$export->id}.zip");
 
             $export->update(['status' => AuditLogExportStatus::Ready, 'path' => $path, 'records' => $records]);
             AuditLogExportFinished::dispatch($export->admin_id);

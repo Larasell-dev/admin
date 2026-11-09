@@ -562,3 +562,19 @@ it('keeps a ready export ready when its job reports a failure late', function ()
     expect($export->fresh()->status)->toBe(AuditLogExportStatus::Ready)
         ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.export_failed')->exists())->toBeFalse();
 });
+
+it('never deletes a file outside the exports folder, whatever the export\'s path says', function (string $path) {
+    // Arrange
+    Storage::disk('local')->put('secrets/keys.txt', 'secret');
+    $export = AuditLogExport::query()->create(['admin_id' => $this->ada->id, 'format' => 'json', 'status' => AuditLogExportStatus::Ready, 'path' => $path, 'records' => 1, 'created_at' => now(), 'expires_at' => now()]);
+
+    // Act & Assert
+    expect(fn () => DeleteExpiredAuditLogExport::delete($export))->toThrow(InvalidAuditLogExport::class);
+
+    expect(Storage::disk('local')->get('secrets/keys.txt'))->toBe('secret')
+        ->and($export->fresh())->not->toBeNull();
+})->with([
+    'another folder' => ['secrets/keys.txt'],
+    'out of the folder' => ['larasell/audit-log-exports/../../secrets/keys.txt'],
+    'the folder itself' => ['larasell/audit-log-exports'],
+]);
