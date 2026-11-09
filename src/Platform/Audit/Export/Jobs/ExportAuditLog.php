@@ -14,7 +14,9 @@ use Larasell\Admin\Platform\Audit\Export\AuditLogExporter;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportFailed;
 use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
+use Larasell\Admin\Platform\Audit\Export\Exceptions\InvalidAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
+use Larasell\Admin\Platform\Support\Assert;
 use Throwable;
 
 /**
@@ -47,6 +49,11 @@ class ExportAuditLog implements ShouldQueue
         }
 
         $export = AuditLogExport::query()->findOrFail($this->exportId);
+
+        // Only a pending export is claimed; prune marks one failed only after an hour, long past the timeout.
+        if (! Assert::that($export->status === AuditLogExportStatus::Pending, fn () => InvalidAuditLogExport::notPending($export->id, $export->status->value))) {
+            return;
+        }
         $file = tempnam(sys_get_temp_dir(), 'larasell-audit-export');
 
         try {
@@ -66,7 +73,8 @@ class ExportAuditLog implements ShouldQueue
     {
         $export = AuditLogExport::query()->find($this->exportId);
 
-        if ($export !== null) {
+        // Something after the export was written can fail too, e.g. the broadcast; it stays ready then.
+        if ($export?->status === AuditLogExportStatus::Pending) {
             self::markFailed($export, $exception->getMessage());
         }
     }
@@ -76,6 +84,10 @@ class ExportAuditLog implements ShouldQueue
      */
     public static function markFailed(AuditLogExport $export, string $error): void
     {
+        if (! Assert::that($export->status === AuditLogExportStatus::Pending, fn () => InvalidAuditLogExport::notPending($export->id, $export->status->value))) {
+            return;
+        }
+
         DB::transaction(function () use ($export, $error): void {
             $export->update(['status' => AuditLogExportStatus::Failed]);
             app(Auditor::class)->record(new AuditLogExportFailed($export->id, $export->format, $error), new SystemActor('audit-log-export'));

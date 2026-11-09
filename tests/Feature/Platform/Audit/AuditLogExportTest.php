@@ -549,3 +549,16 @@ it('refuses to download a ready export without a file, instead of reading anothe
 
     expect(DB::table('larasell_audit_log')->where('event', 'audit_log.exported')->exists())->toBeFalse();
 });
+
+it('keeps a ready export ready when its job reports a failure late', function () {
+    // Arrange
+    exportAs($this->ada);
+    $export = AuditLogExport::query()->sole();
+
+    // Act
+    (new ExportAuditLog($export->id))->failed(new RuntimeException('Broadcast failed'));
+
+    // Assert
+    expect($export->fresh()->status)->toBe(AuditLogExportStatus::Ready)
+        ->and(DB::table('larasell_audit_log')->where('event', 'audit_log.export_failed')->exists())->toBeFalse();
+});
