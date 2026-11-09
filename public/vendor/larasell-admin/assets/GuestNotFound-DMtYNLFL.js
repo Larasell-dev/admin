@@ -1,0 +1,1 @@
+import{Xn as e,Z9 as t}from"./dist-hnaINIWw.js";import{t as n}from"./NotFoundState-CousbN4f.js";var r=t(e(),1);function i(){return(0,r.jsx)(`main`,{className:`flex min-h-dvh items-center justify-center bg-white px-6 py-12 dark:bg-mauve-950`,children:(0,r.jsx)(n,{})})}export{i as default};
