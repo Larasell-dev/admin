@@ -107,17 +107,14 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
             "Delete sales channel",
             "Sales channel page: title of the dialog that asks to confirm deleting the channel",
           )}
-          description={
-            errors.channel ??
-            fbs(
-              [
-                "Customers can no longer reach ",
-                fbs.param("channelName", name),
-                ". This can't be undone.",
-              ],
-              "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
-            )
-          }
+          description={fbs(
+            [
+              "Customers can no longer reach ",
+              fbs.param("channelName", name),
+              ". This can't be undone.",
+            ],
+            "Sales channel page: explains what deleting the channel does, e.g. 'Customers can no longer reach Default, …'",
+          )}
         >
           <Field
             label={fbs(
@@ -125,7 +122,8 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
               "Sales channel page: label of the field in the delete dialog that the admin types the channel's name into to confirm, e.g. 'Type \"Default\" to confirm'",
             )}
             name="confirmation"
-            error={errors.confirmation}
+            // Also why the channel can't be deleted at all, which the field then locks.
+            error={errors.confirmation ?? errors.channel}
           >
             <Input
               autoComplete="off"
