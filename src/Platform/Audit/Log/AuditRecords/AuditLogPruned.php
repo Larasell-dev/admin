@@ -4,6 +4,7 @@ namespace Larasell\Admin\Platform\Audit\Log\AuditRecords;
 
 use Larasell\Admin\Platform\Audit\AuditRecord;
 use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
+use Larasell\Admin\Platform\Audit\Log\RetentionPeriod;
 use Larasell\Admin\Platform\Audit\Subject;
 
 /**
@@ -11,7 +12,7 @@ use Larasell\Admin\Platform\Audit\Subject;
  * how many records were deleted, and the deleted record the chain now starts after, so the log
  * can still be verified.
  *
- * @internal Recorded by PruneAuditLogCommand. Its event name, audit_log.pruned, is stable.
+ * @internal Recorded by PruneAuditLog. Its event name, audit_log.pruned, is stable.
  */
 class AuditLogPruned extends AuditRecord
 {
@@ -20,7 +21,7 @@ class AuditLogPruned extends AuditRecord
      */
     public function __construct(
         private readonly bool $legalHold,
-        private readonly ?int $retentionDays,
+        private readonly ?RetentionPeriod $retention,
         private readonly int $deleted,
         private readonly ?array $startsAfter,
     ) {}
@@ -50,6 +51,6 @@ class AuditLogPruned extends AuditRecord
 
     public function properties(): array
     {
-        return ['legal_hold' => $this->legalHold, 'retention_days' => $this->retentionDays, 'deleted' => $this->deleted, 'starts_after' => $this->startsAfter];
+        return ['legal_hold' => $this->legalHold, 'retention_days' => $this->retention?->days, 'deleted' => $this->deleted, 'starts_after' => $this->startsAfter];
     }
 }
