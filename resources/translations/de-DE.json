@@ -4180,6 +4180,1161 @@
         }
       ],
       "types": []
+    },
+    "5xeF3SZGQUcl3L1dpDKvfw==": {
+      "description": "Media library: page title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Medien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "36uXBwsCokMS7wiBwU9MnA==": {
+      "description": "Media library: shown instead of the grid when nothing was uploaded",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Medien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ll/JLByWiko7R3u9s38NpQ==": {
+      "description": "Media library: below 'No media yet'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bilder und Videos, die du hochlädst, erscheinen hier.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s+MspsfOHR8rz/Kp7jZyow==": {
+      "description": "Media library: accessible name of the file picker that uploads media",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hochladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HPo0tPOOuTHzRbX4yAHkVg==": {
+      "description": "Media library: button in the header that picks files to upload",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hochladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+6KBEZo8DNKsdevYBSGg9g==": {
+      "description": "Media page: name of the media's asset that is the file as uploaded",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Original",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7iCJAMASjSxNmkPIttDs7g==": {
+      "description": "Media page: accessible name of the button that closes the full-screen media view and returns to the library",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SVtt/pCSOtAkJ0pm1w8QaA==": {
+      "description": "Media page: accessible name of the toggle button that shows a checkerboard behind the media, so its transparent parts stand out",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schachbretthintergrund",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TdppywDk4VC1CiNOR7ccEg==": {
+      "description": "Media page: label of the field for the media's alternative text, read to people who can't see it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alternativtext",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7WRr9FJEUNofhhhaP1KGRw==": {
+      "description": "Media page: hint below the alt text field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibt das Medium für alle, die es nicht sehen können.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "msRig7EpRBXCRCN0NBsoTQ==": {
+      "description": "Media page: button in the sidebar that asks to delete the media",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QAXJLI+hSj7T8IZRAOyNtg==": {
+      "description": "Media page: title of the dialog that asks to confirm deleting the media",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Medium löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WDcAesCMgkdbMyUsSOkAtw==": {
+      "description": "Media page: explains what deleting the media does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Seine Dateien werden aus dem Shop entfernt. Das lässt sich nicht rückgängig machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xS0HcpIx/Y86VwZ5t/DBPQ==": {
+      "description": "Media page: button that closes the delete dialog without deleting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S9m1K+JXfte0ajliGGXWEw==": {
+      "description": "Media page: button in the dialog that deletes the media",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hkDKGFDj09GNpmlXiOBWXw==": {
+      "description": "Media page: visibility of a file anyone with its link can open, e.g. product images",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Öffentlich",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yhHifyPAbW9QZnjR5L3jYw==": {
+      "description": "Media page: visibility of a file only signed-in admins and code that checked access can open",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Privat",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5kkRiEsEkzkTf4k3CosmkA==": {
+      "description": "Media page: label of the select that makes the media's files public or private",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sichtbarkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pzxSvAx/1tKfw5csnTfE6Q==": {
+      "description": "Media page: hint below the visibility select",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Private Dateien öffnen sich nur für angemeldete Admins.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fDo1AQS2u/5BdNVrkiD4ow==": {
+      "description": "Media page: label of the field in the delete dialog that the admin types the given text into to confirm, e.g. 'Type \"delete media\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib „{confirmationText}“ zur Bestätigung ein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qeWBIX9yQmYVwTm/vVfhcw==": {
+      "description": "Media page: name of the media's asset that is the small copy shown in the library's grid",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorschaubild",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rXaD/NfZijs0APhgw3Gi6w==": {
+      "description": "Media page: label of the field for the media's short name, shown in the library and as a caption",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Titel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nmsDcdaViTHOku7JqyjrRw==": {
+      "description": "Media page: label of the field for longer text about the media, e.g. a caption or notes on its use",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2Zr0Y+9WJPH3Olp/wcMV2A==": {
+      "description": "Media page: accessible name of the group of zoom out, fit to screen and zoom in buttons",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zoom",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oQhWViHsdPy/LicEc8O/bQ==": {
+      "description": "Media page: accessible name of the button that makes the image smaller",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verkleinern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PNRYEh+VqqBDxCXcA9Fu4Q==": {
+      "description": "Media page: accessible name of the button that resets the zoom so the whole image fits",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "An Bildschirm anpassen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oiSeReEgvRTO7FX82ssjKA==": {
+      "description": "Media page: accessible name of the button that makes the image larger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vergrößern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wbReeJKT8eVraBKFUpYzxw==": {
+      "description": "Media page: accessible name of the button that starts the video",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abspielen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZexbeG5F/cIxQ5GFG6gOtw==": {
+      "description": "Media page: accessible name of the button that pauses the video",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Pausieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0dq1GbyvKoM7IhGB/XYpxw==": {
+      "description": "Media page: accessible name of the video's timeline slider",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Spulen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7YYVVtW2uFIlyhI76HcZJQ==": {
+      "description": "Media page: accessible name of the button that turns the video's sound on",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ton einschalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fQF+jvRK10xDd/dRj0btIw==": {
+      "description": "Media page: accessible name of the button that turns the video's sound off",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Stummschalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L1vvJzv++Zc4TiwOMuSWbA==": {
+      "description": "Media page: accessible name of the button that leaves fullscreen video",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vollbild beenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Icwhm5PX9G1DZq6sdX6dEQ==": {
+      "description": "Media page: accessible name of the button that shows the video fullscreen",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vollbild",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e8BzSnGNoO5ti+KjWGDfFg==": {
+      "description": "Upload toast: title while files upload, e.g. 'Uploading 2 of 5'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{done} von {total} werden hochgeladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UdyA0peyFJ/k36C3BZ3IFQ==": {
+      "description": "Upload toast: title once uploads ended and some failed, e.g. '4 uploaded, 1 failed'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{done} hochgeladen, {failed} fehlgeschlagen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lvEbiioP9SN1cteReKRLUw==": {
+      "description": "Upload toast: title once every file uploaded, e.g. '5 uploaded'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{done} hochgeladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "T8J+gF544cm6eTmUySlCqQ==": {
+      "description": "Upload toast: accessible name of the box listing uploads",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uploads",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+1c7fC29mOKL6elREmTtKQ==": {
+      "description": "Upload toast: accessible name of the group of retry, show files and close buttons",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Upload-Aktionen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0kOVLYZFb+fJegfy8mCs4g==": {
+      "description": "Upload toast: button that uploads every failed file again",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fehlgeschlagene wiederholen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JjsEFFrrm+g46EzndQ+OYw==": {
+      "description": "Upload toast: accessible name of the button that collapses the file list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dateien ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZPMDXUXJIKfuXLfwFQUtVQ==": {
+      "description": "Upload toast: accessible name of the button that expands the file list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dateien anzeigen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7dO1SMKIrlfFVIfef8vckg==": {
+      "description": "Upload toast: accessible name of the button that closes it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lHpcLuPSgySet44elWyP9g==": {
+      "description": "Upload toast: status of a file waiting for its turn to upload",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wartet",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JKCJL86nUVfhLdSiqhXdrA==": {
+      "description": "Upload toast: status of a file that uploaded",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hochgeladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ezy9jq5yfFju8UIpeQo+uA==": {
+      "description": "Upload toast: accessible name of the button that uploads one failed file again",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{file} erneut hochladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "39lMMvsca0Hbipd8Ka1VAA==": {
+      "description": "Upload toast: error of a file whose upload stopped because the connection dropped",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Upload wurde unterbrochen. Prüfe deine Verbindung und versuche es erneut.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "66SGgrOl3QGcRcOTQj1Lgg==": {
+      "description": "Upload toast: error of a file the server failed to store",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beim Hochladen ist etwas schiefgelaufen. Versuche es erneut.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FUcX3wkdHYtpJ2YaUMxr6A==": {
+      "description": "Upload toast: error of a file larger than the server takes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Datei ist zu groß zum Hochladen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d8tRQCRRxqnvwNiREstjnw==": {
+      "description": "Media library: header button that creates a folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w1bkYBJBtX+YuxIm+I6AKw==": {
+      "description": "Media library: accessible name of the breadcrumb of folders",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qBFJrgM4+dnur8mpkLS2kw==": {
+      "description": "Media library breadcrumb: link to the top level of the library",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Medien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IRPjHmRKS6aT9gCIKg8rgA==": {
+      "description": "Media library: what a folder tile holds, e.g. '3 items'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number} Elemente",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Xh+FyEeNx7/q02FXwZIcVA==": {
+      "description": "Media library: what a folder tile holds, e.g. '3 items'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 Element",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O68K8ClYB3UzNM/Y6Phe0g==": {
+      "description": "Media library: accessible name of the button that opens a folder's menu, e.g. 'Actions for Summer'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {folderName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wf6LQp3cmw0C2ysG2WLXfQ==": {
+      "description": "Media library folder menu: renames the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Umbenennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tYcDqB7w8R3U52dNK9LQ4A==": {
+      "description": "Media library: title of the dialog that creates a folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Ordner",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Em1RPDSdV/I0m5E7MXHSsw==": {
+      "description": "Media library: title of the dialog that renames a folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ordner umbenennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "APeAuBcYgpvzcL+LwjLojw==": {
+      "description": "Media library folder dialog: label of the folder name field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rg3s3iZevpBJTH1oClH3ZQ==": {
+      "description": "Media library folder dialog: closes it without saving",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P6bwtFp8InGBEPY4RQuxWg==": {
+      "description": "Media library folder dialog: creates the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "42mseCpst9KvfoIc5heVnw==": {
+      "description": "Media library folder dialog: saves the new name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Umbenennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/h9i0d3/GpW/71uTRtpv0A==": {
+      "description": "Media library folder menu: deletes the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sbrm+lbb2ZaslYo1U77VkA==": {
+      "description": "Media library: title of the dialog that confirms deleting an empty folder, e.g. 'Delete Summer'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{folderName} löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/yPR30XiTCpDQW6YEGVqxQ==": {
+      "description": "Media library: explains what deleting an empty folder does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Ordner ist leer, es werden also keine Dateien gelöscht. Das lässt sich nicht rückgängig machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UGuRePNUIYHi25qCurPMBg==": {
+      "description": "Media library: closes the delete folder dialog without deleting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wy2InqpZPRQ0/ndpoAG4Qw==": {
+      "description": "Media library: button in the dialog that deletes the folder",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lS2dCKV1ak/qmoVcMxqn7A==": {
+      "description": "Media library: label of the field in the delete folder dialog that the admin types the folder's name into to confirm, e.g. 'Type \"Summer\" to confirm'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zum Bestätigen „{folderName}“ eingeben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wl/g0IhCwxFBKWEU7Ws+ew==": {
+      "description": "Media library: in the new folder dialog opened by dropping a media item onto 'New folder', e.g. 'boots.png is moved into it.'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{itemName} wird hineinverschoben.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9+V1URqj1iE1xdKxLdmB9g==": {
+      "description": "Media library: button in the new folder dialog that creates the folder and moves the dropped item into it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstellen und verschieben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TzVC77G6bQzfEOQ/8ITW+A==": {
+      "description": "Media library: accessible name of the button that opens a media item's menu, e.g. 'Actions for boots.png'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen für {itemName}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/O6R8G7PrWaH4hjUWrZIEA==": {
+      "description": "Media library: shown on a folder tile while a media item is dragged over it, e.g. 'Move into Summer'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "In {folderName} verschieben",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fPYGr9iAvVr/B558n66I/w==": {
+      "description": "Media library item menu: asks to delete the media item",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+Vj1khNUFI95FXTAvbrzOA==": {
+      "description": "Media page: spinner shown while the image loads",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bild wird geladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UKeStg97pyyWlxuQ/XSEXQ==": {
+      "description": "Media library: accessible name of the buttons that show the library as a grid or a list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ansicht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bV9FPoC3rExDPZ6MBwunSg==": {
+      "description": "Media library: shows the entries as tiles",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rasteransicht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DssSj8YRuwhINzQ3e/N4Fg==": {
+      "description": "Media library: shows the entries as rows with their names",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Listenansicht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "K+ElqO2rwIeKlKyg+m3YOw==": {
+      "description": "Media library: spinner below the entries while the next ones load",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weitere werden geladen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1ImGLYbzOawz/GTUVKex/Q==": {
+      "description": "Media library list: what a row is, for a video",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Video",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AYO49CJNrsvtnRE8nhOrtg==": {
+      "description": "Media library list: what a row is, for an image",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bild",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LBosTTkWL/yqoQWnx+ABcA==": {
+      "description": "Media library: badge on an item its provider, e.g. Mux, failed to process",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fehlgeschlagen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cz5Kae80rgWCvOvGn7wfww==": {
+      "description": "Media library: badge on an item its provider, e.g. Mux, still works on",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wird verarbeitet",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "R3sPR35N21Hbj606bV2mgA==": {
+      "description": "Media page: shown instead of the media when its provider, e.g. Mux, failed to process it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diese Datei konnte nicht verarbeitet werden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G80IE/EJIhmemkib+bmLmQ==": {
+      "description": "Media page: shown instead of the media while its provider, e.g. Mux, still works on it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wird noch verarbeitet",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "h7CWG9OGx8jsiEEiNHcGVg==": {
+      "description": "Media page: below 'Still processing'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sie erscheint hier, sobald sie bereit ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+Ab5dWBdV3d5l0kyKOE4EQ==": {
+      "description": "Media page: title of the sidebar section with the media's title, description, alt text and visibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "K49Y/LGJnG2b+oi95pNc8g==": {
+      "description": "Media page: title of the sidebar section listing the media's files",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dateien",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hrpE9DmPVk+uhuDABjCrHQ==": {
+      "description": "Mux settings page: hint below a secret's field when a secret is saved already, which the page never shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gespeichert. Leer lassen, um es zu behalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Nkeca1kHVhlHxhBs+vN/ag==": {
+      "description": "Mux settings page: title, the name of the video service",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mux",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "biBu4Ff1mMlAYhIpfV+ASQ==": {
+      "description": "Mux settings page: heading of the section with the Mux API access token",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zugriffstoken",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zGIbRpwa7o6zbYPxqi4how==": {
+      "description": "Mux settings page: advice below the access token heading on where to make one in Mux",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle eines in Mux unter Settings → Access tokens, mit Lese- und Schreibrechten für Mux Video.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dInHWXMBa+FQepQ0XcVYjg==": {
+      "description": "Mux settings page: label of the field for the access token's ID",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Token-ID",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3n/FurnhwS807b+WAzUjIQ==": {
+      "description": "Mux settings page: label of the field for the access token's secret",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Token-Secret",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "di+hJEFyZ0iYaX14uO0iwQ==": {
+      "description": "Mux settings page: heading of the section about the webhook Mux calls when a video is ready",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Webhook",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jk69YL1kivblA6xO4vtI6A==": {
+      "description": "Mux settings page: advice below the webhook heading",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Trage diese URL in Mux als Webhook ein, damit Videos hier bereit sind, sobald Mux sie fertig verarbeitet hat.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nbG+2H+GhZF+ZYNi5pPvww==": {
+      "description": "Mux settings page: copy button's text right after it copied the webhook URL",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kopiert",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sWZ7wlKY8F45Hh1mjl8/wA==": {
+      "description": "Mux settings page: button that copies the webhook URL to the clipboard",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kopieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "068Dz1mtsyYsCWx9n9PQJQ==": {
+      "description": "Mux settings page: label of the field for the secret Mux signs its webhooks with",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Signatur-Secret",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "J9/H44kPEkjV5V3SfzRlpg==": {
+      "description": "Mux settings page: hint below the webhook signing secret field when none is saved",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mux zeigt es neben dem Webhook an. Ohne es werden Webhooks abgewiesen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "z+aM5WOqwmrQuIa5mLhKBA==": {
+      "description": "Mux settings page: heading of the section with the key private videos are signed with",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Signaturschlüssel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9Y/iJQ+DrvFgx/8FfhCbtg==": {
+      "description": "Mux settings page: advice below the signing key heading",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Private Videos lassen sich nur über signierte Links abspielen. Erstelle einen Schlüssel in Mux unter Settings → Signing keys.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sIUe+bPliZcYPd4DNE1nKA==": {
+      "description": "Mux settings page: label of the field for the signing key's ID",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schlüssel-ID",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rVXlMOPrEB7rpsf+446qjw==": {
+      "description": "Mux settings page: label of the field for the signing key's private key, as Mux hands it out",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Privater Schlüssel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JZ+BXYWqRQGCswRUDkxbMQ==": {
+      "description": "Mux settings page: heading of the section on which videos go to Mux",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Videos",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6Hmu9T24BwH+eAniH9DbAA==": {
+      "description": "Mux settings page: label of the checkbox that sends videos uploaded from now on to Mux",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Videos zu Mux hochladen",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

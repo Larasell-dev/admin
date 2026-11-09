@@ -7,7 +7,9 @@ services:
     portal:
       title: Larasell Admin
   admin-server:
-    command: vendor/bin/testbench serve --host=127.0.0.1 --port=8002
+    # workbench/php raises PHP's upload limits to the media library's; workbench/.env, if there,
+    # holds local credentials such as Mux's, never committed.
+    command: sh -c 'set -a; [ -f workbench/.env ] && . workbench/.env; set +a; PHP_INI_SCAN_DIR=":$PWD/workbench/php" exec vendor/bin/testbench serve --host=127.0.0.1 --port=8002'
     port: 8002
   reverb:
     command: vendor/bin/testbench reverb:start --host=127.0.0.1 --port=8080

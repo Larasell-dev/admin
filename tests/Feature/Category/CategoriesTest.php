@@ -1012,7 +1012,7 @@ it('turns the categories off when disabled in the config', function () {
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('createCategoryUrl', null)
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Orders', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Media', 'Orders', 'Customers', 'Settings']));
 
     expect(Category::query()->pluck('id')->all())->toBe([$shoes->id]);
 });

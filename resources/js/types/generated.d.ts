@@ -90,6 +90,91 @@ declare namespace Larasell.Admin.Customer.Data {
     orders: import("./index").TableResource;
   };
 }
+declare namespace Larasell.Admin.Media.Data {
+  export type MediaAssetData = {
+    role: string;
+    visibility: "public" | "private";
+    fileName: string;
+    mimeType: string;
+    size: number;
+    width: number | null;
+    height: number | null;
+    status: "pending" | "processing" | "ready" | "failed";
+    url: string | null;
+  };
+  export type MediaDetailData = {
+    id: number;
+    type: "image" | "video";
+    fileName: string;
+    url: string | null;
+    status: "pending" | "processing" | "ready" | "failed";
+    failure: string | null;
+    title: string | null;
+    description: string | null;
+    alt: string | null;
+    visibility: "public" | "private";
+    assets: Array<Larasell.Admin.Media.Data.MediaAssetData>;
+  };
+  export type MediaFolderData = {
+    id: number;
+    name: string;
+    url: string;
+    mediaCount: number;
+    folderCount: number;
+    renameUrl: string;
+    destroyUrl: string;
+  };
+  export type MediaFolderNodeData = {
+    id: number;
+    name: string;
+    parentId: number | null;
+    url: string;
+  };
+  export type MediaIndexPageData = {
+    folderId: number | null;
+    tree: Array<Larasell.Admin.Media.Data.MediaFolderNodeData>;
+    storeUrl: string;
+    rootUrl: string;
+    createFolderUrl: string;
+  };
+  export type MediaItemData = {
+    id: number;
+    type: "image" | "video";
+    fileName: string;
+    url: string | null;
+    status: "pending" | "processing" | "ready" | "failed";
+    thumbnailUrl: string | null;
+    thumbHash: string | null;
+    title: string | null;
+    alt: string | null;
+    visibility: "public" | "private";
+    showUrl: string;
+    moveUrl: string;
+    moveToNewFolderUrl: string;
+    destroyUrl: string;
+  };
+  export type MediaLibraryEntryData = {
+    key: string;
+    folder: Larasell.Admin.Media.Data.MediaFolderData | null;
+    media: Larasell.Admin.Media.Data.MediaItemData | null;
+  };
+  export type MediaShowPageData = {
+    media: Larasell.Admin.Media.Data.MediaDetailData;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type MuxSettingsData = {
+    tokenId: string | null;
+    hasTokenSecret: boolean;
+    hasWebhookSecret: boolean;
+    signingKeyId: string | null;
+    hasSigningKey: boolean;
+    useForVideos: boolean;
+    webhookUrl: string;
+    updateUrl: string;
+  };
+}
 declare namespace Larasell.Admin.Order.Data {
   export type AddressData = {
     name: string;

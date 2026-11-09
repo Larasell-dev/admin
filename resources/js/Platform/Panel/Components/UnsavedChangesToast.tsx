@@ -181,8 +181,11 @@ export function useUnsavedChanges(): boolean {
   );
 }
 
-/** Draws the UnsavedChangesToast of the current page. Render it once in a persistent layout. */
-export function UnsavedChangesToastHost() {
+/**
+ * Draws the UnsavedChangesToast of the current page. Render it once in a persistent layout, or
+ * pass the element of a full-screen dialog to draw it there, above the dialog's content.
+ */
+export function UnsavedChangesToastHost({ container }: { container?: HTMLElement | null } = {}) {
   const toast = useSyncExternalStore(store.subscribe, () => store.state);
   const [height, setHeight] = useState(0);
 
@@ -237,7 +240,7 @@ export function UnsavedChangesToastHost() {
         )}
       </AnimatePresence>
     </MotionConfig>,
-    document.body,
+    container ?? document.body,
   );
 }
 

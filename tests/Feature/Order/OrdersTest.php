@@ -102,14 +102,14 @@ it('redirects guests away from the orders', function () {
     $this->get(route('larasell.admin.orders.index'))->assertRedirect(route('larasell.admin.login'));
 });
 
-it('shows Orders in the navigation between Categories and Customers', function () {
+it('shows Orders in the navigation between Media and Customers', function () {
     // Arrange
     signInOrdersAdmin();
 
     // Act & Assert
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Orders', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Media', 'Orders', 'Customers', 'Settings']));
 });
 
 it('turns the orders off when disabled in the config', function () {
@@ -127,7 +127,7 @@ it('turns the orders off when disabled in the config', function () {
     $this->get('/admin/orders/1')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Customers', 'Settings']));
+            ->where('navigation', fn ($items) => collect($items)->pluck('label')->all() === ['Home', 'Products', 'Categories', 'Media', 'Customers', 'Settings']));
 });
 
 /**
