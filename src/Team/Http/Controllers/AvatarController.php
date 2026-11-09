@@ -4,7 +4,9 @@ namespace Larasell\Admin\Team\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Team\Exceptions\AvatarNotStored;
+use Larasell\Admin\Team\Exceptions\InvalidAvatarPath;
 use Larasell\Admin\Team\Http\Requests\AvatarRequest;
 
 class AvatarController
@@ -30,7 +32,8 @@ class AvatarController
         // Only the latest upload can be saved, so an earlier unsaved one is no longer needed.
         $previous = $request->session()->pull(self::PENDING_SESSION_KEY);
 
-        if (is_string($previous)) {
+        // In production a pending path outside avatars/ is reported and its file kept.
+        if (is_string($previous) && Assert::that(self::isAvatar($previous), fn () => InvalidAvatarPath::outsideAvatars($previous))) {
             $disk->delete($previous);
         }
 

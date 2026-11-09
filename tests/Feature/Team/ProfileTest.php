@@ -373,3 +373,19 @@ it('keeps a file outside avatars/ that the previous avatar path points to', func
     expect($update)->toThrow(InvalidAvatarPath::class);
     Storage::disk('public')->assertExists('invoices/2026.pdf');
 });
+
+it('keeps a file outside avatars/ that the pending upload in the session points to', function () {
+    // Arrange
+    Storage::fake('public');
+    Storage::disk('public')->put('invoices/2026.pdf', 'invoice');
+    $admin = profileAdmin();
+
+    // Act
+    $upload = fn () => $this->withoutExceptionHandling()->actingAs($admin, 'larasell-admin')
+        ->withSession([AvatarController::PENDING_SESSION_KEY => 'invoices/2026.pdf'])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)]);
+
+    // Assert
+    expect($upload)->toThrow(InvalidAvatarPath::class);
+    Storage::disk('public')->assertExists('invoices/2026.pdf');
+});
