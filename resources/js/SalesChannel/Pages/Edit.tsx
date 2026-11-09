@@ -4,6 +4,7 @@ import { DeleteBinLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import { useState } from "react";
 import { Page } from "../../Platform/Panel/Components/Page";
+import PersistentAlertDialog from "../../Platform/Panel/Components/PersistentAlertDialog";
 import EntryPoints from "../Components/EntryPoints";
 import SalesChannelForm from "../Components/SalesChannelForm";
 import UnsavedChangesToast from "../../Platform/Panel/Components/UnsavedChangesToast";
@@ -85,7 +86,8 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
     });
 
   return (
-    <AlertDialog.Root
+    // Persistent, since deleting leads to the dashboard and the dialog animates out over it.
+    <PersistentAlertDialog
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
@@ -149,7 +151,7 @@ function DeleteChannel({ name, destroyUrl }: { name: string; destroyUrl: string 
           </AlertDialog.Confirm>
         </AlertDialog.Actions>
       </AlertDialog.Popup>
-    </AlertDialog.Root>
+    </PersistentAlertDialog>
   );
 }
 
