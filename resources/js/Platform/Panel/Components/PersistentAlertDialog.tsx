@@ -37,7 +37,7 @@ const store = {
 /**
  * An `AlertDialog.Root` that the layout renders instead of the page, so it animates out even when
  * confirming it visits another page. Its children render in the layout: they read the layout's
- * context, not the page's. A PersistentAlertDialogHost, which SidebarLayout renders, draws it.
+ * context, not the page's, and show outside the page, so keep the trigger out of it. A PersistentAlertDialogHost, which SidebarLayout renders, draws it.
  */
 export default function PersistentAlertDialog(props: RootProps) {
   const [owner] = useState(() => ({}));
