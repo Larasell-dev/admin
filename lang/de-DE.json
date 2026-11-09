@@ -54,6 +54,7 @@
   "Hidden": "Ausgeblendet",
   "Home": "Startseite",
   "It is removed from the store and every cart. Past orders keep it. This can't be undone.": "Das Produkt wird aus dem Shop und allen Warenkörben entfernt. Bisherige Bestellungen behalten es. Das lässt sich nicht rückgängig machen.",
+  "Keys that let other apps use the API": "Schlüssel, mit denen andere Apps die API nutzen",
   "Last used": "Zuletzt verwendet",
   "length": "Länge",
   "maximum quantity": "Höchstmenge",
@@ -120,6 +121,7 @@
   "Team": "Team",
   "Temporarily unavailable": "Vorübergehend nicht verfügbar",
   "The :attribute must be a number of 0 or more, with a dot for decimals.": ":attribute muss eine Zahl ab 0 sein, mit Punkt als Dezimaltrennzeichen.",
+  "The admins who can sign in to the panel": "Die Admins, die sich im Panel anmelden können",
   "The default currency must be one the channel sells in.": "Die Standardwährung muss eine der Währungen des Kanals sein.",
   "The default language must be one the channel sells in.": "Die Standardsprache muss eine der Sprachen des Kanals sein.",
   "The last sales channel can't be deleted.": "Der letzte Verkaufskanal kann nicht gelöscht werden.",
@@ -143,5 +145,6 @@
   "Visible": "Sichtbar",
   "weight": "Gewicht",
   "weight unit": "Gewichtseinheit",
+  "Who changed what, and when": "Wer was wann geändert hat",
   "width": "Breite"
 }

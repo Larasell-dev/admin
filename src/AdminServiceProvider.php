@@ -39,6 +39,7 @@ use Larasell\Admin\Platform\Panel\Http\Middleware\HandleAdminInertiaRequests;
 use Larasell\Admin\Platform\Panel\Http\Middleware\LogLicensingPlan;
 use Larasell\Admin\Platform\Search\Searches;
 use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Admin\Platform\Settings\Settings;
 use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Platform\Tables\Console\MakeTableCommand;
 use Larasell\Admin\Platform\Tables\Http\Controllers\TableController;
@@ -85,6 +86,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->singleton(Navigation::class);
         $this->app->singleton(Searches::class);
         $this->app->singleton(Sections::class);
+        $this->app->singleton(Settings::class);
         // Reports each failed assertion once per process.
         $this->app->singleton(Assert::class);
 

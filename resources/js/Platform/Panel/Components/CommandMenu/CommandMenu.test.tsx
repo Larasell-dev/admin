@@ -672,16 +672,23 @@ describe("navigating", () => {
     navigation: [
       { ...navigationItem("Home", "/admin"), id: "larasell.admin.home" },
       navigationItem("Products", "/admin/products"),
-      navigationItem("Settings", "/admin/settings", [
-        navigationItem("Team", "/admin/settings/team"),
-        navigationItem("Audit log", "/admin/settings/audit-log"),
-      ]),
+      navigationItem("Settings", "/admin/settings"),
+    ],
+    settingsPages: [
+      { id: "team", label: "Team", description: null, icon: "Team", url: "/admin/settings/team" },
+      {
+        id: "audit-log",
+        label: "Audit log",
+        description: null,
+        icon: "FileShield",
+        url: "/admin/settings/audit-log",
+      },
     ],
     profileUrl: "/admin/profile",
     logoutUrl: "/admin/logout",
   };
 
-  it("goes to the pages of the navigation, those under settings included", async () => {
+  it("goes to the pages of the navigation and each settings page", async () => {
     // Arrange
     const visit = vi.spyOn(router, "visit").mockImplementation(() => {});
     register(goToCommand);
@@ -689,10 +696,17 @@ describe("navigating", () => {
     await openMenu();
     await choose("Go to");
 
-    expect(options()).toEqual(["Home", "Products", "Team", "Audit log", "Profile"]);
+    expect(options()).toEqual([
+      "Home",
+      "Products",
+      "Settings",
+      "Settings › Team",
+      "Settings › Audit log",
+      "Profile",
+    ]);
 
     // Act
-    await choose("Audit log");
+    await choose("Settings › Audit log");
 
     // Assert
     expect(visit).toHaveBeenCalledWith("/admin/settings/audit-log");
@@ -708,6 +722,9 @@ describe("navigating", () => {
     // Act & Assert
     await search().fill("audit");
     await expect.element(option(/Go to.*Audit log/)).toBeVisible();
+
+    await search().fill("settings team");
+    await expect.element(option(/Go to.*Team/)).toBeVisible();
 
     await search().fill("dashboard");
     await expect.element(option(/Go to.*Home/)).toBeVisible();

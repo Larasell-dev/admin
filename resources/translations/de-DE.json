@@ -4136,6 +4136,50 @@
         }
       ],
       "types": []
+    },
+    "H3uTYJVrFFfCsdjFtbUGNA==": {
+      "description": "Settings page: title of the page that lists every settings page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einstellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EVVJhszH3z+RHoqjrxEK7g==": {
+      "description": "Command menu: goes to a settings page, e.g. 'Settings › Team'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einstellungen › {settingsPage}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "o3OeshsjHO8gjBKdn0+28A==": {
+      "description": "Command menu: search keyword for going to a settings page",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "einstellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tZq70MM1i9WOlpiTr85brQ==": {
+      "description": "Settings pages: accessible name of the back arrow in the header that goes to the list of all settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Einstellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

@@ -25,7 +25,7 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
 Route::middleware(Authenticate::class)->group(function () {
     Route::get('/', HomeController::class)->name('home')->withHead(title: Translate::later('Dashboard'));
-    Route::get('settings', SettingsController::class)->name('settings');
+    Route::get('settings', SettingsController::class)->name('settings')->withHead(title: Translate::later('Settings'));
     Route::post('tables/{table}/{record}/actions/{action}', TableActionController::class)->name('tables.actions');
     Route::put('content-locale', SwitchContentLocaleController::class)->name('content-locale.update');
     Route::put('interface-locale', SwitchInterfaceLocaleController::class)->name('interface-locale.update');

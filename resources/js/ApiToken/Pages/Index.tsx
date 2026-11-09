@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Page } from "../../Platform/Panel/Components/Page";
 import ResourceTable from "../../Platform/Tables/Components/ResourceTable";
 import SidebarLayout from "../../Platform/Panel/Layouts/SidebarLayout";
+import { useSettingsBackLink } from "../../Platform/Support/useSettingsBackLink";
 import { useFlash } from "../../Platform/Support/useFlash";
 
 type Props = Larasell.Admin.ApiToken.Data.ApiTokensPageData;
@@ -16,6 +17,7 @@ export default function Index({ apiTokens, createUrl }: Props) {
   return (
     <>
       <Page.Header
+        backLink={useSettingsBackLink()}
         title={apiTokens.title}
         actions={
           // The empty state offers its own button instead.

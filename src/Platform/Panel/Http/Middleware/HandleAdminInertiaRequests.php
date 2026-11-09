@@ -15,6 +15,7 @@ use Larasell\Admin\Platform\InterfaceLocale\Resolvers\InterfaceLocaleResolver;
 use Larasell\Admin\Platform\Navigation\Navigation;
 use Larasell\Admin\Platform\Panel\Data\CommandMenuData;
 use Larasell\Admin\Platform\Search\Searches;
+use Larasell\Admin\Platform\Settings\Settings;
 use Symfony\Component\HttpFoundation\Response;
 
 class HandleAdminInertiaRequests extends Middleware
@@ -62,6 +63,9 @@ class HandleAdminInertiaRequests extends Middleware
             'commandMenu' => fn (): ?CommandMenuData => $request->user('larasell-admin') instanceof Admin
                 ? new CommandMenuData(app(Searches::class)->all())
                 : null,
+            // For the command menu's "Go to"; the settings index shows them too.
+            'settingsPages' => fn (): array => $request->user('larasell-admin') instanceof Admin ? app(Settings::class)->data() : [],
+            'settingsUrl' => fn (): string => route('larasell.admin.settings'),
             'profileUrl' => fn (): string => route('larasell.admin.profile'),
             'logoutUrl' => fn (): string => route('larasell.admin.logout'),
             'loginUrl' => fn (): string => route('larasell.admin.login.store'),

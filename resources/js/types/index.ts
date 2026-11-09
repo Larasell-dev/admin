@@ -4,6 +4,8 @@ export type SharedProps = {
   navigation: Larasell.Admin.Platform.Navigation.Data.NavigationItemData[];
   admin: AdminSummary | null;
   profileUrl: string;
+  /** The settings index, which settings pages link back to. */
+  settingsUrl: string;
   logoutUrl: string;
   /** The language content is edited in, and the others to switch to. Null for guests. */
   contentLocale: Larasell.Admin.Platform.ContentLocale.Data.ContentLocaleData | null;
@@ -15,6 +17,8 @@ export type SharedProps = {
   interfaceLocale: Larasell.Admin.Platform.InterfaceLocale.Data.InterfaceLocaleData | null;
   /** The sidebar's sales channels; sent once and kept across pages. Null for guests. */
   salesChannels: Larasell.Admin.SalesChannel.Data.SalesChannelNavigationData | null;
+  /** The pages on the settings index, in order; empty for guests. */
+  settingsPages: Larasell.Admin.Platform.Settings.Data.SettingsPageData[];
 };
 
 export type Page<TProps extends object = Record<string, never>> = SharedProps & TProps;

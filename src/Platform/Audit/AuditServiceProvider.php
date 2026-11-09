@@ -13,9 +13,8 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Platform\Audit\Log\Http\Controllers\AuditLogController;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
-use Larasell\Admin\Platform\Navigation\Facades\Navigation;
-use Larasell\Admin\Platform\Navigation\NavItem;
 use Larasell\Admin\Platform\Panel\Icon;
+use Larasell\Admin\Platform\Settings\Facades\Settings;
 use Laravel\Pennant\Feature;
 
 /**
@@ -58,10 +57,13 @@ class AuditServiceProvider extends ServiceProvider
 
         Feature::define('audit-log-filters', fn (Admin $admin): bool => false);
 
-        // After API tokens, or Team when that module is turned off.
-        Navigation::add(Translate::later('Audit log'), 'larasell.admin.settings.audit-log.index', Icon::FileShield)
-            ->under(NavItem::Settings)
-            ->after(config('larasell.admin.api_tokens.enabled') ? 'larasell.admin.settings.api-tokens.index' : 'larasell.admin.settings.team.index');
+        // Registered before Team and API tokens, so it is placed after them by id.
+        Settings::add('audit-log')
+            ->label(Translate::later('Audit log'))
+            ->description(Translate::later('Who changed what, and when'))
+            ->icon(Icon::FileShield)
+            ->route('larasell.admin.settings.audit-log.index')
+            ->after('api-tokens');
 
         AdminPanel::resolve()->routes(function (): void {
             Route::get('settings/audit-log', [AuditLogController::class, 'index'])->name('settings.audit-log.index')->withHead(title: Translate::later('Audit log'));

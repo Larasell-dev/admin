@@ -2,15 +2,17 @@
 
 namespace Larasell\Admin\Platform\Panel\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class SettingsController
 {
     /**
-     * Settings has no page of its own; its navigation item opens the first settings page.
+     * The settings index: a card for each settings page. The pages come from the shared
+     * settingsPages prop, which the command menu reads too.
      */
-    public function __invoke(): RedirectResponse
+    public function __invoke(): Response
     {
-        return redirect()->route('larasell.admin.settings.team.index');
+        return Inertia::render('Platform/Panel/Pages/Settings');
     }
 }

@@ -138,15 +138,6 @@ it('ends tokens at the end of the day in the app\'s time zone, and says which', 
     }
 });
 
-it('adds API tokens to the settings navigation', function () {
-    // Act & Assert
-    $this->actingAs($this->ada, 'larasell-admin')
-        ->get(route('larasell.admin.settings.api-tokens.index'))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($navigation) => collect($navigation)
-                ->firstWhere('label', 'Settings')['children'][1]['url'] === route('larasell.admin.settings.api-tokens.index')));
-});
-
 it('opens the new API token page with a choice of expiry periods, 3 months by default', function () {
     // Act & Assert
     $this->actingAs($this->ada, 'larasell-admin')
@@ -528,17 +519,6 @@ it('leaves out the API tokens settings pages when disabled', function () {
     $this->post('/admin/settings/api-tokens', ['name' => 'x', 'expires_in' => '3_months'])->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
 
     expect(ApiToken::query()->count())->toBe(0);
-});
-
-it('leaves out the API tokens navigation item when disabled', function () {
-    // Arrange
-    disableApiTokens();
-    $this->actingAs($this->ada, 'larasell-admin');
-
-    // Act & Assert
-    $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('navigation', fn ($items) => collect(collect($items)->firstWhere('label', 'Settings')['children'])->pluck('label')->all() === ['Team', 'Audit log']));
 });
 
 it('rejects every token on larasell.api routes when disabled, rather than failing', function () {

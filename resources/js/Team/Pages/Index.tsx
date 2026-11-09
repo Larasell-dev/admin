@@ -4,6 +4,7 @@ import { AddLine } from "@larasell-dev/ui/icons";
 import { Page } from "../../Platform/Panel/Components/Page";
 import ResourceTable from "../../Platform/Tables/Components/ResourceTable";
 import SidebarLayout from "../../Platform/Panel/Layouts/SidebarLayout";
+import { useSettingsBackLink } from "../../Platform/Support/useSettingsBackLink";
 
 type Props = Larasell.Admin.Team.Data.TeamPageData;
 
@@ -11,6 +12,7 @@ export default function Index({ members, createUrl }: Props) {
   return (
     <>
       <Page.Header
+        backLink={useSettingsBackLink()}
         title={members.title}
         actions={
           <Button size="sm" render={<Link href={createUrl} prefetch="hover" />}>
