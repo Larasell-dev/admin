@@ -55,7 +55,9 @@ if [ "${#missing_php_packages[@]}" -gt 0 ]; then
     as_root apt-get install -y -qq ca-certificates curl gnupg2 >/dev/null
     as_root install -d /usr/share/keyrings
     as_root curl -fsSL https://packages.sury.org/php/apt.gpg -o /usr/share/keyrings/sury-php.gpg
-    echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php bookworm main" \
+    # Match the orb's Debian release (bookworm, trixie, ...): Sury builds against each release's libraries.
+    codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+    echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php $codename main" \
         | as_root tee /etc/apt/sources.list.d/sury-php.list >/dev/null
     as_root apt-get update -qq
     as_root apt-get install -y -qq "${missing_php_packages[@]}" >/dev/null
