@@ -28,6 +28,9 @@ class DeleteAdmin
             throw AdminRemovalFailed::lastAdmin($admin->email);
         }
 
+        // Read before anything is deleted: a stored path outside avatars/ throws here.
+        $avatar = $admin->avatar_path;
+
         DB::transaction(function () use ($admin, $actor): void {
             if ($admin->delete() === false) {
                 throw AdminRemovalFailed::notDeleted($admin->email);
@@ -42,8 +45,8 @@ class DeleteAdmin
 
         // Only once the deletion is committed: a file can't be rolled back.
 
-        if ($admin->avatar_path !== null && ! Storage::disk(config('larasell.admin.panel.disk'))->delete($admin->avatar_path)) {
-            throw AdminRemovalFailed::avatarNotDeleted($admin->email, $admin->avatar_path);
+        if ($avatar !== null && ! Storage::disk(config('larasell.admin.panel.disk'))->delete($avatar->path)) {
+            throw AdminRemovalFailed::avatarNotDeleted($admin->email, $avatar->path);
         }
     }
 }

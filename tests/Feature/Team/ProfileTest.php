@@ -5,7 +5,9 @@ declare(strict_types=1);
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
+use Larasell\Admin\Platform\Auth\Exceptions\InvalidAvatarPath;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Team\Http\Controllers\AvatarController;
 
 function profileAdmin(array $attributes = []): Admin
 {
@@ -180,7 +182,7 @@ it('assigns an uploaded avatar when the profile is saved', function () {
         ->assertSessionHasNoErrors();
 
     // Assert
-    expect($admin->fresh()->avatar_path)->toBe($path);
+    expect($admin->fresh()->avatar_path?->path)->toBe($path);
 
     $this->actingAs($admin->fresh(), 'larasell-admin')
         ->get(route('larasell.admin.profile'))
@@ -209,7 +211,7 @@ it('replaces the previous avatar and deletes the old file', function () {
         ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'avatar' => $new])
         ->assertSessionHasNoErrors();
 
-    expect($admin->fresh()->avatar_path)->toBe($new);
+    expect($admin->fresh()->avatar_path?->path)->toBe($new);
     Storage::disk('public')->assertMissing($old);
     Storage::disk('public')->assertExists($new);
 });
@@ -269,7 +271,7 @@ it('keeps the avatar when the profile is saved without a new one', function () {
         ->assertSessionHasNoErrors();
 
     // Assert
-    expect($admin->fresh()->avatar_path)->toBe('avatars/current.png');
+    expect($admin->fresh()->avatar_path?->path)->toBe('avatars/current.png');
     Storage::disk('public')->assertExists('avatars/current.png');
 });
 
@@ -355,4 +357,38 @@ it('rate limits avatar uploads', function () {
     $this->actingAs($admin, 'larasell-admin')
         ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 128, 128)])
         ->assertTooManyRequests();
+});
+
+it('keeps a file outside avatars/ that the previous avatar path points to', function () {
+    // Arrange
+    Storage::fake('public');
+    Storage::disk('public')->put('invoices/2026.pdf', 'invoice');
+    $admin = profileAdmin();
+    // Written past the cast, as a row changed outside the panel would be.
+    Admin::query()->whereKey($admin->id)->toBase()->update(['avatar_path' => 'invoices/2026.pdf']);
+    $admin = $admin->fresh();
+
+    // Act
+    $update = fn () => $this->withoutExceptionHandling()->actingAs($admin, 'larasell-admin')
+        ->put(route('larasell.admin.profile.update'), ['name' => 'Test Admin', 'email' => 'admin@example.com', 'remove_avatar' => true]);
+
+    // Assert
+    expect($update)->toThrow(InvalidAvatarPath::class);
+    Storage::disk('public')->assertExists('invoices/2026.pdf');
+});
+
+it('keeps a file outside avatars/ that the pending upload in the session points to', function () {
+    // Arrange
+    Storage::fake('public');
+    Storage::disk('public')->put('invoices/2026.pdf', 'invoice');
+    $admin = profileAdmin();
+
+    // Act
+    $upload = fn () => $this->withoutExceptionHandling()->actingAs($admin, 'larasell-admin')
+        ->withSession([AvatarController::PENDING_SESSION_KEY => 'invoices/2026.pdf'])
+        ->postJson(route('larasell.admin.profile.avatar.store'), ['avatar' => UploadedFile::fake()->image('avatar.png', 256, 256)]);
+
+    // Assert
+    expect($upload)->toThrow(InvalidAvatarPath::class);
+    Storage::disk('public')->assertExists('invoices/2026.pdf');
 });

@@ -4,6 +4,7 @@ namespace Larasell\Admin\Team\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Larasell\Admin\Platform\Auth\AvatarPath;
 use Larasell\Admin\Team\Exceptions\AvatarNotStored;
 use Larasell\Admin\Team\Http\Requests\AvatarRequest;
 
@@ -21,11 +22,12 @@ class AvatarController
         // Only the latest upload can be saved, so an earlier unsaved one is no longer needed.
         $previous = $request->session()->pull(self::PENDING_SESSION_KEY);
 
+        // A pending path outside avatars/ throws before anything is deleted.
         if (is_string($previous)) {
-            $disk->delete($previous);
+            $disk->delete(AvatarPath::fromString($previous)->path);
         }
 
-        $path = $request->file('avatar')->storePublicly('avatars', ['disk' => config('larasell.admin.panel.disk')]);
+        $path = $request->file('avatar')->storePublicly(AvatarPath::DIRECTORY, ['disk' => config('larasell.admin.panel.disk')]);
 
         if ($path === false) {
             throw AvatarNotStored::onDisk();

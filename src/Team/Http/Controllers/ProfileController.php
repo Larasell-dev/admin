@@ -28,6 +28,7 @@ class ProfileController
     {
         $attributes = $request->safe()->only(['name', 'email']);
         $disk = Storage::disk(config('larasell.admin.panel.disk'));
+        // Read before anything is saved: a stored path outside avatars/ throws here.
         $previousAvatar = $admin->avatar_path;
 
         if ($request->filled('avatar')) {
@@ -39,8 +40,8 @@ class ProfileController
 
         $updateAdmin->handle($admin, $attributes, $admin);
 
-        if ($previousAvatar !== null && $previousAvatar !== $admin->avatar_path) {
-            $disk->delete($previousAvatar);
+        if ($previousAvatar !== null && $previousAvatar->path !== $admin->avatar_path?->path) {
+            $disk->delete($previousAvatar->path);
         }
 
         return redirect()->route('larasell.admin.profile');

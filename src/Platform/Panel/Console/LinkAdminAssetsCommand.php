@@ -5,6 +5,7 @@ namespace Larasell\Admin\Platform\Panel\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Larasell\Admin\AdminPanel;
+use Larasell\Admin\Platform\Panel\Exceptions\InvalidExtension;
 
 class LinkAdminAssetsCommand extends Command
 {
@@ -38,6 +39,12 @@ class LinkAdminAssetsCommand extends Command
     {
         $source = "{$publicPath}/vendor/{$name}";
         $target = public_path("vendor/{$name}");
+
+        // AdminPanel::vite() checks the name, but a deleted folder can't be restored, so this
+        // throws rather than trusting it.
+        if (dirname($target) !== public_path('vendor') || in_array(basename($target), ['', '.', '..'], true)) {
+            throw InvalidExtension::invalidName($name);
+        }
 
         if (! is_dir($source)) {
             $this->components->error($notBuilt);

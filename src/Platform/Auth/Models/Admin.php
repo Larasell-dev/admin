@@ -5,7 +5,11 @@ namespace Larasell\Admin\Platform\Auth\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Larasell\Admin\Platform\Audit\Actors\Actor;
+use Larasell\Admin\Platform\Auth\AvatarPath;
 
+/**
+ * @property ?AvatarPath $avatar_path
+ */
 class Admin extends Authenticatable implements Actor
 {
     protected $table = 'larasell_admin_users';
@@ -26,6 +30,7 @@ class Admin extends Authenticatable implements Actor
     {
         return [
             'password' => 'hashed',
+            'avatar_path' => AvatarPath::class,
         ];
     }
 
@@ -35,7 +40,7 @@ class Admin extends Authenticatable implements Actor
             return null;
         }
 
-        return Storage::disk(config('larasell.admin.panel.disk'))->url($this->avatar_path);
+        return Storage::disk(config('larasell.admin.panel.disk'))->url($this->avatar_path->path);
     }
 
     /**

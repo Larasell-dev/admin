@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
+use Larasell\Admin\Platform\Auth\Exceptions\InvalidAvatarPath;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 
 /**
@@ -226,3 +227,30 @@ it('requires a signed-in admin', function (string $uri) {
     // Act & Assert
     $this->get($uri)->assertRedirect(route('larasell.admin.login'));
 })->with(['/admin/settings', '/admin/settings/team', '/admin/settings/team/create', '/admin/settings/team/1/edit']);
+
+it('keeps a file outside avatars/ that an admin\'s avatar path points to', function () {
+    // Arrange
+    $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+    $alan = Admin::create(['name' => 'Alan Turing', 'email' => 'alan@example.com', 'password' => 'password']);
+    $disk = Storage::fake(config('larasell.admin.panel.disk'));
+    $disk->put('invoices/2026.pdf', 'invoice');
+    $delete = adminRows($alan)[0]['_actions'][0]['url'];
+    // Written past the cast, as a row changed outside the panel would be.
+    Admin::query()->whereKey($ada->id)->toBase()->update(['avatar_path' => 'invoices/2026.pdf']);
+
+    // Act
+    $delete = fn () => $this->withoutExceptionHandling()->post($delete, ['confirmation' => 'ada@example.com']);
+
+    // Assert
+    expect($delete)->toThrow(InvalidAvatarPath::class);
+    $disk->assertExists('invoices/2026.pdf');
+    expect(Admin::query()->whereKey($ada->id)->exists())->toBeTrue();
+});
+
+it('refuses to store an avatar path outside avatars/', function (string $path) {
+    // Arrange
+    $ada = Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']);
+
+    // Act & Assert
+    expect(fn () => $ada->update(['avatar_path' => $path]))->toThrow(InvalidAvatarPath::class);
+})->with(['invoices/2026.pdf', 'avatars/../.env', 'avatars/', 'avatars/nested/a.png']);
