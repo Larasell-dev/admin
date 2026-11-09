@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\TestResponse;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\Facades\Audit;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 
 beforeEach(function () {
@@ -367,7 +368,7 @@ it('audits revoking a token, keeping its name once the token is gone', function 
 
 it('creates no token when its audit record can\'t be stored', function () {
     // Arrange
-    Schema::drop('larasell_audit_log');
+    Audit::fake()->failing();
 
     // Act
     $this->actingAs($this->ada, 'larasell-admin')
@@ -386,7 +387,7 @@ it('keeps a token working when its revocation can\'t be audited', function () {
         ->inertiaProps('apiTokens.rows.0._actions.0');
 
     // Act
-    Schema::drop('larasell_audit_log');
+    Audit::fake()->failing();
     $this->post($revoke['url'], ['confirmation' => 'ERP sync'])->assertServerError();
 
     // Assert

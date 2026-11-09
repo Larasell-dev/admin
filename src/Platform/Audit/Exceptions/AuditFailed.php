@@ -16,6 +16,19 @@ class AuditFailed extends RuntimeException implements StructuredException
     use HasStructuredException;
 
     /**
+     * @internal Thrown by AuditFake::failing(), so tests can check a change rolls back.
+     */
+    public static function faked(string $event): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.audit.faked-failure',
+            message: "Audit record [{$event}] failed, as the test told Audit::fake() to.",
+            why: 'The test called Audit::fake()->failing() to check what happens when a record can\'t be stored.',
+            fix: 'Expect the failure in the test, or leave out failing().',
+        );
+    }
+
+    /**
      * @internal
      */
     public static function outsideTransaction(string $event): static
