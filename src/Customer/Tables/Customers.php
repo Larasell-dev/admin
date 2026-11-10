@@ -36,7 +36,7 @@ class Customers extends Table
         return [
             TextColumn::make('customer_number', __('Number')),
             TextColumn::make('name', __('Name'))->map(fn (mixed $value, Customer $customer): string => $customer->displayName()),
-            TextColumn::make('email', __('Email'))->map(fn (mixed $value, Customer $customer): ?string => $customer->personProfile?->email),
+            TextColumn::make('email', __('Email'))->map(fn (mixed $value, Customer $customer): ?string => $customer->personProfile?->email?->value()),
             TextColumn::make('type', __('Type'))->map(fn (CustomerType $type): string => self::typeLabel($type)),
             BadgeColumn::make('status', __('Status'))
                 ->map(fn (CustomerStatus $status): string => self::statusLabel($status))

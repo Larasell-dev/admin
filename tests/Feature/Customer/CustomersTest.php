@@ -14,6 +14,7 @@ use Larasell\Larasell\Customers\Enums\CustomerSource;
 use Larasell\Larasell\Customers\Enums\CustomerStatus;
 use Larasell\Larasell\Customers\Enums\CustomerType;
 use Larasell\Larasell\Customers\Models\Customer;
+use Larasell\Larasell\EmailAddress;
 use Larasell\Larasell\Enums\Country;
 use Larasell\Larasell\Enums\Locale;
 
@@ -24,7 +25,7 @@ beforeEach(function () {
 function adminCustomer(PersonProfileData|CompanyProfileData|null $profile = null): Customer
 {
     return app(CreateCustomer::class)->handle(new CreateCustomerPayload(
-        profile: $profile ?? new PersonProfileData(firstName: 'Erika', lastName: 'Musterfrau', email: 'erika@example.com'),
+        profile: $profile ?? new PersonProfileData(firstName: 'Erika', lastName: 'Musterfrau', email: EmailAddress::of('erika@example.com')),
         source: CustomerSource::Storefront,
     ));
 }
@@ -81,7 +82,7 @@ it('creates an individual customer and asks for the fields its type needs', func
     $this->post(route('larasell.admin.customers.store'), ['type' => 'individual', 'first_name' => 'Erika', 'last_name' => 'Musterfrau', 'email' => 'erika@example.com'])
         ->assertRedirect();
 
-    expect(Customer::query()->sole()->personProfile?->email)->toBe('erika@example.com');
+    expect(Customer::query()->sole()->personProfile?->email?->value())->toBe('erika@example.com');
 });
 
 it('shows a customer with everything the edit page needs', function () {
@@ -128,6 +129,29 @@ it('rejects a preferred language that is no locale', function () {
     // Act & Assert
     $this->put(route('larasell.admin.customers.update', $customer), ['first_name' => 'Erika', 'last_name' => 'Beispiel', 'preferred_locale' => 'german'])
         ->assertSessionHasErrors('preferred_locale');
+});
+
+it('rejects a phone number with letters and a website that is no web address', function () {
+    // Arrange
+    $customer = adminCustomer();
+
+    // Act & Assert
+    $this->put(route('larasell.admin.customers.update', $customer), ['first_name' => 'Erika', 'last_name' => 'Beispiel', 'phone' => 'call me'])
+        ->assertSessionHasErrors('phone');
+});
+
+it('stores a website without a scheme with https', function () {
+    // Arrange
+    $customer = adminCustomer(new CompanyProfileData(legalName: 'Muster GmbH', countryCode: Country::DE));
+
+    // Act
+    $this->put(route('larasell.admin.customers.update', $customer), ['legal_name' => 'Muster GmbH', 'country_code' => 'DE', 'website' => 'muster.de/shop', 'phone' => '+49 (0)30 123'])
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect($customer->fresh()?->companyProfile?->website?->value())->toBe('https://muster.de/shop');
+    $this->put(route('larasell.admin.customers.update', $customer), ['legal_name' => 'Muster GmbH', 'country_code' => 'DE', 'website' => 'ftp://muster.de'])
+        ->assertSessionHasErrors('website');
 });
 
 it('blocks, archives and reactivates a customer and audits each change', function () {

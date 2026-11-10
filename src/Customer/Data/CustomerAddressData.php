@@ -42,7 +42,7 @@ class CustomerAddressData extends Data
             city: $address->city,
             region: $address->region,
             countryCode: $address->country_code->value,
-            phone: $address->phone,
+            phone: $address->phone?->value(),
             defaultBilling: $address->is_default_billing,
             defaultShipping: $address->is_default_shipping,
             updateUrl: route('larasell.admin.customers.addresses.update', $route),

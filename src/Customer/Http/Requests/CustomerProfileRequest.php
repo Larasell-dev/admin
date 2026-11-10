@@ -11,6 +11,11 @@ use Larasell\Larasell\Customers\Models\Customer;
 use Larasell\Larasell\Enums\Country;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
+use Larasell\Admin\Customer\Rules\ValidPhoneNumber;
+use Larasell\Admin\Customer\Rules\ValidUrl;
+use Larasell\Larasell\EmailAddress;
+use Larasell\Larasell\PhoneNumber;
+use Larasell\Larasell\Url;
 
 /**
  * A customer's profile and preferences. On create the type comes from the form; on update it is
@@ -18,16 +23,6 @@ use Larasell\Larasell\Enums\Locale;
  */
 class CustomerProfileRequest extends FormRequest
 {
-    /** The form shows https:// in front of the website, so it sends only the rest. */
-    protected function prepareForValidation(): void
-    {
-        $website = trim($this->string('website')->value());
-
-        if ($website !== '' && ! preg_match('#^https?://#i', $website)) {
-            $this->merge(['website' => 'https://'.$website]);
-        }
-    }
-
     /**
      * @return array<string, array<int, mixed>>
      */
@@ -40,15 +35,15 @@ class CustomerProfileRequest extends FormRequest
             'first_name' => [Rule::requiredIf($type === 'individual'), 'nullable', 'string', 'max:255'],
             'last_name' => [Rule::requiredIf($type === 'individual'), 'nullable', 'string', 'max:255'],
             'salutation' => ['nullable', 'string', 'max:64'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:64'],
+            'email' => ['nullable', 'email:filter', 'max:255'],
+            'phone' => ['nullable', 'string', new ValidPhoneNumber],
             'legal_name' => [Rule::requiredIf($type === 'company'), 'nullable', 'string', 'max:255'],
             'legal_form' => ['nullable', 'string', 'max:64'],
             'company_number' => ['nullable', 'string', 'max:64'],
             'vat_id' => ['nullable', 'string', 'max:64'],
             'country_code' => [Rule::requiredIf($type === 'company'), 'nullable', Rule::enum(Country::class)],
             'industry' => ['nullable', 'string', 'max:255'],
-            'website' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'string', 'max:255', new ValidUrl],
             'preferred_locale' => ['nullable', Rule::enum(Locale::class)],
             'preferred_currency' => ['nullable', Rule::enum(Currency::class)],
         ];
@@ -71,15 +66,15 @@ class CustomerProfileRequest extends FormRequest
                 legalForm: $this->input('legal_form'),
                 companyNumber: $this->input('company_number'),
                 industry: $this->input('industry'),
-                website: $this->input('website'),
+                website: $this->filled('website') ? Url::of($this->string('website')->value()) : null,
             );
         }
 
         return new PersonProfileData(
             firstName: $this->string('first_name')->value(),
             lastName: $this->string('last_name')->value(),
-            email: $this->input('email'),
-            phone: $this->input('phone'),
+            email: $this->filled('email') ? EmailAddress::of($this->string('email')->value()) : null,
+            phone: $this->filled('phone') ? PhoneNumber::of($this->string('phone')->value()) : null,
             salutation: $this->input('salutation'),
         );
     }

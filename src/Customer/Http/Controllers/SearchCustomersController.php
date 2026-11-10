@@ -20,7 +20,7 @@ class SearchCustomersController
 
         $results = $search->search($query)->map(function (Customer $customer) use ($query): SearchResultData {
             $name = $customer->displayName();
-            $email = $customer->personProfile?->email;
+            $email = $customer->personProfile?->email?->value();
 
             return new SearchResultData(
                 $customer->id,

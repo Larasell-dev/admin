@@ -4,8 +4,10 @@ namespace Larasell\Admin\Customer\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Larasell\Admin\Customer\Rules\ValidPhoneNumber;
 use Larasell\Larasell\Customers\Actions\CustomerAddressPayload;
 use Larasell\Larasell\Enums\Country;
+use Larasell\Larasell\PhoneNumber;
 
 class CustomerAddressRequest extends FormRequest
 {
@@ -24,7 +26,7 @@ class CustomerAddressRequest extends FormRequest
             'city' => ['required', 'string', 'max:255'],
             'region' => ['nullable', 'string', 'max:255'],
             'country_code' => ['required', Rule::enum(Country::class)],
-            'phone' => ['nullable', 'string', 'max:64'],
+            'phone' => ['nullable', 'string', new ValidPhoneNumber],
         ];
     }
 
@@ -39,7 +41,7 @@ class CustomerAddressRequest extends FormRequest
             countryCode: $this->enum('country_code', Country::class) ?? Country::DE,
             company: $this->input('company'),
             region: $this->input('region'),
-            phone: $this->input('phone'),
+            phone: $this->filled('phone') ? PhoneNumber::of($this->string('phone')->value()) : null,
         );
     }
 }

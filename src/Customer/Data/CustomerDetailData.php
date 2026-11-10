@@ -39,8 +39,8 @@ class CustomerDetailData extends Data
             source: $customer->source->value,
             preferredLocale: $customer->preferred_locale?->value,
             preferredCurrency: $customer->preferred_currency?->value,
-            person: $person === null ? null : new PersonProfileFormData($person->salutation, $person->first_name, $person->last_name, $person->email, $person->phone),
-            company: $company === null ? null : new CompanyProfileFormData($company->legal_name, $company->legal_form, $company->company_number, $company->vat_id, $company->country_code->value, $company->industry, $company->website),
+            person: $person === null ? null : new PersonProfileFormData($person->salutation, $person->first_name, $person->last_name, $person->email?->value(), $person->phone?->value()),
+            company: $company === null ? null : new CompanyProfileFormData($company->legal_name, $company->legal_form, $company->company_number, $company->vat_id, $company->country_code->value, $company->industry, $company->website?->value()),
         );
     }
 }
