@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f924901645b4ba1441a37fac79003a13",
+    "content-hash": "456853da668ba45c59fdc2cc8404c834",
     "packages": [
         {
             "name": "brick/math",
@@ -1254,12 +1254,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "6a5ecf5a284c01a2914f1d2de5db965e1aa78117"
+                "reference": "43980ec747925f54dbdb16c5403627b11b1954d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/6a5ecf5a284c01a2914f1d2de5db965e1aa78117",
-                "reference": "6a5ecf5a284c01a2914f1d2de5db965e1aa78117",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/43980ec747925f54dbdb16c5403627b11b1954d8",
+                "reference": "43980ec747925f54dbdb16c5403627b11b1954d8",
                 "shasum": ""
             },
             "require": {

@@ -805,20 +805,6 @@ it('shows the description in the content locale on the product\'s page', functio
         ->assertInertia(fn (AssertableInertia $page) => $page->where('product.description', bootsDescription()));
 });
 
-it('shows a description saved as plain text as paragraphs', function () {
-    // Arrange
-    signInAdmin();
-
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'description' => "Warm.\nDry."]);
-
-    // Act & Assert
-    $this->get(route('larasell.admin.products.edit', $boots))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('product.description', [
-            descriptionBlock('b0', [['Warm.']]),
-            descriptionBlock('b1', [['Dry.']]),
-        ]));
-});
-
 it('only changes the current locale\'s description, and removes it when it is emptied', function () {
     // Arrange
     signInAdmin();

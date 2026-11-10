@@ -21,7 +21,7 @@ class ProductDetailData extends Data
         /**
          * In the content locale, null while the product has none in it.
          *
-         * @var array<string, mixed>|null
+         * @var list<array<string, mixed>>|null
          */
         #[LiteralTypeScriptType('import("../Platform/RichText/types").RichText | null')]
         public ?array $description,

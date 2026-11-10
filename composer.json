@@ -14,7 +14,7 @@
     "ext-zip": "*",
     "inertiajs/inertia-laravel": "^3.7",
     "larasell-dev/chronicle": "^0.4",
-    "larasell-dev/larasell": "dev-feat/rich-text-description as 1.28.0",
+    "larasell-dev/larasell": "dev-feat/rich-text-description#43980ec747925f54dbdb16c5403627b11b1954d8 as 1.28.0",
     "laravel/framework": "^13.23",
     "laravel/head": "^0.2",
     "laravel/pennant": "^1.26",
