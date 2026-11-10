@@ -13,6 +13,7 @@ use JsonSerializable;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
+use Larasell\Admin\Platform\Tables\Actions\TableActionGroup;
 use Larasell\Admin\Platform\Tables\Attributes\Remember;
 use Larasell\Admin\Platform\Tables\Attributes\UseModel;
 use Larasell\Admin\Platform\Tables\Columns\BadgeColumn;
@@ -116,11 +117,12 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * Actions for the whole table, shown in its header, e.g. a link to add a record.
-     * They are hidden while the table shows its empty state, which takes its own
-     * actions; return the same ones from emptyState() to offer them there too.
+     * Actions for the whole table, shown in its header, e.g. a link to add a record,
+     * or a TableActionGroup of related ones. They are hidden while the table shows its
+     * empty state, which takes its own actions; return the same ones from emptyState()
+     * to offer them there too.
      *
-     * @return array<int, TableAction>
+     * @return array<int, TableAction|TableActionGroup>
      */
     public function headerActions(): array
     {
@@ -236,7 +238,7 @@ abstract class Table implements JsonSerializable
     /**
      * What to show when the table has no rows: a 'title', and optionally a
      * 'description', an 'icon' (an Icon case or its Remix icon name), and
-     * 'actions' (a list of TableAction that resolve it, e.g. adding a record).
+     * 'actions' (a list of TableAction and TableActionGroup that resolve it, e.g. adding a record).
      * Return null for the default empty state.
      *
      * @return array<string, mixed>|null
@@ -247,7 +249,7 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return array{title: string, description: ?string, icon: ?string, actions: array<int, TableAction>}|null
+     * @return array{title: string, description: ?string, icon: ?string, actions: array<int, TableAction|TableActionGroup>}|null
      */
     protected function resolveEmptyState(): ?array
     {
@@ -286,10 +288,10 @@ abstract class Table implements JsonSerializable
 
     /**
      * Checks the header's or the empty state's actions, which share these rules: a
-     * list of TableAction, each with a link, and no two with the same label, since
-     * the page tells them apart by it.
+     * list of TableAction and TableActionGroup, each action with a link, and no two
+     * with the same label, in a group or not, since the page tells them apart by it.
      *
-     * @return array<int, TableAction>
+     * @return array<int, TableAction|TableActionGroup>
      */
     private function resolveTableActions(string $source, mixed $actions): array
     {
@@ -301,17 +303,19 @@ abstract class Table implements JsonSerializable
         }
 
         $labels = [];
-        foreach ($actions as $action) {
-            if (! $action instanceof TableAction) {
-                throw InvalidTableAction::invalidList(static::class, $source, 'a list of TableAction');
+        foreach ($actions as $item) {
+            if (! $item instanceof TableAction && ! $item instanceof TableActionGroup) {
+                throw InvalidTableAction::invalidList(static::class, $source, 'a list of TableAction and TableActionGroup');
             }
 
-            $action->assertConfigured(static::class);
+            foreach ($item instanceof TableActionGroup ? $item->actions() : [$item] as $action) {
+                $action->assertConfigured(static::class);
 
-            if (in_array($action->label(), $labels, true)) {
-                throw InvalidTableAction::duplicateLabel(static::class, $source, $action->label());
+                if (in_array($action->label(), $labels, true)) {
+                    throw InvalidTableAction::duplicateLabel(static::class, $source, $action->label());
+                }
+                $labels[] = $action->label();
             }
-            $labels[] = $action->label();
         }
 
         return $actions;
@@ -408,7 +412,7 @@ abstract class Table implements JsonSerializable
     }
 
     /**
-     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string, actions: array<int, TableAction>}|null, headerActions: array<int, TableAction>, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
+     * @return array{title: string, emptyState: array{title: string, description: ?string, icon: ?string, actions: array<int, TableAction|TableActionGroup>}|null, headerActions: array<int, TableAction|TableActionGroup>, columns: array<int, Column>, rows: array<int, array<string, mixed>>, pagination: array{page: int, pageSize: int, total: int}}
      */
     public function jsonSerialize(): array
     {

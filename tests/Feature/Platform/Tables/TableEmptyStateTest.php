@@ -8,6 +8,7 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
+use Larasell\Admin\Platform\Tables\Actions\TableActionGroup;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableAction;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableEmptyState;
@@ -111,6 +112,25 @@ it('offers actions that resolve the empty state', function () {
     ]);
 });
 
+it('offers a group of actions', function () {
+    // Arrange
+    ShelfTable::$emptyState = [
+        'title' => 'No books yet',
+        'actions' => [TableActionGroup::make([
+            TableAction::make('Add book')->to('/a'),
+            TableAction::make('Add audiobook')->to('/b'),
+        ])],
+    ];
+
+    // Act & Assert
+    expect(emptyStateOf(ShelfTable::make())['actions'])->toBe([
+        ['actions' => [
+            ['label' => 'Add book', 'method' => 'get', 'url' => '/a', 'icon' => null],
+            ['label' => 'Add audiobook', 'method' => 'get', 'url' => '/b', 'icon' => null],
+        ]],
+    ]);
+});
+
 it('rejects an invalid empty state', function (array $emptyState, string $code) {
     // Arrange
     ShelfTable::$emptyState = $emptyState;
@@ -153,7 +173,7 @@ it('says which rule invalid empty state actions break', function (mixed $actions
 })->with([
     'a single action instead of an array' => [fn () => TableAction::make('Add book')->to('/a'), 'an array'],
     'actions keyed by name' => [fn () => ['add' => TableAction::make('Add book')->to('/a')], 'a list'],
-    'an array instead of a TableAction' => [[['label' => 'Add book', 'url' => '/a']], 'a list of TableAction'],
+    'an array instead of a TableAction' => [[['label' => 'Add book', 'url' => '/a']], 'a list of TableAction and TableActionGroup'],
 ]);
 
 it('rejects empty state actions without a link or with the same label', function (Closure $actions, string $message) {

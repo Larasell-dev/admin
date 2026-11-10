@@ -85,8 +85,18 @@ class InvalidTableAction extends InvalidArgumentException implements StructuredE
         return static::structured(
             errorCode: 'larasell-admin.table.action.invalid-list',
             message: "Table [{$table}] {$source} must be {$expected}.",
-            why: 'Anything but a TableAction, such as a row Action, is sent to the page as an empty object and shows as a button without a label or link.',
-            fix: "Return a list of TableAction from {$source}, e.g. [TableAction::make('Add product')->route('products.create')].",
+            why: 'Anything but a TableAction or TableActionGroup, such as a row Action, is sent to the page as an empty object and shows as a button without a label or link.',
+            fix: "Return a list of TableAction and TableActionGroup from {$source}, e.g. [TableAction::make('Add product')->route('products.create')].",
+        );
+    }
+
+    public static function invalidGroup(): static
+    {
+        return static::structured(
+            errorCode: 'larasell-admin.table.action.invalid-group',
+            message: 'A TableActionGroup must be a list of at least two TableAction.',
+            why: 'The group shows its first action as a button and the others in a menu next to it, so it needs another action for the menu, and it cannot hold another group.',
+            fix: "Pass two or more TableAction, e.g. TableActionGroup::make([TableAction::make('Add product')->route('products.create'), TableAction::make('Add digital product')->route('products.create-digital')]), or a single TableAction instead of the group.",
         );
     }
 

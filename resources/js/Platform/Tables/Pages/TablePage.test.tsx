@@ -78,3 +78,32 @@ it("keeps the header but swaps its actions for the empty state's when the table 
   expect(page.getByRole("banner").getByRole("link").elements()).toHaveLength(0);
   expect(page.getByRole("link", { name: "Import books" }).elements()).toHaveLength(0);
 });
+
+it("shows a group as its first action with the others in a menu next to it", async () => {
+  // Arrange
+  const addAudiobook: TableAction = {
+    ...importBooks,
+    label: "Add audiobook",
+    url: "/admin/audiobooks/create",
+  };
+
+  // Act
+  await render(
+    <TablePage table={table(1, { headerActions: [{ actions: [addBook, addAudiobook] }] })} />,
+  );
+  await page
+    .getByRole("banner")
+    .getByRole("button", { name: "More actions like Add book" })
+    .click();
+
+  // Assert
+  const header = page.getByRole("banner");
+  await expect.element(header.getByRole("group", { name: "Add book" })).toBeVisible();
+  await expect
+    .element(header.getByRole("link", { name: "Add book" }))
+    .toHaveAttribute("href", "/admin/books/create");
+  await expect
+    .element(page.getByRole("menuitem", { name: "Add audiobook" }))
+    .toHaveAttribute("href", "/admin/audiobooks/create");
+  expect(header.getByRole("link", { name: "Add audiobook" }).elements()).toHaveLength(0);
+});

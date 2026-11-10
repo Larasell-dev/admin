@@ -5764,6 +5764,17 @@
         }
       ],
       "types": []
+    },
+    "OcwNRtA0n9NxwXyKRcAHGA==": {
+      "description": "List page: accessible name of the arrow button next to an action, which opens a menu of related actions, e.g. 'More actions like Add product'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weitere Aktionen wie {action}",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
