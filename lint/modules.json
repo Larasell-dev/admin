@@ -1,6 +1,7 @@
 {
   "ApiToken": { "buildsOn": [] },
   "Category": { "buildsOn": [] },
+  "Customer": { "buildsOn": [] },
   "Order": { "buildsOn": [] },
   "Product": {
     "buildsOn": ["Category"],

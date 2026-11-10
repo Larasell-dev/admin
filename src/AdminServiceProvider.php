@@ -17,6 +17,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\ExceptionResponse;
 use Larasell\Admin\ApiToken\ApiTokenServiceProvider;
 use Larasell\Admin\Category\CategoryServiceProvider;
+use Larasell\Admin\Customer\CustomerServiceProvider;
 use Larasell\Admin\Order\OrderServiceProvider;
 use Larasell\Admin\Platform\Audit\AuditServiceProvider;
 use Larasell\Admin\Platform\Audit\Chain\Console\VerifyAuditLogCommand;
@@ -77,6 +78,7 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->register(ProductServiceProvider::class);
         $this->app->register(CategoryServiceProvider::class);
         $this->app->register(OrderServiceProvider::class);
+        $this->app->register(CustomerServiceProvider::class);
         $this->app->register(ApiTokenServiceProvider::class);
         $this->app->register(TeamServiceProvider::class);
         $this->app->register(SalesChannelServiceProvider::class);

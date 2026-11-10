@@ -672,6 +672,9 @@ describe("navigating", () => {
     navigation: [
       { ...navigationItem("Home", "/admin"), id: "larasell.admin.home" },
       navigationItem("Products", "/admin/products"),
+      navigationItem("Customers", "/admin/customers", [
+        navigationItem("Customer groups", "/admin/customer-groups"),
+      ]),
       navigationItem("Settings", "/admin/settings"),
     ],
     settingsPages: [
@@ -699,6 +702,8 @@ describe("navigating", () => {
     expect(options()).toEqual([
       "Home",
       "Products",
+      "Customers",
+      "Customer groups",
       "Settings",
       "Settings › Team",
       "Settings › Audit log",

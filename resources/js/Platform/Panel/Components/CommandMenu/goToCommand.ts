@@ -7,9 +7,8 @@ import { defineCommand } from "./commands";
 
 type NavigationItem = Larasell.Admin.Platform.Navigation.Data.NavigationItemData;
 
-/** The pages an item stands for: itself, or the pages under it, e.g. those of Settings. */
-const pages = (item: NavigationItem): NavigationItem[] =>
-  item.children.length > 0 ? item.children.flatMap(pages) : [item];
+/** The pages an item stands for: its own and those under it, e.g. Customers and Customer groups. */
+const pages = (item: NavigationItem): NavigationItem[] => [item, ...item.children.flatMap(pages)];
 
 /**
  * Goes to a page of the navigation, a settings page, or the profile, so it offers the same pages
