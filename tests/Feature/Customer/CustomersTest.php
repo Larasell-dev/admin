@@ -61,7 +61,7 @@ it('creates a company customer by hand and audits it', function () {
         'type' => 'company',
         'legal_name' => 'Muster GmbH',
         'country_code' => 'DE',
-        'vat_id' => 'DE123456789',
+        'vat_id' => 'de 123 456 789',
     ]);
 
     // Assert
@@ -69,7 +69,7 @@ it('creates a company customer by hand and audits it', function () {
     $response->assertRedirect(route('larasell.admin.customers.show', $customer));
     expect($customer->type)->toBe(CustomerType::Company)
         ->and($customer->source)->toBe(CustomerSource::Admin)
-        ->and($customer->companyProfile?->vat_id)->toBe('DE123456789')
+        ->and($customer->companyProfile?->vat_id?->value())->toBe('DE123456789')
         ->and(customerAuditEvents())->toBe(['customer.created']);
 });
 
@@ -138,6 +138,15 @@ it('rejects a phone number with letters and a website that is no web address', f
     // Act & Assert
     $this->put(route('larasell.admin.customers.update', $customer), ['first_name' => 'Erika', 'last_name' => 'Beispiel', 'phone' => 'call me'])
         ->assertSessionHasErrors('phone');
+});
+
+it('rejects a VAT ID in no EU format', function () {
+    // Arrange
+    $customer = adminCustomer(new CompanyProfileData(legalName: 'Muster GmbH', countryCode: Country::DE));
+
+    // Act & Assert
+    $this->put(route('larasell.admin.customers.update', $customer), ['legal_name' => 'Muster GmbH', 'country_code' => 'DE', 'vat_id' => 'DE12345'])
+        ->assertSessionHasErrors(['vat_id' => __('Enter a VAT ID such as DE123456789.')]);
 });
 
 it('stores a website without a scheme with https', function () {

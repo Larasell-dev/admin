@@ -4,18 +4,20 @@ namespace Larasell\Admin\Customer\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Larasell\Admin\Customer\Rules\ValidPhoneNumber;
+use Larasell\Admin\Customer\Rules\ValidUrl;
+use Larasell\Admin\Customer\Rules\VatId as VatIdRule;
 use Larasell\Larasell\Customers\Actions\CompanyProfileData;
 use Larasell\Larasell\Customers\Actions\PersonProfileData;
 use Larasell\Larasell\Customers\Enums\CustomerType;
 use Larasell\Larasell\Customers\Models\Customer;
+use Larasell\Larasell\EmailAddress;
 use Larasell\Larasell\Enums\Country;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
-use Larasell\Admin\Customer\Rules\ValidPhoneNumber;
-use Larasell\Admin\Customer\Rules\ValidUrl;
-use Larasell\Larasell\EmailAddress;
 use Larasell\Larasell\PhoneNumber;
 use Larasell\Larasell\Url;
+use Larasell\Larasell\VatId;
 
 /**
  * A customer's profile and preferences. On create the type comes from the form; on update it is
@@ -40,7 +42,7 @@ class CustomerProfileRequest extends FormRequest
             'legal_name' => [Rule::requiredIf($type === 'company'), 'nullable', 'string', 'max:255'],
             'legal_form' => ['nullable', 'string', 'max:64'],
             'company_number' => ['nullable', 'string', 'max:64'],
-            'vat_id' => ['nullable', 'string', 'max:64'],
+            'vat_id' => ['nullable', 'string', new VatIdRule],
             'country_code' => [Rule::requiredIf($type === 'company'), 'nullable', Rule::enum(Country::class)],
             'industry' => ['nullable', 'string', 'max:255'],
             'website' => ['nullable', 'string', 'max:255', new ValidUrl],
@@ -62,7 +64,7 @@ class CustomerProfileRequest extends FormRequest
             return new CompanyProfileData(
                 legalName: $this->string('legal_name')->value(),
                 countryCode: $this->enum('country_code', Country::class) ?? Country::DE,
-                vatId: $this->input('vat_id'),
+                vatId: $this->filled('vat_id') ? VatId::of($this->string('vat_id')->value()) : null,
                 legalForm: $this->input('legal_form'),
                 companyNumber: $this->input('company_number'),
                 industry: $this->input('industry'),
