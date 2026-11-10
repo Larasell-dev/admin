@@ -70,12 +70,15 @@ export type TableAction = {
   icon: string | null;
 };
 
+/** The JSON shape of a Larasell\Admin\Platform\Tables\Actions\TableActionGroup: the first action is its button, the others are in a menu. */
+export type TableActionGroup = { actions: TableAction[] };
+
 export type TableEmptyState = {
   title: string;
   description: string | null;
   /** Icon case name, e.g. "Book"; @larasell-dev/ui/icons exports it with a Fill or Line suffix. */
   icon: string | null;
-  actions: TableAction[];
+  actions: (TableAction | TableActionGroup)[];
 };
 
 /** The JSON shape of a Larasell\Admin\Platform\Tables\Table. */
@@ -84,7 +87,7 @@ export type TableResource = {
   /** Shown when there are no rows; null for the default. */
   emptyState: TableEmptyState | null;
   /** Shown in the header, except while the empty state shows. */
-  headerActions: TableAction[];
+  headerActions: (TableAction | TableActionGroup)[];
   columns: TableColumn[];
   /** The rows on the current page. */
   rows: TableRow[];

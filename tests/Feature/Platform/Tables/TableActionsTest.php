@@ -7,6 +7,7 @@ use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
+use Larasell\Admin\Platform\Tables\Actions\TableActionGroup;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Exceptions\InvalidTableAction;
 use Larasell\Admin\Platform\Tables\Table;
@@ -730,7 +731,7 @@ describe('header actions', function () {
                 ->and($exception->getMessage())->toBe("Table [BookHeaderActionsTable] headerActions() must be {$expected}.");
         });
     })->with([
-        'a row action' => [fn () => [Action::make('Add book')->to('/a')], 'a list of TableAction'],
+        'a row action' => [fn () => [Action::make('Add book')->to('/a')], 'a list of TableAction and TableActionGroup'],
         'actions keyed by name' => [fn () => ['add' => TableAction::make('Add book')->to('/a')], 'a list'],
     ]);
 
@@ -746,4 +747,60 @@ describe('header actions', function () {
         // Act & Assert
         TableAction::make('Add book')->icon('not-an-icon');
     })->throws(InvalidTableAction::class, 'is not a Remix icon');
+    describe('groups', function () {
+        it('sends a group of actions in order, between single actions', function () {
+            // Act & Assert
+            expect(headerActions(fn () => [
+                TableAction::make('Import books')->to('/import'),
+                TableActionGroup::make([
+                    TableAction::make('Add book')->to('/books/create')->icon(Icon::Add),
+                    TableAction::make('Add audiobook')->to('/audiobooks/create'),
+                ]),
+            ]))->toBe([
+                ['label' => 'Import books', 'method' => 'get', 'url' => '/import', 'icon' => null],
+                ['actions' => [
+                    ['label' => 'Add book', 'method' => 'get', 'url' => '/books/create', 'icon' => 'Add'],
+                    ['label' => 'Add audiobook', 'method' => 'get', 'url' => '/audiobooks/create', 'icon' => null],
+                ]],
+            ]);
+        });
+
+        it('needs a link on every action in it, and says which table it belongs to', function () {
+            // Act & Assert
+            headerActions(fn () => [TableActionGroup::make([
+                TableAction::make('Add book')->to('/a'),
+                TableAction::make('Add audiobook'),
+            ])]);
+        })->throws(InvalidTableAction::class, 'Table [BookHeaderActionsTable] action [Add audiobook] needs a link');
+
+        it('rejects a label used both in and outside a group', function () {
+            // Act & Assert
+            headerActions(fn () => [
+                TableAction::make('Add book')->to('/a'),
+                TableActionGroup::make([
+                    TableAction::make('Add audiobook')->to('/b'),
+                    TableAction::make('Add book')->to('/c'),
+                ]),
+            ]);
+        })->throws(InvalidTableAction::class, 'Table [BookHeaderActionsTable] headerActions() has more than one action labelled [Add book]');
+
+        it('rejects anything but a list of at least two TableAction', function (Closure $make, string $expected) {
+            // Act & Assert
+            expect($make)->toThrow(function (InvalidTableAction $exception) use ($expected) {
+                expect($exception->errorCode())->toBe('larasell-admin.table.action.invalid-group')
+                    ->and($exception->getMessage())->toBe("A TableActionGroup must be {$expected}.");
+            });
+        })->with([
+            'no actions' => [fn () => TableActionGroup::make([]), 'a list of at least two TableAction'],
+            'one action' => [fn () => TableActionGroup::make([TableAction::make('Add book')->to('/a')]), 'a list of at least two TableAction'],
+            'a nested group' => [fn () => TableActionGroup::make([
+                TableAction::make('Add book')->to('/a'),
+                TableActionGroup::make([TableAction::make('B')->to('/b'), TableAction::make('C')->to('/c')]),
+            ]), 'a list of at least two TableAction'],
+            'actions keyed by name' => [fn () => TableActionGroup::make([
+                'add' => TableAction::make('Add book')->to('/a'),
+                'import' => TableAction::make('Import books')->to('/b'),
+            ]), 'a list of at least two TableAction'],
+        ]);
+    });
 });
