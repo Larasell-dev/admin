@@ -4137,17 +4137,6 @@
       ],
       "types": []
     },
-    "53GL7l+nhhSyTgoJkZNEAg==": {
-      "description": "Slideover: accessible name of the button that closes it",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Schließen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "T3NQ2i97Lv2busbnyth0gA==": {
       "description": "New customer page: option for a customer who is one person",
       "tokens": [],
@@ -5485,6 +5474,17 @@
       "translations": [
         {
           "translation": "Kaufmännische Gruppen wie Endkunden oder Großhandel. Preise, Rabatte und Kataloge können von ihnen abhängen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gqVY7qAYpdcF/27X1oDXMg==": {
+      "description": "Customer page: accessible name of the button that closes an add slideover",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
           "variations": {}
         }
       ],

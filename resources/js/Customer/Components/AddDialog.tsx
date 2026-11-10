@@ -1,8 +1,7 @@
 import { Form } from "@inertiajs/react";
-import { Button } from "@larasell-dev/ui";
+import { Button, Slideover } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import type { ReactNode } from "react";
-import { Slideover } from "../../Platform/Panel/Components/Slideover";
 
 type Props = {
   open: boolean;
@@ -36,11 +35,17 @@ export default function AddDialog({
         resetOnSuccess
         options={{ preserveScroll: true }}
         onSuccess={() => onOpenChange(false)}
-        className="flex min-h-0 flex-1 flex-col"
       >
         {({ errors, processing }) => (
           <>
-            <Slideover.Header title={title} description={description} />
+            <Slideover.Header
+              title={title}
+              description={description}
+              closeLabel={fbs(
+                "Close",
+                "Customer page: accessible name of the button that closes an add slideover",
+              )}
+            />
             <Slideover.Content>
               <div className="grid items-start gap-4">{children(errors)}</div>
             </Slideover.Content>
