@@ -1,27 +1,28 @@
 import { createHeadlessEditor } from "@input/pen";
 import type { DocumentOp } from "@input/pen-types";
 import { expect, it } from "vitest";
+import { block as pt, bullet, number } from "../testing";
 import type { RichText } from "../types";
 import { fromPen, loadIntoPen } from "./convert";
 
-const everything: RichText = {
-  version: 1,
-  blocks: [
-    { type: "heading", level: 2, children: [{ text: "Made to last" }] },
-    {
-      type: "paragraph",
-      children: [
-        { text: "Waxed " },
-        { text: "leather", marks: ["bold", "italic", "underline"] },
-        { text: ", see the " },
-        { text: "care guide", marks: ["bold"], link: { href: "https://example.com/care" } },
-      ],
-    },
-    { type: "list", style: "bullet", items: [[{ text: "Waterproof" }], [{ text: "Resoleable" }]] },
-    { type: "list", style: "numbered", items: [[{ text: "Unpack" }]] },
-    { type: "heading", level: 4, children: [{ text: "Sizes" }] },
-  ],
-};
+const everything: RichText = [
+  pt(0, [["Made to last"]], { style: "h2" }),
+  pt(
+    1,
+    [
+      ["Waxed "],
+      ["leather", ["strong", "em", "underline"]],
+      [", see the "],
+      ["care guide", ["strong", "b1l0"]],
+    ],
+    {},
+    [{ _type: "link", _key: "b1l0", href: "https://example.com/care" }],
+  ),
+  pt(2, [["Waterproof"]], bullet),
+  pt(3, [["Resoleable"]], bullet),
+  pt(4, [["Unpack"]], number),
+  pt(5, [["Sizes"]], { style: "h4" }),
+];
 
 it("gives back every block and mark it loaded into Pen", () => {
   // Arrange
@@ -40,26 +41,20 @@ it("replaces what Pen had before", () => {
   loadIntoPen(editor, everything);
 
   // Act
-  loadIntoPen(editor, { version: 1, blocks: [{ type: "paragraph", children: [{ text: "Hi" }] }] });
+  loadIntoPen(editor, [pt(0, [["Hi"]])]);
 
   // Assert
-  expect(fromPen(editor)).toEqual({
-    version: 1,
-    blocks: [{ type: "paragraph", children: [{ text: "Hi" }] }],
-  });
+  expect(fromPen(editor)).toEqual([pt(0, [["Hi"]])]);
 });
 
 it("keeps two lists apart when a paragraph separates them", () => {
   // Arrange
   const editor = createHeadlessEditor();
-  const lists: RichText = {
-    version: 1,
-    blocks: [
-      { type: "list", style: "bullet", items: [[{ text: "One" }]] },
-      { type: "paragraph", children: [{ text: "Between" }] },
-      { type: "list", style: "bullet", items: [[{ text: "Two" }]] },
-    ],
-  };
+  const lists: RichText = [
+    pt(0, [["One"]], bullet),
+    pt(1, [["Between"]]),
+    pt(2, [["Two"]], bullet),
+  ];
 
   // Act
   loadIntoPen(editor, lists);
@@ -107,20 +102,17 @@ it("keeps only what Larasell supports of what Pen can hold", () => {
   const result = fromPen(editor);
 
   // Assert
-  expect(result).toEqual({
-    version: 1,
-    blocks: [
-      // Headings fit Larasell's levels 2 to 4: the product's name is the page's h1.
-      { type: "heading", level: 2, children: [{ text: "Title" }] },
-      { type: "heading", level: 4, children: [{ text: "Fine print" }] },
-      { type: "paragraph", children: [{ text: "struck", marks: ["italic"] }] },
-      // Other text blocks keep their text as paragraphs.
-      { type: "paragraph", children: [{ text: "Quoted" }] },
-      { type: "paragraph", children: [{ text: "let a" }] },
-      // Lists are flat.
-      { type: "list", style: "bullet", items: [[{ text: "Nested" }]] },
-    ],
-  });
+  expect(result).toEqual([
+    // Headings fit Larasell's levels 2 to 4: the product's name is the page's h1.
+    pt(0, [["Title"]], { style: "h2" }),
+    pt(1, [["Fine print"]], { style: "h4" }),
+    pt(2, [["struck", ["em"]]]),
+    // Other text blocks keep their text as paragraphs.
+    pt(3, [["Quoted"]]),
+    pt(4, [["let a"]]),
+    // Lists are flat.
+    pt(5, [["Nested"]], bullet),
+  ]);
 });
 
 it("keeps the text of links it can't save, without the link", () => {
@@ -134,10 +126,7 @@ it("keeps the text of links it can't save, without the link", () => {
   const result = fromPen(editor);
 
   // Assert
-  expect(result).toEqual({
-    version: 1,
-    blocks: [{ type: "paragraph", children: [{ text: "unsafe" }] }],
-  });
+  expect(result).toEqual([pt(0, [["unsafe"]])]);
 });
 
 it("joins neighboring text with the same formatting", () => {
@@ -152,7 +141,5 @@ it("joins neighboring text with the same formatting", () => {
   const result = fromPen(editor);
 
   // Assert
-  expect(result.blocks).toEqual([
-    { type: "paragraph", children: [{ text: "two words", marks: ["bold"] }] },
-  ]);
+  expect(result).toEqual([pt(0, [["two words", ["strong"]]])]);
 });

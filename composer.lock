@@ -1254,12 +1254,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "8ed53aaf7a8a538070c99aca982d886cd8d6b399"
+                "reference": "6a5ecf5a284c01a2914f1d2de5db965e1aa78117"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/8ed53aaf7a8a538070c99aca982d886cd8d6b399",
-                "reference": "8ed53aaf7a8a538070c99aca982d886cd8d6b399",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/6a5ecf5a284c01a2914f1d2de5db965e1aa78117",
+                "reference": "6a5ecf5a284c01a2914f1d2de5db965e1aa78117",
                 "shasum": ""
             },
             "require": {
@@ -1320,8 +1320,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-11-10T15:28:47+00:00",
-            "published-time": "2026-11-10T15:28:53+00:00"
+            "time": "2026-11-10T15:37:26+00:00",
+            "published-time": "2026-11-10T15:37:33+00:00"
         },
         {
             "name": "laravel/framework",

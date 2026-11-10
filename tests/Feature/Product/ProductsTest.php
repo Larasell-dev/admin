@@ -744,19 +744,32 @@ it('only changes the current locale\'s product name', function () {
     expect($boots->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel']);
 });
 
-/** A description with a heading, formatted text and a link, as the form sends it. */
+/** A Portable Text block with spans given as [text, marks]. */
+function descriptionBlock(string $key, array $spans, array $extra = [], array $markDefs = []): array
+{
+    return [
+        '_type' => 'block',
+        '_key' => $key,
+        'style' => 'normal',
+        ...$extra,
+        'markDefs' => $markDefs,
+        'children' => array_map(fn (array $span, int $i): array => [
+            '_type' => 'span', '_key' => "{$key}s{$i}", 'text' => $span[0], 'marks' => $span[1] ?? [],
+        ], $spans, array_keys($spans)),
+    ];
+}
+
+/** A description with a heading, formatted text, a link and a list, as the form sends it. */
 function bootsDescription(): array
 {
-    return ['version' => 1, 'blocks' => [
-        ['type' => 'heading', 'level' => 2, 'children' => [['text' => 'Made to last']]],
-        ['type' => 'paragraph', 'children' => [
-            ['text' => 'Waxed '],
-            ['text' => 'leather', 'marks' => ['bold']],
-            ['text' => ', see the ', 'marks' => []],
-            ['text' => 'care guide', 'link' => ['href' => 'https://example.com/care']],
-        ]],
-        ['type' => 'list', 'style' => 'bullet', 'items' => [[['text' => 'Waterproof']], [['text' => 'Resoleable']]]],
-    ]];
+    return [
+        descriptionBlock('b0', [['Made to last']], ['style' => 'h2']),
+        descriptionBlock('b1', [['Waxed '], ['leather', ['strong']], [', see the '], ['care guide', ['b1l0']]], markDefs: [
+            ['_type' => 'link', '_key' => 'b1l0', 'href' => 'https://example.com/care'],
+        ]),
+        descriptionBlock('b2', [['Waterproof']], ['listItem' => 'bullet', 'level' => 1]),
+        descriptionBlock('b3', [['Resoleable']], ['listItem' => 'bullet', 'level' => 1]),
+    ];
 }
 
 it('saves the description in the content locale', function () {
@@ -784,7 +797,7 @@ it('shows the description in the content locale on the product\'s page', functio
     $boots = Product::create([
         'name' => 'Boots',
         'price' => Price::of(1000),
-        'description' => ['en' => json_encode(bootsDescription()), 'de' => json_encode(['version' => 1, 'blocks' => []])],
+        'description' => ['en' => json_encode(bootsDescription()), 'de' => json_encode([])],
     ]);
 
     // Act & Assert
@@ -800,17 +813,17 @@ it('shows a description saved as plain text as paragraphs', function () {
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('product.description', ['version' => 1, 'blocks' => [
-            ['type' => 'paragraph', 'children' => [['text' => 'Warm.']]],
-            ['type' => 'paragraph', 'children' => [['text' => 'Dry.']]],
-        ]]));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('product.description', [
+            descriptionBlock('b0', [['Warm.']]),
+            descriptionBlock('b1', [['Dry.']]),
+        ]));
 });
 
 it('only changes the current locale\'s description, and removes it when it is emptied', function () {
     // Arrange
     signInAdmin();
 
-    $german = json_encode(['version' => 1, 'blocks' => [['type' => 'paragraph', 'children' => [['text' => 'Stiefel']]]]]);
+    $german = json_encode([descriptionBlock('b0', [['Stiefel']])], JSON_UNESCAPED_SLASHES);
     $boots = Product::create([
         'name' => 'Boots',
         'price' => Price::of(1000),
@@ -821,7 +834,7 @@ it('only changes the current locale\'s description, and removes it when it is em
     $this->put(route('larasell.admin.products.update', $boots), [
         'name' => 'Boots',
         'status' => 'visible',
-        'description' => json_encode(['version' => 1, 'blocks' => [['type' => 'paragraph', 'children' => []]]]),
+        'description' => json_encode([descriptionBlock('b0', [])]),
     ])->assertSessionHasNoErrors();
 
     // Assert
@@ -855,8 +868,8 @@ it('rejects a description it cannot show', function (string $description) {
     expect(Product::query()->count())->toBe(0);
 })->with([
     'not JSON' => ['<p>Boots</p>'],
-    'unknown block' => [json_encode(['version' => 1, 'blocks' => [['type' => 'table', 'children' => []]]])],
-    'javascript link' => [json_encode(['version' => 1, 'blocks' => [['type' => 'paragraph', 'children' => [['text' => 'a', 'link' => ['href' => 'javascript:alert(1)']]]]]])],
+    'unknown block' => [json_encode([['_type' => 'table', '_key' => 'b0']])],
+    'javascript link' => [json_encode([descriptionBlock('b0', [['a', ['l']]], markDefs: [['_type' => 'link', '_key' => 'l', 'href' => 'javascript:alert(1)']])])],
 ]);
 
 it('rejects an invalid product', function (array $input, string $error) {

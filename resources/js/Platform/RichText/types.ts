@@ -1,31 +1,38 @@
 /**
- * Larasell's rich text format, the same as the server's `Platform\RichText\RichText`. It doesn't
- * depend on the editor: only `pen/convert.ts` knows Pen's document.
+ * Formatted text as Portable Text (https://portabletext.org), limited to what the server's
+ * `Larasell\Larasell\RichText\RichText` accepts. It doesn't depend on the editor: only
+ * `pen/convert.ts` knows Pen's document.
  */
-export type RichText = {
-  version: 1;
-  blocks: RichTextBlock[];
+export type RichText = RichTextBlock[];
+
+export type RichTextBlock = {
+  _type: "block";
+  _key: string;
+  style: "normal" | "h2" | "h3" | "h4";
+  listItem?: "bullet" | "number";
+  level?: 1;
+  markDefs: RichTextLink[];
+  children: RichTextSpan[];
 };
 
-export type RichTextBlock =
-  | { type: "paragraph"; children: RichTextSpan[] }
-  | { type: "heading"; level: 2 | 3 | 4; children: RichTextSpan[] }
-  | { type: "list"; style: "bullet" | "numbered"; items: RichTextSpan[][] };
+export type RichTextLink = { _type: "link"; _key: string; href: string };
 
-export type RichTextMark = "bold" | "italic" | "underline";
+export type RichTextDecorator = "strong" | "em" | "underline";
 
 export type RichTextSpan = {
+  _type: "span";
+  _key: string;
   text: string;
-  marks?: RichTextMark[];
-  link?: { href: string };
+  /** Decorators, and the keys of the block's links. */
+  marks: string[];
 };
 
 /** In the order the server nests them. */
-export const MARKS: readonly RichTextMark[] = ["bold", "italic", "underline"];
+export const DECORATORS: readonly RichTextDecorator[] = ["strong", "em", "underline"];
 
 /** Absolute http, https and mailto addresses, the only links the server accepts. */
 export function isAllowedHref(href: unknown): href is string {
   return typeof href === "string" && /^(https?:\/\/\S+|mailto:\S+)$/i.test(href);
 }
 
-export const emptyRichText = (): RichText => ({ version: 1, blocks: [] });
+export const emptyRichText = (): RichText => [];

@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import ProductForm from "./ProductForm";
+import { block, number } from "../../Platform/RichText/testing";
 import type { RichText } from "../../Platform/RichText/types";
 import UnsavedChangesToast, {
   UnsavedChangesToastHost,
@@ -131,13 +132,10 @@ const submittedDescription = () => JSON.parse(formData().get("description") as s
 describe("description", () => {
   it("submits an existing product's description as it was saved", async () => {
     // Arrange
-    const saved: RichText = {
-      version: 1,
-      blocks: [
-        { type: "heading", level: 2, children: [{ text: "Made to last" }] },
-        { type: "paragraph", children: [{ text: "Waxed " }, { text: "leather", marks: ["bold"] }] },
-      ],
-    };
+    const saved: RichText = [
+      block(0, [["Made to last"]], { style: "h2" }),
+      block(1, [["Waxed "], ["leather", ["strong"]]]),
+    ];
 
     // Act
     await renderForm({ ...boots, description: saved });
@@ -156,17 +154,14 @@ describe("description", () => {
     await userEvent.keyboard("Warm and dry");
 
     // Assert
-    await expect.poll(submittedDescription).toEqual({
-      version: 1,
-      blocks: [{ type: "paragraph", children: [{ text: "Warm and dry" }] }],
-    });
+    await expect.poll(submittedDescription).toEqual([block(0, [["Warm and dry"]])]);
   });
 
   it("puts the caret at the end when the empty space below the text is clicked", async () => {
     // Arrange
     await renderForm({
       ...boots,
-      description: { version: 1, blocks: [{ type: "paragraph", children: [{ text: "Warm" }] }] },
+      description: [block(0, [["Warm"]])],
     });
     const content = page.elementLocator(description().element().parentElement!);
     const { height } = content.element().getBoundingClientRect();
@@ -176,10 +171,7 @@ describe("description", () => {
     await userEvent.keyboard(" and dry");
 
     // Assert
-    await expect.poll(submittedDescription).toEqual({
-      version: 1,
-      blocks: [{ type: "paragraph", children: [{ text: "Warm and dry" }] }],
-    });
+    await expect.poll(submittedDescription).toEqual([block(0, [["Warm and dry"]])]);
   });
 
   it("turns a line into a heading when it starts with ##", async () => {
@@ -191,10 +183,7 @@ describe("description", () => {
     await userEvent.keyboard("## Care");
 
     // Assert
-    await expect.poll(submittedDescription).toEqual({
-      version: 1,
-      blocks: [{ type: "heading", level: 2, children: [{ text: "Care" }] }],
-    });
+    await expect.poll(submittedDescription).toEqual([block(0, [["Care"]], { style: "h2" })]);
   });
 
   it("turns a line into the block picked from the / menu, without the /", async () => {
@@ -208,17 +197,14 @@ describe("description", () => {
     await userEvent.keyboard("Unpack");
 
     // Assert
-    await expect.poll(submittedDescription).toEqual({
-      version: 1,
-      blocks: [{ type: "list", style: "numbered", items: [[{ text: "Unpack" }]] }],
-    });
+    await expect.poll(submittedDescription).toEqual([block(0, [["Unpack"]], number)]);
   });
 
   it("makes the selected text bold from the toolbar", async () => {
     // Arrange
     await renderForm({
       ...boots,
-      description: { version: 1, blocks: [{ type: "paragraph", children: [{ text: "Boots" }] }] },
+      description: [block(0, [["Boots"]])],
     });
     await userEvent.click(description());
     await userEvent.keyboard("{Control>}a{/Control}");
@@ -227,10 +213,7 @@ describe("description", () => {
     await userEvent.click(page.getByRole("button", { name: "Bold" }));
 
     // Assert
-    await expect.poll(submittedDescription).toEqual({
-      version: 1,
-      blocks: [{ type: "paragraph", children: [{ text: "Boots", marks: ["bold"] }] }],
-    });
+    await expect.poll(submittedDescription).toEqual([block(0, [["Boots", ["strong"]]])]);
   });
 });
 
