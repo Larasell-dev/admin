@@ -72,6 +72,11 @@ a page as a signed-in admin. Hit `/admin/__dev` to discover any newly added
 shortcuts. When adding a new dev shortcut, put it in the `__dev` group in
 `routes/web.php` so it is listed automatically and inherits the local-only guard.
 
+## Dialogs
+
+Before adding or changing a dialog or a confirmation, read
+`.agents/skills/building-dialogs/SKILL.md`.
+
 ## Live updates
 
 Props can reload in every signed-in admin's browser when the server says they changed, with
