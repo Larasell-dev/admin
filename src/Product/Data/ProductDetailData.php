@@ -2,7 +2,6 @@
 
 namespace Larasell\Admin\Product\Data;
 
-use Larasell\Admin\Platform\RichText\RichText;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
@@ -49,7 +48,7 @@ class ProductDetailData extends Data
             name: $product->name->has($locale->value) ? $product->name->get($locale->value) : null,
             fallbackName: $product->name->get($locale->value),
             description: $product->description?->has($locale->value)
-                ? RichText::fromStored($product->description->get($locale->value))->toArray()
+                ? $product->description->get($locale->value)->toArray()
                 : null,
             visible: $product->status === Visibility::Visible,
             weight: $product->weight === null ? null : WeightData::fromWeight($product->weight),

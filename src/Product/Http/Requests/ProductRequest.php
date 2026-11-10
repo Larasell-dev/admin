@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
-use Larasell\Admin\Platform\RichText\RichText;
 use Larasell\Admin\Platform\RichText\Rules\RichTextDocument;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
@@ -22,6 +21,7 @@ use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\RichText\RichText;
 use Larasell\Larasell\Weight;
 
 class ProductRequest extends FormRequest

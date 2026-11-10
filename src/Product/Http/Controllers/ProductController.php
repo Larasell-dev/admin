@@ -29,6 +29,7 @@ use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\ProductId;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\RichText\TranslatableRichText;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
 
@@ -66,7 +67,7 @@ class ProductController
             $product = $this->createProduct->handle(new CreateProductPayload([
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
-                'description' => $request->description() === null ? null : Translatable::fromString($request->description()->toJson(), $locale->value),
+                'description' => $request->description() === null ? null : TranslatableRichText::of($request->description(), $locale->value),
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
                 'sku' => $request->validated('sku'),
@@ -146,7 +147,7 @@ class ProductController
     /**
      * The product's descriptions with the content locale's changed, and without it when it was emptied.
      */
-    protected function description(ProductRequest $request, Product $product, Locale $locale): ?Translatable
+    protected function description(ProductRequest $request, Product $product, Locale $locale): ?TranslatableRichText
     {
         $text = $request->description();
 
@@ -154,8 +155,8 @@ class ProductController
             return $product->description?->without($locale->value);
         }
 
-        return $product->description?->with($locale->value, $text->toJson())
-            ?? Translatable::fromString($text->toJson(), $locale->value);
+        return $product->description?->with($locale->value, $text)
+            ?? TranslatableRichText::of($text, $locale->value);
     }
 
     /**

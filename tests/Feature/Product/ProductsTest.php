@@ -774,7 +774,7 @@ it('saves the description in the content locale', function () {
     $product = Product::query()->sole();
 
     expect(array_keys($product->description->all()))->toBe(['en'])
-        ->and(json_decode($product->description->get('en'), true))->toBe(bootsDescription());
+        ->and($product->description->get('en')->toArray())->toBe(bootsDescription());
 });
 
 it('shows the description in the content locale on the product\'s page', function () {
@@ -825,7 +825,8 @@ it('only changes the current locale\'s description, and removes it when it is em
     ])->assertSessionHasNoErrors();
 
     // Assert
-    expect($boots->refresh()->description->all())->toBe(['de' => $german]);
+    expect(array_keys($boots->refresh()->description->all()))->toBe(['de'])
+        ->and($boots->description->get('de')->toJson())->toBe($german);
 });
 
 it('keeps the description when the form leaves it out', function () {
@@ -839,7 +840,7 @@ it('keeps the description when the form leaves it out', function () {
         ->assertSessionHasNoErrors();
 
     // Assert
-    expect(json_decode($boots->refresh()->description->get('en'), true))->toBe(bootsDescription());
+    expect($boots->refresh()->description->get('en')->toArray())->toBe(bootsDescription());
 });
 
 it('rejects a description it cannot show', function (string $description) {

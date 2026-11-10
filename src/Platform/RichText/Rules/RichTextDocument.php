@@ -5,8 +5,8 @@ namespace Larasell\Admin\Platform\RichText\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
-use Larasell\Admin\Platform\RichText\Exceptions\InvalidRichText;
-use Larasell\Admin\Platform\RichText\RichText;
+use Larasell\Larasell\Exceptions\InvalidRichText;
+use Larasell\Larasell\RichText\RichText;
 
 /**
  * A rich text document as JSON, as the editor sends it. The editor only writes valid documents,
