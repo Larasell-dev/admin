@@ -305,6 +305,7 @@ it('shares the searches of the enabled modules with signed-in admins', function 
             ['id' => 'products', 'label' => 'Search products', 'icon' => 'ShoppingBag', 'placeholder' => 'Search by name, SKU or barcode', 'url' => route('larasell.admin.search.products')],
             ['id' => 'categories', 'label' => 'Search categories', 'icon' => 'Folders', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.categories')],
             ['id' => 'orders', 'label' => 'Search orders', 'icon' => 'Receipt', 'placeholder' => 'Search by number, customer or email', 'url' => route('larasell.admin.search.orders')],
+            ['id' => 'customers', 'label' => 'Search customers', 'icon' => 'User3', 'placeholder' => 'Search by number, name or email', 'url' => route('larasell.admin.search.customers')],
             ['id' => 'sales-channels', 'label' => 'Search sales channels', 'icon' => 'Store', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.sales-channels')],
         ]));
 
@@ -312,7 +313,7 @@ it('shares the searches of the enabled modules with signed-in admins', function 
     signInSearchAdmin();
 
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'sales-channels']));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'customers', 'sales-channels']));
 });
 
 it('lets a plugin add its own search to the command menu', function () {
@@ -328,7 +329,7 @@ it('lets a plugin add its own search to the command menu', function () {
 
     // Act & Assert
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.4', [
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.5', [
             'id' => 'gift-cards',
             'label' => 'Search gift cards',
             'icon' => 'Gift',

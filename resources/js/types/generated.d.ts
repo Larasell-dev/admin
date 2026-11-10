@@ -73,6 +73,121 @@ declare namespace Larasell.Admin.Category.Data {
 declare namespace Larasell.Admin.Category.Enums {
   export type CategorySection = "general" | "products";
 }
+declare namespace Larasell.Admin.Customer.Data {
+  export type CompanyProfileFormData = {
+    legalName: string;
+    legalForm: string | null;
+    companyNumber: string | null;
+    vatId: string | null;
+    countryCode: string;
+    industry: string | null;
+    website: string | null;
+  };
+  export type CreateCustomerPageData = {
+    storeUrl: string;
+    indexUrl: string;
+    locales: Array<Larasell.Admin.Customer.Data.CustomerOptionData>;
+    currencies: Array<Larasell.Admin.Customer.Data.CustomerOptionData>;
+    countries: Array<Larasell.Admin.Customer.Data.CustomerOptionData>;
+  };
+  export type CustomerAccountData = {
+    id: number;
+    label: string;
+    contact: string | null;
+    destroyUrl: string;
+  };
+  export type CustomerAddressData = {
+    id: number;
+    firstName: string;
+    lastName: string;
+    company: string | null;
+    street: { [key: number]: string };
+    postcode: string;
+    city: string;
+    region: string | null;
+    countryCode: string;
+    phone: string | null;
+    defaultBilling: boolean;
+    defaultShipping: boolean;
+    updateUrl: string;
+    destroyUrl: string;
+    defaultUrl: string;
+  };
+  export type CustomerContactData = {
+    id: number;
+    name: string;
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    phone: string | null;
+    jobTitle: string | null;
+    updateUrl: string;
+    destroyUrl: string;
+  };
+  export type CustomerDetailData = {
+    id: number;
+    number: string;
+    name: string;
+    type: string;
+    status: string;
+    source: string;
+    preferredLocale: string | null;
+    preferredCurrency: string | null;
+    person: Larasell.Admin.Customer.Data.PersonProfileFormData | null;
+    company: Larasell.Admin.Customer.Data.CompanyProfileFormData | null;
+  };
+  export type CustomerGroupData = {
+    id: number;
+    code: string;
+    name: string;
+    description: string | null;
+  };
+  export type CustomerGroupMembershipData = {
+    id: number;
+    name: string;
+    code: string;
+    destroyUrl: string;
+  };
+  export type CustomerGroupOptionData = {
+    value: number;
+    label: string;
+  };
+  export type CustomerGroupPageData = {
+    group: Larasell.Admin.Customer.Data.CustomerGroupData | null;
+    saveUrl: string;
+    destroyUrl: string | null;
+    indexUrl: string;
+  };
+  export type CustomerOptionData = {
+    value: string;
+    label: string;
+  };
+  export type EditCustomerPageData = {
+    customer: Larasell.Admin.Customer.Data.CustomerDetailData;
+    updateUrl: string;
+    indexUrl: string;
+    statusUrl: string;
+    addresses: Array<Larasell.Admin.Customer.Data.CustomerAddressData>;
+    addAddressUrl: string;
+    contacts: Array<Larasell.Admin.Customer.Data.CustomerContactData> | null;
+    addContactUrl: string | null;
+    accounts: Array<Larasell.Admin.Customer.Data.CustomerAccountData>;
+    groups: Array<Larasell.Admin.Customer.Data.CustomerGroupMembershipData>;
+    availableGroups: Array<Larasell.Admin.Customer.Data.CustomerGroupOptionData>;
+    addGroupUrl: string;
+    createGroupUrl: string;
+    locales: Array<Larasell.Admin.Customer.Data.CustomerOptionData>;
+    currencies: Array<Larasell.Admin.Customer.Data.CustomerOptionData>;
+    countries: Array<Larasell.Admin.Customer.Data.CustomerOptionData>;
+  };
+  export type PersonProfileFormData = {
+    salutation: string | null;
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    phone: string | null;
+  };
+}
 declare namespace Larasell.Admin.Order.Data {
   export type AddressData = {
     name: string;

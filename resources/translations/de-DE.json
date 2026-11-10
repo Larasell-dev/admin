@@ -4136,6 +4136,1359 @@
         }
       ],
       "types": []
+    },
+    "53GL7l+nhhSyTgoJkZNEAg==": {
+      "description": "Slideover: accessible name of the button that closes it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "T3NQ2i97Lv2busbnyth0gA==": {
+      "description": "New customer page: option for a customer who is one person",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Privatperson",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7IOfMSCgT2NSFL13rqLrrA==": {
+      "description": "New customer page: option for a customer that is a company",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unternehmen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wAcd8fdmcFAUhamLDO7f2w==": {
+      "description": "New customer page: title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Kunde",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RM+XnthuZ271sureRwDIcA==": {
+      "description": "New customer page: accessible name of the back arrow",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Kunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p2XZwPEckvSXln8x/iEbRg==": {
+      "description": "New customer page: label of the select for whether the customer is a person or a company",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Art",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yT8KFkKoDVQc5+n2LM8OLA==": {
+      "description": "New customer page: hint below the type select",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Das lässt sich später nicht ändern.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3xRNPwP2NdWVjG1lNMvl3Q==": {
+      "description": "Customer page: accessible name of the back arrow to the customers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Kunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UlZ1ceY/EdDKlefdPmVjGg==": {
+      "description": "Customer page: heading of the section with the customer's addresses",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adressen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4LM3XMGmKqRxBqVzbus50Q==": {
+      "description": "Customer page: explains the addresses section and its default billing and shipping badges",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wohin der Kunde Bestellungen und Rechnungen erhält. Die Badges markieren die Standards, die der Checkout vorschlägt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MvUgB6bJ/BxUdkjt/PxGgA==": {
+      "description": "Customer page: badge on the default billing address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rechnung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LkLrCKBS0RnI9kTeDnHjnQ==": {
+      "description": "Customer page: badge on the default shipping address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lieferung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L6ttDSQCjLs2SAm3ZVhPbA==": {
+      "description": "Customer page: button that makes an address the default shipping address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Standardmäßig hierhin liefern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "deF9j6e0/Wz6tMdY8BuObQ==": {
+      "description": "Customer page: button that makes an address the default billing address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Standardmäßig hierhin abrechnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q3eFIiqYYGApu7iSuSckdg==": {
+      "description": "Customer page: accessible name of the button that deletes an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adresse löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "byYWiKhH0wvC9GEMgj52Cw==": {
+      "description": "Customer page: title of the dialog that confirms deleting an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adresse löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AyJwm3pnkoV/9AcnYmr51g==": {
+      "description": "Customer page: asks to confirm deleting an address, e.g. 'Delete the address in Berlin? …'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Adresse in {city} löschen? Frühere Bestellungen behalten die Adresse, mit der sie aufgegeben wurden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "inmoSALfVm6P1rCTNcJl7w==": {
+      "description": "Customer page: button in the dialog that deletes an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1+IC9FKgPIJ9bUG/g1BPGg==": {
+      "description": "Customer page: shown in the addresses section while the customer has none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Adressen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X1PTDGU8/m0PjbZZAX7Oxw==": {
+      "description": "Customer page: explains the empty addresses section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge die Adressen hinzu, an die der Kunde Bestellungen und Rechnungen erhält. Die erste wird für beides zum Standard.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8rivaC4AusAirTMTne4OgA==": {
+      "description": "Customer page: button in the empty addresses section that opens the dialog to add an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adresse hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yGeHhM4/UkK1D+XNP3ZBUQ==": {
+      "description": "Customer page: button that opens the dialog to add an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adresse hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Rzw2YHbE/yebFqx9+GLjyg==": {
+      "description": "Customer page: heading of the section with the company's contacts",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kontakte",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+gISuYaoRnHLve7l9gObjQ==": {
+      "description": "Customer page: explains contacts",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Personen, die für das Unternehmen handeln. Sie brauchen kein Login.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+oTXzfl1oqSSR7ziHCtmyQ==": {
+      "description": "Customer page: accessible name of the button that removes a contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{contactName} entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D0zRCX052YngI3Tkpsg2Iw==": {
+      "description": "Customer page: shown in the contacts section while the company has none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Kontakte",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EdZZPRbt/HiXPzue3FciqA==": {
+      "description": "Customer page: explains the empty contacts section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge die Personen hinzu, mit denen du in diesem Unternehmen zu tun hast, etwa Einkauf oder Buchhaltung.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4txIHefirzVsANctSjR72Q==": {
+      "description": "Customer page: button in the empty contacts section that opens the dialog to add a contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kontakt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "haRn4J1NuqllMPic4vy2nw==": {
+      "description": "Customer page: button that opens the dialog to add a contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kontakt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n3TOycwX2Q5ulxyzEuNx3g==": {
+      "description": "Customer page: heading of the section with the users who act for the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Konten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MiOYOmrvIjM3+avKtjrPgg==": {
+      "description": "Customer page: explains linked accounts",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nutzer des Shops, die für diesen Kunden handeln. Sie werden bei Registrierung oder Anmeldung verknüpft.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QtMrio7NvTIiO6ph/59LsA==": {
+      "description": "Customer page: button that unlinks a user from the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Trennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SSKrYbHhC+c/Gjgsd946Gg==": {
+      "description": "Customer page: shown while no user acts for the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Konten verknüpft",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RQIM7ayF4ywCVYIdqjTqhQ==": {
+      "description": "Customer page: explains the empty accounts section; accounts can't be added here",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Konten erscheinen hier, sobald sich ein Nutzer des Shops für diesen Kunden registriert oder anmeldet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YA/aQ8+S/AxVjrS0EcuRCw==": {
+      "description": "Customer page: heading of the section with the customer's groups",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gruppen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "U32aMYC/9zxs89RD/EVjYQ==": {
+      "description": "Customer page: accessible name of the button that takes the customer out of a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus {groupName} entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zxldtiMX31YHNmsmQhjXkQ==": {
+      "description": "Customer page: title of the dialog that confirms taking the customer out of a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus Gruppe entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ahb62qj56Nn8inn34sHUdQ==": {
+      "description": "Customer page: asks to confirm taking the customer out of a group, e.g. 'The customer leaves Wholesale. …'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Kunde verlässt {groupName}. Regeln für diese Gruppe gelten nicht mehr für ihn.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DueLtd2tr/4wtIqQdaGZ4Q==": {
+      "description": "Customer page: button in the dialog that takes the customer out of the group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TM+9KHTuOZ6nehw/Xt96jQ==": {
+      "description": "Customer page: shown in the groups section while the customer is in no group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch in keiner Gruppe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gyuHlCnk2WQywljLH3LOHg==": {
+      "description": "Customer page: explains the empty groups section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge den Kunden einer Gruppe hinzu, damit ihre Preise, Rabatte und Kataloge für ihn gelten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O2LQTynhK0zD4FJuN4jcjQ==": {
+      "description": "Customer page: button in the empty groups section that opens the dialog to add the customer to a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zu Gruppe hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3wnGfH3Wv82yWmb6NCaPUQ==": {
+      "description": "Customer page: shown in the groups section while the shop has no customer groups",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Kundengruppen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3b6QAxO9i80dh8qShy0zVg==": {
+      "description": "Customer page: explains that customer groups must be created before customers can join one",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lege zuerst eine Gruppe wie Endkunden oder Großhandel an und füge den Kunden dann hinzu.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s0PwpoJbABNAIiKe4SRE6g==": {
+      "description": "Customer page: link in the groups section to the page that creates a customer group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kundengruppe anlegen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jPixSJUp9U8qf29SynESBg==": {
+      "description": "Customer page: button that opens the dialog to add the customer to a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zu Gruppe hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MUExDIIFNkvUlTeEoD0+sA==": {
+      "description": "Customer page: title of the dialog that adds an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adresse hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2XZifMQeDl3AyD11Be/C2A==": {
+      "description": "Customer page: description of the dialog that adds an address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wohin der Kunde Bestellungen oder Rechnungen erhält.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p6rZ9ZVznOjba67LgukiUQ==": {
+      "description": "Customer page: button in the dialog that adds the address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Adresse hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XBNGedQvGEpxMeVufLb2HA==": {
+      "description": "Customer page: address first name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iYA4lyjU2gDzRPVxXsBYFg==": {
+      "description": "Customer page: address last name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nachname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2sMWmVSiyg0Q7LMWq/3AsQ==": {
+      "description": "Customer page: address street",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Straße",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m4uybbEJQzCSFT+SkGTB5A==": {
+      "description": "Customer page: address company",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unternehmen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PbIzxi0zrjPFdJQe5mJAwA==": {
+      "description": "Customer page: address postcode",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PLZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3iyljpYGGCrsmRx3+8Yxxw==": {
+      "description": "Customer page: address city",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CBqetgLfu9vRrjmhWBEppw==": {
+      "description": "Customer page: title of the dialog that adds a contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kontakt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EVaL4LYd7yLA59sFEKgVIQ==": {
+      "description": "Customer page: description of the dialog that adds a contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eine Person, die für das Unternehmen handelt. Sie braucht kein Login.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Jl4UE8mKVWwQpl5YzvAxFg==": {
+      "description": "Customer page: button in the dialog that adds the contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kontakt hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C8kcUWwUT0LZhsixOnRucA==": {
+      "description": "Customer page: contact first name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7pZKz+fQYgp7TSU401sQ5Q==": {
+      "description": "Customer page: contact last name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nachname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "877hEKF1ddNz0UQNNVAEXg==": {
+      "description": "Customer page: contact job title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Position",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "90hnD1bCqpuEty2YtJnBCA==": {
+      "description": "Customer page: title of the dialog that adds the customer to a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zu Gruppe hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6trHc6l/vUns702YAy4Bbg==": {
+      "description": "Customer page: description of the dialog that adds the customer to a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gruppen bestimmen, welche Preise, Rabatte und Kataloge für den Kunden gelten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vEkK4TIkeg0wYUuu3VD57g==": {
+      "description": "Customer page: button in the dialog that adds the customer to the group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zu Gruppe hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FkLE/Fw8WWmgPfDflDUyCA==": {
+      "description": "Customer page: select of the group to add the customer to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gruppe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2o7gO7mSFMzkhxd23Ju1iA==": {
+      "description": "Customer page: shown in the group select until one is picked",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gruppe wählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yNOMr+b6awQlSpoQ89DmZQ==": {
+      "description": "Customer page: placeholder of the search field in the group select",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gruppen suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6awKc6ybl7eSd0v7bUfmdw==": {
+      "description": "Customer page: shown in the group select when the search matches none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Gruppe passt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5Wa/VWpAvngUF33Sfhs7Tg==": {
+      "description": "Customer page: status menu item that blocks the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sperren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D/7kY9Rfd3C2I3sCFiPUVw==": {
+      "description": "Customer page: title of the dialog that confirms blocking the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunden sperren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cXjQRLChO5ub3LQfMZvPyQ==": {
+      "description": "Customer page: explains what blocking the customer does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Kunde behält seine Historie, bekommt aber keine neuen Konten, bis er entsperrt ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JMYzaQnsUriDXJEFh5LK9w==": {
+      "description": "Customer page: status menu item that deactivates the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deaktivieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AijF0JZsI04W787ET2EWtg==": {
+      "description": "Customer page: title of the dialog that confirms deactivating the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kunden deaktivieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LS//kGbFQtPZUocQzzu5Yg==": {
+      "description": "Customer page: explains what deactivating the customer does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Kunde wird archiviert. Seine Historie bleibt erhalten, und du kannst ihn später reaktivieren.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GMqcqaHayVWiQfr3ifPJHQ==": {
+      "description": "Customer page: status menu item that unblocks the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entsperren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+hVWGpJh4ZCCmdqhBKpVpw==": {
+      "description": "Customer page: status menu item that reactivates a deactivated customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Reaktivieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wiMGqmnSDZTehQbP6v9+5A==": {
+      "description": "Customer page: status menu button of a blocked customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gesperrt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CEys/7my8PuXLA7NFa7lrA==": {
+      "description": "Customer page: status menu button of a deactivated customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deaktiviert",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ymc7RRUmSDeB/qGVlIV1pw==": {
+      "description": "Customer page: status menu button of an active customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktiv",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "phvGyrOWQdF4sBePr0wnjw==": {
+      "description": "Customer page: accessible name of the button that opens the menu to change the customer's status, e.g. 'Status: Active'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Status: {status}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZWeRO70/OU30DyyQqQidUA==": {
+      "description": "Customer group page: title while adding a group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Kundengruppe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fuui6KOFs9tLbrw5DwIAWQ==": {
+      "description": "Customer group page: accessible name of the back arrow",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Kundengruppen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rKW19cy1gKvX/H5z//r4Aw==": {
+      "description": "Customer group page: heading of the section with the group's name and code",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IHKtGotILFcdGnHN8W7Ltg==": {
+      "description": "Customer group page: explains the section with the group's name and code",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Regeln für Preise oder Kataloge verweisen über ihren Code auf die Gruppe.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NL/+qxctDTbzXJ1YNnA78A==": {
+      "description": "Customer group page: label of the group's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EO8eHXARprJtuWTjlp5hHw==": {
+      "description": "Customer group page: label of the group's code, e.g. wholesale",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5WuayXXZjGzuXhlp+8Z4NQ==": {
+      "description": "Customer group page: label of the group's optional description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pqe67Mmnd6NRZbi3uZ/apw==": {
+      "description": "Customer group page: heading of the section that deletes the group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kundengruppe löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XkGN+X4mV0jCB2QAl1Xmpg==": {
+      "description": "Customer group page: explains when the group can be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nur Gruppen ohne Kunden können gelöscht werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pZcDwRU3Ug/JI9p3nQLA8g==": {
+      "description": "Customer group page: button that asks to delete the group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e5Si1CgbKKgJyMQGY90w6Q==": {
+      "description": "Customer group page: title of the dialog that confirms deleting the group",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kundengruppe löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "khqBBQeqen2PZakMTR+EMA==": {
+      "description": "Customer group page: explains what deleting the group does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Regeln, die auf den Code der Gruppe verweisen, gelten nicht mehr. Das lässt sich nicht rückgängig machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q7hPt4v7ZsPyqJmoCHjVSw==": {
+      "description": "Customer page: button that closes an add slideover without adding anything",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pfW+VZMRUFz0cT88p+vmDg==": {
+      "description": "Customer form: label of the select for a country",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Land",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mdyajsN3bNaNVUb/lUsC3Q==": {
+      "description": "Customer form: shown in the country select until one is picked",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Land wählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zDYV29mZ7HEq2Wi92nfrsA==": {
+      "description": "Customer form: placeholder of the search field in the country select",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Länder suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+D3Nr1EtNFJAYOcgov71yw==": {
+      "description": "Customer form: shown in the country select when the search matches none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kein Land passt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pgtTqozEDSoJr/Dt11v2OQ==": {
+      "description": "Customer form: heading of the section with the customer's name and details",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Profil",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TurI5UAXegawHJW7kmggWg==": {
+      "description": "Customer form: explains the profile section of a company customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die rechtlichen Angaben des Unternehmens. Nur Name und Land sind Pflicht.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0Fz86e9F9tTTFf/W7As30g==": {
+      "description": "Customer form: explains the profile section of an individual customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wer der Kunde ist. Nur der Name ist Pflicht.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jM7cQ73Pu95v50xhiMUGKw==": {
+      "description": "Customer form: label of the company's legal name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Firmenname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FFUiuz77l33nI0BvBLs/MA==": {
+      "description": "Customer form: label of the company's legal form, e.g. GmbH",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rechtsform",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "z2iHc0JIaLeoY446Sa5aow==": {
+      "description": "Customer form: label of the company's VAT identification number",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "USt-IdNr.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PWOtSjnY2grx7H342uWzfQ==": {
+      "description": "Customer form: label of the company's registration number",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Handelsregisternummer",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l7IDjMndPykNQit5s5+Llg==": {
+      "description": "Customer form: label of the company's industry",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Branche",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b4lAis72Yvshc1z4D2tvGA==": {
+      "description": "Customer form: label of the company's website",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Website",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NvYgif1PgYHYd9Q4whKmVA==": {
+      "description": "Customer form: label of the person's first name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Rc3VXcrFcaqgmPyS/cu0AQ==": {
+      "description": "Customer form: label of the person's last name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nachname",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nr2y6OIQc3+lXXSsa20nHA==": {
+      "description": "Customer form: label of the person's email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i2eszTUI2TsRwnCbSkoyEQ==": {
+      "description": "Customer form: label of the person's phone number",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Telefon",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d8cTNaWs+OaeXO7Sc84pWA==": {
+      "description": "Customer form: label of the language the customer prefers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bevorzugte Sprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wzJ1/RXDn8bWVn1OaljRxQ==": {
+      "description": "Customer form: label of the currency the customer prefers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bevorzugte Währung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xSSVUIaCZ3D0A+L1UVx23w==": {
+      "description": "Customer form: first option of the preferred language and currency selects",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Vorgabe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6Ev0+A/ppy4+5sb9+qdpKw==": {
+      "description": "Customer form: shown in the preferred language and currency selects while the customer has no preference",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Vorgabe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hFj6NHdM59sRQKa+ImZmGg==": {
+      "description": "Customer form: placeholder of the search field in the language and currency selects",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DbtgmfiR8LYMxTb4vtSNLQ==": {
+      "description": "Customer form: shown in the language and currency selects when the search matches no option",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nichts passt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Wz4JCyuuXP/Q7A9eMh/F3Q==": {
+      "description": "Customer page: title of the dialog that confirms removing a contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kontakt entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c2aRNxxm6cgmzMhEqXPZkA==": {
+      "description": "Customer page: asks to confirm removing a contact, e.g. 'Max Mustermann no longer acts for the company. …'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{contactName} handelt nicht mehr für das Unternehmen. Mit der Person verknüpfte Konten bleiben mit dem Kunden verknüpft.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tageEM49enE5/o96kR5cWQ==": {
+      "description": "Customer page: button in the dialog that removes the contact",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C7GL0Q/SlX8LLOEK6AlzIQ==": {
+      "description": "Customer page: title of the dialog that confirms unlinking a user from the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Konto trennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dLx/UPLt3ymkatHXQK2srA==": {
+      "description": "Customer page: asks to confirm unlinking a user, e.g. 'max@muster.de can no longer act for this customer. …'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{account} kann nicht mehr für diesen Kunden handeln. Das Nutzerkonto bleibt bestehen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "htPwXSer5g1NdXSMHiLibg==": {
+      "description": "Customer page: button in the dialog that unlinks the user from the customer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Trennen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dqXByG5v/GsU0knQ8MuSKA==": {
+      "description": "Customer page: explains the groups section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kaufmännische Gruppen wie Endkunden oder Großhandel. Preise, Rabatte und Kataloge können von ihnen abhängen.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

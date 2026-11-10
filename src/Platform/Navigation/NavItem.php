@@ -13,6 +13,7 @@ enum NavItem: string
     case Products = 'larasell.admin.products.index';
     case Categories = 'larasell.admin.categories.index';
     case Orders = 'larasell.admin.orders.index';
+    case Customers = 'larasell.admin.customers.index';
     case Settings = 'larasell.admin.settings';
 
     public function label(): string
@@ -22,6 +23,7 @@ enum NavItem: string
             self::Products => Translate::later('Products'),
             self::Categories => Translate::later('Categories'),
             self::Orders => Translate::later('Orders'),
+            self::Customers => Translate::later('Customers'),
             self::Settings => Translate::later('Settings'),
         };
     }
@@ -36,7 +38,8 @@ enum NavItem: string
             self::Products => 2000,
             self::Categories => 3000,
             self::Orders => 4000,
-            self::Settings => 5000,
+            self::Customers => 5000,
+            self::Settings => 6000,
         };
     }
 }
