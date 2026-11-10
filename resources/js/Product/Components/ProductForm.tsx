@@ -16,6 +16,7 @@ import CategoryCheckboxTree from "../../Category/Components/CategoryCheckboxTree
 import ExtensionSections from "../../Platform/Sections/Components/ExtensionSections";
 import FormCheckbox from "../../Platform/Panel/Components/FormCheckbox";
 import VisibilityField from "../../Platform/Panel/Components/VisibilityField";
+import RichTextEditor from "../../Platform/RichText/RichTextEditor";
 import { fbs } from "fbtee";
 
 type Product = Omit<Larasell.Admin.Product.Data.ProductDetailData, "id">;
@@ -160,6 +161,28 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
           autoComplete="off"
         />
       </Field>
+
+      <div className="flex flex-col gap-1.5">
+        <span className="type-label-md text-base-primary" aria-hidden>
+          <fbt desc="Product form: label of the formatted text field for the product's description">
+            Description
+          </fbt>
+        </span>
+        <RichTextEditor
+          name="description"
+          label={fbs(
+            "Description",
+            "Product form: accessible name of the formatted text field for the product's description",
+          )}
+          defaultValue={product?.description ?? null}
+          placeholder={fbs(
+            "Enter a description…",
+            "Product form: placeholder in the empty description field",
+          )}
+          invalid={!!errors.description}
+        />
+        {errors.description && <Error match>{errors.description}</Error>}
+      </div>
 
       <VisibilityField defaultVisible={product?.visible ?? true} error={errors.status} />
     </Stack>

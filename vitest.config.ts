@@ -9,6 +9,18 @@ export default defineConfig({
     projects: [
       {
         plugins: [fbtee(), react(), tailwindcss()],
+        // Bundled up front, since Vite reloads the page when it finds them mid-run and the
+        // running tests fail.
+        optimizeDeps: {
+          include: [
+            "@input/pen",
+            "@input/pen-core",
+            "@input/pen-react",
+            "@input/pen-shortcuts",
+            "@input/pen-autoformat",
+            "@base-ui/react/toolbar",
+          ],
+        },
         test: {
           name: "frontend",
           include: ["resources/js/**/*.test.{ts,tsx}"],

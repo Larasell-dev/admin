@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5302d988dfbf1a209e0e73b818856abf",
+    "content-hash": "78578d8f5d1830de0ff24eef214b9225",
     "packages": [
         {
             "name": "brick/math",
@@ -1250,16 +1250,16 @@
         },
         {
             "name": "larasell-dev/larasell",
-            "version": "v1.27.1",
+            "version": "v1.27.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "b82e01581ef05a85245574f2b66a46bab25f4af5"
+                "reference": "9b0cd850cbc155936a4c679bea07e73fefbc80c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/b82e01581ef05a85245574f2b66a46bab25f4af5",
-                "reference": "b82e01581ef05a85245574f2b66a46bab25f4af5",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/9b0cd850cbc155936a4c679bea07e73fefbc80c1",
+                "reference": "9b0cd850cbc155936a4c679bea07e73fefbc80c1",
                 "shasum": ""
             },
             "require": {
@@ -1320,8 +1320,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-11-10T09:12:12+00:00",
-            "published-time": "2026-11-10T09:12:34+00:00"
+            "time": "2026-11-10T20:18:22+00:00",
+            "published-time": "2026-11-10T20:18:41+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1706,16 +1706,16 @@
         },
         {
             "name": "laravel/prompts",
-            "version": "v0.3.26",
+            "version": "v0.3.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/prompts.git",
-                "reference": "2d1e9bf6bab8d3f383c254db7f2b4ea8816d55e0"
+                "reference": "abdfc75a1ae6c6f21522daed50da7124cbff09d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/prompts/zipball/2d1e9bf6bab8d3f383c254db7f2b4ea8816d55e0",
-                "reference": "2d1e9bf6bab8d3f383c254db7f2b4ea8816d55e0",
+                "url": "https://api.github.com/repos/laravel/prompts/zipball/abdfc75a1ae6c6f21522daed50da7124cbff09d2",
+                "reference": "abdfc75a1ae6c6f21522daed50da7124cbff09d2",
                 "shasum": ""
             },
             "require": {
@@ -1758,10 +1758,10 @@
             ],
             "description": "Add beautiful and user-friendly forms to your command-line applications.",
             "support": {
-                "source": "https://github.com/laravel/prompts/tree/v0.3.26"
+                "source": "https://github.com/laravel/prompts/tree/v0.3.27"
             },
-            "time": "2026-10-09T14:45:13+00:00",
-            "published-time": "2026-10-13T15:18:36+00:00"
+            "time": "2026-11-09T16:07:10+00:00",
+            "published-time": "2026-11-09T16:09:07+00:00"
         },
         {
             "name": "laravel/serializable-closure",

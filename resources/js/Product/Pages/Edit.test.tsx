@@ -23,6 +23,7 @@ function props(
       id: 1,
       name,
       fallbackName,
+      description: null,
       visible: true,
       weight: null,
       dimensions: null,

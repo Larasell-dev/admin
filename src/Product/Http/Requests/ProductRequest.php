@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
+use Larasell\Admin\Platform\RichText\Rules\RichTextDocument;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\SectionRequests;
@@ -20,6 +21,7 @@ use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\RichText\RichText;
 use Larasell\Larasell\Weight;
 
 class ProductRequest extends FormRequest
@@ -37,6 +39,8 @@ class ProductRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::enum(Visibility::class)],
+            // The editor's document as JSON. Left out, the product keeps its description.
+            'description' => ['sometimes', 'nullable', 'string', new RichTextDocument],
             // Optional, since digital products have neither. The units always come with the
             // form, so only the amounts decide whether there is a weight or dimensions.
             'weight' => ['nullable', 'array'],
@@ -163,6 +167,25 @@ class ProductRequest extends FormRequest
             'max_quantity' => $integer('max_quantity'),
             ...$this->has('allow_backorders') ? ['allow_backorders' => $this->boolean('allow_backorders')] : [],
         ];
+    }
+
+    /**
+     * Whether the form sent a description, which an existing product otherwise keeps.
+     */
+    public function hasDescription(): bool
+    {
+        return array_key_exists('description', $this->validated());
+    }
+
+    /**
+     * The description as sent, or null when it was left empty, since an empty document has nothing to show.
+     */
+    public function description(): ?RichText
+    {
+        $description = $this->validated('description');
+        $text = is_string($description) ? RichText::fromJson($description) : null;
+
+        return $text === null || $text->isEmpty() ? null : $text;
     }
 
     /**

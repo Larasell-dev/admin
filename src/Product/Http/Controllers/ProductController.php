@@ -29,6 +29,7 @@ use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\ProductId;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Price;
+use Larasell\Larasell\RichText\TranslatableRichText;
 use Larasell\Larasell\Translatable;
 use Laravel\Head\Facades\Head;
 
@@ -66,6 +67,7 @@ class ProductController
             $product = $this->createProduct->handle(new CreateProductPayload([
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
+                'description' => $request->description() === null ? null : TranslatableRichText::of($request->description(), $locale->value),
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
                 'sku' => $request->validated('sku'),
@@ -115,6 +117,7 @@ class ProductController
             $product = $this->updateProduct->handle(ProductId::of($product), new UpdateProductPayload([
                 'name' => $product->name->with($locale->value, $request->validated('name')),
                 'status' => $request->validated('status'),
+                ...$request->hasDescription() ? ['description' => $this->description($request, $product, $locale)] : [],
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
                 'sku' => $request->validated('sku'),
@@ -139,6 +142,21 @@ class ProductController
         Assert::that(DB::transactionLevel() > 0, ProductNotSavedAtomically::outsideTransaction(...));
 
         event(new ProductSaved($product, $created, new SectionContext($locale), $request->sections()));
+    }
+
+    /**
+     * The product's descriptions with the content locale's changed, and without it when it was emptied.
+     */
+    protected function description(ProductRequest $request, Product $product, Locale $locale): ?TranslatableRichText
+    {
+        $text = $request->description();
+
+        if ($text === null) {
+            return $product->description?->without($locale->value);
+        }
+
+        return $product->description?->with($locale->value, $text)
+            ?? TranslatableRichText::of($text, $locale->value);
     }
 
     /**
