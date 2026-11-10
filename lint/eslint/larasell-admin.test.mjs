@@ -176,3 +176,28 @@ new RuleTester().run("module-boundaries", plugin.rules["module-boundaries"], {
     },
   ],
 });
+
+const classes = (count) => Array.from({ length: count }, (_, i) => `c${i}`).join(" ");
+const tsx = (code) => ({ code, filename: `${frontend}Product/Pages/Edit.tsx` });
+const tooMany = (messageId, count) => ({ messageId, data: { count: String(count), max: "10" } });
+
+new RuleTester().run("group-class-names", plugin.rules["group-class-names"], {
+  valid: [
+    tsx(`<div className="${classes(10)}" />`),
+    tsx(`<div className={cn("${classes(10)}", "${classes(10)}")} />`),
+    tsx(`<div className={\`  ${classes(10)}  \`} />`),
+    // Only className: other attributes may hold long strings.
+    tsx(`<div title="${classes(11)}" />`),
+    // What isn't known until it runs isn't counted.
+    tsx(`<div className={\`${classes(10)} \${extra}\`} />`),
+  ],
+  invalid: [
+    { ...tsx(`<div className="${classes(11)}" />`), errors: [tooMany("className", 11)] },
+    { ...tsx(`<div className={"${classes(11)}"} />`), errors: [tooMany("className", 11)] },
+    { ...tsx(`<div className={\`${classes(12)}\`} />`), errors: [tooMany("className", 12)] },
+    {
+      ...tsx(`const c = cn("${classes(2)}", open && "${classes(3)}", "${classes(11)}");`),
+      errors: [tooMany("group", 11)],
+    },
+  ],
+});

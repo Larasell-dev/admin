@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { Avatar } from "@base-ui/react/avatar";
 import { Field as BaseField } from "@base-ui/react/field";
 import { Radio } from "@base-ui/react/radio";
@@ -259,7 +260,12 @@ function PreferenceSection() {
           >
             <ThemePreview theme={value} />
             <span className="flex items-center gap-2 type-label-md text-base-primary">
-              <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-base-strong bg-base-surface group-data-checked:border-action-neutral-primary-default group-data-checked:bg-action-neutral-primary-default">
+              <span
+                className={cn(
+                  "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-base-strong bg-base-surface",
+                  "group-data-checked:border-action-neutral-primary-default group-data-checked:bg-action-neutral-primary-default",
+                )}
+              >
                 <Radio.Indicator className="size-1.5 rounded-full bg-base-surface" />
               </span>
               {themeLabel(value)}

@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { Field as BaseField } from "@base-ui/react/field";
 import { useFormContext } from "@inertiajs/react";
 import {
@@ -448,7 +449,10 @@ function UnitSelect({
         {...props}
         ref={ref}
         aria-label={label}
-        className="type-input-md cursor-pointer appearance-none bg-transparent pr-9 pl-3.5 text-base-primary select-none hover:bg-action-neutral-ghost-hover focus-visible:focus-ring focus-visible:outline-offset-0"
+        className={cn(
+          "type-input-md cursor-pointer appearance-none bg-transparent pr-9 pl-3.5 text-base-primary select-none",
+          "hover:bg-action-neutral-ghost-hover focus-visible:focus-ring focus-visible:outline-offset-0",
+        )}
       >
         {units.map((unit) => (
           <option key={unit} value={unit}>

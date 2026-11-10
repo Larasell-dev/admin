@@ -17,6 +17,8 @@ export default defineConfig({
     "@nkzw/fbtee/no-unhelpful-desc": "error",
     // Like tests/Arch/ModulesTest.php for the PHP code.
     "larasell-admin/module-boundaries": "error",
+    // Long class lists are grouped with cn(), one group per line.
+    "larasell-admin/group-class-names": "error",
   },
   overrides: [
     {

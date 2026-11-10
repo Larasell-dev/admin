@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { Form } from "@inertiajs/react";
 import { Button, Field, Icon, Input, Section, SectionStack, Stack } from "@larasell-dev/ui";
 import { DeleteBinLine } from "@larasell-dev/ui/icons";
@@ -73,7 +74,10 @@ export default function EditGroup({ group, saveUrl, destroyUrl, indexUrl }: Prop
                       name="description"
                       rows={4}
                       defaultValue={group?.description ?? ""}
-                      className="type-input-md border-base-strong bg-base-surface text-base-primary placeholder:text-base-tertiary focus:focus-ring min-h-28 w-full resize-y border px-3.5 py-2.5 outline-none"
+                      className={cn(
+                        "type-input-md border-base-strong bg-base-surface text-base-primary placeholder:text-base-tertiary",
+                        "focus:focus-ring min-h-28 w-full resize-y border px-3.5 py-2.5 outline-none",
+                      )}
                     />
                   </Field>
                 </Stack>

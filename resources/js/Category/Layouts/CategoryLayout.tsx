@@ -103,7 +103,12 @@ function TreeDialog(
         {/* Both start below the mobile nav, which stays visible above the dialog. */}
         {/* Gives way to the backdrop of a confirmation opened on top, such as deleting a
             category, which covers the page as well, so the page isn't dimmed twice. */}
-        <Dialog.Backdrop className="fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-base-overlay backdrop-blur-overlay transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden [body:has([role=alertdialog])_&]:opacity-0" />
+        <Dialog.Backdrop
+          className={cn(
+            "fixed inset-x-0 top-(--mobile-nav-height) bottom-0 z-40 bg-base-overlay backdrop-blur-overlay lg:hidden",
+            "transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 [body:has([role=alertdialog])_&]:opacity-0",
+          )}
+        />
         <Dialog.Popup
           aria-label={fbs(
             "Categories",
@@ -111,7 +116,8 @@ function TreeDialog(
           )}
           className={cn(
             // Panel
-            "fixed top-(--mobile-nav-height) bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 border-r border-base-subtle bg-base-canvas outline-none lg:hidden",
+            "fixed top-(--mobile-nav-height) bottom-0 left-0 z-50 flex w-[calc(100%-3.5rem)] max-w-80 lg:hidden",
+            "border-r border-base-subtle bg-base-canvas outline-none",
             // Slides in from the left
             "transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
           )}

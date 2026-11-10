@@ -218,7 +218,8 @@ function CategoryRow({
           if (event.key === " ") onToggle();
         }}
         className={cn(
-          "type-body-md flex cursor-pointer items-center gap-2 py-2 pl-[calc(0.5rem+var(--tree-level)*1.5rem)] text-base-primary outline-none select-none group-hover/row:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2",
+          "type-body-md flex cursor-pointer items-center gap-2 py-2 pl-[calc(0.5rem+var(--tree-level)*1.5rem)] text-base-primary",
+          "outline-none select-none group-hover/row:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2",
           expanded === undefined ? "pr-10" : "pr-28",
         )}
       >
