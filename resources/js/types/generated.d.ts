@@ -372,6 +372,7 @@ declare namespace Larasell.Admin.Product.Data {
     categories: Array<Larasell.Admin.Category.Data.CategoryOptionData>;
     createCategoryUrl: string | null;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
+    type: Larasell.Admin.Product.Data.ProductTypeData;
   };
   export type DimensionsData = {
     length: string;
@@ -386,6 +387,7 @@ declare namespace Larasell.Admin.Product.Data {
     categories: Array<Larasell.Admin.Category.Data.CategoryOptionData>;
     createCategoryUrl: string | null;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
+    type: Larasell.Admin.Product.Data.ProductTypeData;
   };
   export type ProductDetailData = {
     id: number;
@@ -402,6 +404,11 @@ declare namespace Larasell.Admin.Product.Data {
     minQuantity: number | null;
     maxQuantity: number | null;
     categoryIds: Array<number>;
+  };
+  export type ProductTypeData = {
+    key: string;
+    label: string;
+    capabilities: Array<string>;
   };
   export type WeightData = {
     amount: string;

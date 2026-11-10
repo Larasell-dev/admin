@@ -66,7 +66,7 @@ class Sections
      */
     public function data(SectionForm $form, ?Model $resource, SectionContext $context): array
     {
-        $sections = array_filter($this->sections[$form->value] ?? [], fn (SectionDefinition $section): bool => ! $section->isBroken());
+        $sections = array_filter($this->sections[$form->value] ?? [], fn (SectionDefinition $section): bool => ! $section->isBroken() && $section->appliesTo($context));
 
         uasort($sections, fn (SectionDefinition $a, SectionDefinition $b): int => [$a->placement()['position'], $a->key] <=> [$b->placement()['position'], $b->key]);
 
@@ -103,7 +103,7 @@ class Sections
         $requests = [];
 
         foreach ($this->sections[$form->value] ?? [] as $key => $section) {
-            if (! $section->isBroken() && $class = $section->requestClass()) {
+            if (! $section->isBroken() && $section->appliesTo($context) && $class = $section->requestClass()) {
                 $requests[$key] = app()->make($class);
                 $requests[$key]->setUp($key, $request, $resource, $context);
             }

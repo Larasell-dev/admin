@@ -7,6 +7,8 @@ use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Larasell\Larasell\Catalog\ProductType;
+use Larasell\Larasell\Catalog\ProductTypes;
 use Larasell\Larasell\Enums\Locale;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\TypeScriptTransformer\Transformers\EnumTransformer;
@@ -45,6 +47,11 @@ class WorkbenchServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->commands([FakeAuditLogCommand::class]);
+
+        // BEST-BEFORE 2026-12-15: remove this temporary type once custom product types are tried out.
+        $this->callAfterResolving(ProductTypes::class, fn ($types) => $types->register(
+            ProductType::make('digital')->label('Digital product'),
+        ));
 
         // Amp orb portals terminate TLS and forward over HTTP; trusting the proxy
         // makes generated asset URLs use https instead of being blocked as mixed content.

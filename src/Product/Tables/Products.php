@@ -7,6 +7,7 @@ use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
+use Larasell\Admin\Platform\Tables\Actions\TableActionGroup;
 use Larasell\Admin\Platform\Tables\Attributes\UseModel;
 use Larasell\Admin\Platform\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
@@ -14,6 +15,8 @@ use Larasell\Admin\Platform\Tables\Enums\Variant;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Product\Actions\DeleteProduct;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\ProductType;
+use Larasell\Larasell\Catalog\ProductTypes;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Translatable;
 
@@ -53,9 +56,22 @@ class Products extends Table
 
     public function headerActions(): array
     {
-        return [
-            TableAction::make(Translate::later('Add product'))->route('larasell.admin.products.create')->icon(Icon::Add),
-        ];
+        $others = app(ProductTypes::class)->all();
+        // The core always registers physical, so there is a first type.
+        $first = array_shift($others) ?? app(ProductTypes::class)->get('physical');
+        $add = TableAction::make(Translate::later('Add product'))->route('larasell.admin.products.create', $others === [] ? [] : ['type' => $first->key()])->icon(Icon::Add);
+
+        // The first registered type (physical) is the button; other types are in its menu.
+        if ($others === []) {
+            return [$add];
+        }
+
+        return [TableActionGroup::make([$add, ...array_map(
+            fn (ProductType $type): TableAction => TableAction::make(__('Add :type', ['type' => lcfirst(__($type->label()))]))
+                ->route('larasell.admin.products.create', ['type' => $type->key()])
+                ->icon(Icon::Add),
+            $others,
+        )])];
     }
 
     public function actions(): array
