@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { router, useFormContext } from "@inertiajs/react";
 import { Button, useToastPosition } from "@larasell-dev/ui";
 import { AnimatePresence, MotionConfig, motion, useAnimate, useIsPresent } from "motion/react";
@@ -271,7 +272,11 @@ function ToastContent({ toast }: { toast: ToastState }) {
     <div
       ref={scope}
       inert={!present}
-      className="flex w-max max-w-[calc(100vw-2rem)] min-w-(--toast-min-width) flex-wrap items-center justify-between gap-x-6 border border-base-subtle bg-base-elevated bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-elevated max-sm:w-[calc(100vw-2rem)] max-sm:min-w-0"
+      className={cn(
+        "flex w-max max-w-[calc(100vw-2rem)] min-w-(--toast-min-width) flex-wrap items-center justify-between gap-x-6",
+        "border border-base-subtle bg-base-elevated bg-clip-padding py-1.5 pr-1.5 pl-5 shadow-elevated",
+        "max-sm:w-[calc(100vw-2rem)] max-sm:min-w-0",
+      )}
     >
       <p className="type-body-md py-2 text-base-primary">
         <fbt desc="Unsaved changes toast: message in the bar at the bottom of a form that has changes not saved yet">

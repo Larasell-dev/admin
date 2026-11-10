@@ -149,7 +149,10 @@ export default function CommandMenu() {
             "Command menu",
             "Accessible name of the command menu dialog, opened with Cmd+K",
           )}
-          className="fixed top-[15vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 border border-base-subtle bg-base-elevated bg-clip-padding shadow-elevated outline-none"
+          className={cn(
+            "fixed top-[15vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2",
+            "border border-base-subtle bg-base-elevated bg-clip-padding shadow-elevated outline-none",
+          )}
         >
           {/* Suspends the page's hotkeys while open, like other overlays. */}
           <HotkeysProvider scope="command-menu" exclusive={overlayExclusive} enabled={open}>

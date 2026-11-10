@@ -145,7 +145,73 @@ const moduleBoundaries = {
   },
 };
 
+/** The most classes one string may hold before it's split into groups. */
+const MAX_CLASSES = 10;
+
+/** The text of a string literal or a template literal without expressions, else null. */
+function staticText(node) {
+  if (node?.type === "Literal" && typeof node.value === "string") {
+    return node.value;
+  }
+  if (node?.type === "TemplateLiteral" && node.expressions.length === 0) {
+    return node.quasis[0].value.cooked;
+  }
+
+  return null;
+}
+
+const classCount = (text) => text.split(/\s+/).filter(Boolean).length;
+
+/**
+ * Long class lists are hard to read and review on one line. Past MAX_CLASSES, a className is
+ * written as cn() with one group of related classes per line, such as layout, color and states,
+ * and each group stays within MAX_CLASSES too.
+ */
+const groupClassNames = {
+  meta: {
+    type: "suggestion",
+    messages: {
+      className:
+        "This className has {{count}} classes. Write it as cn() with one group of related classes per line, such as layout, color and states, each at most {{max}}.",
+      group:
+        "This cn() group has {{count}} classes. Split it into groups of related classes, one per line, each at most {{max}}.",
+    },
+  },
+  create(context) {
+    function check(node, messageId) {
+      const text = staticText(node);
+      const count = text === null ? 0 : classCount(text);
+      if (count > MAX_CLASSES) {
+        context.report({ node, messageId, data: { count, max: MAX_CLASSES } });
+      }
+    }
+
+    return {
+      JSXAttribute(node) {
+        if (node.name.type !== "JSXIdentifier" || node.name.name !== "className") {
+          return;
+        }
+        check(
+          node.value?.type === "JSXExpressionContainer" ? node.value.expression : node.value,
+          "className",
+        );
+      },
+      CallExpression(node) {
+        if (node.callee.type === "Identifier" && node.callee.name === "cn") {
+          for (const argument of node.arguments) {
+            check(argument, "group");
+          }
+        }
+      },
+    };
+  },
+};
+
 export default {
   meta: { name: "larasell-admin" },
-  rules: { "arrange-act-assert": arrangeActAssert, "module-boundaries": moduleBoundaries },
+  rules: {
+    "arrange-act-assert": arrangeActAssert,
+    "group-class-names": groupClassNames,
+    "module-boundaries": moduleBoundaries,
+  },
 };

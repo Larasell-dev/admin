@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { Avatar } from "@base-ui/react/avatar";
 import { Menu } from "@base-ui/react/menu";
 import { Link, router, usePage } from "@inertiajs/react";
@@ -17,7 +18,12 @@ export default function UserMenu() {
 
   return (
     <Menu.Root>
-      <Menu.Trigger className="flex w-full border-t border-base-subtle cursor-pointer h-[59px] items-center gap-3 px-6 text-left outline-none hover:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-state-hover">
+      <Menu.Trigger
+        className={cn(
+          "flex w-full border-t border-base-subtle cursor-pointer h-[59px] items-center gap-3 px-6 text-left",
+          "outline-none hover:bg-state-hover focus-visible:focus-ring focus-visible:-outline-offset-2 data-popup-open:bg-state-hover",
+        )}
+      >
         <Avatar.Root className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-base-muted type-body-md text-base-secondary">
           {admin.avatarUrl && (
             <Avatar.Image src={admin.avatarUrl} alt="" className="size-full object-cover" />
@@ -41,7 +47,12 @@ export default function UserMenu() {
           alignOffset={12}
           className="z-50 w-58"
         >
-          <Menu.Popup className="origin-(--transform-origin) border border-base-subtle bg-base-elevated bg-clip-padding shadow-popover outline-none transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0">
+          <Menu.Popup
+            className={cn(
+              "origin-(--transform-origin) border border-base-subtle bg-base-elevated bg-clip-padding shadow-popover outline-none",
+              "transition-[opacity,translate] duration-150 data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:translate-y-1 data-starting-style:opacity-0",
+            )}
+          >
             <HotkeysProvider scope="user-menu" exclusive={overlayExclusive}>
               <UserMenuItem icon={UserLine} render={<Link href={profileUrl} />}>
                 <fbt desc="User menu: goes to the page where the admin edits their own name, avatar and password">
@@ -70,7 +81,10 @@ function UserMenuItem({
   return (
     <Menu.Item
       {...props}
-      className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-base-primary outline-none select-none hover:bg-state-hover data-highlighted:bg-action-neutral-ghost-hover"
+      className={cn(
+        "flex w-full cursor-pointer items-center gap-2 px-3.5 py-2.5 type-body-md text-base-primary",
+        "outline-none select-none hover:bg-state-hover data-highlighted:bg-action-neutral-ghost-hover",
+      )}
     >
       <span className="flex text-base-tertiary">
         <Icon icon={icon} size={4} />

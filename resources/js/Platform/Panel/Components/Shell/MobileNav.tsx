@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { Drawer } from "@base-ui/react/drawer";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Icon, IconButton } from "@larasell-dev/ui";
@@ -57,7 +58,14 @@ export default function MobileNav() {
               "Navigation",
               "Mobile: accessible name of the drawer with the admin panel's navigation",
             )}
-            className="pointer-events-auto h-full w-fit translate-x-(--drawer-swipe-movement-x) outline-none transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0 [&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_[data-sidebar-row]]:pl-[calc(100vw+1.5rem)] [&_aside>button]:pl-[calc(100vw+1.5rem)]"
+            className={cn(
+              // Drawer
+              "pointer-events-auto h-full w-fit outline-none",
+              // Swipes and slides in from the left
+              "translate-x-(--drawer-swipe-movement-x) transition-transform duration-300 data-ending-style:-translate-x-full data-starting-style:-translate-x-full data-swiping:duration-0",
+              // Widens the sidebar past the left edge, so swiping further doesn't show a gap
+              "[&_aside]:-ml-[100vw] [&_aside]:w-[calc(100vw+16rem)] [&_aside>div]:pl-[calc(100vw+1.5rem)] [&_[data-sidebar-row]]:pl-[calc(100vw+1.5rem)] [&_aside>button]:pl-[calc(100vw+1.5rem)]",
+            )}
           >
             <HotkeysProvider scope="mobile-nav" exclusive={overlayExclusive} enabled={open}>
               <Sidebar frozen={frozen} />
