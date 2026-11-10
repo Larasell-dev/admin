@@ -130,7 +130,14 @@ export default function RichTextEditor({
         data-rich-text={scope}
         ref={content}
         className={cn(
-          "type-input-md max-h-96 min-h-32 cursor-text overflow-y-auto py-2.5 px-3.5 [--pen-placeholder-color:var(--text-color-base-tertiary)] [&_[data-pen-editor-blocks-host]>*+*]:pt-2 [&_[data-pen-inline-content]]:outline-none! [&_[data-pen-list-item-layout]]:items-baseline! [&_[data-pen-list-item-marker]]:min-h-0! [&_[data-pen-list-item-marker]]:min-w-4 [&_[data-pen-list-item-marker]]:items-baseline! [&_[data-pen-list-item-marker]]:justify-end [&_a]:underline [&_a]:underline-offset-2 [&_h2]:type-title-lg [&_h3]:type-title-md [&_h4]:type-title-sm",
+          // Field
+          "type-input-md max-h-96 min-h-32 cursor-text overflow-y-auto py-2.5 px-3.5",
+          // Pen's placeholder, spacing between rows, and no outline per row
+          "[--pen-placeholder-color:var(--text-color-base-tertiary)] [&_[data-pen-editor-blocks-host]>*+*]:pt-2 [&_[data-pen-inline-content]]:outline-none!",
+          // List markers on their text's baseline, in a fixed-width column
+          "[&_[data-pen-list-item-layout]]:items-baseline! [&_[data-pen-list-item-marker]]:min-h-0! [&_[data-pen-list-item-marker]]:min-w-4 [&_[data-pen-list-item-marker]]:items-baseline! [&_[data-pen-list-item-marker]]:justify-end",
+          // Links and headings, which Tailwind resets
+          "[&_a]:underline [&_a]:underline-offset-2 [&_h2]:type-title-lg [&_h3]:type-title-md [&_h4]:type-title-sm",
           overflowing && "scroll-mask-y",
         )}
       >
@@ -273,7 +280,12 @@ function ToolbarButton({
       // Keeps the editor's selection, which the button formats.
       onMouseDown={(event) => event.preventDefault()}
       onClick={onPress}
-      className="text-base-secondary hover:bg-action-neutral-ghost-hover hover:text-base-primary aria-pressed:bg-action-neutral-secondary-hover aria-pressed:text-base-primary focus-visible:focus-ring box-border inline-flex size-8 shrink-0 cursor-pointer items-center justify-center select-none"
+      className={cn(
+        // Button
+        "box-border inline-flex size-8 shrink-0 cursor-pointer items-center justify-center select-none",
+        // States: hover, on and focus
+        "text-base-secondary hover:bg-action-neutral-ghost-hover hover:text-base-primary aria-pressed:bg-action-neutral-secondary-hover aria-pressed:text-base-primary focus-visible:focus-ring",
+      )}
     >
       <Icon icon={icon} />
     </BaseToolbar.Button>
