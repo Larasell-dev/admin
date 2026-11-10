@@ -15,6 +15,7 @@ use Larasell\Larasell\Customers\Enums\CustomerStatus;
 use Larasell\Larasell\Customers\Enums\CustomerType;
 use Larasell\Larasell\Customers\Models\Customer;
 use Larasell\Larasell\Enums\Country;
+use Larasell\Larasell\Enums\Locale;
 
 beforeEach(function () {
     $this->actingAs(Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']), 'larasell-admin');
@@ -116,8 +117,17 @@ it('updates a customer and audits it', function () {
     // Assert
     $customer = $customer->fresh();
     expect($customer?->personProfile?->last_name)->toBe('Beispiel')
-        ->and($customer?->preferred_locale)->toBe('de-DE')
+        ->and($customer?->preferred_locale)->toBe(Locale::GERMAN_GERMANY)
         ->and(customerAuditEvents())->toBe(['customer.updated']);
+});
+
+it('rejects a preferred language that is no locale', function () {
+    // Arrange
+    $customer = adminCustomer();
+
+    // Act & Assert
+    $this->put(route('larasell.admin.customers.update', $customer), ['first_name' => 'Erika', 'last_name' => 'Beispiel', 'preferred_locale' => 'german'])
+        ->assertSessionHasErrors('preferred_locale');
 });
 
 it('blocks, archives and reactivates a customer and audits each change', function () {

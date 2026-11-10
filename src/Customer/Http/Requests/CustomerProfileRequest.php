@@ -10,6 +10,7 @@ use Larasell\Larasell\Customers\Enums\CustomerType;
 use Larasell\Larasell\Customers\Models\Customer;
 use Larasell\Larasell\Enums\Country;
 use Larasell\Larasell\Enums\Currency;
+use Larasell\Larasell\Enums\Locale;
 
 /**
  * A customer's profile and preferences. On create the type comes from the form; on update it is
@@ -48,7 +49,7 @@ class CustomerProfileRequest extends FormRequest
             'country_code' => [Rule::requiredIf($type === 'company'), 'nullable', Rule::enum(Country::class)],
             'industry' => ['nullable', 'string', 'max:255'],
             'website' => ['nullable', 'url', 'max:255'],
-            'preferred_locale' => ['nullable', 'string', 'max:16'],
+            'preferred_locale' => ['nullable', Rule::enum(Locale::class)],
             'preferred_currency' => ['nullable', Rule::enum(Currency::class)],
         ];
     }
@@ -83,9 +84,9 @@ class CustomerProfileRequest extends FormRequest
         );
     }
 
-    public function preferredLocale(): ?string
+    public function preferredLocale(): ?Locale
     {
-        return $this->input('preferred_locale');
+        return $this->enum('preferred_locale', Locale::class);
     }
 
     public function preferredCurrency(): ?Currency
