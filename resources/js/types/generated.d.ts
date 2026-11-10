@@ -429,7 +429,7 @@ declare namespace Larasell.Admin.SalesChannel.Data {
     destroyUrl: string;
     locales: Array<Larasell.Admin.SalesChannel.Data.SalesChannelOptionData>;
     currencies: Array<Larasell.Admin.SalesChannel.Data.SalesChannelOptionData>;
-    entryPoints: Array<Larasell.Admin.SalesChannel.Data.EntryPointData> | null;
+    entryPoints: Larasell.Admin.SalesChannel.Data.EntryPointsData | null;
     addEntryPointUrl: string | null;
   };
   export type EntryPointData = {
@@ -440,6 +440,12 @@ declare namespace Larasell.Admin.SalesChannel.Data {
     defaultCurrency: string | null;
     primary: boolean;
     destroyUrl: string;
+  };
+  export type EntryPointsData = {
+    entryPoints: Array<Larasell.Admin.SalesChannel.Data.EntryPointData>;
+    page: number;
+    pageSize: number;
+    total: number;
   };
   export type SalesChannelData = {
     id: number;

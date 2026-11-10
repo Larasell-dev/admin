@@ -136,12 +136,12 @@ it('adds domains to a storefront through the core action and hands primary on wh
     $this->post($add, ['url' => 'https://shop.example/en', 'locale' => 'en', 'default_currency' => 'USD'])->assertRedirect($edit);
 
     $this->get($edit)->assertInertia(fn (AssertableInertia $page) => $page
-        ->has('entryPoints', 2)
-        ->where('entryPoints.0.url', 'https://shop.example/de')
-        ->where('entryPoints.0.primary', true)
-        ->where('entryPoints.0.defaultCurrency', null)
-        ->where('entryPoints.1.primary', false)
-        ->where('entryPoints.1.defaultCurrency', 'USD'));
+        ->has('entryPoints.entryPoints', 2)
+        ->where('entryPoints.entryPoints.0.url', 'https://shop.example/de')
+        ->where('entryPoints.entryPoints.0.primary', true)
+        ->where('entryPoints.entryPoints.0.defaultCurrency', null)
+        ->where('entryPoints.entryPoints.1.primary', false)
+        ->where('entryPoints.entryPoints.1.defaultCurrency', 'USD'));
 
     $first = EntryPoint::query()->orderBy('id')->firstOrFail();
     $destroy = route('larasell.admin.sales-channels.entry-points.destroy', [1, $first->id]);
@@ -149,9 +149,40 @@ it('adds domains to a storefront through the core action and hands primary on wh
     $this->delete($destroy, ['confirmation' => 'shop.example/de'])->assertRedirect($edit);
 
     $this->get($edit)->assertInertia(fn (AssertableInertia $page) => $page
-        ->has('entryPoints', 1)
-        ->where('entryPoints.0.url', 'https://shop.example/en')
-        ->where('entryPoints.0.primary', true));
+        ->has('entryPoints.entryPoints', 1)
+        ->where('entryPoints.entryPoints.0.url', 'https://shop.example/en')
+        ->where('entryPoints.entryPoints.0.primary', true));
+});
+
+it('pages the domains by the domains query parameters', function () {
+    // Arrange
+    EntryPoint::query()->delete();
+    $add = route('larasell.admin.sales-channels.entry-points.store', 1);
+    foreach (range(1, 30) as $i) {
+        $this->post($add, ['url' => "https://shop{$i}.example", 'locale' => 'en']);
+    }
+    $edit = route('larasell.admin.sales-channels.edit', 1);
+
+    // Act & Assert
+    $this->get($edit)->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('entryPoints.page', 1)
+        ->where('entryPoints.pageSize', 10)
+        ->where('entryPoints.total', 30)
+        ->has('entryPoints.entryPoints', 10)
+        // The primary domain comes first.
+        ->where('entryPoints.entryPoints.0.url', 'https://shop1.example'));
+
+    $this->get($edit.'?domains[page]=2&domains[size]=25')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('entryPoints.page', 2)
+        ->where('entryPoints.pageSize', 25)
+        ->has('entryPoints.entryPoints', 5)
+        ->where('entryPoints.entryPoints.4.url', 'https://shop30.example'));
+
+    // A page past the end shows the last page; a size that isn't offered falls back to 10.
+    $this->get($edit.'?domains[page]=9&domains[size]=7')->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('entryPoints.page', 3)
+        ->where('entryPoints.pageSize', 10)
+        ->has('entryPoints.entryPoints', 10));
 });
 
 it('refuses a taken URL, a language the channel does not sell in, and dropping a language a domain serves', function () {

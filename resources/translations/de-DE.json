@@ -3037,17 +3037,6 @@
       ],
       "types": []
     },
-    "7J7+OlFx5ioTJav0HeZNvg==": {
-      "description": "Sales channel page: under a domain, the currency its visits start in, e.g. 'Starts in Swiss Franc'",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Startet in {currency}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "oafgzInR03vFfIA2RYfOzA==": {
       "description": "Sales channel page: accessible name of the button on a domain that deletes it, e.g. 'Delete https://shop.example/de'",
       "tokens": [],
@@ -5705,6 +5694,72 @@
       "translations": [
         {
           "translation": "Blocktyp",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O+q3lNbwGfKVs2cIoZybwg==": {
+      "description": "Sales channel page: name of the table of the URLs a storefront is reached through",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Domains",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QO3nS6MFqQ07tPR1X5GJaA==": {
+      "description": "Sales channel page: heading of the domains table's column with each domain's URL",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "URL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sSP2KKUMwW0vh5GLGM3anw==": {
+      "description": "Sales channel page: heading of the domains table's column with the language each domain shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DYJq+0DeHIZNwfBW8QDGiQ==": {
+      "description": "Sales channel page: heading of the domains table's column with the currency visits through a domain start in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Startwährung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5ZLeRErs0zjKLcTALCkLZQ==": {
+      "description": "Sales channel page: heading of the domains table's column with each domain's delete button",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktionen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OlcTbUvV7nqZ7MJqXdxLKg==": {
+      "description": "Sales channel page: in the domains table, below the currency of a domain whose visits start in the channel's default currency",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "(Kanal-Standard)",
           "variations": {}
         }
       ],

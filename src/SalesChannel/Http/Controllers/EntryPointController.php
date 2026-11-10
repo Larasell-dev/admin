@@ -23,6 +23,7 @@ class EntryPointController
     {
         $delete->handle($request->entryPoint());
 
-        return redirect()->route('larasell.admin.sales-channels.edit', $channel);
+        // Back to the page of domains it was on; past the end, the channel's page shows the last one.
+        return back(fallback: route('larasell.admin.sales-channels.edit', $channel));
     }
 }

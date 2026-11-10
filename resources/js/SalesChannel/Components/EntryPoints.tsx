@@ -1,5 +1,5 @@
 import { Field as BaseField } from "@base-ui/react/field";
-import { Form } from "@inertiajs/react";
+import { Form, router } from "@inertiajs/react";
 import {
   Badge,
   Button,
@@ -9,9 +9,13 @@ import {
   Icon,
   IconButton,
   Input,
+  Pagination,
   Section,
   Select,
   Stack,
+  Table,
+  Tooltip,
+  TruncateMiddle,
 } from "@larasell-dev/ui";
 import { AddLine, DeleteBinLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
@@ -28,10 +32,29 @@ type Option = Larasell.Admin.SalesChannel.Data.SalesChannelOptionData;
 const label = (options: Option[], value: string) =>
   options.find((option) => option.value === value)?.label ?? value;
 
+/** The page sizes the server takes, the first by default. */
+const PAGE_SIZES = [10, 25, 50, 100];
+
+/**
+ * This page's address with the domains on the given page and page size, in domains[page] and
+ * [size]; other query parameters stay.
+ */
+function withPage(page: number, pageSize: number): string {
+  const next = new URL(window.location.href);
+  const set = (key: string, value: number, fallback: number) =>
+    value === fallback
+      ? next.searchParams.delete(`domains[${key}]`)
+      : next.searchParams.set(`domains[${key}]`, String(value));
+  set("page", page, 1);
+  set("size", pageSize, PAGE_SIZES[0]);
+  return next.pathname + next.search + next.hash;
+}
+
 /**
  * The section with a storefront's domains: the URLs customers reach it through, each in one of its
  * languages; customers switch between the channel's currencies on any of them. Only the saved
- * languages and currencies are offered, since the server checks against those.
+ * languages and currencies are offered, since the server checks against those. The server pages
+ * the domains by domains[page] and [size] in the query.
  */
 export default function EntryPoints({
   channel,
@@ -41,7 +64,7 @@ export default function EntryPoints({
   currencies,
 }: {
   channel: Channel;
-  entryPoints: EntryPoint[];
+  entryPoints: Larasell.Admin.SalesChannel.Data.EntryPointsData;
   addUrl: string;
   locales: Option[];
   currencies: Option[];
@@ -62,53 +85,116 @@ export default function EntryPoints({
         )}
       />
       <Stack spacing={4}>
-        {entryPoints.length > 0 ? (
-          <ul className="border-base-subtle divide-base-subtle divide-y border">
-            {entryPoints.map((entryPoint) => (
-              <li key={entryPoint.id} className="flex items-center gap-3 py-2 pr-2 pl-4">
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className="type-body-md truncate text-base-primary">
-                      {entryPoint.url}
-                    </span>
-                    {entryPoint.primary && (
-                      <Badge>
-                        <fbt desc="Sales channel page: badge on the domain that links in its language and currency use">
-                          Primary
-                        </fbt>
-                      </Badge>
-                    )}
-                  </div>
-                  <span className="type-body-sm text-base-secondary">
-                    {label(locales, entryPoint.locale)}
-                    {entryPoint.defaultCurrency && (
-                      <>
-                        {" · "}
-                        <fbt desc="Sales channel page: under a domain, the currency its visits start in, e.g. 'Starts in Swiss Franc'">
-                          Starts in{" "}
-                          <fbt:param name="currency">
-                            {label(currencies, entryPoint.defaultCurrency)}
-                          </fbt:param>
-                        </fbt>{" "}
-                        <span className="text-base-tertiary">{entryPoint.defaultCurrency}</span>
-                      </>
-                    )}
-                  </span>
-                </div>
-                <IconButton
-                  variant="tertiary"
-                  size="sm"
-                  aria-label={fbs(
-                    ["Delete ", fbs.param("url", entryPoint.url)],
-                    "Sales channel page: accessible name of the button on a domain that deletes it, e.g. 'Delete https://shop.example/de'",
-                  )}
-                  onClick={() => setDeleting(entryPoint)}
-                >
-                  <Icon icon={DeleteBinLine} />
-                </IconButton>
-              </li>
-            ))}
-          </ul>
+        {entryPoints.total > 0 ? (
+          <Section.Card>
+            <Table.Root
+              aria-label={fbs(
+                "Domains",
+                "Sales channel page: name of the table of the URLs a storefront is reached through",
+              )}
+            >
+              <Table.Content>
+                <Table.Header>
+                  <Table.Column>
+                    <fbt desc="Sales channel page: heading of the domains table's column with each domain's URL">
+                      URL
+                    </fbt>
+                  </Table.Column>
+                  <Table.Column>
+                    <fbt desc="Sales channel page: heading of the domains table's column with the language each domain shows">
+                      Language
+                    </fbt>
+                  </Table.Column>
+                  <Table.Column>
+                    <fbt desc="Sales channel page: heading of the domains table's column with the currency visits through a domain start in">
+                      Starting currency
+                    </fbt>
+                  </Table.Column>
+                  <Table.Column type="action">
+                    <fbt desc="Sales channel page: heading of the domains table's column with each domain's delete button">
+                      Actions
+                    </fbt>
+                  </Table.Column>
+                </Table.Header>
+                <Table.Body>
+                  {entryPoints.entryPoints.map((entryPoint) => (
+                    <Table.Row key={entryPoint.id}>
+                      <Table.Cell>
+                        <div className="flex min-w-0 flex-col items-start gap-1">
+                          {/* Without its scheme and cut in the middle, so the language path at its end
+                              stays; hover it for all of it. */}
+                          <Tooltip.Truncated>
+                            <TruncateMiddle>{entryPoint.domain}</TruncateMiddle>
+                          </Tooltip.Truncated>
+                          {entryPoint.primary && (
+                            <Badge>
+                              <fbt desc="Sales channel page: badge on the domain that links in its language and currency use">
+                                Primary
+                              </fbt>
+                            </Badge>
+                          )}
+                        </div>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Tooltip.Truncated>
+                          <span className="block truncate">
+                            {label(locales, entryPoint.locale)}
+                          </span>
+                        </Tooltip.Truncated>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Tooltip.Truncated>
+                          <span className="block truncate">
+                            {label(
+                              currencies,
+                              entryPoint.defaultCurrency ?? channel.defaultCurrency,
+                            )}
+                          </span>
+                        </Tooltip.Truncated>
+                        {!entryPoint.defaultCurrency && (
+                          <span className="type-body-sm block text-base-secondary">
+                            <fbt desc="Sales channel page: in the domains table, below the currency of a domain whose visits start in the channel's default currency">
+                              (Channel default)
+                            </fbt>
+                          </span>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <IconButton
+                          variant="tertiary"
+                          size="sm"
+                          aria-label={fbs(
+                            ["Delete ", fbs.param("url", entryPoint.url)],
+                            "Sales channel page: accessible name of the button on a domain that deletes it, e.g. 'Delete https://shop.example/de'",
+                          )}
+                          onClick={() => setDeleting(entryPoint)}
+                        >
+                          <Icon icon={DeleteBinLine} />
+                        </IconButton>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Content>
+            </Table.Root>
+            {/* Shown while there's more than the smallest page, so a bigger size can be undone. */}
+            {entryPoints.total > PAGE_SIZES[0] && (
+              <div className="border-t border-base-subtle px-(--inset) py-3">
+                <Pagination
+                  page={entryPoints.page}
+                  pageSize={entryPoints.pageSize}
+                  total={entryPoints.total}
+                  pageSizeOptions={PAGE_SIZES}
+                  onPaginationChange={({ page, pageSize }) =>
+                    router.visit(withPage(page, pageSize), {
+                      preserveScroll: true,
+                      preserveState: true,
+                    })
+                  }
+                />
+              </div>
+            )}
+          </Section.Card>
         ) : (
           <p className="type-body-md text-base-secondary">
             <fbt desc="Sales channel page: shown in the domains section while the storefront has none">
