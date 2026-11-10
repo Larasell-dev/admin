@@ -18,6 +18,7 @@ use Larasell\Larasell\Customers\Actions\CustomerGroupPayload;
 use Larasell\Larasell\Customers\Actions\LinkCustomerAccount;
 use Larasell\Larasell\Customers\Actions\PersonProfileData;
 use Larasell\Larasell\Customers\CustomerContactId;
+use Larasell\Larasell\Customers\CustomerGroupCode;
 use Larasell\Larasell\Customers\CustomerId;
 use Larasell\Larasell\Customers\Enums\CustomerSource;
 use Larasell\Larasell\Customers\Models\Customer;
@@ -154,7 +155,7 @@ it('lists linked accounts and unlinks one, audited', function () {
 it('puts a customer in groups and takes it out', function () {
     // Arrange
     $customer = detailsCompany();
-    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload('wholesale', new Translatable(['en' => 'Wholesale'])));
+    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload(CustomerGroupCode::of('wholesale'), new Translatable(['en' => 'Wholesale'])));
 
     // Act
     $this->post(route('larasell.admin.customers.groups.store', $customer), ['group' => $wholesale->id])->assertRedirect();
