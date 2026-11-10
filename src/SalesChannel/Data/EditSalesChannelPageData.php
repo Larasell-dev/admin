@@ -16,12 +16,8 @@ class EditSalesChannelPageData extends Data
         public array $locales,
         /** @var array<int, SalesChannelOptionData> */
         public array $currencies,
-        /**
-         * The storefront's domains by language, primary first; null for a channel of another type.
-         *
-         * @var array<int, EntryPointData>|null
-         */
-        public ?array $entryPoints,
+        /** A page of the storefront's domains; null for a channel of another type. */
+        public ?EntryPointsData $entryPoints,
         public ?string $addEntryPointUrl,
     ) {}
 }

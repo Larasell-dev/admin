@@ -10,7 +10,7 @@ use Larasell\Admin\SalesChannel\Actions\DeleteSalesChannel;
 use Larasell\Admin\SalesChannel\Actions\UpdateSalesChannel;
 use Larasell\Admin\SalesChannel\Data\CreateSalesChannelPageData;
 use Larasell\Admin\SalesChannel\Data\EditSalesChannelPageData;
-use Larasell\Admin\SalesChannel\Data\EntryPointData;
+use Larasell\Admin\SalesChannel\Data\EntryPointsData;
 use Larasell\Admin\SalesChannel\Data\SalesChannelData;
 use Larasell\Admin\SalesChannel\Data\SalesChannelNavigationData;
 use Larasell\Admin\SalesChannel\Data\SalesChannelOptionData;
@@ -19,7 +19,6 @@ use Larasell\Admin\SalesChannel\Http\Requests\DeleteSalesChannelRequest;
 use Larasell\Admin\SalesChannel\Http\Requests\UpdateSalesChannelRequest;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Larasell\Larasell\SalesChannels\SalesChannelTypes;
-use Larasell\Larasell\Storefront\Models\EntryPoint;
 use Larasell\Larasell\Storefront\StorefrontContext;
 use Laravel\Head\Facades\Head;
 
@@ -54,10 +53,7 @@ class SalesChannelController
             destroyUrl: route('larasell.admin.sales-channels.destroy', $channel),
             locales: SalesChannelOptionData::locales(),
             currencies: SalesChannelOptionData::currencies(),
-            entryPoints: $storefront ? EntryPoint::query()
-                ->where('sales_channel_id', $channel->id)
-                ->orderBy('locale')->orderByDesc('is_primary')->orderBy('id')
-                ->get()->map(EntryPointData::fromModel(...))->all() : null,
+            entryPoints: $storefront ? EntryPointsData::forChannel($channel->id) : null,
             addEntryPointUrl: $storefront ? route('larasell.admin.sales-channels.entry-points.store', $channel) : null,
         ));
     }
