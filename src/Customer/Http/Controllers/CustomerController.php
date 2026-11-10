@@ -3,11 +3,8 @@
 namespace Larasell\Admin\Customer\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Customer\AuditRecords\CustomerCreated;
-use Larasell\Admin\Customer\AuditRecords\CustomerUpdated;
 use Larasell\Admin\Customer\Data\CreateCustomerPageData;
 use Larasell\Admin\Customer\Data\CustomerAccountData;
 use Larasell\Admin\Customer\Data\CustomerAddressData;
@@ -18,7 +15,6 @@ use Larasell\Admin\Customer\Data\CustomerGroupOptionData;
 use Larasell\Admin\Customer\Data\CustomerOptionData;
 use Larasell\Admin\Customer\Data\EditCustomerPageData;
 use Larasell\Admin\Customer\Http\Requests\CustomerProfileRequest;
-use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Larasell\Customers\Actions\CreateCustomer;
 use Larasell\Larasell\Customers\Actions\CreateCustomerPayload;
 use Larasell\Larasell\Customers\Actions\UpdateCustomer;
@@ -46,19 +42,14 @@ class CustomerController
         ));
     }
 
-    public function store(CustomerProfileRequest $request, CreateCustomer $create, Auditor $auditor): RedirectResponse
+    public function store(CustomerProfileRequest $request, CreateCustomer $create): RedirectResponse
     {
-        $customer = DB::transaction(function () use ($request, $create, $auditor): Customer {
-            $customer = $create->handle(new CreateCustomerPayload(
-                profile: $request->profile(),
-                source: CustomerSource::Admin,
-                preferredLocale: $request->preferredLocale(),
-                preferredCurrency: $request->preferredCurrency(),
-            ));
-            $auditor->record(new CustomerCreated($customer->id, ['customer_number' => $customer->customer_number, 'type' => $customer->type->value]));
-
-            return $customer;
-        });
+        $customer = $create->handle(new CreateCustomerPayload(
+            profile: $request->profile(),
+            source: CustomerSource::Admin,
+            preferredLocale: $request->preferredLocale(),
+            preferredCurrency: $request->preferredCurrency(),
+        ));
 
         return redirect()->route('larasell.admin.customers.show', $customer);
     }
@@ -90,16 +81,13 @@ class CustomerController
         ));
     }
 
-    public function update(CustomerProfileRequest $request, Customer $customer, UpdateCustomer $update, Auditor $auditor): RedirectResponse
+    public function update(CustomerProfileRequest $request, Customer $customer, UpdateCustomer $update): RedirectResponse
     {
-        DB::transaction(function () use ($request, $customer, $update, $auditor): void {
-            $update->handle(CustomerId::of($customer), new UpdateCustomerPayload(
-                profile: $request->profile(),
-                preferredLocale: $request->preferredLocale(),
-                preferredCurrency: $request->preferredCurrency(),
-            ));
-            $auditor->record(new CustomerUpdated($customer->id));
-        });
+        $update->handle(CustomerId::of($customer), new UpdateCustomerPayload(
+            profile: $request->profile(),
+            preferredLocale: $request->preferredLocale(),
+            preferredCurrency: $request->preferredCurrency(),
+        ));
 
         return redirect()->route('larasell.admin.customers.show', $customer);
     }

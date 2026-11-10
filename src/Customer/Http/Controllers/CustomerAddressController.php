@@ -3,16 +3,14 @@
 namespace Larasell\Admin\Customer\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Larasell\Admin\Customer\Http\Requests\CustomerAddressRequest;
+use Larasell\Admin\Customer\Http\Requests\DefaultCustomerAddressRequest;
 use Larasell\Larasell\Customers\Actions\AddCustomerAddress;
 use Larasell\Larasell\Customers\Actions\DeleteCustomerAddress;
 use Larasell\Larasell\Customers\Actions\SetDefaultCustomerAddress;
 use Larasell\Larasell\Customers\Actions\UpdateCustomerAddress;
 use Larasell\Larasell\Customers\CustomerAddressId;
 use Larasell\Larasell\Customers\CustomerId;
-use Larasell\Larasell\Customers\Enums\AddressUse;
 use Larasell\Larasell\Customers\Models\Customer;
 use Larasell\Larasell\Customers\Models\CustomerAddress;
 
@@ -40,10 +38,9 @@ class CustomerAddressController
         return redirect()->route('larasell.admin.customers.show', $customer);
     }
 
-    public function makeDefault(Request $request, Customer $customer, CustomerAddress $address, SetDefaultCustomerAddress $setDefault): RedirectResponse
+    public function makeDefault(DefaultCustomerAddressRequest $request, Customer $customer, CustomerAddress $address, SetDefaultCustomerAddress $setDefault): RedirectResponse
     {
-        $request->validate(['use' => ['required', Rule::enum(AddressUse::class)]]);
-        $setDefault->handle(CustomerAddressId::of($address), $request->enum('use', AddressUse::class) ?? AddressUse::Billing);
+        $setDefault->handle(CustomerAddressId::of($address), $request->addressUse());
 
         return redirect()->route('larasell.admin.customers.show', $customer);
     }

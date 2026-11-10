@@ -119,7 +119,7 @@ it('updates a customer and audits it', function () {
     $customer = $customer->fresh();
     expect($customer?->personProfile?->last_name)->toBe('Beispiel')
         ->and($customer?->preferred_locale)->toBe(Locale::GERMAN_GERMANY)
-        ->and(customerAuditEvents())->toBe(['customer.updated']);
+        ->and(customerAuditEvents())->toBe(['customer.created', 'customer.updated']);
 });
 
 it('rejects a preferred language that is no locale', function () {
@@ -174,7 +174,7 @@ it('blocks, archives and reactivates a customer and audits each change', functio
 
     // Assert
     expect($customer->fresh()?->status)->toBe(CustomerStatus::Active)
-        ->and(customerAuditEvents())->toBe(['customer.status_changed', 'customer.status_changed', 'customer.status_changed']);
+        ->and(customerAuditEvents())->toBe(['customer.created', 'customer.status_changed', 'customer.status_changed', 'customer.status_changed']);
     $this->post(route('larasell.admin.customers.status', $customer), ['status' => 'deleted'])->assertSessionHasErrors('status');
 });
 
@@ -223,5 +223,5 @@ it('blocks, unblocks, deactivates and reactivates customers from the table, audi
     expect($customer->fresh()?->status)->toBe(CustomerStatus::Archived);
     $run('reactivate')->assertRedirect();
     expect($customer->fresh()?->status)->toBe(CustomerStatus::Active)
-        ->and(customerAuditEvents())->toBe(array_fill(0, 4, 'customer.status_changed'));
+        ->and(customerAuditEvents())->toBe(['customer.created', ...array_fill(0, 4, 'customer.status_changed')]);
 });

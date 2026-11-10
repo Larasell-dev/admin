@@ -10,6 +10,7 @@ use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
+use Larasell\Larasell\Customers\CustomerGroupId;
 use Larasell\Larasell\Customers\Models\CustomerGroup;
 use Larasell\Larasell\Translatable;
 
@@ -45,7 +46,7 @@ class CustomerGroups extends Table
     public function actions(): array
     {
         return [
-            Action::make(Translate::later('Delete'), handle: fn (CustomerGroup $group) => app(DeleteCustomerGroup::class)->handle($group))
+            Action::make(Translate::later('Delete'), handle: fn (CustomerGroup $group) => app(DeleteCustomerGroup::class)->handle(CustomerGroupId::of($group)))
                 ->confirm(
                     title: __('Delete customer group'),
                     message: __('Rules that refer to the group\'s code stop applying. Only groups without customers can be deleted. This can\'t be undone.'),

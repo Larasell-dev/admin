@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Customer;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
@@ -13,6 +14,7 @@ use Larasell\Admin\Customer\Http\Controllers\CustomerGroupController;
 use Larasell\Admin\Customer\Http\Controllers\CustomerGroupMembershipController;
 use Larasell\Admin\Customer\Http\Controllers\CustomerStatusController;
 use Larasell\Admin\Customer\Http\Controllers\SearchCustomersController;
+use Larasell\Admin\Customer\Listeners\AuditCustomerChanges;
 use Larasell\Admin\Customer\Search\CustomerSearch;
 use Larasell\Admin\Customer\Search\DatabaseCustomerSearch;
 use Larasell\Admin\Customer\Tables\CustomerGroups;
@@ -41,6 +43,9 @@ class CustomerServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Audited from the core's events, wherever the change came from.
+        Event::listen(AuditCustomerChanges::EVENTS, [AuditCustomerChanges::class, 'handle']);
+
         if (! config('larasell.admin.customers.enabled')) {
             return;
         }

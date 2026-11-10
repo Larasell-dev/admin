@@ -149,7 +149,7 @@ it('lists linked accounts and unlinks one, audited', function () {
     $this->delete(route('larasell.admin.customers.accounts.destroy', [$customer, $account]))->assertRedirect();
     expect($customer->accounts()->count())->toBe(0)
         ->and($user->fresh())->not->toBeNull()
-        ->and(DB::table('larasell_audit_log')->pluck('event')->all())->toBe(['customer.account_unlinked']);
+        ->and(DB::table('larasell_audit_log')->orderBy('id')->pluck('event')->all())->toBe(['customer.created', 'customer.contact_added', 'customer.account_linked', 'customer.account_unlinked']);
 });
 
 it('puts a customer in groups and takes it out', function () {
@@ -167,4 +167,50 @@ it('puts a customer in groups and takes it out', function () {
             ->where('availableGroups.0.label', 'Wholesale'));
     $this->delete(route('larasell.admin.customers.groups.destroy', [$customer, $wholesale]))->assertRedirect();
     expect($customer->groups()->count())->toBe(0);
+});
+
+it('audits addresses, contacts and group memberships changed in the panel', function () {
+    // Arrange
+    $customer = detailsCompany();
+    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload(CustomerGroupCode::of('wholesale'), new Translatable(['en' => 'Wholesale'])));
+    DB::table('larasell_audit_log')->delete();
+
+    // Act
+    $this->post(route('larasell.admin.customers.addresses.store', $customer), addressInput())->assertRedirect();
+    $address = $customer->addresses()->sole();
+    $this->delete(route('larasell.admin.customers.addresses.destroy', [$customer, $address]))->assertRedirect();
+    $this->post(route('larasell.admin.customers.contacts.store', $customer), ['first_name' => 'Max', 'last_name' => 'Mustermann'])->assertRedirect();
+    $contact = $customer->contacts()->sole();
+    $this->delete(route('larasell.admin.customers.contacts.destroy', [$customer, $contact]))->assertRedirect();
+    $this->post(route('larasell.admin.customers.groups.store', $customer), ['group' => $wholesale->id])->assertRedirect();
+    $this->delete(route('larasell.admin.customers.groups.destroy', [$customer, $wholesale]))->assertRedirect();
+
+    // Assert
+    $records = DB::table('larasell_audit_log')->orderBy('id')->get(['event', 'subject_type', 'subject_id', 'actor_type']);
+    expect($records->pluck('event')->all())->toBe([
+        'customer.address_added',
+        'customer.address_deleted',
+        'customer.contact_added',
+        'customer.contact_removed',
+        'customer.joined_group',
+        'customer.left_group',
+    ])
+        ->and($records->pluck('subject_type')->unique()->all())->toBe(['customer'])
+        ->and($records->pluck('subject_id')->unique()->all())->toBe([(string) $customer->id])
+        ->and($records->pluck('actor_type')->unique()->all())->not->toContain('unknown');
+});
+
+it('audits customer changes made outside the panel with an unknown actor', function () {
+    // Arrange
+    auth('larasell-admin')->logout();
+    DB::table('larasell_audit_log')->delete();
+
+    // Act
+    $customer = detailsCompany();
+
+    // Assert
+    $record = DB::table('larasell_audit_log')->sole();
+    expect($record->event)->toBe('customer.created')
+        ->and($record->subject_id)->toBe((string) $customer->id)
+        ->and($record->unknown_actor_reason)->not->toBeNull();
 });

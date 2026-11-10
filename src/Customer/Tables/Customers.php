@@ -3,7 +3,6 @@
 namespace Larasell\Admin\Customer\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
-use Larasell\Admin\Customer\Actions\ChangeCustomerStatus;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
@@ -12,6 +11,8 @@ use Larasell\Admin\Platform\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Enums\Variant;
 use Larasell\Admin\Platform\Tables\Table;
+use Larasell\Larasell\Customers\Actions\ChangeCustomerStatus;
+use Larasell\Larasell\Customers\CustomerId;
 use Larasell\Larasell\Customers\Enums\CustomerStatus;
 use Larasell\Larasell\Customers\Enums\CustomerType;
 use Larasell\Larasell\Customers\Models\Customer;
@@ -68,7 +69,7 @@ class Customers extends Table
 
     public function actions(): array
     {
-        $status = fn (CustomerStatus $to) => fn (Customer $customer) => app(ChangeCustomerStatus::class)->handle($customer, $to);
+        $status = fn (CustomerStatus $to) => fn (Customer $customer) => app(ChangeCustomerStatus::class)->handle(CustomerId::of($customer), $to);
         $is = fn (CustomerStatus $status) => fn (Customer $customer): bool => $customer->status === $status;
         $isNot = fn (CustomerStatus $status) => fn (Customer $customer): bool => $customer->status !== $status;
 
