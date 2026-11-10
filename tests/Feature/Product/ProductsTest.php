@@ -155,6 +155,7 @@ it('shows the product\'s values to edit on its page', function () {
                 'id' => $boots->id,
                 'name' => 'Boots',
                 'fallbackName' => 'Boots',
+                'description' => null,
                 'visible' => false,
                 'weight' => null,
                 'dimensions' => null,
@@ -742,6 +743,120 @@ it('only changes the current locale\'s product name', function () {
 
     expect($boots->name->all())->toBe(['en' => 'Rain Boots', 'de' => 'Stiefel']);
 });
+
+/** A description with a heading, formatted text and a link, as the form sends it. */
+function bootsDescription(): array
+{
+    return ['version' => 1, 'blocks' => [
+        ['type' => 'heading', 'level' => 2, 'children' => [['text' => 'Made to last']]],
+        ['type' => 'paragraph', 'children' => [
+            ['text' => 'Waxed '],
+            ['text' => 'leather', 'marks' => ['bold']],
+            ['text' => ', see the ', 'marks' => []],
+            ['text' => 'care guide', 'link' => ['href' => 'https://example.com/care']],
+        ]],
+        ['type' => 'list', 'style' => 'bullet', 'items' => [[['text' => 'Waterproof']], [['text' => 'Resoleable']]]],
+    ]];
+}
+
+it('saves the description in the content locale', function () {
+    // Arrange
+    signInAdmin();
+
+    // Act
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Boots',
+        'status' => 'visible',
+        'description' => json_encode(bootsDescription()),
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    $product = Product::query()->sole();
+
+    expect(array_keys($product->description->all()))->toBe(['en'])
+        ->and(json_decode($product->description->get('en'), true))->toBe(bootsDescription());
+});
+
+it('shows the description in the content locale on the product\'s page', function () {
+    // Arrange
+    signInAdmin();
+
+    $boots = Product::create([
+        'name' => 'Boots',
+        'price' => Price::of(1000),
+        'description' => ['en' => json_encode(bootsDescription()), 'de' => json_encode(['version' => 1, 'blocks' => []])],
+    ]);
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.edit', $boots))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('product.description', bootsDescription()));
+});
+
+it('shows a description saved as plain text as paragraphs', function () {
+    // Arrange
+    signInAdmin();
+
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'description' => "Warm.\nDry."]);
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.edit', $boots))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('product.description', ['version' => 1, 'blocks' => [
+            ['type' => 'paragraph', 'children' => [['text' => 'Warm.']]],
+            ['type' => 'paragraph', 'children' => [['text' => 'Dry.']]],
+        ]]));
+});
+
+it('only changes the current locale\'s description, and removes it when it is emptied', function () {
+    // Arrange
+    signInAdmin();
+
+    $german = json_encode(['version' => 1, 'blocks' => [['type' => 'paragraph', 'children' => [['text' => 'Stiefel']]]]]);
+    $boots = Product::create([
+        'name' => 'Boots',
+        'price' => Price::of(1000),
+        'description' => ['en' => json_encode(bootsDescription()), 'de' => $german],
+    ]);
+
+    // Act
+    $this->put(route('larasell.admin.products.update', $boots), [
+        'name' => 'Boots',
+        'status' => 'visible',
+        'description' => json_encode(['version' => 1, 'blocks' => [['type' => 'paragraph', 'children' => []]]]),
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    expect($boots->refresh()->description->all())->toBe(['de' => $german]);
+});
+
+it('keeps the description when the form leaves it out', function () {
+    // Arrange
+    signInAdmin();
+
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'description' => json_encode(bootsDescription())]);
+
+    // Act
+    $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible'])
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect(json_decode($boots->refresh()->description->get('en'), true))->toBe(bootsDescription());
+});
+
+it('rejects a description it cannot show', function (string $description) {
+    // Arrange
+    signInAdmin();
+
+    // Act
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', 'description' => $description])
+        ->assertSessionHasErrors(['description' => 'The description can\'t be saved. Reload the page and try again.']);
+
+    // Assert
+    expect(Product::query()->count())->toBe(0);
+})->with([
+    'not JSON' => ['<p>Boots</p>'],
+    'unknown block' => [json_encode(['version' => 1, 'blocks' => [['type' => 'table', 'children' => []]]])],
+    'javascript link' => [json_encode(['version' => 1, 'blocks' => [['type' => 'paragraph', 'children' => [['text' => 'a', 'link' => ['href' => 'javascript:alert(1)']]]]]])],
+]);
 
 it('rejects an invalid product', function (array $input, string $error) {
     // Arrange

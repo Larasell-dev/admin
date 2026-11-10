@@ -391,6 +391,7 @@ declare namespace Larasell.Admin.Product.Data {
     id: number;
     name: string | null;
     fallbackName: string;
+    description: import("../Platform/RichText/types").RichText | null;
     visible: boolean;
     weight: Larasell.Admin.Product.Data.WeightData | null;
     dimensions: Larasell.Admin.Product.Data.DimensionsData | null;

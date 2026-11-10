@@ -5489,6 +5489,226 @@
         }
       ],
       "types": []
+    },
+    "j9IpM0ZZ6jfqecWKuNLfhA==": {
+      "description": "Product form: label of the formatted text field for the product's description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9PFU5I0qhtJPYXY8rZjxjQ==": {
+      "description": "Product form: accessible name of the formatted text field for the product's description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wbDAk9vjXpQSIwGAwLEiuQ==": {
+      "description": "Rich text editor: accessible name of the toolbar with the formatting buttons",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Formatierung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zFrHgjftR018lDZoqPPCTA==": {
+      "description": "Rich text editor: toolbar button that makes the selected text bold",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fett",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W4kBzOUQOOHXmNxftWQL+Q==": {
+      "description": "Rich text editor: toolbar button that makes the selected text italic",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kursiv",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rh2YMYLsehsOmbRrSi34jw==": {
+      "description": "Rich text editor: toolbar button that underlines the selected text",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unterstrichen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nbVBk7NLIAF2keikHT/mLQ==": {
+      "description": "Rich text editor: toolbar button that links the selected text to a web address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Link",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YFA5Xxfw653pHqZANEdf9Q==": {
+      "description": "Rich text editor: error below the link address field when the address isn't allowed",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib eine Adresse ein, die mit https://, http:// oder mailto: beginnt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CZLQbPtUr1IEyPYU7IOoSw==": {
+      "description": "Rich text editor: accessible name of the field for the web address the selected text links to",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Linkadresse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vNrXsjMHlH46VFg1Y9/IYw==": {
+      "description": "Rich text editor: button that removes the link from the selected text",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Link entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BTV3uGpL+0pBG9+OHm6hEQ==": {
+      "description": "Rich text editor: button that links the selected text to the entered address",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Übernehmen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "r5IzwYiLduHTdb2XV1ET0Q==": {
+      "description": "Rich text editor: shown in the / menu when no block matches what was typed after the /",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine passenden Blöcke",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tX2YaxALgCIlR7U1tO2tOQ==": {
+      "description": "Rich text editor: name of the plain paragraph block in its menus",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Text",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tDxpMrDzOkCJOZ5q/82kvw==": {
+      "description": "Rich text editor: name of the heading block in its menus",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Überschrift",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aQuKg/YtTA58b0crCoVDJw==": {
+      "description": "Rich text editor: name of the smaller heading block in its menus",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zwischenüberschrift",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GjUQGzuTZC6C9JQC5dbvVQ==": {
+      "description": "Rich text editor: name of the bulleted list block in its menus",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aufzählung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eU08hg8uNta1ujGiR2GHxw==": {
+      "description": "Rich text editor: name of the numbered list block in its menus",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nummerierte Liste",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fSWR63w6o9eph090FHz5Sw==": {
+      "description": "Product form: placeholder in the empty description field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung eingeben…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KcSlcM32L3tkOJsB2EjcqQ==": {
+      "description": "Rich text editor: accessible name of the toolbar group with bold, italic, underline and link",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Textstil",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yPhrQNVOyxxECIy13UMCQA==": {
+      "description": "Rich text editor: accessible name of the toolbar group that turns the line into a heading or list",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Blocktyp",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

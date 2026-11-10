@@ -66,6 +66,7 @@ class ProductController
             $product = $this->createProduct->handle(new CreateProductPayload([
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
+                'description' => $request->description() === null ? null : Translatable::fromString($request->description()->toJson(), $locale->value),
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
                 'sku' => $request->validated('sku'),
@@ -115,6 +116,7 @@ class ProductController
             $product = $this->updateProduct->handle(ProductId::of($product), new UpdateProductPayload([
                 'name' => $product->name->with($locale->value, $request->validated('name')),
                 'status' => $request->validated('status'),
+                ...$request->hasDescription() ? ['description' => $this->description($request, $product, $locale)] : [],
                 'weight' => $request->weight(),
                 'dimensions' => $request->dimensions(),
                 'sku' => $request->validated('sku'),
@@ -139,6 +141,21 @@ class ProductController
         Assert::that(DB::transactionLevel() > 0, ProductNotSavedAtomically::outsideTransaction(...));
 
         event(new ProductSaved($product, $created, new SectionContext($locale), $request->sections()));
+    }
+
+    /**
+     * The product's descriptions with the content locale's changed, and without it when it was emptied.
+     */
+    protected function description(ProductRequest $request, Product $product, Locale $locale): ?Translatable
+    {
+        $text = $request->description();
+
+        if ($text === null) {
+            return $product->description?->without($locale->value);
+        }
+
+        return $product->description?->with($locale->value, $text->toJson())
+            ?? Translatable::fromString($text->toJson(), $locale->value);
     }
 
     /**

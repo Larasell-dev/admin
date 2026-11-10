@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import ProductForm from "./ProductForm";
+import type { RichText } from "../../Platform/RichText/types";
 import UnsavedChangesToast, {
   UnsavedChangesToastHost,
 } from "../../Platform/Panel/Components/UnsavedChangesToast";
@@ -80,6 +81,7 @@ async function renderForm(
 const boots = {
   name: "Boots",
   fallbackName: "Boots",
+  description: null,
   visible: true,
   weight: null,
   dimensions: null,
@@ -121,6 +123,115 @@ it("shows an existing product's values", async () => {
 
   // Assert
   expect(submitted()).toMatchObject({ name: "Boots for rain", status: "hidden" });
+});
+
+const description = () => page.getByRole("textbox", { name: "Description" });
+const submittedDescription = () => JSON.parse(formData().get("description") as string);
+
+describe("description", () => {
+  it("submits an existing product's description as it was saved", async () => {
+    // Arrange
+    const saved: RichText = {
+      version: 1,
+      blocks: [
+        { type: "heading", level: 2, children: [{ text: "Made to last" }] },
+        { type: "paragraph", children: [{ text: "Waxed " }, { text: "leather", marks: ["bold"] }] },
+      ],
+    };
+
+    // Act
+    await renderForm({ ...boots, description: saved });
+
+    // Assert
+    await expect.element(description()).toHaveTextContent("Made to lastWaxed leather");
+    expect(submittedDescription()).toEqual(saved);
+  });
+
+  it("submits what is typed into it", async () => {
+    // Arrange
+    await renderForm();
+
+    // Act
+    await userEvent.click(description());
+    await userEvent.keyboard("Warm and dry");
+
+    // Assert
+    await expect.poll(submittedDescription).toEqual({
+      version: 1,
+      blocks: [{ type: "paragraph", children: [{ text: "Warm and dry" }] }],
+    });
+  });
+
+  it("puts the caret at the end when the empty space below the text is clicked", async () => {
+    // Arrange
+    await renderForm({
+      ...boots,
+      description: { version: 1, blocks: [{ type: "paragraph", children: [{ text: "Warm" }] }] },
+    });
+    const content = page.elementLocator(description().element().parentElement!);
+    const { height } = content.element().getBoundingClientRect();
+
+    // Act
+    await userEvent.click(content, { position: { x: 20, y: height - 8 } });
+    await userEvent.keyboard(" and dry");
+
+    // Assert
+    await expect.poll(submittedDescription).toEqual({
+      version: 1,
+      blocks: [{ type: "paragraph", children: [{ text: "Warm and dry" }] }],
+    });
+  });
+
+  it("turns a line into a heading when it starts with ##", async () => {
+    // Arrange
+    await renderForm();
+    await userEvent.click(description());
+
+    // Act
+    await userEvent.keyboard("## Care");
+
+    // Assert
+    await expect.poll(submittedDescription).toEqual({
+      version: 1,
+      blocks: [{ type: "heading", level: 2, children: [{ text: "Care" }] }],
+    });
+  });
+
+  it("turns a line into the block picked from the / menu, without the /", async () => {
+    // Arrange
+    await renderForm();
+    await userEvent.click(description());
+    await userEvent.keyboard("/num");
+
+    // Act
+    await userEvent.click(page.getByRole("option", { name: "Numbered list" }));
+    await userEvent.keyboard("Unpack");
+
+    // Assert
+    await expect.poll(submittedDescription).toEqual({
+      version: 1,
+      blocks: [{ type: "list", style: "numbered", items: [[{ text: "Unpack" }]] }],
+    });
+  });
+
+  it("makes the selected text bold from the toolbar", async () => {
+    // Arrange
+    await renderForm({
+      ...boots,
+      description: { version: 1, blocks: [{ type: "paragraph", children: [{ text: "Boots" }] }] },
+    });
+    await userEvent.click(description());
+    await userEvent.keyboard("{Control>}a{/Control}");
+
+    // Act
+    await userEvent.click(page.getByRole("button", { name: "Bold" }));
+
+    // Assert
+    await expect.poll(submittedDescription).toEqual({
+      version: 1,
+      blocks: [{ type: "paragraph", children: [{ text: "Boots", marks: ["bold"] }] }],
+    });
+  });
 });
 
 const weight = () => page.getByRole("textbox", { name: "Weight", exact: true });

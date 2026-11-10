@@ -144,6 +144,7 @@
   "Tax": "Steuer",
   "Team": "Team",
   "Temporarily unavailable": "Vorübergehend nicht verfügbar",
+  "The :attribute can't be saved. Reload the page and try again.": ":attribute kann nicht gespeichert werden. Lade die Seite neu und versuche es noch einmal.",
   "The :attribute must be a number of 0 or more, with a dot for decimals.": ":attribute muss eine Zahl ab 0 sein, mit Punkt als Dezimaltrennzeichen.",
   "The admins who can sign in to the panel": "Die Admins, die sich im Panel anmelden können",
   "The customer is archived. Their history stays, and you can reactivate them later.": "Der Kunde wird archiviert. Seine Historie bleibt erhalten, und du kannst ihn später reaktivieren.",
