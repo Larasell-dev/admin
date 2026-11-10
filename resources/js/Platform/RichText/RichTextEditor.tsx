@@ -80,12 +80,18 @@ export default function RichTextEditor({
 
     // Resetting the form puts the input's saved value back; the editor shows it again.
     const form = input.current?.form;
-    const reset = () =>
-      setTimeout(() => input.current && loadIntoPen(editor, JSON.parse(input.current.value)));
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+    const reset = () => {
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(
+        () => input.current && loadIntoPen(editor, JSON.parse(input.current.value)),
+      );
+    };
     form?.addEventListener("reset", reset);
 
     return () => {
       stop();
+      clearTimeout(resetTimer);
       form?.removeEventListener("reset", reset);
     };
   }, [editor, initial]);

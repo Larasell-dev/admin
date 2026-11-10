@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "456853da668ba45c59fdc2cc8404c834",
+    "content-hash": "78578d8f5d1830de0ff24eef214b9225",
     "packages": [
         {
             "name": "brick/math",
@@ -1250,16 +1250,16 @@
         },
         {
             "name": "larasell-dev/larasell",
-            "version": "dev-feat/rich-text-description",
+            "version": "v1.27.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "43980ec747925f54dbdb16c5403627b11b1954d8"
+                "reference": "9b0cd850cbc155936a4c679bea07e73fefbc80c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/43980ec747925f54dbdb16c5403627b11b1954d8",
-                "reference": "43980ec747925f54dbdb16c5403627b11b1954d8",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/9b0cd850cbc155936a4c679bea07e73fefbc80c1",
+                "reference": "9b0cd850cbc155936a4c679bea07e73fefbc80c1",
                 "shasum": ""
             },
             "require": {
@@ -1320,8 +1320,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-11-10T15:37:26+00:00",
-            "published-time": "2026-11-10T15:37:33+00:00"
+            "time": "2026-11-10T20:18:22+00:00",
+            "published-time": "2026-11-10T20:18:41+00:00"
         },
         {
             "name": "laravel/framework",
@@ -12189,18 +12189,9 @@
             "time": "2025-12-08T11:19:18+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "larasell-dev/larasell",
-            "version": "dev-feat/rich-text-description",
-            "alias": "1.28.0",
-            "alias_normalized": "1.28.0.0"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "larasell-dev/larasell": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
