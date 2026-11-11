@@ -109,10 +109,8 @@ export default function Show(props: Props) {
                         )
                   }
                   action={destroyUrl}
-                  // Typed only while it's in use; the server checks it too.
-                  confirmationText={
-                    attribute.products + attribute.variants > 0 ? attribute.slug : undefined
-                  }
+                  // The server checks it too.
+                  confirmationText={attribute.slug}
                 />
               </PersistentAlertDialog.Root>
             </div>

@@ -15,13 +15,16 @@ use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Product\Http\Controllers\AttributeController;
-use Larasell\Admin\Product\Http\Controllers\CatalogDefinitionController;
+use Larasell\Admin\Product\Http\Controllers\OptionController;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
 use Larasell\Admin\Product\Http\Controllers\ProductVariantController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
 use Larasell\Admin\Product\Listeners\AuditAttributeChanges;
+use Larasell\Admin\Product\Listeners\AuditOptionChanges;
 use Larasell\Admin\Product\Search\DatabaseProductSearch;
 use Larasell\Admin\Product\Search\ProductSearch;
+use Larasell\Admin\Product\Tables\Attributes;
+use Larasell\Admin\Product\Tables\Options;
 use Larasell\Admin\Product\Tables\Products;
 use Larasell\Larasell\Catalog\Events\ProductAttributeCreated;
 use Larasell\Larasell\Catalog\Events\ProductAttributeDeleted;
@@ -29,6 +32,12 @@ use Larasell\Larasell\Catalog\Events\ProductAttributeUpdated;
 use Larasell\Larasell\Catalog\Events\ProductAttributeValueCreated;
 use Larasell\Larasell\Catalog\Events\ProductAttributeValueDeleted;
 use Larasell\Larasell\Catalog\Events\ProductAttributeValueUpdated;
+use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionCreated;
+use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionDeleted;
+use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionUpdated;
+use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionValueCreated;
+use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionValueDeleted;
+use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionValueUpdated;
 
 /**
  * The products module. Setting larasell.admin.products.enabled to false leaves
@@ -52,6 +61,12 @@ class ProductServiceProvider extends ServiceProvider
         Event::listen(ProductAttributeValueCreated::class, [AuditAttributeChanges::class, 'valueCreated']);
         Event::listen(ProductAttributeValueUpdated::class, [AuditAttributeChanges::class, 'valueUpdated']);
         Event::listen(ProductAttributeValueDeleted::class, [AuditAttributeChanges::class, 'valueDeleted']);
+        Event::listen(OptionDefinitionCreated::class, [AuditOptionChanges::class, 'created']);
+        Event::listen(OptionDefinitionUpdated::class, [AuditOptionChanges::class, 'updated']);
+        Event::listen(OptionDefinitionDeleted::class, [AuditOptionChanges::class, 'deleted']);
+        Event::listen(OptionDefinitionValueCreated::class, [AuditOptionChanges::class, 'valueCreated']);
+        Event::listen(OptionDefinitionValueUpdated::class, [AuditOptionChanges::class, 'valueUpdated']);
+        Event::listen(OptionDefinitionValueDeleted::class, [AuditOptionChanges::class, 'valueDeleted']);
 
         if (! config('larasell.admin.products.enabled')) {
             return;
@@ -77,10 +92,13 @@ class ProductServiceProvider extends ServiceProvider
             Route::get('products/{product}/variants/{variant}/edit', [ProductVariantController::class, 'edit'])->name('products.variants.edit');
             Route::put('products/{product}/variants/{variant}', [ProductVariantController::class, 'update'])->name('products.variants.update');
             Route::delete('products/{product}/variants/{variant}', [ProductVariantController::class, 'destroy'])->name('products.variants.destroy');
-            Route::get('options', [CatalogDefinitionController::class, 'options'])->name('options.index')->withHead(title: Translate::later('Options'));
-            Route::post('options', [CatalogDefinitionController::class, 'storeOption'])->name('options.store');
-            Route::post('options/{definition}/values', [CatalogDefinitionController::class, 'storeOptionValue'])->name('options.values.store');
-            Route::get('attributes', [AttributeController::class, 'index'])->name('attributes.index')->withHead(title: Translate::later('Attributes'));
+            Route::index('options', Options::class);
+            Route::get('options/create', [OptionController::class, 'create'])->name('options.create')->withHead(title: Translate::later('New option'));
+            Route::post('options', [OptionController::class, 'store'])->name('options.store');
+            Route::get('options/{option}', [OptionController::class, 'show'])->name('options.show');
+            Route::put('options/{option}', [OptionController::class, 'update'])->name('options.update');
+            Route::delete('options/{option}', [OptionController::class, 'destroy'])->name('options.destroy');
+            Route::index('attributes', Attributes::class);
             Route::get('attributes/create', [AttributeController::class, 'create'])->name('attributes.create')->withHead(title: Translate::later('New attribute'));
             Route::post('attributes', [AttributeController::class, 'store'])->name('attributes.store');
             Route::get('attributes/{attribute}', [AttributeController::class, 'show'])->name('attributes.show');

@@ -12,7 +12,6 @@ use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 use Larasell\Admin\Product\Data\AttributeDetailData;
 use Larasell\Admin\Product\Data\AttributePageData;
 use Larasell\Admin\Product\Data\AttributeScopeOptionData;
-use Larasell\Admin\Product\Data\AttributesPageData;
 use Larasell\Admin\Product\Data\AttributeValueRowData;
 use Larasell\Admin\Product\Data\CreateAttributePageData;
 use Larasell\Admin\Product\Http\Requests\AttributeRequest;
@@ -27,14 +26,6 @@ use Laravel\Head\Facades\Head;
 /** The catalog's attributes, which describe products and variants without creating variants. */
 class AttributeController
 {
-    public function index(): Response
-    {
-        return Inertia::render('Product/Pages/Attributes/Index', new AttributesPageData(
-            createUrl: route('larasell.admin.attributes.create'),
-            attributes: Attributes::make(),
-        ));
-    }
-
     public function create(): Response
     {
         return Inertia::render('Product/Pages/Attributes/Create', new CreateAttributePageData(
@@ -87,16 +78,12 @@ class AttributeController
     }
 
     /**
-     * Deletes the attribute with its values, which products and variants lose. While any have
-     * values of it, the admin confirms by typing its slug.
+     * Deletes the attribute with its values, which products and variants lose. The admin
+     * confirms by typing its slug.
      */
     public function destroy(Request $request, ProductAttribute $attribute, DeleteProductAttribute $delete): RedirectResponse
     {
-        $used = Attributes::withUsage(ProductAttribute::query())->findOrFail($attribute->id);
-
-        if ($used->getAttribute('products_count') + $used->getAttribute('variants_count') > 0) {
-            $request->validate(['confirmation' => [new Confirmation($attribute->slug)]]);
-        }
+        $request->validate(['confirmation' => [new Confirmation($attribute->slug)]]);
 
         $delete->handle(AttributeId::of($attribute));
 

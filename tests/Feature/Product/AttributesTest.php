@@ -37,11 +37,11 @@ it('lists attributes with how many values, products and variants they have', fun
     $this->get(route('larasell.admin.attributes.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Product/Pages/Attributes/Index')
-            ->where('attributes.rows.0.name', 'Material')
-            ->where('attributes.rows.0.values_count', '2')
-            ->where('attributes.rows.0.products_count', '1')
-            ->where('attributes.rows.0.variants_count', '0'));
+            ->component('Platform/Tables/Pages/TablePage')
+            ->where('table.rows.0.name', 'Material')
+            ->where('table.rows.0.values_count', '2')
+            ->where('table.rows.0.products_count', '1')
+            ->where('table.rows.0.variants_count', '0'));
 });
 
 it('creates an attribute with its values and opens its page', function () {

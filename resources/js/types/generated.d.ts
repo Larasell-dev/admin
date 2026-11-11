@@ -397,10 +397,6 @@ declare namespace Larasell.Admin.Product.Data {
     products: number;
     variants: number;
   };
-  export type AttributesPageData = {
-    createUrl: string;
-    attributes: import("./index").TableResource;
-  };
   export type CombinationData = {
     valueIds: Array<number>;
     label: string;
@@ -409,6 +405,11 @@ declare namespace Larasell.Admin.Product.Data {
     storeUrl: string;
     indexUrl: string;
     scopes: Array<Larasell.Admin.Product.Data.AttributeScopeOptionData>;
+  };
+  export type CreateOptionPageData = {
+    storeUrl: string;
+    indexUrl: string;
+    displays: Array<Larasell.Admin.Product.Data.OptionDisplayOptionData>;
   };
   export type CreateProductPageData = {
     storeUrl: string;
@@ -466,10 +467,40 @@ declare namespace Larasell.Admin.Product.Data {
     name: string;
     values: Array<Larasell.Admin.Product.Data.OptionValueData>;
   };
+  export type OptionDetailData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    display: "dropdown" | "buttons" | "swatch";
+    products: number;
+    variants: number;
+  };
+  export type OptionDisplayOptionData = {
+    value: string;
+    label: string;
+  };
+  export type OptionPageData = {
+    option: Larasell.Admin.Product.Data.OptionDetailData;
+    values: Array<Larasell.Admin.Product.Data.OptionValueRowData>;
+    displays: Array<Larasell.Admin.Product.Data.OptionDisplayOptionData>;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
   export type OptionValueData = {
     id: number;
     name: string;
     swatch: string | null;
+  };
+  export type OptionValueRowData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    swatch: string | null;
+    products: number;
+    variants: number;
   };
   export type ProductAttributeFieldData = {
     id: number;
