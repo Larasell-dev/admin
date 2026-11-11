@@ -14,7 +14,7 @@
     "ext-zip": "*",
     "inertiajs/inertia-laravel": "^3.7",
     "larasell-dev/chronicle": "^0.4",
-    "larasell-dev/larasell": "dev-feat/audit-log as 1.28.0",
+    "larasell-dev/larasell": "^1.28",
     "laravel/framework": "^13.23",
     "laravel/head": "^0.2",
     "laravel/pennant": "^1.26",
@@ -72,12 +72,5 @@
       "testbench typescript:transform",
       "npx oxfmt resources/js/types/generated.d.ts"
     ]
-  },
-  "repositories": [
-    {
-      "name": "larasell",
-      "type": "vcs",
-      "url": "https://github.com/Larasell-dev/larasell"
-    }
-  ]
+  }
 }
