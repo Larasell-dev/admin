@@ -16,6 +16,7 @@ export default function Edit({
   categories,
   createCategoryUrl,
   sections,
+  type,
   contentLocale,
 }: Props) {
   return (
@@ -48,6 +49,7 @@ export default function Edit({
           categories={categories}
           createCategoryUrl={createCategoryUrl}
           sections={sections}
+          type={type}
         />
         <UnsavedChangesToast />
       </Page.Body>

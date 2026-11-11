@@ -94,9 +94,9 @@ class InvalidTableAction extends InvalidArgumentException implements StructuredE
     {
         return static::structured(
             errorCode: 'larasell-admin.table.action.invalid-group',
-            message: 'A TableActionGroup must be a list of at least two TableAction.',
-            why: 'The group shows its first action as a button and the others in a menu next to it, so it needs another action for the menu, and it cannot hold another group.',
-            fix: "Pass two or more TableAction, e.g. TableActionGroup::make([TableAction::make('Add product')->route('products.create'), TableAction::make('Add digital product')->route('products.create-digital')]), or a single TableAction instead of the group.",
+            message: 'A TableActionGroup must be a list of at least one TableAction.',
+            why: 'The group shows its first action as a button and the others in a menu next to it, and cannot hold another group.',
+            fix: "Pass one or more TableAction, e.g. TableActionGroup::make([TableAction::make('Add product')->route('products.create'), TableAction::make('Add digital product')->route('products.create-digital')]), or a single TableAction instead of the group.",
         );
     }
 

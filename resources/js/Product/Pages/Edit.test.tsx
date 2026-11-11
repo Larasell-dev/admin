@@ -40,6 +40,11 @@ function props(
     categories: [],
     createCategoryUrl: null,
     sections: [],
+    type: {
+      key: "physical",
+      label: "Physical product",
+      capabilities: ["stock", "shipping", "dimensions"],
+    },
     contentLocale: {
       current: "en",
       options: [english, german],

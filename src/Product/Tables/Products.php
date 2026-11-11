@@ -7,6 +7,7 @@ use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
 use Larasell\Admin\Platform\Tables\Actions\TableAction;
+use Larasell\Admin\Platform\Tables\Actions\TableActionGroup;
 use Larasell\Admin\Platform\Tables\Attributes\UseModel;
 use Larasell\Admin\Platform\Tables\Columns\BadgeColumn;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
@@ -14,7 +15,9 @@ use Larasell\Admin\Platform\Tables\Enums\Variant;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Product\Actions\DeleteProduct;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Facades\ProductTypes;
 use Larasell\Larasell\Translatable;
 
 #[UseModel(Product::class)]
@@ -53,9 +56,16 @@ class Products extends Table
 
     public function headerActions(): array
     {
-        return [
-            TableAction::make(Translate::later('Add product'))->route('larasell.admin.products.create')->icon(Icon::Add),
-        ];
+        $types = ProductTypes::all();
+
+        // The first registered type (physical) is the button, the others are in its menu.
+        return [TableActionGroup::make(array_map(
+            fn (ProductType $type, int $index): TableAction => TableAction::make($index === 0 ? Translate::later('Add product') : __('Add :type', ['type' => lcfirst(__($type->label()))]))
+                ->route('larasell.admin.products.create', ['type' => $type->key()])
+                ->icon(Icon::Add),
+            $types,
+            array_keys($types),
+        ))];
     }
 
     public function actions(): array

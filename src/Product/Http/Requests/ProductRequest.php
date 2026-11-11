@@ -14,14 +14,19 @@ use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Product\Rules\Barcode;
 use Larasell\Larasell\Attachments\Attachments;
 use Larasell\Larasell\Barcode as LarasellBarcode;
+use Larasell\Larasell\Catalog\CoreProductType;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\Facades\ProductTypes;
+use Larasell\Larasell\Inventory\InventoryCapabilities;
 use Larasell\Larasell\RichText\RichText;
+use Larasell\Larasell\Shipping\ShippingCapabilities;
 use Larasell\Larasell\Weight;
 
 class ProductRequest extends FormRequest
@@ -36,6 +41,11 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Fields of capabilities the type lacks are dropped, e.g. a weight sent for a digital product.
+        $without = fn (string $capability): array => $this->productType()->has($capability) ? [] : ['exclude'];
+        $stock = $without(InventoryCapabilities::STOCK);
+        $dimensions = $without(ShippingCapabilities::DIMENSIONS);
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::enum(Visibility::class)],
@@ -43,28 +53,43 @@ class ProductRequest extends FormRequest
             'description' => ['sometimes', 'nullable', 'string', new RichTextDocument],
             // Optional, since digital products have neither. The units always come with the
             // form, so only the amounts decide whether there is a weight or dimensions.
-            'weight' => ['nullable', 'array'],
-            'weight.amount' => ['nullable', 'string', self::AMOUNT],
-            'weight.unit' => ['required_with:weight.amount', Rule::enum(WeightUnit::class)],
-            'dimensions' => ['nullable', 'array'],
+            'weight' => [...$dimensions, 'nullable', 'array'],
+            'weight.amount' => [...$dimensions, 'nullable', 'string', self::AMOUNT],
+            'weight.unit' => [...$dimensions, 'required_with:weight.amount', Rule::enum(WeightUnit::class)],
+            'dimensions' => [...$dimensions, 'nullable', 'array'],
             // All three or none, since Dimensions needs every axis.
-            'dimensions.length' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.width,dimensions.height'],
-            'dimensions.width' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.height'],
-            'dimensions.height' => ['nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.width'],
-            'dimensions.unit' => ['required_with:dimensions.length,dimensions.width,dimensions.height', Rule::enum(LengthUnit::class)],
+            'dimensions.length' => [...$dimensions, 'nullable', 'string', self::AMOUNT, 'required_with:dimensions.width,dimensions.height'],
+            'dimensions.width' => [...$dimensions, 'nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.height'],
+            'dimensions.height' => [...$dimensions, 'nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.width'],
+            'dimensions.unit' => [...$dimensions, 'required_with:dimensions.length,dimensions.width,dimensions.height', Rule::enum(LengthUnit::class)],
             // Optional, but each identifies one product, so no other product may have it.
             'sku' => ['nullable', 'string', 'max:255', Rule::unique(Product::class)->ignore($this->route('product'))],
             'barcode' => ['nullable', 'string', new Barcode, Rule::unique(Product::class)->ignore($this->route('product'))],
             // An empty stock isn't tracked. Backorders sell past 0, so the stock may be below it.
-            'stock' => ['nullable', 'integer'],
+            'stock' => [...$stock, 'nullable', 'integer'],
             // Left out, a new product allows backorders and an existing one keeps its setting.
-            'allow_backorders' => ['sometimes', 'boolean'],
-            'min_quantity' => ['nullable', 'integer', 'min:1'],
-            'max_quantity' => ['nullable', 'integer', 'min:1', 'gte:min_quantity'],
+            'allow_backorders' => [...$stock, 'sometimes', 'boolean'],
+            'min_quantity' => [...$stock, 'nullable', 'integer', 'min:1'],
+            'max_quantity' => [...$stock, 'nullable', 'integer', 'min:1', 'gte:min_quantity'],
             // The form leaves it out when no category is selected.
             'categories' => ['sometimes', 'array'],
             'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
         ];
+    }
+
+    /**
+     * The edited product's type, or for a new one the type in ?type=, physical without one.
+     */
+    public function productType(): ProductType
+    {
+        $product = $this->route('product');
+        if ($product instanceof Product) {
+            return $product->productType();
+        }
+
+        $key = $this->query('type', CoreProductType::Physical->value);
+
+        return is_string($key) && ProductTypes::has($key) ? ProductTypes::get($key) : abort(404);
     }
 
     /**
@@ -114,7 +139,7 @@ class ProductRequest extends FormRequest
             SectionForm::Product,
             $this,
             $this->route('product') instanceof Product ? $this->route('product') : null,
-            new SectionContext($locale),
+            new SectionContext($locale, $this->productType()->capabilities()),
         ));
     }
 
@@ -165,7 +190,7 @@ class ProductRequest extends FormRequest
             'stock' => $integer('stock'),
             'min_quantity' => $integer('min_quantity'),
             'max_quantity' => $integer('max_quantity'),
-            ...$this->has('allow_backorders') ? ['allow_backorders' => $this->boolean('allow_backorders')] : [],
+            ...$this->has('allow_backorders') && $this->productType()->has(InventoryCapabilities::STOCK) ? ['allow_backorders' => $this->boolean('allow_backorders')] : [],
         ];
     }
 

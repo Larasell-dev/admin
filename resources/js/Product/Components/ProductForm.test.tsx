@@ -14,11 +14,19 @@ import UnsavedChangesToast, {
 
 type Product = ComponentProps<typeof ProductForm>["product"];
 type Category = ComponentProps<typeof ProductForm>["categories"][number];
+type ProductType = ComponentProps<typeof ProductForm>["type"];
+
+const physical: ProductType = {
+  key: "physical",
+  label: "Physical product",
+  capabilities: ["stock", "shipping", "dimensions"],
+};
 
 type FormPageProps = {
   product?: Product;
   categories: Category[];
   createCategoryUrl: string | null;
+  type: ProductType;
 };
 
 /**
@@ -26,7 +34,7 @@ type FormPageProps = {
  * Inertia's router keeps resolving the component of the file's first test after a visit.
  */
 function FormPage() {
-  const { product, categories, createCategoryUrl } = usePage<FormPageProps>().props;
+  const { product, categories, createCategoryUrl, type } = usePage<FormPageProps>().props;
 
   return (
     <>
@@ -35,6 +43,7 @@ function FormPage() {
           product={product}
           categories={categories}
           createCategoryUrl={createCategoryUrl}
+          type={type}
         />
         <UnsavedChangesToast />
       </Form>
@@ -56,12 +65,13 @@ async function renderForm(
   categories: Category[] = [],
   url = "/admin/products",
   createCategoryUrl: string | null = "/admin/categories/create",
+  type: ProductType = physical,
 ) {
   formPage = {
     component: "FormPage",
     url,
     version: null,
-    props: { product, categories, createCategoryUrl },
+    props: { product, categories, createCategoryUrl, type },
   };
 
   const screen = await render(
@@ -111,6 +121,19 @@ it("starts a new product empty and visible", async () => {
 
   // Assert
   expect(submitted()).toMatchObject({ name: "Linen Shirt", status: "visible" });
+});
+
+it("shows only the sections the product type's capabilities apply to", async () => {
+  // Arrange
+  const digital = { key: "digital", label: "Digital product", capabilities: [] };
+
+  // Act
+  await renderForm(undefined, [], "/admin/products", null, digital);
+
+  // Assert
+  await expect.element(page.getByRole("heading", { name: "General" })).toBeVisible();
+  expect(page.getByRole("heading", { name: "Stock" }).query()).toBeNull();
+  expect(page.getByRole("heading", { name: "Weight and dimensions" }).query()).toBeNull();
 });
 
 it("shows an existing product's values", async () => {

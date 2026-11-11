@@ -15,6 +15,7 @@ export default function Create({
   categories,
   createCategoryUrl,
   sections,
+  type,
   contentLocale,
 }: Props) {
   return (
@@ -46,6 +47,7 @@ export default function Create({
           categories={categories}
           createCategoryUrl={createCategoryUrl}
           sections={sections}
+          type={type}
         />
         <UnsavedChangesToast />
       </Page.Body>

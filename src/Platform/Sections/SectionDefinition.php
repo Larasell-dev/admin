@@ -32,6 +32,8 @@ final class SectionDefinition
 
     private int $position = 0;
 
+    private ?string $requires = null;
+
     /** Whether it was set up wrongly, so in production its form leaves it out. */
     private bool $broken = false;
 
@@ -105,6 +107,23 @@ final class SectionDefinition
         $this->position = $position;
 
         return $this;
+    }
+
+    /**
+     * Shows the section only when the resource has the capability, e.g. a product whose type has
+     * "shipping". Its request is left out too, so its fields are neither validated nor saved.
+     */
+    public function requires(string $capability): self
+    {
+        $this->requires = $capability;
+
+        return $this;
+    }
+
+    /** @internal */
+    public function appliesTo(SectionContext $context): bool
+    {
+        return $this->requires === null || $context->capabilities === null || in_array($this->requires, $context->capabilities, true);
     }
 
     /**

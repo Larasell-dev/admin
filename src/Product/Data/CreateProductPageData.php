@@ -18,5 +18,6 @@ class CreateProductPageData extends Data
         public ?string $createCategoryUrl,
         /** @var array<int, SectionData> */
         public array $sections,
+        public ProductTypeData $type,
     ) {}
 }

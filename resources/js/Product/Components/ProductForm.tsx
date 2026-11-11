@@ -24,6 +24,7 @@ type Product = Omit<Larasell.Admin.Product.Data.ProductDetailData, "id">;
 type Category = Larasell.Admin.Category.Data.CategoryOptionData;
 type Errors = Record<string, string | undefined>;
 type ExtensionSection = Larasell.Admin.Platform.Sections.Data.SectionData;
+type ProductType = Larasell.Admin.Product.Data.ProductTypeData;
 /** The product form's own sections, generated from the ProductSection enum. */
 type Anchor = Larasell.Admin.Product.Enums.ProductSection;
 
@@ -36,8 +37,11 @@ export default function ProductForm({
   categories,
   createCategoryUrl,
   sections = [],
+  type,
 }: {
   product?: Product;
+  /** The product's type; its capabilities decide which sections show. */
+  type: ProductType;
   /** The store's categories to pick the product's from. */
   categories: Category[];
   /** Where the store's first categories are created, offered while it has none. Null while the
@@ -84,7 +88,7 @@ export default function ProductForm({
         />
       </Section.Root>
     ),
-    stock: (
+    stock: type.capabilities.includes("stock") && (
       <Section.Root>
         <Section.Header
           title={fbs(
@@ -99,7 +103,7 @@ export default function ProductForm({
         <StockFields product={product} errors={errors} />
       </Section.Root>
     ),
-    "weight-and-dimensions": (
+    "weight-and-dimensions": type.capabilities.includes("dimensions") && (
       <Section.Root>
         <Section.Header
           title={fbs(

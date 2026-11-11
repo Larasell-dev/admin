@@ -6,12 +6,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Admin\Platform\Sections\Facades\Section;
+use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\Facades\ProductCapabilities;
+use Larasell\Larasell\Facades\ProductTypes;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 use Larasell\Larasell\Weight;
@@ -78,7 +83,7 @@ it('says there are no products yet when the store has none', function () {
                 'description' => 'Products you add to the store show up here.',
                 'icon' => 'ShoppingBag',
                 'actions' => [
-                    ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create'), 'icon' => 'Add'],
+                    ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create', ['type' => 'physical']), 'icon' => 'Add'],
                 ],
             ]));
 });
@@ -90,7 +95,7 @@ it('links to adding a product from the header', function () {
     // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.headerActions', [
-            ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create'), 'icon' => 'Add'],
+            ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create', ['type' => 'physical']), 'icon' => 'Add'],
         ]));
 });
 
@@ -114,7 +119,7 @@ it('shows the page for adding a product', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Product/Pages/Create')
-            ->where('storeUrl', route('larasell.admin.products.store'))
+            ->where('storeUrl', route('larasell.admin.products.store', ['type' => 'physical']))
             ->where('indexUrl', route('larasell.admin.products.index')));
 });
 
@@ -974,4 +979,96 @@ it('turns the products off when disabled in the config', function () {
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('navigation', fn ($items) => ! collect($items)->pluck('label')->contains('Products')));
+});
+
+function registerDigitalType(): void
+{
+    ProductTypes::register(ProductType::make('digital')->label('Digital product'));
+}
+
+it('offers the first type as the create button and the others in its menu', function () {
+    // Arrange
+    signInAdmin();
+    registerDigitalType();
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('table.headerActions', [
+            ['actions' => [
+                ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create', ['type' => 'physical']), 'icon' => 'Add'],
+                ['label' => 'Add digital product', 'method' => 'get', 'url' => route('larasell.admin.products.create', ['type' => 'digital']), 'icon' => 'Add'],
+            ]],
+        ]));
+});
+
+it('shows the create page with the type and its capabilities', function () {
+    // Arrange
+    signInAdmin();
+    registerDigitalType();
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.create', ['type' => 'digital']))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('type', ['key' => 'digital', 'label' => 'Digital product', 'capabilities' => []])
+            ->where('storeUrl', route('larasell.admin.products.store', ['type' => 'digital'])));
+});
+
+it('sends unknown types back to the products', function () {
+    // Arrange
+    signInAdmin();
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.create', ['type' => 'nope']))
+        ->assertRedirect(route('larasell.admin.products.index'));
+});
+
+it('creates a product of the given type without fields its type lacks', function () {
+    // Arrange
+    signInAdmin();
+    registerDigitalType();
+
+    // Act
+    $this->post(route('larasell.admin.products.store', ['type' => 'digital']), [
+        'name' => 'Ebook',
+        'status' => 'visible',
+        'stock' => '5',
+        'weight' => ['amount' => '1', 'unit' => 'kg'],
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    $product = Product::query()->sole();
+    expect($product->type)->toBe('digital')
+        ->and($product->stock)->toBeNull()
+        ->and($product->weight)->toBeNull();
+});
+
+it('shows the type on the edit page and never changes it', function () {
+    // Arrange
+    signInAdmin();
+    registerDigitalType();
+    $product = Product::create(['name' => 'Ebook', 'price' => Price::of(0), 'type' => 'digital']);
+
+    // Act
+    $this->get(route('larasell.admin.products.edit', $product))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('type.key', 'digital'));
+    $this->put(route('larasell.admin.products.update', $product), ['name' => 'Ebook', 'status' => 'visible', 'type' => 'physical'])
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect($product->fresh()->type)->toBe('digital');
+});
+
+it('leaves out sections whose capability the type lacks', function () {
+    // Arrange
+    signInAdmin();
+    ProductCapabilities::register('download');
+    ProductTypes::register(ProductType::make('digital')->capabilities(['download']));
+    Section::add(SectionForm::Product, 'test-shipping-notes')->requires('shipping');
+    Section::add(SectionForm::Product, 'test-download-files')->requires('download');
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.create', ['type' => 'digital']))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('sections', fn ($sections) => collect($sections)->pluck('key')->sort()->values()->all() === ['seo', 'test-download-files']));
 });

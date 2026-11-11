@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Product\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,6 +16,7 @@ use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Product\Data\CreateProductPageData;
 use Larasell\Admin\Product\Data\EditProductPageData;
 use Larasell\Admin\Product\Data\ProductDetailData;
+use Larasell\Admin\Product\Data\ProductTypeData;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
@@ -24,9 +26,11 @@ use Larasell\Larasell\Catalog\Actions\SetProductCategories;
 use Larasell\Larasell\Catalog\Actions\UpdateProduct;
 use Larasell\Larasell\Catalog\Actions\UpdateProductPayload;
 use Larasell\Larasell\Catalog\CategoryId;
+use Larasell\Larasell\Catalog\CoreProductType;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\ProductId;
+use Larasell\Larasell\Catalog\ProductTypes;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\RichText\TranslatableRichText;
@@ -45,14 +49,27 @@ class ProductController
         private readonly SetProductCategories $setCategories,
     ) {}
 
-    public function create(#[CurrentContentLocale] Locale $locale): Response
+    /**
+     * The form for a new product of the type in ?type=, physical without one. Only the sections
+     * its type's capabilities apply to show; an unknown type goes back to the products.
+     */
+    public function create(Request $request, ProductTypes $types, #[CurrentContentLocale] Locale $locale): Response|RedirectResponse
     {
+        $key = $request->query('type', CoreProductType::Physical->value);
+
+        if (! is_string($key) || ! $types->has($key)) {
+            return redirect()->route('larasell.admin.products.index');
+        }
+
+        $type = $types->get($key);
+
         return Inertia::render('Product/Pages/Create', new CreateProductPageData(
-            storeUrl: route('larasell.admin.products.store'),
+            storeUrl: route('larasell.admin.products.store', ['type' => $type->key()]),
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
-            sections: $this->sections->data(SectionForm::Product, null, new SectionContext($locale)),
+            sections: $this->sections->data(SectionForm::Product, null, new SectionContext($locale, $type->capabilities())),
+            type: ProductTypeData::fromType($type),
         ));
     }
 
@@ -64,7 +81,7 @@ class ProductController
     {
         // With the sections' own fields, so a section that fails leaves no product behind.
         $product = DB::transaction(function () use ($request, $locale): Product {
-            $product = $this->createProduct->handle(new CreateProductPayload([
+            $product = $this->createProduct->handle(new CreateProductPayload(type: $request->productType()->key(), attributes: [
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
                 'description' => $request->description() === null ? null : TranslatableRichText::of($request->description(), $locale->value),
@@ -74,7 +91,7 @@ class ProductController
                 'barcode' => $request->validated('barcode'),
                 ...$request->stock(),
                 'price' => Price::of(0),
-            ], $request->attachments()));
+            ], attachments: $request->attachments()));
 
             $this->saveRelations($request, $product);
             $this->saved($request, $product, true, $locale);
@@ -95,7 +112,8 @@ class ProductController
             indexUrl: route('larasell.admin.products.index'),
             categories: $this->categories($locale),
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
-            sections: $this->sections->data(SectionForm::Product, $product, new SectionContext($locale)),
+            sections: $this->sections->data(SectionForm::Product, $product, new SectionContext($locale, $product->productType()->capabilities())),
+            type: ProductTypeData::fromType($product->productType()),
         ));
     }
 
@@ -141,7 +159,7 @@ class ProductController
         // The promise ProductSaved documents, and asserts again: its listeners run in the save's transaction.
         Assert::that(DB::transactionLevel() > 0, ProductNotSavedAtomically::outsideTransaction(...));
 
-        event(new ProductSaved($product, $created, new SectionContext($locale), $request->sections()));
+        event(new ProductSaved($product, $created, new SectionContext($locale, $product->productType()->capabilities()), $request->sections()));
     }
 
     /**

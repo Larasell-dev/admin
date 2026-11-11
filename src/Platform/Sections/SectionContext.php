@@ -14,5 +14,12 @@ final readonly class SectionContext
     public function __construct(
         /** The content locale the page edits, e.g. the product's name in German. */
         public Locale $locale,
+        /**
+         * What the edited resource can do, e.g. a product type's capabilities such as "stock".
+         * Null when the form has none, so every section shows.
+         *
+         * @var list<string>|null
+         */
+        public ?array $capabilities = null,
     ) {}
 }
