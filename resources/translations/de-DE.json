@@ -6065,162 +6065,6 @@
       ],
       "types": []
     },
-    "xwZc8nSSyQ2ibiI7bftK9g==": {
-      "description": "Attributes page: scope of an attribute only the product has",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Product only",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "vpKVjaukaR3iQK2diChawg==": {
-      "description": "Attributes page: scope of an attribute variants inherit, override or clear",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Product, inherited by variants",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ukAgb46YBL+JWuxKLdHSfg==": {
-      "description": "Attributes page: scope of an attribute only variants have",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Variants only",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "TFyeMB4Ks7sTHs+FCzqmkw==": {
-      "description": "Attributes page: accessible name of what the attribute describes",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Describes",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "znWqiuFrjRwwC+ZXHl1JXQ==": {
-      "description": "Attributes page: title of the page of the catalog's attributes",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Attributes",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Vw50K2xSAwFpws0+nOk4EQ==": {
-      "description": "Attributes page: heading of the form that creates an attribute",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "New attribute",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "UxqDu9AnJvMXtPfKrF3xpA==": {
-      "description": "Attributes page: examples below the heading of the new attribute form",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "E.g. Material, Care or Voltage.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "A5ooXxnQFXUF/iGEBMaJgA==": {
-      "description": "Attributes page: accessible name of the new attribute's name",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Name",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "CWEPPSi1RXb2y+B57qHYag==": {
-      "description": "Attributes page: placeholder of the new attribute's name",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Name",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "6dGGnauxZqPY3pCiOt6bPA==": {
-      "description": "Attributes page: button that creates the attribute",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Add attribute",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Fcr8sLL7AKQ0ICgVU9XmVw==": {
-      "description": "Attributes page: accessible name of the field for a new value",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "New value",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "d3DoMT5YuxDGa2LLbLcFpw==": {
-      "description": "Attributes page: placeholder of the field for a new value",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "New value",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "niaFxZhWrKyf7gp6n11WVQ==": {
-      "description": "Attributes page: button that adds a value to the attribute",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Add value",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "hcUf1jIeu7L+bpOQ3esrXw==": {
       "description": "Product form: heading of the section with the SKU, barcode (e.g. EAN or UPC) and manufacturer part number",
       "status": "new",
@@ -6749,18 +6593,6 @@
       ],
       "types": []
     },
-    "HYgjixeYrATNAC80MALIjg==": {
-      "description": "Attributes page: checkbox that lets products and variants have several values of the attribute, e.g. a blend of materials",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Several values per product or variant",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "E6U+21pjZA/OJWHm58ZZug==": {
       "description": "Product form: accessible name of the button on an attribute value that removes it, e.g. 'Remove Cotton'",
       "status": "new",
@@ -6900,6 +6732,786 @@
       "translations": [
         {
           "translation": "Add option",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EcohPTp6D969bJMmHey/Tw==": {
+      "description": "New attribute page: title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n8fUFLU2SGs+D5K7UFUFZw==": {
+      "description": "New attribute page: accessible name of the back arrow to the list of attributes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Back to attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dBWkCwpTTRfb357YfjPeTA==": {
+      "description": "New attribute page: heading of the attribute's fields",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "General",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qwmdQAtryr1kA7pM4SFNWw==": {
+      "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{products} products and {variants} variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "juQ81atlIIc1pb8nj4XE8A==": {
+      "description": "Attribute page: accessible name of the back arrow to the list of attributes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Back to attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6gEXDzS159sLdt4OsLhMWQ==": {
+      "description": "Attribute page: heading of the attribute's settings",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "General",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5SZzG6nyWffxFUi26m59lQ==": {
+      "description": "Attribute page: explains the section with the attribute's settings",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "How the attribute is named, and what it describes.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CdftVpJdSJpuYIhicWjHfA==": {
+      "description": "Attribute page: heading of the delete section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "52ObOU30yO3rP08B6eBYlA==": {
+      "description": "Attribute page: explains the section with the button that deletes the attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Its values are deleted with it, and products and variants lose them.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DoIjbZbxyUNAEFu173dcLA==": {
+      "description": "Attribute page: button that asks to delete the attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Kq25rqfrkostYGEmIS5F+Q==": {
+      "description": "Attribute page: title of the delete dialog",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4dHyuTfHZaMVDTX99G52ww==": {
+      "description": "Attribute page: delete dialog text for an attribute in use",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} is used by {usage}. They lose its values. This can't be undone.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "04LWHsPRkBV8gZM9l6IH1Q==": {
+      "description": "Attribute page: delete dialog text for an unused attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No product or variant uses {name}. This can't be undone.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PNMhgsQLhnWaOCjeX63aiw==": {
+      "description": "Attribute page: heading of the attribute's values",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Values",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JDPRV21D0EESp/Ep9XHBPQ==": {
+      "description": "Attribute page: explains the values section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "What products and variants pick from, in the order they show.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+INA3+DeIZvsePyThr62Gg==": {
+      "description": "Attribute page: name of the values table",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Values",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3e0TtzJX2ACepvPmBPVFew==": {
+      "description": "Attribute page: values table column with the name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oGJyhgIhzNT25s+hctfUmQ==": {
+      "description": "Attribute page: values table column with the slug",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Slug",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kqpRjlURziYeTC1otDvf9g==": {
+      "description": "Attribute page: values table column with each value's buttons",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Actions",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5UOyl2qWUwY1DMLjPd9QBA==": {
+      "description": "Attribute form: label of the field for the attribute's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4P0T9VUaZY34MqEyp4W7CA==": {
+      "description": "Attribute form: label of the field for the attribute's slug, its key in URLs",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Slug",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tWRU9C/I7rHlmlPlOGzqCA==": {
+      "description": "Attribute form: hint below the slug of an existing attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Storefront filter links use it. Changing it breaks links that use the old one.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DR6sdLRsZdS0yhSgM0260w==": {
+      "description": "Attribute form: hint below the slug of a new attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Used in storefront filter links. Lowercase letters and numbers, joined by - or _.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QG+8EAk+R5R0drNCIeng0w==": {
+      "description": "Attribute form: label of the select for whether the attribute describes products, variants or both",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Describes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HN+R8v4ea6j82Zt5Swr65g==": {
+      "description": "Attribute form: checkbox that lets products and variants have several values of the attribute, e.g. a blend of materials",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Several values per product or variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i9CXuGaOEfnwY772zrUk5g==": {
+      "description": "Attributes page: header button that opens the form to add an attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6mB5U5Meh0AlyT5HzL6N3A==": {
+      "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{products} products and 1 variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DLRAuQiBCOsH+UPsc27Z1w==": {
+      "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 product and {variants} variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eWDdaOjiijgNm2dOQX2/uw==": {
+      "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 product and 1 variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aniv9gmescGREV0skQBWlQ==": {
+      "description": "Attribute page: shown in the values section while the attribute has none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No values yet",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YkIh6NdBkIdf0b0zm19Ypg==": {
+      "description": "Attribute page: explains the empty values section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add the values products and variants pick from, e.g. Cotton or Wool.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lGv1tPeIInvOVN+mzMv3CQ==": {
+      "description": "Attribute page: button that opens the slideover to add a value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4VkFMWnJnG/C7LeHpzr2KA==": {
+      "description": "Attribute page: title of the slideover that adds a value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aDpM4qKSOaBWUCrEcY/ysg==": {
+      "description": "Attribute page: accessible name of the button that closes the value slideover",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Close",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mzJ879Q9ZMDqdY1kVJ89ew==": {
+      "description": "Value slideover: label of the value's name, e.g. Cotton",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+bK/yCHkqsdK/obxMZeWdQ==": {
+      "description": "Value slideover: label of the value's slug",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Slug",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WLC1CeIxBDpwPYzV05uriA==": {
+      "description": "Value slideover: hint below the slug",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Storefront filter links use it. Changing it breaks links that use the old one.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5SJ5TU1Ey3h33XJG6VyY1w==": {
+      "description": "New attribute page: explains the section with the attribute's fields",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E.g. Material, Care or Fit.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2KNoFKYUTv1SJsePIzFimQ==": {
+      "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deleted on save. {products} products and {variants} variants lose it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "76Gw8VHTpUuxK6c0uneS1g==": {
+      "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deleted on save. {products} products and 1 variant lose it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oipaPVfBhip2+irnIQCKzg==": {
+      "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deleted on save. 1 product and {variants} variants lose it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FYHczsAyJ7K8X/d33aDzSA==": {
+      "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deleted on save. 1 product and 1 variant lose it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cmbELMO5ORtefwBRgXR5Pw==": {
+      "description": "Value slideover: error when the name is empty",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Enter a name.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HuS5HNHsAZTdqfHkQrmRvg==": {
+      "description": "Value slideover: error when the slug has other characters or is empty",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Use lowercase letters and numbers, joined by - or _.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4QV1RC2VGbIVrcJkCemFbg==": {
+      "description": "Value slideover: error when the slug is taken",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Another value has this slug.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LX7+vA64iopJiIx6reb5pA==": {
+      "description": "Attribute page: title of the slideover that changes a value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Edit value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SaSSELXaulYZ12MwA67alA==": {
+      "description": "Value slideover: says the change is stored when the attribute page is saved",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Saved with the attribute.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7SPvSKUoQ2hgp+6r6R/UYA==": {
+      "description": "Value slideover: button that closes it without changes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Cancel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TO4cS8LN4714rooS1CnYzA==": {
+      "description": "Value slideover: button that adds the value to the list",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SW05sRn2Z9eIFMLeL8b10Q==": {
+      "description": "Value slideover: button that applies the changes to the value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Apply",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "exNff7pKNiJ7Nvz8SSr/7g==": {
+      "description": "Attribute page: accessible name of the button that opens a value's menu, e.g. 'Actions for Cotton'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Actions for {name}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/I7cuMIEbOT//AsE3SUw6g==": {
+      "description": "Attribute page: menu item that undoes removing a value before saving",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keep value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "waDt4wNpUrTI9y92+BUOQQ==": {
+      "description": "Attribute page: menu item that opens the slideover to change a value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Edit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FUuQfXnao/A+SIWLhzz1jg==": {
+      "description": "Attribute page: menu item that moves a value one place up",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Move up",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hrNEbVMJkuZM0OdbOJyMXg==": {
+      "description": "Attribute page: menu item that moves a value one place down",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Move down",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EdVawzaC+G77daiuUoebJQ==": {
+      "description": "Attribute page: menu item that removes a value; saving deletes it",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Remove",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BYLpLuFTF6m5Bh17vWtb5A==": {
+      "description": "Attribute form: type of an attribute whose values are words, e.g. Cotton",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Text",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s3qKXNoqVph3t2sx8+gUnw==": {
+      "description": "Attribute form: type of an attribute whose values are numbers, e.g. 180",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Number",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z+7zaltTob5JKB1Xn5K1fw==": {
+      "description": "Attribute form: type of an attribute that is either yes or no, e.g. Waterproof",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Yes or no",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0bBUJS91eDJ1KCE0/x1iGQ==": {
+      "description": "Attribute form: label of the attribute's type, e.g. Number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Type",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/XniPn9KnaKU+lvD8voeSQ==": {
+      "description": "Attribute form: hint below the read-only type of an existing attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "It can't change, since products picked its values.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WXVUKdXgJxMELu2/rxHffw==": {
+      "description": "Attribute form: hint below the type select of a new attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "It can't change later.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mL4yGN5ESOXfpwTmZ8gMlw==": {
+      "description": "Attribute page: name of a yes-or-no attribute's yes value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Yes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vuui19PNRERzInJmRqhLpQ==": {
+      "description": "Attribute page: name of a yes-or-no attribute's no value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SN1xdEmbWIyJJxejkmSf4g==": {
+      "description": "Value slideover: error when a number attribute's value isn't a number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Enter a number, e.g. 180 or 2.5.",
           "variations": {}
         }
       ],

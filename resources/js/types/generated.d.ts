@@ -366,9 +366,49 @@ declare namespace Larasell.Admin.Platform.Settings.Data {
   };
 }
 declare namespace Larasell.Admin.Product.Data {
+  export type AttributeDetailData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    type: "text" | "number" | "boolean";
+    scope: string;
+    multiple: boolean;
+    products: number;
+    variants: number;
+  };
+  export type AttributePageData = {
+    attribute: Larasell.Admin.Product.Data.AttributeDetailData;
+    values: Array<Larasell.Admin.Product.Data.AttributeValueRowData>;
+    scopes: Array<Larasell.Admin.Product.Data.AttributeScopeOptionData>;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type AttributeScopeOptionData = {
+    value: string;
+    label: string;
+  };
+  export type AttributeValueRowData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    products: number;
+    variants: number;
+  };
+  export type AttributesPageData = {
+    createUrl: string;
+    attributes: import("./index").TableResource;
+  };
   export type CombinationData = {
     valueIds: Array<number>;
     label: string;
+  };
+  export type CreateAttributePageData = {
+    storeUrl: string;
+    indexUrl: string;
+    scopes: Array<Larasell.Admin.Product.Data.AttributeScopeOptionData>;
   };
   export type CreateProductPageData = {
     storeUrl: string;

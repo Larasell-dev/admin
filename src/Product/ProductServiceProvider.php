@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Product;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
@@ -13,13 +14,21 @@ use Larasell\Admin\Platform\Search\Searches;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
+use Larasell\Admin\Product\Http\Controllers\AttributeController;
 use Larasell\Admin\Product\Http\Controllers\CatalogDefinitionController;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
 use Larasell\Admin\Product\Http\Controllers\ProductVariantController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
+use Larasell\Admin\Product\Listeners\AuditAttributeChanges;
 use Larasell\Admin\Product\Search\DatabaseProductSearch;
 use Larasell\Admin\Product\Search\ProductSearch;
 use Larasell\Admin\Product\Tables\Products;
+use Larasell\Larasell\Catalog\Events\ProductAttributeCreated;
+use Larasell\Larasell\Catalog\Events\ProductAttributeDeleted;
+use Larasell\Larasell\Catalog\Events\ProductAttributeUpdated;
+use Larasell\Larasell\Catalog\Events\ProductAttributeValueCreated;
+use Larasell\Larasell\Catalog\Events\ProductAttributeValueDeleted;
+use Larasell\Larasell\Catalog\Events\ProductAttributeValueUpdated;
 
 /**
  * The products module. Setting larasell.admin.products.enabled to false leaves
@@ -36,6 +45,14 @@ class ProductServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Audited from the core's events, wherever the change came from.
+        Event::listen(ProductAttributeCreated::class, [AuditAttributeChanges::class, 'created']);
+        Event::listen(ProductAttributeUpdated::class, [AuditAttributeChanges::class, 'updated']);
+        Event::listen(ProductAttributeDeleted::class, [AuditAttributeChanges::class, 'deleted']);
+        Event::listen(ProductAttributeValueCreated::class, [AuditAttributeChanges::class, 'valueCreated']);
+        Event::listen(ProductAttributeValueUpdated::class, [AuditAttributeChanges::class, 'valueUpdated']);
+        Event::listen(ProductAttributeValueDeleted::class, [AuditAttributeChanges::class, 'valueDeleted']);
+
         if (! config('larasell.admin.products.enabled')) {
             return;
         }
@@ -63,10 +80,12 @@ class ProductServiceProvider extends ServiceProvider
             Route::get('options', [CatalogDefinitionController::class, 'options'])->name('options.index')->withHead(title: Translate::later('Options'));
             Route::post('options', [CatalogDefinitionController::class, 'storeOption'])->name('options.store');
             Route::post('options/{definition}/values', [CatalogDefinitionController::class, 'storeOptionValue'])->name('options.values.store');
-            Route::get('attributes', [CatalogDefinitionController::class, 'attributes'])->name('attributes.index')->withHead(title: Translate::later('Attributes'));
-            Route::post('attributes', [CatalogDefinitionController::class, 'storeAttribute'])->name('attributes.store');
-            Route::put('attributes/{attribute}', [CatalogDefinitionController::class, 'updateAttribute'])->name('attributes.update');
-            Route::post('attributes/{attribute}/values', [CatalogDefinitionController::class, 'storeAttributeValue'])->name('attributes.values.store');
+            Route::get('attributes', [AttributeController::class, 'index'])->name('attributes.index')->withHead(title: Translate::later('Attributes'));
+            Route::get('attributes/create', [AttributeController::class, 'create'])->name('attributes.create')->withHead(title: Translate::later('New attribute'));
+            Route::post('attributes', [AttributeController::class, 'store'])->name('attributes.store');
+            Route::get('attributes/{attribute}', [AttributeController::class, 'show'])->name('attributes.show');
+            Route::put('attributes/{attribute}', [AttributeController::class, 'update'])->name('attributes.update');
+            Route::delete('attributes/{attribute}', [AttributeController::class, 'destroy'])->name('attributes.destroy');
             Route::get('search/products', SearchProductsController::class)->name('search.products');
         });
     }
