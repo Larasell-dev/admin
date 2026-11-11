@@ -73,9 +73,11 @@
       "npx oxfmt resources/js/types/generated.d.ts"
     ]
   },
-  "repositories": [{
-    "name": "larasell",
-    "type": "vcs",
-    "url": "https://github.com/Larasell-dev/larasell"
-  }]
+  "repositories": [
+    {
+      "name": "larasell",
+      "type": "vcs",
+      "url": "https://github.com/Larasell-dev/larasell"
+    }
+  ]
 }
