@@ -48,7 +48,7 @@ function detailsCompany(): Customer
     return app(CreateCustomer::class)->handle(new CreateCustomerPayload(
         profile: new CompanyProfileData(legalName: 'Muster GmbH', countryCode: Country::DE),
         source: CustomerSource::Admin,
-    ));
+    ), origin());
 }
 
 /** @return array<string, mixed> */
@@ -127,7 +127,7 @@ it('adds, edits and removes contacts of a company', function () {
 
 it('explains that individuals have no contacts', function () {
     // Arrange
-    $person = app(CreateCustomer::class)->handle(new CreateCustomerPayload(new PersonProfileData('Erika', 'Musterfrau'), CustomerSource::Admin));
+    $person = app(CreateCustomer::class)->handle(new CreateCustomerPayload(new PersonProfileData('Erika', 'Musterfrau'), CustomerSource::Admin), origin());
 
     // Act & Assert
     $this->post(route('larasell.admin.customers.contacts.store', $person), ['first_name' => 'Max', 'last_name' => 'Mustermann'])
@@ -137,9 +137,9 @@ it('explains that individuals have no contacts', function () {
 it('lists linked accounts and unlinks one, audited', function () {
     // Arrange
     $customer = detailsCompany();
-    $max = app(AddCustomerContact::class)->handle(CustomerId::of($customer), new CustomerContactPayload('Max', 'Mustermann'));
+    $max = app(AddCustomerContact::class)->handle(CustomerId::of($customer), new CustomerContactPayload('Max', 'Mustermann'), origin());
     $user = CustomerDetailsTestUser::query()->create(['email' => 'max@muster.example']);
-    $account = app(LinkCustomerAccount::class)->handle(CustomerId::of($customer), $user, CustomerContactId::of($max));
+    $account = app(LinkCustomerAccount::class)->handle(CustomerId::of($customer), $user, origin(), CustomerContactId::of($max));
 
     // Act & Assert
     $this->get(route('larasell.admin.customers.show', $customer))
@@ -155,7 +155,7 @@ it('lists linked accounts and unlinks one, audited', function () {
 it('puts a customer in groups and takes it out', function () {
     // Arrange
     $customer = detailsCompany();
-    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload(CustomerGroupCode::of('wholesale'), new Translatable(['en' => 'Wholesale'])));
+    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload(CustomerGroupCode::of('wholesale'), new Translatable(['en' => 'Wholesale'])), origin());
 
     // Act
     $this->post(route('larasell.admin.customers.groups.store', $customer), ['group' => $wholesale->id])->assertRedirect();
@@ -172,7 +172,7 @@ it('puts a customer in groups and takes it out', function () {
 it('audits addresses, contacts and group memberships changed in the panel', function () {
     // Arrange
     $customer = detailsCompany();
-    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload(CustomerGroupCode::of('wholesale'), new Translatable(['en' => 'Wholesale'])));
+    $wholesale = app(CreateCustomerGroup::class)->handle(new CustomerGroupPayload(CustomerGroupCode::of('wholesale'), new Translatable(['en' => 'Wholesale'])), origin());
     DB::table('larasell_audit_log')->delete();
 
     // Act
@@ -198,19 +198,4 @@ it('audits addresses, contacts and group memberships changed in the panel', func
         ->and($records->pluck('subject_type')->unique()->all())->toBe(['customer'])
         ->and($records->pluck('subject_id')->unique()->all())->toBe([(string) $customer->id])
         ->and($records->pluck('actor_type')->unique()->all())->not->toContain('unknown');
-});
-
-it('audits customer changes made outside the panel with an unknown actor', function () {
-    // Arrange
-    auth('larasell-admin')->logout();
-    DB::table('larasell_audit_log')->delete();
-
-    // Act
-    $customer = detailsCompany();
-
-    // Assert
-    $record = DB::table('larasell_audit_log')->sole();
-    expect($record->event)->toBe('customer.created')
-        ->and($record->subject_id)->toBe((string) $customer->id)
-        ->and($record->unknown_actor_reason)->not->toBeNull();
 });

@@ -6,11 +6,12 @@ use Carbon\CarbonInterface;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Platform\Audit\Actors\SystemActor;
-use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Audit\Actors\SystemActor;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Origin;
+use Larasell\Larasell\Audit\Subject;
 
 /**
  * Fills the playground's audit log with fake records, e.g. to try exports, pruning and
@@ -45,7 +46,7 @@ class FakeAuditLogCommand extends Command
             DB::transaction(function () use ($auditor, $done, $count, $start, $step): void {
                 for ($i = $done; $i < min($done + 1000, $count); $i++) {
                     [$event, $category, $subject] = self::EVENTS[$i % count(self::EVENTS)];
-                    $auditor->record($this->record($event, $category, new Subject($subject, random_int(1, 500)), $start->copy()->addSeconds($i * $step)), new SystemActor('workbench:fake-audit-log'));
+                    $auditor->record($this->record($event, $category, new Subject($subject, random_int(1, 500)), $start->copy()->addSeconds($i * $step)), Origin::cli(new SystemActor('workbench:fake-audit-log')));
                 }
             });
             $bar->advance(min(1000, $count - $done));

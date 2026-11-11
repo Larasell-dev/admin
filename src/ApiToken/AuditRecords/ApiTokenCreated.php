@@ -3,9 +3,9 @@
 namespace Larasell\Admin\ApiToken\AuditRecords;
 
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Subject;
 
 /**
  * An admin created an API token. Never with the token or its hash.

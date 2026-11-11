@@ -12,7 +12,9 @@ use Larasell\Admin\ApiToken\Data\CreateApiTokenPageData;
 use Larasell\Admin\ApiToken\Data\CreatedApiTokenData;
 use Larasell\Admin\ApiToken\Enums\ApiTokenExpiry;
 use Larasell\Admin\ApiToken\Tables\ApiTokens;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Origin;
 
 /**
  * @internal The settings pages for API tokens.
@@ -37,13 +39,13 @@ class ApiTokenController
         ));
     }
 
-    public function store(Request $request, CreateApiToken $createApiToken): RedirectResponse
+    public function store(Request $request, CreateApiToken $createApiToken, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         $admin = $request->user('larasell-admin');
 
         [$apiToken, $plainTextToken] = $createApiToken->handle(
             $request->only(['name', 'description', 'expires_in']),
-            $admin instanceof Admin ? $admin : null,
+            $admin instanceof Admin ? $admin : null, $origin,
         );
 
         // Flash data, unlike props, stays out of the browser history, so the token shows once.

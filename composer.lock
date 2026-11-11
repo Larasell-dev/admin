@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1758131b77454e305a4b400570c317d3",
+    "content-hash": "3a8d5a7f170220ac108153bdef37106a",
     "packages": [
         {
             "name": "brick/math",
@@ -1250,16 +1250,16 @@
         },
         {
             "name": "larasell-dev/larasell",
-            "version": "v1.27.4",
+            "version": "v1.28.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Larasell-dev/larasell.git",
-                "reference": "ff202c824eab905e124700e7efdebed468527525"
+                "reference": "ba7bb374f6dd757441bdde79a5c56a7a3ed2a218"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/ff202c824eab905e124700e7efdebed468527525",
-                "reference": "ff202c824eab905e124700e7efdebed468527525",
+                "url": "https://api.github.com/repos/Larasell-dev/larasell/zipball/ba7bb374f6dd757441bdde79a5c56a7a3ed2a218",
+                "reference": "ba7bb374f6dd757441bdde79a5c56a7a3ed2a218",
                 "shasum": ""
             },
             "require": {
@@ -1320,8 +1320,8 @@
                 "issues": "https://github.com/Larasell-dev/larasell/issues",
                 "source": "https://github.com/Larasell-dev/larasell"
             },
-            "time": "2026-11-11T07:07:16+00:00",
-            "published-time": "2026-11-11T07:07:33+00:00"
+            "time": "2026-11-11T21:54:21+00:00",
+            "published-time": "2026-11-11T21:54:40+00:00"
         },
         {
             "name": "laravel/framework",

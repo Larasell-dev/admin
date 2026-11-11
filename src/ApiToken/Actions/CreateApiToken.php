@@ -10,8 +10,9 @@ use Illuminate\Validation\ValidationException;
 use Larasell\Admin\ApiToken\AuditRecords\ApiTokenCreated;
 use Larasell\Admin\ApiToken\Enums\ApiTokenExpiry;
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Origin;
 
 /**
  * @internal Tokens are created in the admin panel's settings.
@@ -35,7 +36,7 @@ class CreateApiToken
      *
      * @throws ValidationException
      */
-    public function handle(array $input, ?Admin $createdBy): array
+    public function handle(array $input, ?Admin $createdBy, Origin $origin): array
     {
         $validated = Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
@@ -46,7 +47,7 @@ class CreateApiToken
         $entropy = Str::random(40);
         $secret = self::PREFIX.$entropy.hash('crc32b', $entropy);
 
-        $apiToken = DB::transaction(function () use ($validated, $createdBy, $secret): ApiToken {
+        $apiToken = DB::transaction(function () use ($origin, $validated, $createdBy, $secret): ApiToken {
             $apiToken = ApiToken::query()->create([
                 'name' => $validated['name'],
                 'description' => $validated['description'] ?? null,
@@ -56,7 +57,7 @@ class CreateApiToken
                 'expires_at' => ApiTokenExpiry::from($validated['expires_in'])->expiresAt(),
             ]);
 
-            $this->auditor->record(new ApiTokenCreated($apiToken));
+            $this->auditor->record(new ApiTokenCreated($apiToken), $origin);
 
             return $apiToken;
         });

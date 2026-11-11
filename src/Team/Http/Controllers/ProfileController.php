@@ -12,6 +12,7 @@ use Larasell\Admin\Team\Actions\UpdateAdmin;
 use Larasell\Admin\Team\Data\AdminData;
 use Larasell\Admin\Team\Data\ProfilePageData;
 use Larasell\Admin\Team\Http\Requests\ProfileRequest;
+use Larasell\Larasell\Audit\Origin;
 
 class ProfileController
 {
@@ -38,7 +39,7 @@ class ProfileController
             $attributes['avatar_path'] = null;
         }
 
-        $updateAdmin->handle($admin, $attributes, $admin);
+        $updateAdmin->handle($admin, $attributes, Origin::web($admin));
 
         if ($previousAvatar !== null && $previousAvatar->path !== $admin->avatar_path?->path) {
             $disk->delete($previousAvatar->path);

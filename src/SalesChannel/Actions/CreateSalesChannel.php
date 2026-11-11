@@ -3,6 +3,7 @@
 namespace Larasell\Admin\SalesChannel\Actions;
 
 use Illuminate\Validation\ValidationException;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\SalesChannels\Actions\CreateSalesChannel as CoreCreateSalesChannel;
 use Larasell\Larasell\SalesChannels\Exceptions\InvalidSalesChannel;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
@@ -17,7 +18,7 @@ class CreateSalesChannel
      *
      * @throws ValidationException
      */
-    public function handle(CreateSalesChannelPayload $payload): SalesChannel
+    public function handle(CreateSalesChannelPayload $payload, Origin $origin): SalesChannel
     {
         try {
             return $this->create->handle([
@@ -29,7 +30,7 @@ class CreateSalesChannel
                 'default_locale' => $payload->defaultLocale,
                 'default_currency' => $payload->defaultCurrency,
                 'active' => $payload->active,
-            ]);
+            ], $origin);
         } catch (InvalidSalesChannel $exception) {
             throw ValidationException::withMessages(['channel' => $exception->getMessage()]);
         }

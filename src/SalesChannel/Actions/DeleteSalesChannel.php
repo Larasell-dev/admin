@@ -3,6 +3,7 @@
 namespace Larasell\Admin\SalesChannel\Actions;
 
 use Illuminate\Validation\ValidationException;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\SalesChannels\Actions\DeleteSalesChannel as CoreDeleteSalesChannel;
 use Larasell\Larasell\SalesChannels\Exceptions\InvalidSalesChannel;
 use Larasell\Larasell\SalesChannels\Exceptions\SalesChannelInUse;
@@ -20,10 +21,10 @@ class DeleteSalesChannel
      *
      * @throws ValidationException
      */
-    public function handle(SalesChannel $channel): void
+    public function handle(SalesChannel $channel, Origin $origin): void
     {
         try {
-            $this->delete->handle(SalesChannelId::of($channel));
+            $this->delete->handle(SalesChannelId::of($channel), $origin);
         } catch (InvalidSalesChannel) {
             throw ValidationException::withMessages(['channel' => __("The last sales channel can't be deleted.")]);
         } catch (SalesChannelInUse) {

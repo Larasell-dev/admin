@@ -8,8 +8,6 @@ use Illuminate\Http\File;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Platform\Audit\Actors\SystemActor;
-use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\Export\AuditLogExporter;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportFailed;
 use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
@@ -17,6 +15,9 @@ use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
 use Larasell\Admin\Platform\Audit\Export\Exceptions\InvalidAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
 use Larasell\Admin\Platform\Support\Assert;
+use Larasell\Larasell\Audit\Actors\SystemActor;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Origin;
 use Throwable;
 
 /**
@@ -80,7 +81,7 @@ class ExportAuditLog implements ShouldQueue
     }
 
     /**
-     * @internal Also called by larasell:prune-audit-log for exports that never finished.
+     * @internal Also called when the audit log is pruned, for exports that never finished.
      */
     public static function markFailed(AuditLogExport $export, string $error): void
     {
@@ -90,7 +91,7 @@ class ExportAuditLog implements ShouldQueue
 
         DB::transaction(function () use ($export, $error): void {
             $export->update(['status' => AuditLogExportStatus::Failed]);
-            app(Auditor::class)->record(new AuditLogExportFailed($export->id, $export->format, $error), new SystemActor('audit-log-export'));
+            app(Auditor::class)->record(new AuditLogExportFailed($export->id, $export->format, $error), Origin::job(new SystemActor('audit-log-export')));
         });
         AuditLogExportFinished::dispatch($export->admin_id);
     }

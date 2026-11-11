@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Category\Tables;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Larasell\Admin\Platform\Audit\Origins;
 use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -66,7 +67,7 @@ class CategoryProducts extends Table
                 ->hidden(! config('larasell.admin.products.enabled')),
             Action::make(Translate::later('Remove'), handle: fn (Product $product) => app(SetProductCategories::class)->handle(
                 ProductId::of($product),
-                CategoryId::many($product->categories()->allRelatedIds()->map(fn (mixed $id): int => (int) $id)->reject(fn (int $id): bool => $id === $this->category->id)),
+                CategoryId::many($product->categories()->allRelatedIds()->map(fn (mixed $id): int => (int) $id)->reject(fn (int $id): bool => $id === $this->category->id)), app(Origins::class)->current(),
             ))
                 ->confirm(
                     title: __('Remove product'),

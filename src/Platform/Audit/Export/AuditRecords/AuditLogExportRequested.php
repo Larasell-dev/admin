@@ -2,9 +2,9 @@
 
 namespace Larasell\Admin\Platform\Audit\Export\AuditRecords;
 
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Subject;
 
 /**
  * Someone started an export of the audit log and the format.

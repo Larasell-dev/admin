@@ -7,13 +7,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
-use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Auth\AuditRecords\AdminSignedIn;
 use Larasell\Admin\Platform\Auth\AuditRecords\AdminSignInFailed;
 use Larasell\Admin\Platform\Auth\Data\LoginPageData;
 use Larasell\Admin\Platform\Auth\Http\Requests\LoginRequest;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Actors\UnknownActor;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Origin;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Throwable;
 
@@ -34,7 +35,7 @@ class LoginController
 
         if (! $guard->attempt($credentials)) {
             $tried = Admin::query()->where('email', $credentials['email'])->first();
-            $auditor->record(new AdminSignInFailed($tried, $credentials['email'], $request->ip()), new UnknownActor('No one was signed in: the sign-in failed.'));
+            $auditor->record(new AdminSignInFailed($tried, $credentials['email'], $request->ip()), Origin::web(new UnknownActor('No one was signed in: the sign-in failed.')));
 
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
@@ -45,7 +46,7 @@ class LoginController
         $admin = $guard->user();
 
         try {
-            $auditor->record(new AdminSignedIn($admin), $admin);
+            $auditor->record(new AdminSignedIn($admin), Origin::web($admin));
         } catch (Throwable $e) {
             // No session without its record.
             $guard->logout();

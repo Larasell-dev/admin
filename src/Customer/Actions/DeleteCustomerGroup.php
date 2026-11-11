@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Customer\Actions;
 
 use Illuminate\Validation\ValidationException;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Customers\Actions\DeleteCustomerGroup as CoreDeleteCustomerGroup;
 use Larasell\Larasell\Customers\CustomerGroupId;
 use Larasell\Larasell\Customers\Exceptions\CustomerGroupInUse;
@@ -16,10 +17,10 @@ class DeleteCustomerGroup
     public function __construct(private readonly CoreDeleteCustomerGroup $delete) {}
 
     /** @throws ValidationException */
-    public function handle(CustomerGroupId $groupId): void
+    public function handle(CustomerGroupId $groupId, Origin $origin): void
     {
         try {
-            $this->delete->handle($groupId);
+            $this->delete->handle($groupId, $origin);
         } catch (CustomerGroupInUse) {
             throw ValidationException::withMessages(['group' => __('Take the customers out of the group before deleting it.')]);
         }

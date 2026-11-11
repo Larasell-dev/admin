@@ -2,10 +2,10 @@
 
 namespace Larasell\Admin\Platform\Auth\AuditRecords;
 
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Subject;
 
 /**
  * Someone failed to sign in, against the admin whose email they tried, if any. Keeps the email

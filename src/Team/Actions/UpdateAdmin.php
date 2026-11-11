@@ -3,11 +3,10 @@
 namespace Larasell\Admin\Team\Actions;
 
 use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Platform\Audit\Actors\Actor;
-use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
-use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Team\AuditRecords\AdminUpdated;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Origin;
 
 /**
  * @internal Admins are changed in the settings and on their profile page.
@@ -22,17 +21,17 @@ class UpdateAdmin
      *
      * @param  array<string, mixed>  $attributes  Validated by the caller.
      */
-    public function handle(Admin $admin, array $attributes, Actor|UnknownActor $actor): void
+    public function handle(Admin $admin, array $attributes, Origin $origin): void
     {
         $emailFrom = $admin->email;
         $admin->fill($attributes);
 
-        DB::transaction(function () use ($admin, $emailFrom, $actor): void {
+        DB::transaction(function () use ($admin, $emailFrom, $origin): void {
             $admin->save();
             $record = new AdminUpdated($admin, $emailFrom);
 
             if ($record->changed !== []) {
-                $this->auditor->record($record, $actor);
+                $this->auditor->record($record, $origin);
             }
         });
     }

@@ -82,7 +82,7 @@ it('broadcasts to the other admins when a channel is created, renamed or deleted
 
 it('broadcasts nothing for other changes to a channel, or for a delete that was refused', function () {
     // Arrange
-    $channel = app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'B2B', 'type' => 'storefront', 'locales' => ['en', 'de'], 'currencies' => ['USD']]);
+    $channel = app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'B2B', 'type' => 'storefront', 'locales' => ['en', 'de'], 'currencies' => ['USD']], origin());
     Cart::createIn(SalesContext::for('b2b', 'en'));
     broadcasts()->exchangeArray([]);
     $this->actingAs($this->admin, 'larasell-admin');
@@ -101,7 +101,7 @@ it('broadcasts nothing for other changes to a channel, or for a delete that was 
 it('broadcasts a rename made outside the panel too, once the transaction it ran in commits', function () {
     // Act
     DB::transaction(function () {
-        app(UpdateSalesChannel::class)->handle(new SalesChannelId(1), ['name' => 'Webshop']);
+        app(UpdateSalesChannel::class)->handle(new SalesChannelId(1), ['name' => 'Webshop'], origin());
 
         expect(broadcasts()->count())->toBe(0);
     });

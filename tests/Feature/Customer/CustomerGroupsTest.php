@@ -49,8 +49,8 @@ it('refuses a taken code and keeps groups with members', function () {
     // Arrange
     $this->post(route('larasell.admin.customer-groups.store'), ['code' => 'vip', 'name' => 'VIP']);
     $group = CustomerGroup::query()->sole();
-    $customer = app(CreateCustomer::class)->handle(new CreateCustomerPayload(new PersonProfileData('A', 'B'), CustomerSource::Admin));
-    app(AddCustomerToGroup::class)->handle(CustomerId::of($customer), CustomerGroupId::of($group));
+    $customer = app(CreateCustomer::class)->handle(new CreateCustomerPayload(new PersonProfileData('A', 'B'), CustomerSource::Admin), origin());
+    app(AddCustomerToGroup::class)->handle(CustomerId::of($customer), CustomerGroupId::of($group), origin());
 
     // Act & Assert
     $this->post(route('larasell.admin.customer-groups.store'), ['code' => 'vip', 'name' => 'Other'])->assertSessionHasErrors('code');
@@ -77,8 +77,8 @@ it('refuses to delete a group with members from the table', function () {
     // Arrange
     $this->post(route('larasell.admin.customer-groups.store'), ['code' => 'vip', 'name' => 'VIP']);
     $group = CustomerGroup::query()->sole();
-    $customer = app(CreateCustomer::class)->handle(new CreateCustomerPayload(new PersonProfileData('A', 'B'), CustomerSource::Admin));
-    app(AddCustomerToGroup::class)->handle(CustomerId::of($customer), CustomerGroupId::of($group));
+    $customer = app(CreateCustomer::class)->handle(new CreateCustomerPayload(new PersonProfileData('A', 'B'), CustomerSource::Admin), origin());
+    app(AddCustomerToGroup::class)->handle(CustomerId::of($customer), CustomerGroupId::of($group), origin());
     $table = CustomerGroups::make();
 
     // Act & Assert

@@ -27,7 +27,7 @@ function adminCustomer(PersonProfileData|CompanyProfileData|null $profile = null
     return app(CreateCustomer::class)->handle(new CreateCustomerPayload(
         profile: $profile ?? new PersonProfileData(firstName: 'Erika', lastName: 'Musterfrau', email: EmailAddress::of('erika@example.com')),
         source: CustomerSource::Storefront,
-    ));
+    ), origin());
 }
 
 function customerAuditEvents(): array

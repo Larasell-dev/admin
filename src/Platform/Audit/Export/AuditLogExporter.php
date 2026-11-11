@@ -3,10 +3,10 @@
 namespace Larasell\Admin\Platform\Audit\Export;
 
 use Illuminate\Support\Facades\Date;
-use Larasell\Admin\Platform\Audit\Chain\AuditChain;
 use Larasell\Admin\Platform\Audit\Export\Exceptions\AuditLogExportUnwritable;
 use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
-use Larasell\Admin\Platform\Audit\Log\Models\AuditLogEntry;
+use Larasell\Larasell\Audit\Chain\AuditChain;
+use Larasell\Larasell\Audit\Models\AuditLogEntry;
 use ZipArchive;
 
 /**

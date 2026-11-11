@@ -3,25 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
-use Larasell\Admin\Platform\Audit\Actors\Actor;
-use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
-use Larasell\Admin\Platform\Audit\Chain\AuditChain;
-use Larasell\Admin\Platform\Audit\Enums\AuditSource;
-use Larasell\Admin\Platform\Audit\Facades\Audit;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
-use Larasell\Admin\Product\AuditRecords\ProductCreated;
-use Larasell\Admin\Product\AuditRecords\ProductDeleted;
-use Larasell\Admin\Product\AuditRecords\ProductUpdated as ProductUpdatedRecord;
-use Larasell\Admin\Seo\AuditRecords\SeoUrlReleased as SeoUrlReleasedRecord;
-use Larasell\Larasell\Catalog\Events\ProductUpdated;
+use Larasell\Larasell\Audit\Actors\Actor;
+use Larasell\Larasell\Audit\Chain\AuditChain;
+use Larasell\Larasell\Audit\Facades\Audit;
+use Larasell\Larasell\Audit\Origin;
+use Larasell\Larasell\Audit\Subject;
+use Larasell\Larasell\Catalog\AuditRecords\ProductCreated;
+use Larasell\Larasell\Catalog\AuditRecords\ProductDeleted;
+use Larasell\Larasell\Catalog\AuditRecords\ProductUpdated as ProductUpdatedRecord;
 use Larasell\Larasell\Catalog\Models\Product;
-use Larasell\Larasell\Catalog\ProductId;
-use Larasell\Larasell\Price;
-use Larasell\Larasell\SalesChannels\SalesChannelId;
-use Larasell\Larasell\Seo\Events\SeoUrlReleased;
-use Larasell\Larasell\Seo\SeoUrlStatus;
 use Larasell\Larasell\Storefront\Models\EntryPoint;
 
 beforeEach(function () {
@@ -52,28 +43,15 @@ it('audits creating, updating and deleting a product as the admin who did', func
     $this->from(route('larasell.admin.products.index'))->post($delete)->assertRedirect();
 
     // Assert
-    $byAdmin = fn (Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->admin);
+    $byAdmin = fn (Actor $actor) => $actor instanceof Admin && $actor->is($this->admin);
 
-    Audit::assertRecorded(ProductCreated::class, fn (ProductCreated $record, Actor|UnknownActor $actor) => $byAdmin($actor)
+    Audit::assertRecorded(ProductCreated::class, fn (ProductCreated $record, Origin $origin) => $byAdmin($origin->actor)
         && $record->subject() == new Subject('product', $boots->id)
         && $record->properties() === ['name' => ['en' => 'Boots']]);
-    Audit::assertRecorded(ProductUpdatedRecord::class, fn (ProductUpdatedRecord $record, Actor|UnknownActor $actor) => $byAdmin($actor)
+    Audit::assertRecorded(ProductUpdatedRecord::class, fn (ProductUpdatedRecord $record, Origin $origin) => $byAdmin($origin->actor)
         && in_array('status', $record->properties()['changed'], true));
-    Audit::assertRecorded(ProductDeleted::class, fn (ProductDeleted $record, Actor|UnknownActor $actor) => $byAdmin($actor)
+    Audit::assertRecorded(ProductDeleted::class, fn (ProductDeleted $record, Origin $origin) => $byAdmin($origin->actor)
         && $record->properties() === ['name' => ['en' => 'Boots']]);
-});
-
-it('audits a product changed by a command as an unknown actor, instead of failing the change', function () {
-    // Arrange
-    Audit::fake();
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
-
-    // Act
-    DB::transaction(fn () => ProductUpdated::dispatch(new ProductId($boots->id), ['price']));
-
-    // Assert
-    Audit::assertRecorded(ProductUpdatedRecord::class, fn (ProductUpdatedRecord $record, Actor|UnknownActor $actor, AuditSource $source) => $actor instanceof UnknownActor
-        && $source === AuditSource::Cli);
 });
 
 it('audits creating, updating and deleting a sales channel and its entry points', function () {
@@ -98,18 +76,4 @@ it('audits creating, updating and deleting a sales channel and its entry points'
         ->and(moduleRecords('sales_channel.entry_point_deleted')[0]->properties)->toBe(['entry_point_id' => $entryPoint->id])
         ->and(moduleRecords('sales_channel.deleted')[0]->properties)->toBe(['key' => 'b2b', 'type' => 'storefront'])
         ->and(app(AuditChain::class)->verify()->passed)->toBeTrue();
-});
-
-it('audits an old URL being released', function () {
-    // Arrange
-    Audit::fake();
-    Route::middleware('web')->post('urls/release', fn () => SeoUrlReleased::dispatch(new SalesChannelId(1), 'en', '/old-boots', 'product', 7, SeoUrlStatus::Historic));
-
-    // Act
-    $this->actingAs($this->admin, 'larasell-admin')->post('urls/release')->assertOk();
-
-    // Assert
-    Audit::assertRecorded(SeoUrlReleasedRecord::class, fn (SeoUrlReleasedRecord $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->admin)
-        && $record->subject() == new Subject('product', 7)
-        && $record->properties() === ['sales_channel_id' => 1, 'locale' => 'en', 'path' => '/old-boots', 'status' => 'historic']);
 });

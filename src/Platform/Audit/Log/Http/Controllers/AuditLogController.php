@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
-use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\Audit\Export\Data\AuditLogExportData;
 use Larasell\Admin\Platform\Audit\Export\Events\AuditLogExportFinished;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
@@ -16,15 +16,17 @@ use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogViewed;
 use Larasell\Admin\Platform\Audit\Log\Data\AuditLogFiltersData;
 use Larasell\Admin\Platform\Audit\Log\Data\AuditLogPageData;
 use Larasell\Admin\Platform\Audit\Log\Http\Requests\AuditLogFiltersRequest;
-use Larasell\Admin\Platform\Audit\Log\Models\AuditLogEntry;
 use Larasell\Admin\Platform\Audit\Log\Tables\AuditLog;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Models\AuditLogEntry;
+use Larasell\Larasell\Audit\Origin;
 
 /**
  * @internal The audit log page in the settings.
  */
 class AuditLogController
 {
-    public function index(AuditLogFiltersRequest $request, Auditor $auditor): Response
+    public function index(AuditLogFiltersRequest $request, Auditor $auditor, #[CurrentOrigin] Origin $origin): Response
     {
         $admin = $request->user('larasell-admin');
         $gate = Gate::forUser($admin);
@@ -33,7 +35,7 @@ class AuditLogController
         $page = max(1, $request->integer('page', 1));
 
         // Before showing anything, so no one reads the log without it saying so.
-        DB::transaction(fn () => $auditor->record($filters === [] ? new AuditLogViewed($page) : new AuditLogSearched($filters, $page)));
+        DB::transaction(fn () => $auditor->record($filters === [] ? new AuditLogViewed($page) : new AuditLogSearched($filters, $page), $origin));
 
         /** @return list<string> */
         $options = fn (string $column): array => array_values(array_filter(

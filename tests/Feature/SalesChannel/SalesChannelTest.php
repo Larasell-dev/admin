@@ -41,7 +41,7 @@ function channelInput(array $overrides = []): array
 it('lists the sales channels by name in the sidebar, once', function () {
     // Act & Assert
     SalesChannel::query()->whereKey(1)->update(['name' => 'Webshop']);
-    app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'B2B', 'type' => 'storefront', 'locales' => ['en'], 'currencies' => ['USD']]);
+    app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'B2B', 'type' => 'storefront', 'locales' => ['en'], 'currencies' => ['USD']], origin());
 
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page

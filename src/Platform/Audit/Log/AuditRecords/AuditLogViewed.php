@@ -2,9 +2,9 @@
 
 namespace Larasell\Admin\Platform\Audit\Log\AuditRecords;
 
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Subject;
 
 /**
  * Someone opened a page of the audit log without filters.

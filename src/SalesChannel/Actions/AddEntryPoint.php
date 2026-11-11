@@ -3,6 +3,7 @@
 namespace Larasell\Admin\SalesChannel\Actions;
 
 use Illuminate\Validation\ValidationException;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\SalesChannels\Exceptions\InvalidSalesChannel;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Larasell\Larasell\SalesChannels\SalesChannelId;
@@ -19,7 +20,7 @@ class AddEntryPoint
      *
      * @throws ValidationException
      */
-    public function handle(SalesChannel $channel, AddEntryPointPayload $payload): EntryPoint
+    public function handle(SalesChannel $channel, AddEntryPointPayload $payload, Origin $origin): EntryPoint
     {
         try {
             return $this->add->handle(SalesChannelId::of($channel), [
@@ -27,7 +28,7 @@ class AddEntryPoint
                 'locale' => $payload->locale,
                 'default_currency' => $payload->defaultCurrency,
                 'primary' => $payload->primary,
-            ]);
+            ], $origin);
         } catch (InvalidSalesChannel $exception) {
             throw ValidationException::withMessages(['url' => $exception->getMessage()]);
         }

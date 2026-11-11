@@ -3,8 +3,9 @@
 namespace Larasell\Admin\Seo\Actions;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Larasell\Admin\Seo\SeoUrlId;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Seo\Models\SeoUrl;
+use Larasell\Larasell\Seo\SeoUrlId;
 use Larasell\Larasell\Seo\SeoUrlManager;
 use Larasell\Larasell\Seo\SeoUrlStatus;
 
@@ -18,12 +19,12 @@ class RemoveOldUrl
      *
      * @throws ModelNotFoundException when it isn't an old URL, e.g. a current one or a deleted page's
      */
-    public function handle(SeoUrlId $url): void
+    public function handle(SeoUrlId $url, Origin $origin): void
     {
         $old = SeoUrl::query()
             ->whereKey($url->value)
             ->where('status', SeoUrlStatus::Historic->value)
             ->firstOrFail();
-        $this->urls->remove($old);
+        $this->urls->remove($old, $origin);
     }
 }

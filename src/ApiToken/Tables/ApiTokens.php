@@ -6,6 +6,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Larasell\Admin\ApiToken\Actions\RevokeApiToken;
 use Larasell\Admin\ApiToken\Models\ApiToken;
+use Larasell\Admin\Platform\Audit\Origins;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
@@ -50,7 +51,7 @@ class ApiTokens extends Table
     public function actions(): array
     {
         return [
-            Action::make(Translate::later('Revoke'), handle: fn (ApiToken $apiToken) => app(RevokeApiToken::class)->handle($apiToken))
+            Action::make(Translate::later('Revoke'), handle: fn (ApiToken $apiToken) => app(RevokeApiToken::class)->handle($apiToken, app(Origins::class)->current()))
                 ->confirm(
                     title: __('Revoke API token'),
                     message: __('Apps using it can no longer call the API. This can\'t be undone.'),

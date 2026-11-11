@@ -2,9 +2,6 @@
 
 namespace Larasell\Admin\Platform\Audit;
 
-use Illuminate\Queue\Events\JobExceptionOccurred;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -14,16 +11,17 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Export\Formats\JsonFormat;
 use Larasell\Admin\Platform\Audit\Export\Http\Controllers\AuditLogExportController;
+use Larasell\Admin\Platform\Audit\Export\Listeners\CleanUpAuditLogExports;
 use Larasell\Admin\Platform\Audit\Log\Http\Controllers\AuditLogController;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Settings\Facades\Settings;
+use Larasell\Larasell\Audit\Events\AuditLogPruned;
 use Laravel\Pennant\Feature;
 
 /**
- * The audit log: the Auditor that modules and extensions record their audit records with, and
- * the settings page that lists them.
+ * The audit log's pages: the settings page that lists the core's audit records, and their exports.
  *
  * Who may open the page is up to the larasell.admin.view-audit-log gate, and who may filter it
  * up to larasell.admin.search-audit-log, and who may export it up to
@@ -45,19 +43,14 @@ class AuditServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../../../config/larasell/admin/audit.php', 'larasell.admin.audit');
 
-        $this->app->singleton(Auditor::class);
+        $this->app->singleton(Origins::class);
         // The export's file format; an app binds its own to swap it.
         $this->app->bindIf(AuditLogExportFormat::class, JsonFormat::class);
     }
 
     public function boot(): void
     {
-        // Tells the Auditor when a queued job runs, so its records get the job source and must name
-        // their actor. Otherwise a job on the sync queue would run inside the request that dispatched
-        // it and be recorded as the signed-in admin. A job ends with exactly one of JobProcessed and
-        // JobExceptionOccurred.
-        Event::listen(JobProcessing::class, fn () => $this->app->make(Auditor::class)->jobStarted());
-        Event::listen([JobProcessed::class, JobExceptionOccurred::class], fn () => $this->app->make(Auditor::class)->jobEnded());
+        Event::listen(AuditLogPruned::class, CleanUpAuditLogExports::class);
 
         Gate::define('larasell.admin.view-audit-log', fn (Admin $admin): bool => true);
         Gate::define('larasell.admin.search-audit-log', fn (Admin $admin): bool => true);

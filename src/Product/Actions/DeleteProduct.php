@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Product\Actions;
 
 use Illuminate\Validation\ValidationException;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Actions\DeleteProduct as CoreDeleteProduct;
 use Larasell\Larasell\Catalog\Exceptions\ProductInUse;
 use Larasell\Larasell\Catalog\Models\Product;
@@ -19,10 +20,10 @@ class DeleteProduct
      *
      * @throws ValidationException
      */
-    public function handle(Product $product): void
+    public function handle(Product $product, Origin $origin): void
     {
         try {
-            $this->delete->handle(ProductId::of($product));
+            $this->delete->handle(ProductId::of($product), $origin);
         } catch (ProductInUse) {
             throw ValidationException::withMessages([
                 'confirmation' => __('Open orders or reserved stock still need this product, so it can\'t be deleted yet.'),
