@@ -18,12 +18,12 @@ use Larasell\Larasell\Catalog\CoreProductType;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\ProductType;
-use Larasell\Larasell\Catalog\ProductTypes;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\Facades\ProductTypes;
 use Larasell\Larasell\Inventory\InventoryCapabilities;
 use Larasell\Larasell\RichText\RichText;
 use Larasell\Larasell\Shipping\ShippingCapabilities;
@@ -83,15 +83,13 @@ class ProductRequest extends FormRequest
     public function productType(): ProductType
     {
         $product = $this->route('product');
-        $types = app(ProductTypes::class);
-
         if ($product instanceof Product) {
             return $product->productType();
         }
 
         $key = $this->query('type', CoreProductType::Physical->value);
 
-        return is_string($key) && $types->has($key) ? $types->get($key) : abort(404);
+        return is_string($key) && ProductTypes::has($key) ? ProductTypes::get($key) : abort(404);
     }
 
     /**

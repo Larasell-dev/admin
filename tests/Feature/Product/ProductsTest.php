@@ -10,13 +10,13 @@ use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
-use Larasell\Larasell\Catalog\ProductCapabilities;
 use Larasell\Larasell\Catalog\ProductType;
-use Larasell\Larasell\Catalog\ProductTypes;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
+use Larasell\Larasell\Facades\ProductCapabilities;
+use Larasell\Larasell\Facades\ProductTypes;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\Translatable;
 use Larasell\Larasell\Weight;
@@ -983,7 +983,7 @@ it('turns the products off when disabled in the config', function () {
 
 function registerDigitalType(): void
 {
-    app(ProductTypes::class)->register(ProductType::make('digital')->label('Digital product'));
+    ProductTypes::register(ProductType::make('digital')->label('Digital product'));
 }
 
 it('offers the first type as the create button and the others in its menu', function () {
@@ -1062,8 +1062,8 @@ it('shows the type on the edit page and never changes it', function () {
 it('leaves out sections whose capability the type lacks', function () {
     // Arrange
     signInAdmin();
-    app(ProductCapabilities::class)->register('download');
-    app(ProductTypes::class)->register(ProductType::make('digital')->capabilities(['download']));
+    ProductCapabilities::register('download');
+    ProductTypes::register(ProductType::make('digital')->capabilities(['download']));
     Section::add(SectionForm::Product, 'test-shipping-notes')->requires('shipping');
     Section::add(SectionForm::Product, 'test-download-files')->requires('download');
 

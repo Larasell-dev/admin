@@ -16,8 +16,8 @@ use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Product\Actions\DeleteProduct;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\ProductType;
-use Larasell\Larasell\Catalog\ProductTypes;
 use Larasell\Larasell\Enums\Visibility;
+use Larasell\Larasell\Facades\ProductTypes;
 use Larasell\Larasell\Translatable;
 
 #[UseModel(Product::class)]
@@ -56,7 +56,7 @@ class Products extends Table
 
     public function headerActions(): array
     {
-        $types = app(ProductTypes::class)->all();
+        $types = ProductTypes::all();
 
         // The first registered type (physical) is the button, the others are in its menu.
         return [TableActionGroup::make(array_map(
