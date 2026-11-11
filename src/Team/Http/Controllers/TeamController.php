@@ -16,6 +16,7 @@ use Larasell\Admin\Team\Data\EditMemberPageData;
 use Larasell\Admin\Team\Data\TeamPageData;
 use Larasell\Admin\Team\Http\Requests\MemberRequest;
 use Larasell\Admin\Team\Tables\Members;
+use Larasell\Larasell\Audit\Origin;
 use Laravel\Head\Facades\Head;
 
 class TeamController
@@ -38,7 +39,7 @@ class TeamController
 
     public function store(Request $request, CreateAdmin $createAdmin, #[CurrentUser('larasell-admin')] Admin $signedIn): RedirectResponse
     {
-        $admin = $createAdmin->handle($request->only(['name', 'email', 'password']), $signedIn);
+        $admin = $createAdmin->handle($request->only(['name', 'email', 'password']), Origin::web($signedIn));
 
         return redirect()->route('larasell.admin.settings.team.edit', $admin);
     }
@@ -56,7 +57,7 @@ class TeamController
 
     public function update(MemberRequest $request, Admin $admin, UpdateAdmin $updateAdmin, #[CurrentUser('larasell-admin')] Admin $signedIn): RedirectResponse
     {
-        $updateAdmin->handle($admin, array_filter($request->validated(), fn (mixed $value): bool => $value !== null), $signedIn);
+        $updateAdmin->handle($admin, array_filter($request->validated(), fn (mixed $value): bool => $value !== null), Origin::web($signedIn));
 
         return redirect()->route('larasell.admin.settings.team.edit', $admin);
     }

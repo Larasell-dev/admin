@@ -7,18 +7,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\Actors\Actor;
-use Larasell\Admin\Platform\Audit\Actors\SystemActor;
-use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
-use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Enums\AuditSource;
-use Larasell\Admin\Platform\Audit\Facades\Audit;
 use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogSearched;
 use Larasell\Admin\Platform\Audit\Log\AuditRecords\AuditLogViewed;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Actors\Actor;
+use Larasell\Larasell\Audit\Actors\SystemActor;
+use Larasell\Larasell\Audit\Actors\UnknownActor;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Enums\AuditSource;
+use Larasell\Larasell\Audit\Facades\Audit;
+use Larasell\Larasell\Audit\Origin;
+use Larasell\Larasell\Audit\Subject;
 use Laravel\Pennant\Feature;
 
 beforeEach(function () {
@@ -35,7 +36,7 @@ beforeEach(function () {
  *
  * @param  array<string, mixed>  $properties
  */
-function recordAt(string $time, string $event, mixed $actor, ?Subject $subject = null, array $properties = []): void
+function recordAt(string $time, string $event, Actor $actor, ?Subject $subject = null, array $properties = []): void
 {
     test()->travelTo(Carbon::parse($time));
 
@@ -65,7 +66,7 @@ function recordAt(string $time, string $event, mixed $actor, ?Subject $subject =
         {
             return $this->props;
         }
-    }, $actor));
+    }, Origin::cli($actor)));
 
     test()->travelTo(Carbon::parse('2026-10-30 12:00:00'));
 }
@@ -233,10 +234,10 @@ it('audits viewing the log, as the admin who did', function () {
     auditLogPage();
 
     // Assert
-    Audit::assertRecorded(AuditLogViewed::class, fn (AuditLogViewed $record, Actor|UnknownActor $actor, AuditSource $source) => $actor instanceof Admin && $actor->is($this->ada)
+    Audit::assertRecorded(AuditLogViewed::class, fn (AuditLogViewed $record, Origin $origin) => $origin->actor instanceof Admin && $origin->actor->is($this->ada)
         && $record->subject() === null
         && $record->properties() === ['page' => 1]
-        && $source === AuditSource::Web);
+        && $origin->source === AuditSource::Web);
     Audit::assertNotRecorded(AuditLogSearched::class);
 });
 

@@ -3,6 +3,7 @@
 namespace Larasell\Admin\Customer\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
+use Larasell\Admin\Platform\Audit\Origins;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
@@ -69,7 +70,7 @@ class Customers extends Table
 
     public function actions(): array
     {
-        $status = fn (CustomerStatus $to) => fn (Customer $customer) => app(ChangeCustomerStatus::class)->handle(CustomerId::of($customer), $to);
+        $status = fn (CustomerStatus $to) => fn (Customer $customer) => app(ChangeCustomerStatus::class)->handle(CustomerId::of($customer), $to, app(Origins::class)->current());
         $is = fn (CustomerStatus $status) => fn (Customer $customer): bool => $customer->status === $status;
         $isNot = fn (CustomerStatus $status) => fn (Customer $customer): bool => $customer->status !== $status;
 

@@ -4,7 +4,6 @@ namespace Larasell\Admin\Seo;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
@@ -17,8 +16,6 @@ use Larasell\Admin\Seo\Data\SeoUrlsProps;
 use Larasell\Admin\Seo\Http\Controllers\RemoveOldUrlController;
 use Larasell\Admin\Seo\Http\Controllers\RestoreOldUrlController;
 use Larasell\Admin\Seo\Http\Requests\SeoUrlsRequest;
-use Larasell\Admin\Seo\Listeners\AuditSeoChanges;
-use Larasell\Larasell\Seo\Events\SeoUrlReleased;
 use Larasell\Larasell\Seo\Exceptions\CustomUrlRejected;
 use Larasell\Larasell\Seo\Exceptions\InvalidSeoPath;
 
@@ -32,9 +29,6 @@ class SeoServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // Audited from the core's events, wherever the change came from.
-        Event::listen(SeoUrlReleased::class, [AuditSeoChanges::class, 'released']);
-
         Section::add(SectionForm::Product, SeoUrlsRequest::SECTION)
             ->after(ProductSection::Identifiers)
             ->props(SeoUrlsProps::class)

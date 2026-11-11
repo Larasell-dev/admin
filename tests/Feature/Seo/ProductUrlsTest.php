@@ -20,9 +20,9 @@ beforeEach(function () {
     $this->actingAs(Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']), 'larasell-admin');
 
     // Next to the default channel "Laravel", which sells in English on app.url.
-    $europe = app(CreateSalesChannel::class)->handle(['key' => 'europe', 'name' => 'Europe', 'type' => 'storefront', 'locales' => ['de', 'en'], 'currencies' => ['EUR']]);
-    app(AddEntryPoint::class)->handle(SalesChannelId::of($europe), ['url' => 'https://shop.de', 'locale' => 'de']);
-    app(AddEntryPoint::class)->handle(SalesChannelId::of($europe), ['url' => 'https://shop.de/en', 'locale' => 'en']);
+    $europe = app(CreateSalesChannel::class)->handle(['key' => 'europe', 'name' => 'Europe', 'type' => 'storefront', 'locales' => ['de', 'en'], 'currencies' => ['EUR']], origin());
+    app(AddEntryPoint::class)->handle(SalesChannelId::of($europe), ['url' => 'https://shop.de', 'locale' => 'de'], origin());
+    app(AddEntryPoint::class)->handle(SalesChannelId::of($europe), ['url' => 'https://shop.de/en', 'locale' => 'en'], origin());
     $this->europe = $europe->id;
 });
 

@@ -6,11 +6,11 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\Log\Models\AuditLogEntry;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Models\AuditLogEntry;
 
 /**
  * @internal The audit log page in the settings.

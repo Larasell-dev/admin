@@ -2,7 +2,6 @@
 
 namespace Larasell\Admin\Product;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
@@ -16,13 +15,9 @@ use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
-use Larasell\Admin\Product\Listeners\AuditProductChanges;
 use Larasell\Admin\Product\Search\DatabaseProductSearch;
 use Larasell\Admin\Product\Search\ProductSearch;
 use Larasell\Admin\Product\Tables\Products;
-use Larasell\Larasell\Catalog\Events\ProductCreated;
-use Larasell\Larasell\Catalog\Events\ProductDeleted;
-use Larasell\Larasell\Catalog\Events\ProductUpdated;
 
 /**
  * The products module. Setting larasell.admin.products.enabled to false leaves
@@ -39,11 +34,6 @@ class ProductServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Audited from the core's events, wherever the change came from.
-        Event::listen(ProductCreated::class, [AuditProductChanges::class, 'created']);
-        Event::listen(ProductUpdated::class, [AuditProductChanges::class, 'updated']);
-        Event::listen(ProductDeleted::class, [AuditProductChanges::class, 'deleted']);
-
         if (! config('larasell.admin.products.enabled')) {
             return;
         }

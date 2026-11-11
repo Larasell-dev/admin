@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Category\Data\CategoryOptionData;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
@@ -20,6 +21,7 @@ use Larasell\Admin\Product\Data\ProductTypeData;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Actions\CreateProduct;
 use Larasell\Larasell\Catalog\Actions\CreateProductPayload;
 use Larasell\Larasell\Catalog\Actions\SetProductCategories;
@@ -77,10 +79,10 @@ class ProductController
      * Creates a product with the name in the content locale, through the core's actions, which
      * also give it its URLs. The form has no price yet, and every product needs one, so it starts at 0.
      */
-    public function store(ProductRequest $request, #[CurrentContentLocale] Locale $locale): RedirectResponse
+    public function store(ProductRequest $request, #[CurrentContentLocale] Locale $locale, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         // With the sections' own fields, so a section that fails leaves no product behind.
-        $product = DB::transaction(function () use ($request, $locale): Product {
+        $product = DB::transaction(function () use ($origin, $request, $locale): Product {
             $product = $this->createProduct->handle(new CreateProductPayload(type: $request->productType()->key(), attributes: [
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
@@ -91,9 +93,9 @@ class ProductController
                 'barcode' => $request->validated('barcode'),
                 ...$request->stock(),
                 'price' => Price::of(0),
-            ], attachments: $request->attachments()));
+            ], attachments: $request->attachments()), $origin);
 
-            $this->saveRelations($request, $product);
+            $this->saveRelations($request, $product, $origin);
             $this->saved($request, $product, true, $locale);
 
             return $product;
@@ -121,10 +123,10 @@ class ProductController
      * Changes the name in the content locale and keeps its other translations, through the
      * core's actions, which also move the product's automatic URLs.
      */
-    public function update(ProductRequest $request, Product $product, #[CurrentContentLocale] Locale $locale): RedirectResponse
+    public function update(ProductRequest $request, Product $product, #[CurrentContentLocale] Locale $locale, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         // With the sections' own fields, so a section that fails leaves the product unchanged.
-        DB::transaction(function () use ($request, $product, $locale): void {
+        DB::transaction(function () use ($origin, $request, $product, $locale): void {
             $stock = $request->stock();
             // The product checks each quantity limit against the other one it has as it's set, so
             // a new range wholly above the old one sets its maximum first, and any other its minimum.
@@ -142,9 +144,9 @@ class ProductController
                 'barcode' => $request->validated('barcode'),
                 ...$limits,
                 ...array_diff_key($stock, $limits),
-            ], $request->attachments()));
+            ], $request->attachments()), $origin);
 
-            $this->saveRelations($request, $product);
+            $this->saveRelations($request, $product, $origin);
             $this->saved($request, $product, false, $locale);
         });
 
@@ -180,9 +182,9 @@ class ProductController
     /**
      * Saves the product's categories.
      */
-    protected function saveRelations(ProductRequest $request, Product $product): void
+    protected function saveRelations(ProductRequest $request, Product $product, #[CurrentOrigin] Origin $origin): void
     {
-        $this->setCategories->handle(ProductId::of($product), CategoryId::many($request->categoryIds()));
+        $this->setCategories->handle(ProductId::of($product), CategoryId::many($request->categoryIds()), $origin);
     }
 
     /**

@@ -15,6 +15,8 @@ use Larasell\Admin\Customer\Data\CustomerGroupOptionData;
 use Larasell\Admin\Customer\Data\CustomerOptionData;
 use Larasell\Admin\Customer\Data\EditCustomerPageData;
 use Larasell\Admin\Customer\Http\Requests\CustomerProfileRequest;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Customers\Actions\CreateCustomer;
 use Larasell\Larasell\Customers\Actions\CreateCustomerPayload;
 use Larasell\Larasell\Customers\Actions\UpdateCustomer;
@@ -42,14 +44,14 @@ class CustomerController
         ));
     }
 
-    public function store(CustomerProfileRequest $request, CreateCustomer $create): RedirectResponse
+    public function store(CustomerProfileRequest $request, CreateCustomer $create, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         $customer = $create->handle(new CreateCustomerPayload(
             profile: $request->profile(),
             source: CustomerSource::Admin,
             preferredLocale: $request->preferredLocale(),
             preferredCurrency: $request->preferredCurrency(),
-        ));
+        ), $origin);
 
         return redirect()->route('larasell.admin.customers.show', $customer);
     }
@@ -81,13 +83,13 @@ class CustomerController
         ));
     }
 
-    public function update(CustomerProfileRequest $request, Customer $customer, UpdateCustomer $update): RedirectResponse
+    public function update(CustomerProfileRequest $request, Customer $customer, UpdateCustomer $update, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         $update->handle(CustomerId::of($customer), new UpdateCustomerPayload(
             profile: $request->profile(),
             preferredLocale: $request->preferredLocale(),
             preferredCurrency: $request->preferredCurrency(),
-        ));
+        ), $origin);
 
         return redirect()->route('larasell.admin.customers.show', $customer);
     }

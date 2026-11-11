@@ -233,7 +233,7 @@ it('finds sales channels by their name', function () {
     // Arrange
     signInSearchAdmin();
     SalesChannel::query()->whereKey(1)->update(['name' => 'Webshop']);
-    app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'Wholesale Shop', 'type' => 'storefront', 'locales' => ['en'], 'currencies' => ['USD']]);
+    app(CreateSalesChannel::class)->handle(['key' => 'b2b', 'name' => 'Wholesale Shop', 'type' => 'storefront', 'locales' => ['en'], 'currencies' => ['USD']], origin());
     $wholesale = SalesChannel::query()->where('key', 'b2b')->firstOrFail();
 
     // Act & Assert

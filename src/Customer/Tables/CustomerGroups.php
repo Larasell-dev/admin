@@ -4,6 +4,7 @@ namespace Larasell\Admin\Customer\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use Larasell\Admin\Customer\Actions\DeleteCustomerGroup;
+use Larasell\Admin\Platform\Audit\Origins;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Tables\Actions\Action;
@@ -46,7 +47,7 @@ class CustomerGroups extends Table
     public function actions(): array
     {
         return [
-            Action::make(Translate::later('Delete'), handle: fn (CustomerGroup $group) => app(DeleteCustomerGroup::class)->handle(CustomerGroupId::of($group)))
+            Action::make(Translate::later('Delete'), handle: fn (CustomerGroup $group) => app(DeleteCustomerGroup::class)->handle(CustomerGroupId::of($group), app(Origins::class)->current()))
                 ->confirm(
                     title: __('Delete customer group'),
                     message: __('Rules that refer to the group\'s code stop applying. Only groups without customers can be deleted. This can\'t be undone.'),

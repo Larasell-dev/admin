@@ -4,13 +4,14 @@ namespace Larasell\Admin\Platform\Audit\Export\Actions;
 
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Larasell\Admin\Platform\Audit\Auditor;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportRequested;
 use Larasell\Admin\Platform\Audit\Export\Enums\AuditLogExportStatus;
 use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\Origin;
 
 /**
  * Stores a pending export with its record, then queues the job that writes it and the one that
@@ -27,10 +28,10 @@ class RequestAuditLogExport
 
     public function __construct(private readonly Auditor $auditor, private readonly AuditLogExportFormat $format) {}
 
-    public function handle(RequestAuditLogExportPayload $payload): AuditLogExport
+    public function handle(RequestAuditLogExportPayload $payload, Origin $origin): AuditLogExport
     {
         // The export and its record are stored together, or neither is.
-        $export = DB::transaction(function () use ($payload): AuditLogExport {
+        $export = DB::transaction(function () use ($origin, $payload): AuditLogExport {
             $export = AuditLogExport::query()->create([
                 'admin_id' => $payload->adminId,
                 'format' => $this->format->extension(),
@@ -39,7 +40,7 @@ class RequestAuditLogExport
                 'expires_at' => Date::now()->utc()->addHours(self::HOURS_KEPT),
             ]);
 
-            $this->auditor->record(new AuditLogExportRequested($export->id, $export->format));
+            $this->auditor->record(new AuditLogExportRequested($export->id, $export->format), $origin);
 
             return $export;
         });

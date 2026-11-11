@@ -7,17 +7,11 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
-use Larasell\Admin\Platform\Audit\Actors\Actor;
-use Larasell\Admin\Platform\Audit\Actors\SystemActor;
-use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
-use Larasell\Admin\Platform\Audit\Auditor;
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Exceptions\AuditFailed;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportDeleted;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExported;
 use Larasell\Admin\Platform\Audit\Export\AuditRecords\AuditLogExportFailed;
@@ -29,9 +23,15 @@ use Larasell\Admin\Platform\Audit\Export\Formats\AuditLogExportFormat;
 use Larasell\Admin\Platform\Audit\Export\Jobs\DeleteExpiredAuditLogExport;
 use Larasell\Admin\Platform\Audit\Export\Jobs\ExportAuditLog;
 use Larasell\Admin\Platform\Audit\Export\Models\AuditLogExport;
-use Larasell\Admin\Platform\Audit\Facades\Audit;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Actors\SystemActor;
+use Larasell\Larasell\Audit\Auditor;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Exceptions\AuditFailed;
+use Larasell\Larasell\Audit\Facades\Audit;
+use Larasell\Larasell\Audit\Origin;
+use Larasell\Larasell\Audit\Subject;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
@@ -67,7 +67,7 @@ function catalogued(string $event, int $book): void
         {
             return ['shelf' => $this->book];
         }
-    }, new SystemActor('librarian')));
+    }, Origin::cli(new SystemActor('librarian'))));
 }
 
 /**
@@ -172,7 +172,7 @@ it('records starting an export, as the admin who did', function () {
     exportAs($this->ada);
 
     // Assert
-    Audit::assertRecorded(AuditLogExportRequested::class, fn (AuditLogExportRequested $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+    Audit::assertRecorded(AuditLogExportRequested::class, fn (AuditLogExportRequested $record, Origin $origin) => $origin->actor instanceof Admin && $origin->actor->is($this->ada)
         && $record->properties() === ['format' => 'json']);
 });
 
@@ -201,7 +201,7 @@ it('lets the admin who exported download it, and records the download', function
     // Assert
     $response->assertOk()->assertDownload('audit-log-2026-10-30-120000.zip');
 
-    Audit::assertRecorded(AuditLogExported::class, fn (AuditLogExported $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+    Audit::assertRecorded(AuditLogExported::class, fn (AuditLogExported $record, Origin $origin) => $origin->actor instanceof Admin && $origin->actor->is($this->ada)
         && $record->subject()?->type === 'audit_log_export'
         && $record->properties() === ['format' => 'json', 'record_count' => 2]);
 });
@@ -316,7 +316,7 @@ it('exports on the command line to a file, recorded as the command', function ()
 
         expect($export['records'][0]['event'])->toBe('book.shelved')
             ->and($export['summary']['records'])->toBe(1);
-        Audit::assertRecorded(AuditLogExported::class, fn (AuditLogExported $record, Actor|UnknownActor $actor) => $actor == new SystemActor('larasell:export-audit-log'));
+        Audit::assertRecorded(AuditLogExported::class, fn (AuditLogExported $record, Origin $origin) => $origin->actor == new SystemActor('larasell:export-audit-log'));
     } finally {
         @unlink($file);
     }
@@ -401,7 +401,7 @@ it('records a failed export, with why it failed', function () {
     (new ExportAuditLog($export->id))->failed(new RuntimeException('Disk full'));
 
     // Assert
-    Audit::assertRecorded(AuditLogExportFailed::class, fn (AuditLogExportFailed $record, Actor|UnknownActor $actor) => $actor instanceof SystemActor
+    Audit::assertRecorded(AuditLogExportFailed::class, fn (AuditLogExportFailed $record, Origin $origin) => $origin->actor instanceof SystemActor
         && $record->subject() == new Subject('audit_log_export', $export->id)
         && $record->properties() === ['format' => 'json', 'error' => 'Disk full']);
 });
@@ -434,7 +434,8 @@ it('exports a log with an unreadable record, and says where the chain broke', fu
 
 it('prunes the log even when deleting an expired export fails, and keeps that export\'s file', function () {
     // Arrange
-    config(['larasell.admin.audit.retention.days' => 30]);
+    config(['larasell.audit.retention.days' => 30]);
+    Exceptions::fake();
     $this->travelTo(now()->subDays(40));
     catalogued('book.shelved', 1);
     $this->travelBack();
@@ -445,11 +446,12 @@ it('prunes the log even when deleting an expired export fails, and keeps that ex
     AuditLogExport::deleting(fn () => throw new RuntimeException('Database timeout'));
 
     // Act
-    $this->artisan('larasell:prune-audit-log')->expectsOutputToContain('Database timeout')->assertSuccessful();
+    $this->artisan('larasell:prune-audit-log')->assertSuccessful();
 
     // Assert
     expect(DB::table('larasell_audit_log')->where('event', 'book.shelved')->exists())->toBeFalse()
         ->and(Storage::disk('local')->exists($path))->toBeTrue();
+    Exceptions::assertReported(fn (RuntimeException $exception) => $exception->getMessage() === 'Database timeout');
 });
 
 it('deletes each export when it expires, without the prune command', function () {
@@ -528,7 +530,7 @@ it('lets the admin delete their export once they type the confirmation, and reco
 
     expect(AuditLogExport::query()->whereKey($export->id)->exists())->toBeFalse()
         ->and(Storage::disk('local')->exists($path))->toBeFalse();
-    Audit::assertRecorded(AuditLogExportDeleted::class, fn (AuditLogExportDeleted $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+    Audit::assertRecorded(AuditLogExportDeleted::class, fn (AuditLogExportDeleted $record, Origin $origin) => $origin->actor instanceof Admin && $origin->actor->is($this->ada)
         && $record->subject() == new Subject('audit_log_export', $export->id));
 });
 

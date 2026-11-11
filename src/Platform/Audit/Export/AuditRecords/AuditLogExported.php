@@ -2,9 +2,9 @@
 
 namespace Larasell\Admin\Platform\Audit\Export\AuditRecords;
 
-use Larasell\Admin\Platform\Audit\AuditRecord;
-use Larasell\Admin\Platform\Audit\Enums\AuditCategory;
-use Larasell\Admin\Platform\Audit\Subject;
+use Larasell\Larasell\Audit\AuditRecord;
+use Larasell\Larasell\Audit\Enums\AuditCategory;
+use Larasell\Larasell\Audit\Subject;
 
 /**
  * An export of the audit log left the app: an admin downloaded it, or the command wrote it to a file.

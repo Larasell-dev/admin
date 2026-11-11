@@ -8,10 +8,11 @@ use Larasell\Admin\AdminPanel;
 use Larasell\Admin\ApiToken\Http\Controllers\ApiTokenController;
 use Larasell\Admin\ApiToken\Http\Middleware\AuthenticateApiToken;
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\Auditor;
+use Larasell\Admin\Platform\Audit\Origins;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
 use Larasell\Admin\Platform\Settings\Facades\Settings;
+use Larasell\Larasell\Audit\Auditor;
 
 /**
  * The API tokens module: the settings pages to list, create and revoke tokens, their navigation
@@ -32,9 +33,8 @@ class ApiTokenServiceProvider extends ServiceProvider
         AuthenticateApiToken::register();
 
         // Even when disabled, so the audit log still names the tokens of older records.
-        $auditor = $this->app->make(Auditor::class);
-        $auditor->apiGuard(AuthenticateApiToken::GUARD);
-        $auditor->actorType('api_token', Translate::later('API token'), ApiToken::class);
+        $this->app->make(Origins::class)->apiGuard(AuthenticateApiToken::GUARD);
+        $this->app->make(Auditor::class)->actorType('api_token', Translate::later('API token'), ApiToken::class);
 
         if (! config('larasell.admin.api_tokens.enabled')) {
             return;

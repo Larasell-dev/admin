@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Facades\Audit;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Enums\Currency;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\SalesChannels\Actions\CreateSalesChannel;
 use Larasell\Larasell\SalesChannels\SalesChannelId;
 use Larasell\Larasell\SalesChannels\SalesContext;
+use Larasell\Larasell\Seo\AuditRecords\SeoUrlRestored;
 use Larasell\Larasell\Seo\Models\SeoUrl;
 use Larasell\Larasell\Seo\SeoUrlManager;
 use Larasell\Larasell\Seo\SeoUrlStatus;
@@ -22,8 +25,8 @@ beforeEach(function () {
     $this->actingAs(Admin::create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com', 'password' => 'password']), 'larasell-admin');
 
     // Next to the default channel "Laravel", which sells in English on app.url.
-    $europe = app(CreateSalesChannel::class)->handle(['key' => 'europe', 'name' => 'Europe', 'type' => 'storefront', 'locales' => ['de', 'en'], 'currencies' => ['EUR']]);
-    app(AddEntryPoint::class)->handle(SalesChannelId::of($europe), ['url' => 'https://shop.de/en', 'locale' => 'en']);
+    $europe = app(CreateSalesChannel::class)->handle(['key' => 'europe', 'name' => 'Europe', 'type' => 'storefront', 'locales' => ['de', 'en'], 'currencies' => ['EUR']], origin());
+    app(AddEntryPoint::class)->handle(SalesChannelId::of($europe), ['url' => 'https://shop.de/en', 'locale' => 'en'], origin());
     $this->europe = $europe->id;
 });
 
@@ -87,9 +90,9 @@ it('pages each channel\'s old URLs on its own, by 10 or a size from the query st
     $manager = app(SeoUrlManager::class);
     $europe = SalesContext::for('europe', 'en');
     foreach (range(1, 28) as $i) {
-        $manager->setCustom($boots, $europe, "sale/boots-{$i}");
+        $manager->setCustom($boots, $europe, "sale/boots-{$i}", origin());
     }
-    $manager->resetToAutomatic($boots, $europe);
+    $manager->resetToAutomatic($boots, $europe, origin());
     // 30 for Europe: the 2 renamed-away URLs and the 28 custom ones; the reset makes "p/snow-boots" current again.
     $edit = route('larasell.admin.products.edit', $boots);
 
@@ -178,6 +181,7 @@ it('refuses to remove a current URL', function () {
 it('makes an old URL current again in its channel, keeping it through renames', function () {
     // Arrange
     $boots = renamedBoots();
+    Audit::fake([SeoUrlRestored::class]);
 
     // Act
     $this->from(route('larasell.admin.products.edit', $boots))
@@ -195,6 +199,7 @@ it('makes an old URL current again in its channel, keeping it through renames', 
 
     $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Winter Boots', 'status' => 'visible']);
     expect(app(SeoUrlManager::class)->canonical($boots, $europe)->path)->toBe('p/boots');
+    Audit::assertRecorded(SeoUrlRestored::class, fn (SeoUrlRestored $record, Origin $origin) => $origin->actor instanceof Admin && $record->properties()['path'] === 'p/boots');
 });
 
 it('refuses to make a deleted page\'s URL current', function () {

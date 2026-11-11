@@ -20,7 +20,7 @@ Tests sit next to what they test. A page's Inertia name is its path, e.g.
 `Inertia::render('Product/Pages/Edit')`.
 
 Platform areas use the same folders. Only the classes apps and modules work with directly
-stay at an area's top level, such as `Audit\Auditor`, `Navigation\NavigationItem` or
+stay at an area's top level, such as `Audit\CurrentOrigin`, `Navigation\NavigationItem` or
 `InterfaceLocale\Translate`. Areas with a swappable strategy add `Resolvers/` (the contract and
 its default, e.g. `ContentLocaleResolver`) and `Locales/` (the lists of locales offered).
 

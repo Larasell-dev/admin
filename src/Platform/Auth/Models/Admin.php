@@ -4,8 +4,8 @@ namespace Larasell\Admin\Platform\Auth\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
-use Larasell\Admin\Platform\Audit\Actors\Actor;
 use Larasell\Admin\Platform\Auth\AvatarPath;
+use Larasell\Larasell\Audit\Actors\Actor;
 
 /**
  * @property ?AvatarPath $avatar_path

@@ -2,6 +2,7 @@
 
 namespace Larasell\Admin\Product\Tables;
 
+use Larasell\Admin\Platform\Audit\Origins;
 use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Admin\Platform\InterfaceLocale\Translate;
 use Larasell\Admin\Platform\Panel\Icon;
@@ -71,7 +72,7 @@ class Products extends Table
     public function actions(): array
     {
         return [
-            Action::make(Translate::later('Delete'), handle: fn (Product $product) => app(DeleteProduct::class)->handle($product))
+            Action::make(Translate::later('Delete'), handle: fn (Product $product) => app(DeleteProduct::class)->handle($product, app(Origins::class)->current()))
                 ->confirm(
                     title: __('Delete product'),
                     message: __('It is removed from the store and every cart. Past orders keep it. This can\'t be undone.'),

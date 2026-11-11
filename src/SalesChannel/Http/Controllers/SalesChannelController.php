@@ -5,6 +5,7 @@ namespace Larasell\Admin\SalesChannel\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\SalesChannel\Actions\CreateSalesChannel;
 use Larasell\Admin\SalesChannel\Actions\DeleteSalesChannel;
 use Larasell\Admin\SalesChannel\Actions\UpdateSalesChannel;
@@ -17,6 +18,7 @@ use Larasell\Admin\SalesChannel\Data\SalesChannelOptionData;
 use Larasell\Admin\SalesChannel\Http\Requests\CreateSalesChannelRequest;
 use Larasell\Admin\SalesChannel\Http\Requests\DeleteSalesChannelRequest;
 use Larasell\Admin\SalesChannel\Http\Requests\UpdateSalesChannelRequest;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\SalesChannels\Models\SalesChannel;
 use Larasell\Larasell\SalesChannels\SalesChannelTypes;
 use Larasell\Larasell\Storefront\StorefrontContext;
@@ -34,9 +36,9 @@ class SalesChannelController
         ));
     }
 
-    public function store(CreateSalesChannelRequest $request, CreateSalesChannel $create): RedirectResponse
+    public function store(CreateSalesChannelRequest $request, CreateSalesChannel $create, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $channel = $create->handle($request->createPayload());
+        $channel = $create->handle($request->createPayload(), $origin);
         SalesChannelNavigationData::refreshOnNextPage();
 
         return redirect()->route('larasell.admin.sales-channels.edit', $channel);
@@ -58,17 +60,17 @@ class SalesChannelController
         ));
     }
 
-    public function update(UpdateSalesChannelRequest $request, SalesChannel $channel, UpdateSalesChannel $update): RedirectResponse
+    public function update(UpdateSalesChannelRequest $request, SalesChannel $channel, UpdateSalesChannel $update, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $update->handle($channel, $request->payload());
+        $update->handle($channel, $request->payload(), $origin);
         SalesChannelNavigationData::refreshOnNextPage();
 
         return redirect()->route('larasell.admin.sales-channels.edit', $channel);
     }
 
-    public function destroy(DeleteSalesChannelRequest $request, SalesChannel $channel, DeleteSalesChannel $delete): RedirectResponse
+    public function destroy(DeleteSalesChannelRequest $request, SalesChannel $channel, DeleteSalesChannel $delete, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $delete->handle($channel);
+        $delete->handle($channel, $origin);
         SalesChannelNavigationData::refreshOnNextPage();
 
         return redirect()->route('larasell.admin.home');

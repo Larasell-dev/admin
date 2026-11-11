@@ -16,12 +16,11 @@ use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\ApiToken\AuditRecords\ApiTokenCreated;
 use Larasell\Admin\ApiToken\AuditRecords\ApiTokenRevoked;
 use Larasell\Admin\ApiToken\Models\ApiToken;
-use Larasell\Admin\Platform\Audit\Actors\Actor;
-use Larasell\Admin\Platform\Audit\Actors\UnknownActor;
-use Larasell\Admin\Platform\Audit\Enums\AuditSource;
-use Larasell\Admin\Platform\Audit\Facades\Audit;
-use Larasell\Admin\Platform\Audit\Subject;
 use Larasell\Admin\Platform\Auth\Models\Admin;
+use Larasell\Larasell\Audit\Enums\AuditSource;
+use Larasell\Larasell\Audit\Facades\Audit;
+use Larasell\Larasell\Audit\Origin;
+use Larasell\Larasell\Audit\Subject;
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
@@ -329,8 +328,8 @@ it('audits creating a token as the admin who did, without its secret', function 
     // Assert
     $apiToken = ApiToken::query()->sole();
 
-    Audit::assertRecorded(ApiTokenCreated::class, fn (ApiTokenCreated $record, Actor|UnknownActor $actor, AuditSource $source) => $actor instanceof Admin && $actor->is($this->ada)
-        && $source === AuditSource::Web
+    Audit::assertRecorded(ApiTokenCreated::class, fn (ApiTokenCreated $record, Origin $origin) => $origin->actor instanceof Admin && $origin->actor->is($this->ada)
+        && $origin->source === AuditSource::Web
         && $record->subject() == new Subject('api_token', $apiToken->id)
         && $record->properties() === [
             'name' => 'ERP sync',
@@ -352,7 +351,7 @@ it('audits revoking a token, keeping its name once the token is gone', function 
     $this->post($revoke['url'], ['confirmation' => 'ERP sync'])->assertRedirect();
 
     // Assert
-    Audit::assertRecorded(ApiTokenRevoked::class, fn (ApiTokenRevoked $record, Actor|UnknownActor $actor) => $actor instanceof Admin && $actor->is($this->ada)
+    Audit::assertRecorded(ApiTokenRevoked::class, fn (ApiTokenRevoked $record, Origin $origin) => $origin->actor instanceof Admin && $origin->actor->is($this->ada)
         && $record->subject() == new Subject('api_token', $apiToken->id)
         && $record->properties() === [
             'name' => 'ERP sync',

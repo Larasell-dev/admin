@@ -17,10 +17,12 @@ use Larasell\Admin\Category\Http\Requests\CreateCategoryRequest;
 use Larasell\Admin\Category\Http\Requests\DeleteCategoryRequest;
 use Larasell\Admin\Category\Http\Requests\UpdateCategoryRequest;
 use Larasell\Admin\Category\Tables\CategoryProducts;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Platform\Sections\Sections;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Actions\CreateCategory;
 use Larasell\Larasell\Catalog\Actions\DeleteCategoryTree;
 use Larasell\Larasell\Catalog\Actions\UpdateCategory;
@@ -114,9 +116,9 @@ class CategoryController
      * Creates a category, inside its parent when given, with the name in the content locale. The
      * page's sections save with it, through the core action's events.
      */
-    public function store(CreateCategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create): RedirectResponse
+    public function store(CreateCategoryRequest $request, #[CurrentContentLocale] Locale $locale, CreateCategory $create, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $category = $create->handle($request->payload($locale));
+        $category = $create->handle($request->payload($locale), $origin);
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -124,9 +126,9 @@ class CategoryController
     /**
      * Changes the name in the content locale and keeps its other translations.
      */
-    public function update(UpdateCategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update): RedirectResponse
+    public function update(UpdateCategoryRequest $request, Category $category, #[CurrentContentLocale] Locale $locale, UpdateCategory $update, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $update->handle(CategoryId::of($category), $request->payload($category, $locale));
+        $update->handle(CategoryId::of($category), $request->payload($category, $locale), $origin);
 
         return redirect()->route('larasell.admin.categories.show', $category);
     }
@@ -135,9 +137,9 @@ class CategoryController
      * Deletes the category with all categories below it. Goes back, unless the previous page
      * was one of the deleted categories.
      */
-    public function destroy(DeleteCategoryRequest $request, Category $category, DeleteCategoryTree $delete): RedirectResponse
+    public function destroy(DeleteCategoryRequest $request, Category $category, DeleteCategoryTree $delete, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $delete->handle(CategoryId::of($category));
+        $delete->handle(CategoryId::of($category), $origin);
 
         try {
             $previous = Route::getRoutes()->match(Request::create(url()->previous()));

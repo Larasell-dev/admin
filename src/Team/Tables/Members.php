@@ -11,6 +11,7 @@ use Larasell\Admin\Platform\Tables\Columns\TextColumn;
 use Larasell\Admin\Platform\Tables\Table;
 use Larasell\Admin\Team\Actions\DeleteAdmin;
 use Larasell\Chronicle\Exceptions\StructuredLogicException;
+use Larasell\Larasell\Audit\Origin;
 
 #[UseModel(Admin::class)]
 class Members extends Table
@@ -36,7 +37,7 @@ class Members extends Table
     public function actions(): array
     {
         return [
-            Action::make(Translate::later('Delete'), handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin, $this->signedInAdmin()))
+            Action::make(Translate::later('Delete'), handle: fn (Admin $admin) => app(DeleteAdmin::class)->handle($admin, Origin::web($this->signedInAdmin())))
                 ->confirm(
                     title: __('Delete member'),
                     message: __('They can no longer sign in to the admin panel. This can\'t be undone.'),
