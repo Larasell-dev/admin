@@ -311,6 +311,10 @@ abstract class Table implements JsonSerializable
             foreach ($item instanceof TableActionGroup ? $item->actions() : [$item] as $action) {
                 $action->assertConfigured(static::class);
 
+                if ($action->isHidden()) {
+                    continue;
+                }
+
                 if (in_array($action->label(), $labels, true)) {
                     throw InvalidTableAction::duplicateLabel(static::class, $source, $action->label());
                 }
@@ -318,7 +322,11 @@ abstract class Table implements JsonSerializable
             }
         }
 
-        return $actions;
+        // Hidden actions are left out, and a group shows only its visible ones.
+        return array_merge(...array_map(
+            fn (TableAction|TableActionGroup $item): array => $item instanceof TableActionGroup ? $item->visible() : ($item->isHidden() ? [] : [$item]),
+            $actions,
+        ));
     }
 
     protected function resolveEmptyStateIcon(mixed $icon): ?string

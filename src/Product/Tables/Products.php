@@ -56,22 +56,16 @@ class Products extends Table
 
     public function headerActions(): array
     {
-        $others = app(ProductTypes::class)->all();
-        // The core always registers physical, so there is a first type.
-        $first = array_shift($others) ?? app(ProductTypes::class)->get('physical');
-        $add = TableAction::make(Translate::later('Add product'))->route('larasell.admin.products.create', $others === [] ? [] : ['type' => $first->key()])->icon(Icon::Add);
+        $types = app(ProductTypes::class)->all();
 
-        // The first registered type (physical) is the button; other types are in its menu.
-        if ($others === []) {
-            return [$add];
-        }
-
-        return [TableActionGroup::make([$add, ...array_map(
-            fn (ProductType $type): TableAction => TableAction::make(__('Add :type', ['type' => lcfirst(__($type->label()))]))
+        // The first registered type (physical) is the button, the others are in its menu.
+        return [TableActionGroup::make(array_map(
+            fn (ProductType $type, int $index): TableAction => TableAction::make($index === 0 ? Translate::later('Add product') : __('Add :type', ['type' => lcfirst(__($type->label()))]))
                 ->route('larasell.admin.products.create', ['type' => $type->key()])
                 ->icon(Icon::Add),
-            $others,
-        )])];
+            $types,
+            array_keys($types),
+        ))];
     }
 
     public function actions(): array

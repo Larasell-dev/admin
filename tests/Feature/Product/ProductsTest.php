@@ -83,7 +83,7 @@ it('says there are no products yet when the store has none', function () {
                 'description' => 'Products you add to the store show up here.',
                 'icon' => 'ShoppingBag',
                 'actions' => [
-                    ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create'), 'icon' => 'Add'],
+                    ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create', ['type' => 'physical']), 'icon' => 'Add'],
                 ],
             ]));
 });
@@ -95,7 +95,7 @@ it('links to adding a product from the header', function () {
     // Act & Assert
     $this->get(route('larasell.admin.products.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('table.headerActions', [
-            ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create'), 'icon' => 'Add'],
+            ['label' => 'Add product', 'method' => 'get', 'url' => route('larasell.admin.products.create', ['type' => 'physical']), 'icon' => 'Add'],
         ]));
 });
 

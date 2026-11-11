@@ -24,6 +24,8 @@ final class TableAction implements JsonSerializable
 
     private ?Icon $icon = null;
 
+    private bool $hidden = false;
+
     /** @var array<int, string> The configuration methods called so far, which may each be called only once. */
     private array $configured = [];
 
@@ -69,6 +71,23 @@ final class TableAction implements JsonSerializable
         $this->icon = is_string($icon) ? $this->resolveIcon($icon) : $icon;
 
         return $this;
+    }
+
+    /**
+     * Hide the action, e.g. when the admin can't use it. Hidden actions are left out of the
+     * header, the empty state and their group. This is not authorization: guard the route itself.
+     */
+    public function hidden(bool $condition = true): self
+    {
+        $this->configureOnce('hidden()');
+        $this->hidden = $condition;
+
+        return $this;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
     }
 
     /**
