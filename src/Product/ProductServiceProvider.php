@@ -2,7 +2,6 @@
 
 namespace Larasell\Admin\Product;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Larasell\Admin\AdminPanel;
@@ -19,25 +18,11 @@ use Larasell\Admin\Product\Http\Controllers\OptionController;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
 use Larasell\Admin\Product\Http\Controllers\ProductVariantController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
-use Larasell\Admin\Product\Listeners\AuditAttributeChanges;
-use Larasell\Admin\Product\Listeners\AuditOptionChanges;
 use Larasell\Admin\Product\Search\DatabaseProductSearch;
 use Larasell\Admin\Product\Search\ProductSearch;
 use Larasell\Admin\Product\Tables\Attributes;
 use Larasell\Admin\Product\Tables\Options;
 use Larasell\Admin\Product\Tables\Products;
-use Larasell\Larasell\Catalog\Events\ProductAttributeCreated;
-use Larasell\Larasell\Catalog\Events\ProductAttributeDeleted;
-use Larasell\Larasell\Catalog\Events\ProductAttributeUpdated;
-use Larasell\Larasell\Catalog\Events\ProductAttributeValueCreated;
-use Larasell\Larasell\Catalog\Events\ProductAttributeValueDeleted;
-use Larasell\Larasell\Catalog\Events\ProductAttributeValueUpdated;
-use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionCreated;
-use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionDeleted;
-use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionUpdated;
-use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionValueCreated;
-use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionValueDeleted;
-use Larasell\Larasell\Catalog\Options\Events\OptionDefinitionValueUpdated;
 
 /**
  * The products module. Setting larasell.admin.products.enabled to false leaves
@@ -54,20 +39,6 @@ class ProductServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Audited from the core's events, wherever the change came from.
-        Event::listen(ProductAttributeCreated::class, [AuditAttributeChanges::class, 'created']);
-        Event::listen(ProductAttributeUpdated::class, [AuditAttributeChanges::class, 'updated']);
-        Event::listen(ProductAttributeDeleted::class, [AuditAttributeChanges::class, 'deleted']);
-        Event::listen(ProductAttributeValueCreated::class, [AuditAttributeChanges::class, 'valueCreated']);
-        Event::listen(ProductAttributeValueUpdated::class, [AuditAttributeChanges::class, 'valueUpdated']);
-        Event::listen(ProductAttributeValueDeleted::class, [AuditAttributeChanges::class, 'valueDeleted']);
-        Event::listen(OptionDefinitionCreated::class, [AuditOptionChanges::class, 'created']);
-        Event::listen(OptionDefinitionUpdated::class, [AuditOptionChanges::class, 'updated']);
-        Event::listen(OptionDefinitionDeleted::class, [AuditOptionChanges::class, 'deleted']);
-        Event::listen(OptionDefinitionValueCreated::class, [AuditOptionChanges::class, 'valueCreated']);
-        Event::listen(OptionDefinitionValueUpdated::class, [AuditOptionChanges::class, 'valueUpdated']);
-        Event::listen(OptionDefinitionValueDeleted::class, [AuditOptionChanges::class, 'valueDeleted']);
-
         if (! config('larasell.admin.products.enabled')) {
             return;
         }

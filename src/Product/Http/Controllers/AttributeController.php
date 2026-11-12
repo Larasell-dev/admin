@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 use Larasell\Admin\Product\Data\AttributeDetailData;
@@ -16,6 +17,7 @@ use Larasell\Admin\Product\Data\AttributeValueRowData;
 use Larasell\Admin\Product\Data\CreateAttributePageData;
 use Larasell\Admin\Product\Http\Requests\AttributeRequest;
 use Larasell\Admin\Product\Tables\Attributes;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Actions\DeleteProductAttribute;
 use Larasell\Larasell\Catalog\Actions\SaveProductAttribute;
 use Larasell\Larasell\Catalog\AttributeId;
@@ -36,9 +38,9 @@ class AttributeController
     }
 
     /** Creates a text attribute with its values, named in the content locale. */
-    public function store(AttributeRequest $request, #[CurrentContentLocale] Locale $locale, SaveProductAttribute $save): RedirectResponse
+    public function store(AttributeRequest $request, #[CurrentContentLocale] Locale $locale, SaveProductAttribute $save, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $attribute = $save->handle(null, $request->payload($locale));
+        $attribute = $save->handle(null, $request->payload($locale), $origin);
 
         return redirect()->route('larasell.admin.attributes.show', $attribute);
     }
@@ -70,9 +72,9 @@ class AttributeController
      * Saves the attribute with all of its values: new ones are added, the others changed and the
      * ones left out deleted. Names change in the content locale only.
      */
-    public function update(AttributeRequest $request, ProductAttribute $attribute, #[CurrentContentLocale] Locale $locale, SaveProductAttribute $save): RedirectResponse
+    public function update(AttributeRequest $request, ProductAttribute $attribute, #[CurrentContentLocale] Locale $locale, SaveProductAttribute $save, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $save->handle(AttributeId::of($attribute), $request->payload($locale));
+        $save->handle(AttributeId::of($attribute), $request->payload($locale), $origin);
 
         return back();
     }
@@ -81,11 +83,11 @@ class AttributeController
      * Deletes the attribute with its values, which products and variants lose. The admin
      * confirms by typing its slug.
      */
-    public function destroy(Request $request, ProductAttribute $attribute, DeleteProductAttribute $delete): RedirectResponse
+    public function destroy(Request $request, ProductAttribute $attribute, DeleteProductAttribute $delete, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         $request->validate(['confirmation' => [new Confirmation($attribute->slug)]]);
 
-        $delete->handle(AttributeId::of($attribute));
+        $delete->handle(AttributeId::of($attribute), $origin);
 
         return redirect()->route('larasell.admin.attributes.index');
     }

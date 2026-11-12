@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
 use Larasell\Admin\Product\Exceptions\OptionNameMissing;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Options\Actions\OptionValueDraft;
 use Larasell\Larasell\Catalog\Options\Actions\SaveOptionDefinition;
 use Larasell\Larasell\Catalog\Options\Actions\SaveOptionDefinitionPayload;
@@ -50,13 +51,13 @@ class OptionRequest extends FormRequest
      *
      * @throws ValidationException
      */
-    public function save(SaveOptionDefinition $save, Locale $locale): void
+    public function save(SaveOptionDefinition $save, Locale $locale, Origin $origin): void
     {
         // Only the update route saves; it always has an option.
         $option = $this->option() ?? abort(404);
 
         try {
-            $save->handle(OptionDefinitionId::of($option), $this->payload($locale));
+            $save->handle(OptionDefinitionId::of($option), $this->payload($locale), $origin);
         } catch (OptionInUse $exception) {
             $value = $option->values()->where('slug', $exception->value)->first();
 

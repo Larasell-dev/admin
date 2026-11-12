@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Panel\Rules\Confirmation;
 use Larasell\Admin\Product\Data\CreateOptionPageData;
@@ -17,6 +18,7 @@ use Larasell\Admin\Product\Data\OptionPageData;
 use Larasell\Admin\Product\Data\OptionValueRowData;
 use Larasell\Admin\Product\Http\Requests\OptionRequest;
 use Larasell\Admin\Product\Tables\Options;
+use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Options\Actions\DeleteOptionDefinition;
 use Larasell\Larasell\Catalog\Options\Actions\SaveOptionDefinition;
 use Larasell\Larasell\Catalog\Options\Exceptions\OptionInUse;
@@ -40,9 +42,9 @@ class OptionController
         ));
     }
 
-    public function store(OptionRequest $request, #[CurrentContentLocale] Locale $locale, SaveOptionDefinition $save): RedirectResponse
+    public function store(OptionRequest $request, #[CurrentContentLocale] Locale $locale, SaveOptionDefinition $save, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $option = $save->handle(null, $request->payload($locale));
+        $option = $save->handle(null, $request->payload($locale), $origin);
 
         return redirect()->route('larasell.admin.options.show', $option);
     }
@@ -76,20 +78,20 @@ class OptionController
      * Saves the option with all of its values: new ones are added, the others changed and the
      * ones left out deleted, unless variants use them. Names change in the content locale only.
      */
-    public function update(OptionRequest $request, OptionDefinition $option, #[CurrentContentLocale] Locale $locale, SaveOptionDefinition $save): RedirectResponse
+    public function update(OptionRequest $request, OptionDefinition $option, #[CurrentContentLocale] Locale $locale, SaveOptionDefinition $save, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
-        $request->save($save, $locale);
+        $request->save($save, $locale, $origin);
 
         return back();
     }
 
     /** Deletes the option with its values while no variant uses it, once the admin typed its slug. */
-    public function destroy(Request $request, OptionDefinition $option, #[CurrentContentLocale] Locale $locale, DeleteOptionDefinition $delete): RedirectResponse
+    public function destroy(Request $request, OptionDefinition $option, #[CurrentContentLocale] Locale $locale, DeleteOptionDefinition $delete, #[CurrentOrigin] Origin $origin): RedirectResponse
     {
         $request->validate(['confirmation' => [new Confirmation($option->slug)]]);
 
         try {
-            $delete->handle(OptionDefinitionId::of($option));
+            $delete->handle(OptionDefinitionId::of($option), $origin);
         } catch (OptionInUse $exception) {
             throw ValidationException::withMessages(['option' => OptionRequest::inUse($option->name->get($locale->value), $exception)]);
         }
