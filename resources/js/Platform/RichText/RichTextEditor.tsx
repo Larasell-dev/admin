@@ -23,6 +23,7 @@ export default function RichTextEditor({
   defaultValue,
   placeholder,
   invalid = false,
+  readOnly = false,
 }: {
   name: string;
   /** The accessible name of the text area. */
@@ -31,6 +32,8 @@ export default function RichTextEditor({
   /** Shown while it's empty. */
   placeholder?: string;
   invalid?: boolean;
+  /** Shows the text without letting it change; the toolbar's buttons are disabled too. */
+  readOnly?: boolean;
 }) {
   const editor = useEditor({
     preset: defaultPreset(),
@@ -105,7 +108,7 @@ export default function RichTextEditor({
     >
       {/* A text input that's hidden, not a hidden input, so resetting the form restores it. */}
       <input ref={input} type="text" hidden readOnly name={name} defaultValue={initial} />
-      <Toolbar editor={editor} />
+      <Toolbar editor={editor} disabled={readOnly} />
       {/* Pen outlines each row it focuses; the field's ring replaces that. Tailwind resets headings
           and links, so the content gets its look back here. List markers sit on their text's
           baseline, in a column as wide for 1. as for 10., rather than centered in Pen's own box. */}
@@ -146,6 +149,7 @@ export default function RichTextEditor({
         <style>{`[data-rich-text="${CSS.escape(scope)}"] [data-placeholder-visible]:not([data-placeholder="${CSS.escape(placeholder ?? "")}"])::before { content: none; }`}</style>
         {/* PenEditor's own parts, since PenEditor doesn't pass on the block options. */}
         <Pen.Editor.Root
+          readonly={readOnly}
           key={editor.internals.viewId}
           editor={editor}
           // A plain text field: no block handles, dragging or selecting whole blocks.
@@ -160,7 +164,7 @@ export default function RichTextEditor({
   );
 }
 
-function Toolbar({ editor }: { editor: Editor }) {
+function Toolbar({ editor, disabled }: { editor: Editor; disabled: boolean }) {
   const state = useToolbar(editor);
   const selection = useSelection(editor);
   const blockId = selection?.type === "text" ? selection.focus.blockId : null;
@@ -196,6 +200,7 @@ function Toolbar({ editor }: { editor: Editor }) {
               "Rich text editor: toolbar button that makes the selected text bold",
             )}
             icon={Bold}
+            disabled={disabled}
             pressed={Boolean(state.activeMarks.bold)}
             onPress={() => toggleInlineMark(editor, "bold")}
           />
@@ -205,6 +210,7 @@ function Toolbar({ editor }: { editor: Editor }) {
               "Rich text editor: toolbar button that makes the selected text italic",
             )}
             icon={Italic}
+            disabled={disabled}
             pressed={Boolean(state.activeMarks.italic)}
             onPress={() => toggleInlineMark(editor, "italic")}
           />
@@ -214,6 +220,7 @@ function Toolbar({ editor }: { editor: Editor }) {
               "Rich text editor: toolbar button that underlines the selected text",
             )}
             icon={Underline}
+            disabled={disabled}
             pressed={Boolean(state.activeMarks.underline)}
             onPress={() => toggleInlineMark(editor, "underline")}
           />
@@ -223,6 +230,7 @@ function Toolbar({ editor }: { editor: Editor }) {
               "Rich text editor: toolbar button that links the selected text to a web address",
             )}
             icon={Link}
+            disabled={disabled}
             pressed={Boolean(state.activeMarks.link) || linking}
             onPress={() => setLinking(!linking)}
           />
@@ -240,13 +248,14 @@ function Toolbar({ editor }: { editor: Editor }) {
               key={kind.id}
               label={kind.label}
               icon={kind.icon}
+              disabled={disabled}
               pressed={isKind(block, kind)}
               onPress={() => toggle(kind)}
             />
           ))}
         </BaseToolbar.Group>
       </BaseToolbar.Root>
-      {linking && (
+      {linking && !disabled && (
         <LinkForm
           defaultHref={(state.activeMarks.link as { href?: string } | undefined)?.href ?? ""}
           onApply={(href) => {
@@ -265,8 +274,10 @@ function ToolbarButton({
   icon,
   pressed,
   onPress,
+  disabled,
 }: {
   label: string;
+  disabled: boolean;
   icon: Parameters<typeof Icon>[0]["icon"];
   pressed: boolean;
   onPress: () => void;
@@ -277,12 +288,17 @@ function ToolbarButton({
     <BaseToolbar.Button
       aria-label={label}
       aria-pressed={pressed}
+      // Stays focusable, so the toolbar's buttons are still announced, just as unavailable.
+      disabled={disabled}
+      focusableWhenDisabled
       // Keeps the editor's selection, which the button formats.
       onMouseDown={(event) => event.preventDefault()}
       onClick={onPress}
       className={cn(
         // Button
         "box-border inline-flex size-8 shrink-0 cursor-pointer items-center justify-center select-none",
+        // Disabled while the editor is read only
+        "data-disabled:cursor-not-allowed data-disabled:opacity-50 data-disabled:pointer-events-none",
         // States: hover, on and focus
         "text-base-secondary hover:bg-action-neutral-ghost-hover hover:text-base-primary aria-pressed:bg-action-neutral-secondary-hover aria-pressed:text-base-primary focus-visible:focus-ring",
       )}

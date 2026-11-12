@@ -43,6 +43,18 @@ function props(
     categories: [],
     createCategoryUrl: null,
     sections: [],
+    variants: {
+      options: [],
+      availableOptions: [],
+      variants: [],
+      page: 1,
+      pageSize: 10,
+      total: 0,
+      missingCombinations: [],
+      addOptionUrl: "",
+      createCombinationsUrl: "",
+      optionDefinitionsUrl: "",
+    },
     type: {
       key: "physical",
       label: "Physical product",
@@ -273,6 +285,7 @@ it("places sections before or after the product's own sections, or after all of 
     "Identifiers",
     "Customs",
     "Last",
+    "Options",
   ]);
 });
 

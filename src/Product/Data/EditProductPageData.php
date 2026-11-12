@@ -29,6 +29,8 @@ class EditProductPageData extends Data
         public array $attributes,
         /** The catalog's attributes, where their values are defined. */
         public string $attributesUrl,
+        /** The product's options and variants. */
+        public ProductVariantsData $variants,
     ) {}
 
     /**

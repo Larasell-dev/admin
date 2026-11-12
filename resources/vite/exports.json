@@ -101,6 +101,7 @@
     "Field",
     "Icon",
     "IconButton",
+    "InheritableLabel",
     "Inline",
     "Input",
     "Inset",

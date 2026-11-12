@@ -19,6 +19,7 @@ use Larasell\Admin\Product\Data\EditProductPageData;
 use Larasell\Admin\Product\Data\ProductAttributeFieldData;
 use Larasell\Admin\Product\Data\ProductDetailData;
 use Larasell\Admin\Product\Data\ProductTypeData;
+use Larasell\Admin\Product\Data\ProductVariantsData;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
@@ -129,6 +130,7 @@ class ProductController
             countries: EditProductPageData::countries(),
             attributes: ProductAttributeFieldData::forProduct($product, $locale),
             attributesUrl: route('larasell.admin.attributes.index'),
+            variants: ProductVariantsData::fromProduct($product, $locale),
         ));
     }
 

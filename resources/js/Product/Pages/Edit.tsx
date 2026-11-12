@@ -1,8 +1,10 @@
 import { Form } from "@inertiajs/react";
+import { SectionStack } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import ContentLocaleSelect from "../../Platform/ContentLocale/Components/ContentLocaleSelect";
 import { Page } from "../../Platform/Panel/Components/Page";
 import ProductForm from "../Components/ProductForm";
+import VariantsSection from "../Components/VariantsSection";
 import UnsavedChangesToast from "../../Platform/Panel/Components/UnsavedChangesToast";
 import SidebarLayout from "../../Platform/Panel/Layouts/SidebarLayout";
 import type { SharedProps } from "../../types";
@@ -20,6 +22,7 @@ export default function Edit({
   createCategoryUrl,
   sections,
   type,
+  variants,
   contentLocale,
 }: Props) {
   return (
@@ -47,16 +50,19 @@ export default function Edit({
         actions={<ContentLocaleSelect contentLocale={contentLocale} />}
       />
       <Page.Body>
-        <ProductForm
-          product={product}
-          categories={categories}
-          createCategoryUrl={createCategoryUrl}
-          sections={sections}
-          type={type}
-          attributes={attributes}
-          countries={countries}
-          attributesUrl={attributesUrl}
-        />
+        <SectionStack>
+          <ProductForm
+            product={product}
+            categories={categories}
+            createCategoryUrl={createCategoryUrl}
+            sections={sections}
+            type={type}
+            attributes={attributes}
+            countries={countries}
+            attributesUrl={attributesUrl}
+          />
+          <VariantsSection variants={variants} />
+        </SectionStack>
         <UnsavedChangesToast />
       </Page.Body>
     </Form>

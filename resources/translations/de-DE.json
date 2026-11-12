@@ -5765,6 +5765,126 @@
       ],
       "types": []
     },
+    "fK+HAzfRbV6sWk1dySZ8ZQ==": {
+      "description": "Variant page: accessible name of the back arrow to the product",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Back to the product",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N/YqD4hS/RD0NTXxiKFD0A==": {
+      "description": "Variant page: label of the variant's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "snt100hLQ9q6Gp2/QnWX5w==": {
+      "description": "Variant page: label of the variant's description",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Description",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VzQoqxNYK9AGb1gd8Adijg==": {
+      "description": "Variant page: label of the weight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weight",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UNGmFtD7KBuUEoRHmnyQ7w==": {
+      "description": "Variant page: label of the country the goods were made in",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Country of origin",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N6KSKtUcYfDqchIZdv66VQ==": {
+      "description": "Variant page: label of the customs tariff number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HS code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qJskoSzKpKIEQmmzI2eLvw==": {
+      "description": "Variant page: heading of the variant's attributes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EWvUAYJ+O6QA5/j+AIIDlQ==": {
+      "description": "Variant page: button that opens the confirmation to delete the variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Unx7KM30CrtuVUI+OH1TGQ==": {
+      "description": "Variant page: title of the confirmation to delete the variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9swgRXiKShW42xGFFqozqA==": {
+      "description": "Variant page: text of the confirmation to delete the variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Carts and orders keep their copies, but the variant can't be bought anymore.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "fuw2Mcn6RtKxGpDTXVKmww==": {
       "description": "Options page: title of the page of the catalog's option definitions",
       "status": "new",
@@ -6065,18 +6185,6 @@
       ],
       "types": []
     },
-    "HYgjixeYrATNAC80MALIjg==": {
-      "description": "Attributes page: checkbox that lets products and variants have several values of the attribute, e.g. a blend of materials",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Several values per product or variant",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "Fcr8sLL7AKQ0ICgVU9XmVw==": {
       "description": "Attributes page: accessible name of the field for a new value",
       "status": "new",
@@ -6120,6 +6228,414 @@
       "translations": [
         {
           "translation": "Identifiers",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3r+9MiEPva5M3UFJj2rpMQ==": {
+      "description": "Product form: label of the field for the manufacturer part number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MPN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Xl6LpvBa0hlFjNK4yqLucw==": {
+      "description": "Product page: heading of the section with the product's options, e.g. size or colour",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Options",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JZNBsnZ1zkS0q6I/ZnCXbQ==": {
+      "description": "Product page: text below the heading of the options section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Options tell variants apart. Pick from the options defined in the catalog.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "taEVXyVkoLP5ETUry7Dh7g==": {
+      "description": "Product page: heading of the table of the product's variants",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4kkWrreNHmcziSP0XtfCqg==": {
+      "description": "Product page: text below the heading of the variants section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Each variant is one combination of option values with its own SKU and status.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9aaM9Wid2uKfmZFOS3tCtQ==": {
+      "description": "Product page: accessible name of the select that adds a value to an option",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RgxVEeUhOzelekLZwgCWeg==": {
+      "description": "Product page: button that adds the chosen option with its checked values",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add option",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NRDTmPa7QQdtonWaBc54ug==": {
+      "description": "Product page: column heading of the variant's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uKM6zHzhrvPNNTPK/HXtvQ==": {
+      "description": "Product page: column heading of the variant's SKU",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "SKU",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UKSoaWbjpGtG+ibAjiczSQ==": {
+      "description": "Product page: column heading of the variant's visibility",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Status",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5swCCBG62ZnItm4tMTCSFg==": {
+      "description": "Product page: status badge of a visible variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Visible",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w3gaRMWeWx4/rSn/vg0dyw==": {
+      "description": "Product page: status badge of a hidden variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hidden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JTBY40hxklKLgi2VB/hypQ==": {
+      "description": "Product page: heading of the list of option combinations without a variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Combinations without a variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vDocrueugmdUG3nHYBecAA==": {
+      "description": "Product page: button that creates a variant for each checked combination",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Create {count} variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m7UZ+K0I7tx18aGv9H9kVg==": {
+      "description": "Variant page: chain button that makes a field take the product's value again",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Use the product's value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OkMFH5mKdbtpon0h236ivA==": {
+      "description": "Variant page: chain button that gives the variant its own value of a field",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Use an own value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0TLqWAN/PuOINqYJpNZGUw==": {
+      "description": "Variant page: heading of the name, description and visibility",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "General",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MgkJgvKqJHaVsvwp8kF/ng==": {
+      "description": "Variant page: accessible name of the product's description shown while inherited",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Product description",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qVs4mvmRrZOp6NAyUFGGHQ==": {
+      "description": "Variant page: accessible name of the variant's own description",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Description",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m9g6n4Mqx0KtHoTyxpaZbQ==": {
+      "description": "Variant page: heading of the weight and dimensions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weight and dimensions",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TsDx/+6adLsUHlMPsNdcUA==": {
+      "description": "Variant page: label of the length, width and height",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dimensions",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7zlomrNB0XHeF0DOtjjfmw==": {
+      "description": "Variant page: heading of the SKU, barcode and manufacturer part number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Identifiers",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ipxjoonFlTfHsYnwoWQniQ==": {
+      "description": "Product page: accessible name of the table of variants",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aFtdgjCPJyl1ph69HVbx2g==": {
+      "description": "Variant page: placeholder of the search field in the variant select's list",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cor39ER4JiifQSIGA6YpBQ==": {
+      "description": "Variant page: shown in the variant select's list when the search matches no variant",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No variants found",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JvLlhCPzCaknLshSyrgnSA==": {
+      "description": "Variant page: accessible name of the select that opens another variant of the product",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WRrc5sGWYPzRZpKAcoT4Fg==": {
+      "description": "Variant page: accessible name of the select next to the weight field that picks the unit, e.g. kg",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weight unit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lZvG9zNBaH7+Xo79XyD8ZQ==": {
+      "description": "Variant page: text below the label of the length, width and height",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "The packed size. All three share one unit.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ie43rIiVMd5OwZow+xMXOg==": {
+      "description": "Variant page: text below the heading of the Attributes section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Details customers can filter and compare by, such as material. Link one to use the product's value.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eDGxuPHpgLOoU2RQrPL8xg==": {
+      "description": "Variant page: text below the heading of the General section, with the name, description and visibility",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "How the variant is named and found in the store.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0Qrs8El1UdVKXbdlOk6gqg==": {
+      "description": "Variant page: text below the heading of the Weight and dimensions section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Used to choose shipping methods and their prices. Leave them empty for variants that aren't shipped.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9lrDORp8uSQ0csuYjYjOlw==": {
+      "description": "Variant page: text below the heading of the Identifiers section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Identify the variant in your inventory and when it's scanned. Each belongs to one variant only.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bV4rtSlmdrDhHGPV1nsnFw==": {
+      "description": "Product form: heading of the section with the product's attribute values, e.g. its material",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zMWsQTjC+VJpOA3VDP/vmg==": {
+      "description": "Product form: text below the heading of the Attributes section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Details customers can filter and compare by, such as material. Variants take these values unless they set their own.",
           "variations": {}
         }
       ],
@@ -6173,42 +6689,6 @@
       ],
       "types": []
     },
-    "bV4rtSlmdrDhHGPV1nsnFw==": {
-      "description": "Product form: heading of the section with the product's attribute values, e.g. its material",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Attributes",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "zMWsQTjC+VJpOA3VDP/vmg==": {
-      "description": "Product form: text below the heading of the Attributes section",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Details customers can filter and compare by, such as material. Variants take these values unless they set their own.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "3r+9MiEPva5M3UFJj2rpMQ==": {
-      "description": "Product form: label of the field for the manufacturer part number",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "MPN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "SkkxTwks8t2N1semQjaH5A==": {
       "description": "Placeholder of the search field in the list of countries",
       "status": "new",
@@ -6228,6 +6708,126 @@
       "translations": [
         {
           "translation": "No country found",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l+J6a2CmF2HOF+CYcjPpvw==": {
+      "description": "Product page: shown on the select that adds a value to an option",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "+ Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yx5nJYSjvs697evsxM0vbQ==": {
+      "description": "Variant page: heading of the country of origin and HS code",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Customs",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bRXGWarNZz2k2pmLT0vwRg==": {
+      "description": "Variant page: text below the heading of the Customs section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "What customs need to know when the variant is shipped abroad.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HYgjixeYrATNAC80MALIjg==": {
+      "description": "Attributes page: checkbox that lets products and variants have several values of the attribute, e.g. a blend of materials",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Several values per product or variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "E6U+21pjZA/OJWHm58ZZug==": {
+      "description": "Product form: accessible name of the button on an attribute value that removes it, e.g. 'Remove Cotton'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Remove {value}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6wi602mtcq9XNluAQ8GBIQ==": {
+      "description": "Product page: link to the catalog's options, to create one when every option is already used",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Create option",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EPoyqzek+mGJqHwdVDQGfQ==": {
+      "description": "Product form: shown next to an attribute that has no values to pick from yet",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No values yet. Add them on the Attributes page.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ARf1AXFZUkUce/bBdUGdog==": {
+      "description": "Product form: accessible name of the round button that opens the list of an attribute's values, e.g. 'Add values to Material'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add values to {attribute}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tmjx0gU2aJ/PXmimvxjMkw==": {
+      "description": "Product form: placeholder of the search in the list of an attribute's values",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search values",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YHEyUBJZIQ68y/YpgTy5VQ==": {
+      "description": "Product form: shown in the list of an attribute's values when the search matches none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No values found",
           "variations": {}
         }
       ],
@@ -6281,61 +6881,25 @@
       ],
       "types": []
     },
-    "EPoyqzek+mGJqHwdVDQGfQ==": {
-      "description": "Product form: shown next to an attribute that has no values to pick from yet",
+    "MbYlzS1u2Q2lg9q3hu79rQ==": {
+      "description": "Product page: accessible name of the button that opens the options to add",
       "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No values yet. Add them on the Attributes page.",
+          "translation": "Option to add",
           "variations": {}
         }
       ],
       "types": []
     },
-    "E6U+21pjZA/OJWHm58ZZug==": {
-      "description": "Product form: accessible name of the button on an attribute value that removes it, e.g. 'Remove Cotton'",
+    "fc9lEqB2EIf0qGZm/kmq6Q==": {
+      "description": "Product page: button that opens the list of options to add",
       "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Remove {value}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ARf1AXFZUkUce/bBdUGdog==": {
-      "description": "Product form: accessible name of the round button that opens the list of an attribute's values, e.g. 'Add values to Material'",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Add values to {attribute}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "tmjx0gU2aJ/PXmimvxjMkw==": {
-      "description": "Product form: placeholder of the search in the list of an attribute's values",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Search values",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "YHEyUBJZIQ68y/YpgTy5VQ==": {
-      "description": "Product form: shown in the list of an attribute's values when the search matches none",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "No values found",
+          "translation": "Add option",
           "variations": {}
         }
       ],
