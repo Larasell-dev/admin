@@ -78,13 +78,7 @@ class OptionController
      */
     public function update(OptionRequest $request, OptionDefinition $option, #[CurrentContentLocale] Locale $locale, SaveOptionDefinition $save): RedirectResponse
     {
-        try {
-            $save->handle(OptionDefinitionId::of($option), $request->payload($locale));
-        } catch (OptionInUse $exception) {
-            $value = $option->values()->where('slug', $exception->value)->first();
-
-            throw ValidationException::withMessages(['values' => self::inUse($value?->name->get($locale->value) ?? (string) $exception->value, $exception)]);
-        }
+        $request->save($save, $locale);
 
         return back();
     }
@@ -97,18 +91,9 @@ class OptionController
         try {
             $delete->handle(OptionDefinitionId::of($option));
         } catch (OptionInUse $exception) {
-            throw ValidationException::withMessages(['option' => self::inUse($option->name->get($locale->value), $exception)]);
+            throw ValidationException::withMessages(['option' => OptionRequest::inUse($option->name->get($locale->value), $exception)]);
         }
 
         return redirect()->route('larasell.admin.options.index');
-    }
-
-    private static function inUse(string $name, OptionInUse $exception): string
-    {
-        return __(':name is used by :variants of :products. Delete those variants on the product first.', [
-            'name' => $name,
-            'variants' => trans_choice('{1} :count variant|[2,*] :count variants', $exception->variants),
-            'products' => trans_choice('{1} :count product|[2,*] :count products', $exception->products),
-        ]);
     }
 }

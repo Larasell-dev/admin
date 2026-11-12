@@ -4,12 +4,16 @@ namespace Larasell\Admin\Product\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Larasell\Admin\Platform\ContentLocale\Resolvers\ContentLocaleResolver;
-use Larasell\Chronicle\Exceptions\StructuredLogicException;
+use Larasell\Admin\Product\Exceptions\OptionNameMissing;
 use Larasell\Larasell\Catalog\Options\Actions\OptionValueDraft;
+use Larasell\Larasell\Catalog\Options\Actions\SaveOptionDefinition;
 use Larasell\Larasell\Catalog\Options\Actions\SaveOptionDefinitionPayload;
+use Larasell\Larasell\Catalog\Options\Exceptions\OptionInUse;
 use Larasell\Larasell\Catalog\Options\Models\OptionDefinition;
+use Larasell\Larasell\Catalog\Options\OptionDefinitionId;
 use Larasell\Larasell\Catalog\Options\OptionDefinitionValueId;
 use Larasell\Larasell\Catalog\Options\OptionDisplay;
 use Larasell\Larasell\Enums\Locale;
@@ -40,6 +44,36 @@ class OptionRequest extends FormRequest
         ];
     }
 
+    /**
+     * Saves the option with all of its values, as the form error on the values when it leaves
+     * out one that variants use.
+     *
+     * @throws ValidationException
+     */
+    public function save(SaveOptionDefinition $save, Locale $locale): void
+    {
+        // Only the update route saves; it always has an option.
+        $option = $this->option() ?? abort(404);
+
+        try {
+            $save->handle(OptionDefinitionId::of($option), $this->payload($locale));
+        } catch (OptionInUse $exception) {
+            $value = $option->values()->where('slug', $exception->value)->first();
+
+            throw ValidationException::withMessages(['values' => self::inUse($value?->name->get($locale->value) ?? (string) $exception->value, $exception)]);
+        }
+    }
+
+    /** Says which variants of how many products still use an option or value. */
+    public static function inUse(string $name, OptionInUse $exception): string
+    {
+        return __(':name is used by :variants of :products. Delete those variants on the product first.', [
+            'name' => $name,
+            'variants' => trans_choice('{1} :count variant|[2,*] :count variants', $exception->variants),
+            'products' => trans_choice('{1} :count product|[2,*] :count products', $exception->products),
+        ]);
+    }
+
     /** The option with its values for SaveOptionDefinition, each name in the given locale with its other translations kept. */
     public function payload(Locale $locale): SaveOptionDefinitionPayload
     {
@@ -50,11 +84,7 @@ class OptionRequest extends FormRequest
         ksort($values);
         // Without text, the locale's translation goes; validation keeps one in another locale.
         $name = fn (?Translatable $stored, ?string $text): Translatable => $text === null
-            ? ($stored?->without($locale->value) ?? throw new StructuredLogicException(
-                errorCode: 'larasell-admin.product.option-name-missing',
-                message: 'An option or value without a name in the content locale has no other one.',
-                why: 'OptionRequest requires a name where no other locale has one, so this is a bug.',
-            ))
+            ? ($stored?->without($locale->value) ?? throw OptionNameMissing::inEveryLocale())
             : ($stored?->with($locale->value, $text) ?? new Translatable([$locale->value => $text]));
 
         return new SaveOptionDefinitionPayload(

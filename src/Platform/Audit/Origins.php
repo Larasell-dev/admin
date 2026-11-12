@@ -3,7 +3,7 @@
 namespace Larasell\Admin\Platform\Audit;
 
 use Illuminate\Support\Facades\Auth;
-use Larasell\Chronicle\Exceptions\StructuredLogicException;
+use Larasell\Admin\Platform\Audit\Exceptions\MissingOrigin;
 use Larasell\Larasell\Audit\Actors\Actor;
 use Larasell\Larasell\Audit\Actors\UnknownActor;
 use Larasell\Larasell\Audit\Origin;
@@ -27,12 +27,7 @@ class Origins
 
     public function current(): Origin
     {
-        return $this->find() ?? throw new StructuredLogicException(
-            errorCode: 'larasell-admin.audit.no-origin',
-            message: 'No admin or API token is signed in, so the request has no origin to audit its changes with.',
-            why: 'Every audited change names who made it; a request with no one signed in can\'t say.',
-            fix: 'Put the route behind the panel\'s or the API\'s authentication, or pass an Origin yourself, e.g. Origin::cli(new SystemActor(\'...\')).',
-        );
+        return $this->find() ?? throw MissingOrigin::noOneSignedIn();
     }
 
     /**
