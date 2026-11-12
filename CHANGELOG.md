@@ -1,5 +1,116 @@
 # Changelog
 
+## [0.7.0](https://github.com/Larasell-dev/admin/compare/v0.6.0...v0.7.0) (2026-11-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* edit product variants, options and attributes ([#283](https://github.com/Larasell-dev/admin/issues/283))
+* use the core's audit log and pass an Origin to audited changes ([#282](https://github.com/Larasell-dev/admin/issues/282))
+* check paths before deleting extension links and avatars ([#267](https://github.com/Larasell-dev/admin/issues/267))
+* tamper-evident audit log with verification, exports and module records ([#264](https://github.com/Larasell-dev/admin/issues/264))
+* remove the customer module ([#265](https://github.com/Larasell-dev/admin/issues/265))
+* remove product images ([#261](https://github.com/Larasell-dev/admin/issues/261))
+* group the frontend by module like the PHP code
+* save custom URLs through the core's CustomUrls attachment
+* save categories through the core's payload actions
+* import the core's exceptions from their Exceptions namespaces
+* remove the unused Slug validation rule
+* save products and categories through the core's actions
+* translate the panel and let admins pick its language
+* restructure the admin into modules and rename Admins to Team ([#236](https://github.com/Larasell-dev/admin/issues/236))
+* edit products in a content locale picked on the page
+
+### Features
+
+* add a command menu on Mod+K ([ee873fa](https://github.com/Larasell-dev/admin/commit/ee873fa3e9636a6f51666cc531808958b6b877f1))
+* add Audit facade with Audit::fake() for tests ([25738b1](https://github.com/Larasell-dev/admin/commit/25738b1fcbc02432cf3f6aafbc9dac499292a325))
+* add customer pages ([eb63f94](https://github.com/Larasell-dev/admin/commit/eb63f94ae1c41f097aa423b4b7a284b2bb4a3e09))
+* add the Section facade, Props classes and the SectionPage enum ([c291335](https://github.com/Larasell-dev/admin/commit/c2913356c4a9cbc7a6cfe97a7cb134908a560d69))
+* animate alert dialogs out after confirming leaves the page ([26b62f0](https://github.com/Larasell-dev/admin/commit/26b62f0bcc023af7524684f4f93bc0eea4b148be))
+* change the content language from the command menu ([#235](https://github.com/Larasell-dev/admin/issues/235)) ([7f49769](https://github.com/Larasell-dev/admin/commit/7f49769ad7c6681db3f10e8acf67f3a3a7fb2aae))
+* create products by type and show sections by capability ([#279](https://github.com/Larasell-dev/admin/issues/279)) ([eb3a720](https://github.com/Larasell-dev/admin/commit/eb3a720a4457c45dbfd12aa0ea8c88c9cf20d8f9))
+* edit a category's URL in each sales channel ([2d5bf19](https://github.com/Larasell-dev/admin/commit/2d5bf19584180df51c78d145a19be52d00fc40db))
+* edit a product's URL in each sales channel ([78dc139](https://github.com/Larasell-dev/admin/commit/78dc139a21fc1ead173cafc08bab080d26402985))
+* edit categories in the content locale and name products and categories in it ([13a6f0b](https://github.com/Larasell-dev/admin/commit/13a6f0b5e50e5d381d62539621722b40f4838a67))
+* edit product descriptions as rich text ([a9358e8](https://github.com/Larasell-dev/admin/commit/a9358e81635e6d2e13e852f869c176d93e9226b9))
+* edit product variants, options and attributes ([#283](https://github.com/Larasell-dev/admin/issues/283)) ([9d45ba2](https://github.com/Larasell-dev/admin/commit/9d45ba2bb45123445fa01345a24042cb3269deaf))
+* edit products in a content locale picked on the page ([f1b7172](https://github.com/Larasell-dev/admin/commit/f1b7172ebe18d38592c2abfb6ba45666f5d1fb56))
+* error page for 403/404/500/503 and frontend error boundaries ([44cbe0a](https://github.com/Larasell-dev/admin/commit/44cbe0a03a9095198f8debba100b0d97c2e3fafb))
+* find the ranges a search matched like the menu's filter ([016d34b](https://github.com/Larasell-dev/admin/commit/016d34b3c628eb11a3c3e3cb82a044fbc989c33f))
+* go to pages, the profile and log out from the command menu ([9d277a1](https://github.com/Larasell-dev/admin/commit/9d277a147fd6ac08a6be7d5ea9ca76b29ad1bca3))
+* group table header actions into a split button ([#280](https://github.com/Larasell-dev/admin/issues/280)) ([a59458c](https://github.com/Larasell-dev/admin/commit/a59458c125a7f2edf22503aa2579e186a8b63628))
+* highlight search matches in the primary color without moving text ([a41d024](https://github.com/Larasell-dev/admin/commit/a41d024fdd73bd672645e9a32e834d219192fd91))
+* let a command's items be searched only in its own view ([0c482f4](https://github.com/Larasell-dev/admin/commit/0c482f4eeef08c8fe36f6da0ba1503fbb84171dc))
+* let browsers reach the broadcaster at their own address ([83fe914](https://github.com/Larasell-dev/admin/commit/83fe914fb3ecd6100bda4117cf51d220be754b21))
+* let modules and extensions share props with every admin page ([42dfc17](https://github.com/Larasell-dev/admin/commit/42dfc1754446b26a69e6a47bc8c2a7d68acb0069))
+* let modules and plugins add sections to the product page ([e930fa3](https://github.com/Larasell-dev/admin/commit/e930fa30d5d6e3c60358acd38eff5f186d77f3db))
+* lint long class lists into cn() groups ([#277](https://github.com/Larasell-dev/admin/issues/277)) ([609f952](https://github.com/Larasell-dev/admin/commit/609f952a3707cb93a8632f3f3f7cb687bc96cedb))
+* list, restore and remove a page's old URLs ([2a4f244](https://github.com/Larasell-dev/admin/commit/2a4f244ae3faa1e7a5e195645b5436bf6befbd0b))
+* log the content locale on the request's wide event ([05f7bb1](https://github.com/Larasell-dev/admin/commit/05f7bb1df2c7b75061200d693d53587e39e4a736))
+* log the licensing plan on admin requests ([b9d520a](https://github.com/Larasell-dev/admin/commit/b9d520aa9506353fe1a704f6092b6ee306f19cb3))
+* make content translations a Pro entitlement ([33e7e3e](https://github.com/Larasell-dev/admin/commit/33e7e3e6f3de220423975325e89d224e50e29784))
+* manage sales channels and their domains ([aac4994](https://github.com/Larasell-dev/admin/commit/aac49945ea328938cf00a82bcdb315582b75b2b1))
+* mark what the search matched in the command menu's crumbs and labels ([ba28c12](https://github.com/Larasell-dev/admin/commit/ba28c126ff6e607100f00ca1cdd16058848eb39a))
+* page a storefront's domains in a table by query parameters ([#278](https://github.com/Larasell-dev/admin/issues/278)) ([1d53082](https://github.com/Larasell-dev/admin/commit/1d5308264cef04ff3f17577057d522fbaca0fe50))
+* pick languages and currencies with the new Select ([#260](https://github.com/Larasell-dev/admin/issues/260)) ([fe6df6e](https://github.com/Larasell-dev/admin/commit/fe6df6e0f25b137965aa18433340712ae24f9ae1))
+* pick the content language with the searchable Select ([17c4078](https://github.com/Larasell-dev/admin/commit/17c407844f1dfbfb6746c76e185cc01bfd0073d9))
+* place sections around the product form's own and assert their promises ([4beb47f](https://github.com/Larasell-dev/admin/commit/4beb47fcf14f28c4ec8895ea568ae599f0660d8f))
+* register the command menu's searches in their modules ([3527220](https://github.com/Larasell-dev/admin/commit/3527220fd43413ab48dff11a77f0a43173a227ae))
+* render command labels and highlight search matches ([24f49fa](https://github.com/Larasell-dev/admin/commit/24f49fa4d1d4422422c2a7ff49544c82699d64d3))
+* save products and categories through the core's actions ([6b10344](https://github.com/Larasell-dev/admin/commit/6b10344cb9b64c32ead544ddb024a75fa1ef80db))
+* search products, orders, customers and categories from the command menu ([2c6bf14](https://github.com/Larasell-dev/admin/commit/2c6bf141b52fb4c48de424ec6c11d785500df955))
+* search products, orders, customers and categories on the server ([40950e9](https://github.com/Larasell-dev/admin/commit/40950e967e49ac0a88734e0604fe3770b52856af))
+* search sales channels from the command menu ([db8d7dc](https://github.com/Larasell-dev/admin/commit/db8d7dcf34e211d5d5c1dc98c658f8cf130b6977))
+* settings index with Settings::add for modules and extensions ([#263](https://github.com/Larasell-dev/admin/issues/263)) ([605f45b](https://github.com/Larasell-dev/admin/commit/605f45bb7aea35dbb135b559e533c088fb654c02))
+* share the content locale with every admin page ([77843b9](https://github.com/Larasell-dev/admin/commit/77843b9bff3b7014e894e272a3aca74216f4d7d7))
+* show a category's URLs below its products ([5a6cdc0](https://github.com/Larasell-dev/admin/commit/5a6cdc0dbba6528800c8c3619edd8a3c266285fe))
+* show nothing below the search of a searching view before a search ([1ecd293](https://github.com/Larasell-dev/admin/commit/1ecd293b020e7e88a931446f9f5b946ed8ac9cb5))
+* switch the theme from the command menu ([ece0276](https://github.com/Larasell-dev/admin/commit/ece02768faea9ef0625db99dc837ff0473831851))
+* tamper-evident audit log with verification, exports and module records ([#264](https://github.com/Larasell-dev/admin/issues/264)) ([1d3ce37](https://github.com/Larasell-dev/admin/commit/1d3ce3781b06e25b7ee737e02329cb8ab596d9d5))
+* translate the panel and let admins pick its language ([817a183](https://github.com/Larasell-dev/admin/commit/817a18320a87a959da6c20afefee97917a5d013d))
+* update every admin's sales channel sidebar live ([345efac](https://github.com/Larasell-dev/admin/commit/345efac44c260cc428b3e966e17ab52397671350))
+* use the core's audit log and pass an Origin to audited changes ([#282](https://github.com/Larasell-dev/admin/issues/282)) ([cc7e16c](https://github.com/Larasell-dev/admin/commit/cc7e16c72937d0300dd5f9a8039a4a414c44f579))
+* use the semantic color tokens of @larasell-dev/ui 0.3.0 ([c962c77](https://github.com/Larasell-dev/admin/commit/c962c77d409bb1f2ef97f912f2167f14db1f532f))
+* zoom between the login page and the panel when signing in and out ([3188d4b](https://github.com/Larasell-dev/admin/commit/3188d4b4650c6f24b52149030b38ad04d7314c65))
+
+
+### Bug Fixes
+
+* animate the theme word in the theme toast again ([dfeaae7](https://github.com/Larasell-dev/admin/commit/dfeaae7cb700f1fd50145627c7e47fa95c0bebd6))
+* check paths before deleting extension links and avatars ([#267](https://github.com/Larasell-dev/admin/issues/267)) ([b72576d](https://github.com/Larasell-dev/admin/commit/b72576da0a9fb540c5b9903a8ccc0d5e4c405db1))
+* fit the unsaved changes toast to longer text, such as German ([4ce1e6c](https://github.com/Larasell-dev/admin/commit/4ce1e6cfa96d0a96ae62cd8223a17260afd75947))
+* install PHP for the orb's Debian release in orb setup ([#266](https://github.com/Larasell-dev/admin/issues/266)) ([c0e8edc](https://github.com/Larasell-dev/admin/commit/c0e8edc0246956e66f045a6954afdbf89b4c1e2e))
+* restructure the admin into modules and rename Admins to Team ([#236](https://github.com/Larasell-dev/admin/issues/236)) ([94339b3](https://github.com/Larasell-dev/admin/commit/94339b37faab7e6639b0a0044d572dfcf6a084c8))
+* take product URL paths of any length ([b4c8e3a](https://github.com/Larasell-dev/admin/commit/b4c8e3a2200d1c28d63399909604904d8e84af53))
+
+
+### Performance Improvements
+
+* render only the best 20 nested matches per command at the root ([ac2ce9b](https://github.com/Larasell-dev/admin/commit/ac2ce9b4c14e3ce50be873b10d5310b4e66f008c))
+
+
+### Miscellaneous Chores
+
+* add a mini storefront to the workbench playground ([3e07ec1](https://github.com/Larasell-dev/admin/commit/3e07ec1500eee87809a2240102f4b311c429f299))
+* carry live updates through the playground's portal ([9804f51](https://github.com/Larasell-dev/admin/commit/9804f514a01cb2685a0eb036d0d180d2c37ef469))
+* install PHP 8.4 in orb setup ([3a20ea7](https://github.com/Larasell-dev/admin/commit/3a20ea7f1cf3a2ece84a95d58973a6065bac697b))
+* lint that tests mark arrange, act and assert ([24a4fc7](https://github.com/Larasell-dev/admin/commit/24a4fc79e19b5406d18bec3f4d6f23855e3ecd54))
+* list the storefront's redirects in the workbench playground ([9899389](https://github.com/Larasell-dev/admin/commit/9899389d48965b92acf609b479f644b82f9378a4))
+* remove the temporary digital product type from the workbench ([#281](https://github.com/Larasell-dev/admin/issues/281)) ([6c8682c](https://github.com/Larasell-dev/admin/commit/6c8682c95396bfea3bf26a81f0213c947d09c0f5))
+* start Reverb in a fresh playground ([d47a02b](https://github.com/Larasell-dev/admin/commit/d47a02b800e3814e877d54dbc4dbaf545912cbb2))
+
+
+### Code Refactoring
+
+* group the frontend by module like the PHP code ([b5ffc73](https://github.com/Larasell-dev/admin/commit/b5ffc73ffe7af442501f8ba9c71ca4f4db26e4c2))
+* import the core's exceptions from their Exceptions namespaces ([37d7a1d](https://github.com/Larasell-dev/admin/commit/37d7a1d4e5fdf392e3bf9060e1c8846a84149711))
+* remove product images ([#261](https://github.com/Larasell-dev/admin/issues/261)) ([0e42a22](https://github.com/Larasell-dev/admin/commit/0e42a22bcc1f4ac9c7491a66c818f5208597d1e8))
+* remove the customer module ([#265](https://github.com/Larasell-dev/admin/issues/265)) ([dd859f1](https://github.com/Larasell-dev/admin/commit/dd859f1e1209bfd3cff534a8396acb483fae1f23))
+* remove the unused Slug validation rule ([29c1732](https://github.com/Larasell-dev/admin/commit/29c1732731f466b035d97efe62ee8237ed78b02d))
+* save categories through the core's payload actions ([ecfdab8](https://github.com/Larasell-dev/admin/commit/ecfdab8cb9130b05cd375a0189ddb3b2febb6639))
+* save custom URLs through the core's CustomUrls attachment ([60f1232](https://github.com/Larasell-dev/admin/commit/60f1232332f80c47c4a66e84f0a2155884e1b302))
+
 ## [0.6.0](https://github.com/Larasell-dev/admin/compare/v0.5.6...v0.6.0) (2026-11-03)
 
 
