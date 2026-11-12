@@ -92,6 +92,7 @@
     "ButtonGroup",
     "Checkbox",
     "ClipboardProvider",
+    "ColorPicker",
     "Container",
     "DataList",
     "Dialog",
