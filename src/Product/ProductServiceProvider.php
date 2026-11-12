@@ -86,8 +86,6 @@ class ProductServiceProvider extends ServiceProvider
             Route::post('products', [ProductController::class, 'store'])->name('products.store');
             Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
-            Route::post('products/{product}/options', [ProductVariantController::class, 'storeOption'])->name('products.options.store');
-            Route::post('products/{product}/options/{definition}/values', [ProductVariantController::class, 'storeOptionValue'])->name('products.options.values.store');
             Route::post('products/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
             Route::get('products/{product}/variants/{variant}/edit', [ProductVariantController::class, 'edit'])->name('products.variants.edit');
             Route::put('products/{product}/variants/{variant}', [ProductVariantController::class, 'update'])->name('products.variants.update');

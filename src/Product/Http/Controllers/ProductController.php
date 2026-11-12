@@ -5,6 +5,7 @@ namespace Larasell\Admin\Product\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Category\Data\CategoryOptionData;
@@ -28,6 +29,7 @@ use Larasell\Larasell\Catalog\Actions\CreateProduct;
 use Larasell\Larasell\Catalog\Actions\CreateProductPayload;
 use Larasell\Larasell\Catalog\Actions\SetProductAttributeValues;
 use Larasell\Larasell\Catalog\Actions\SetProductCategories;
+use Larasell\Larasell\Catalog\Actions\SyncProductOptions;
 use Larasell\Larasell\Catalog\Actions\UpdateProduct;
 use Larasell\Larasell\Catalog\Actions\UpdateProductPayload;
 use Larasell\Larasell\Catalog\Actions\UpdateProductVariant;
@@ -198,6 +200,20 @@ class ProductController
      */
     protected function saveRelations(ProductRequest $request, Product $product, #[CurrentOrigin] Origin $origin): void
     {
+        $options = $request->options();
+
+        if ($options !== null) {
+            $sync = app(SyncProductOptions::class);
+            $deletions = $sync->deletions(ProductId::of($product), $options);
+
+            // Deleting variants is confirmed with their count, so a stale page can't delete more.
+            if ($deletions > 0 && (int) $request->validated('delete_variants', 0) !== $deletions) {
+                throw ValidationException::withMessages(['delete_variants' => trans_choice('Saving deletes :count variant.|Saving deletes :count variants.', $deletions, ['count' => $deletions])]);
+            }
+
+            $sync->handle(ProductId::of($product), $options);
+        }
+
         // A product without options has only its default variant, whose identifiers the form edits.
         if (! $product->options()->exists()) {
             app(UpdateProductVariant::class)->handle(VariantId::of($product->defaultVariant()), [

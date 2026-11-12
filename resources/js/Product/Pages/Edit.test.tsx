@@ -51,7 +51,6 @@ function props(
       pageSize: 10,
       total: 0,
       missingCombinations: [],
-      addOptionUrl: "",
       createCombinationsUrl: "",
       optionDefinitionsUrl: "",
     },

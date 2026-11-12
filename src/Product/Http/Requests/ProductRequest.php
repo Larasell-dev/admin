@@ -89,6 +89,13 @@ class ProductRequest extends FormRequest
             'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
             // By attribute ID: one of that attribute's values, a list of them for multi-value
             // attributes, or empty for none.
+            // By option definition ID, the value IDs the product offers. Left out, the options stay.
+            'options' => ['sometimes', 'nullable', 'array'],
+            // Inertia sends the IDs as a JSON array, so IDs it skips arrive as null.
+            'options.*' => ['nullable', 'array', 'min:1'],
+            'options.*.*' => ['integer', 'distinct'],
+            // How many variants the admin agreed to delete when values or options go.
+            'delete_variants' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'attributes' => ['sometimes', 'array'],
             'attributes.*' => ['nullable', function (string $attribute, mixed $value, Closure $fail): void {
                 $ids = array_filter(Arr::wrap($value), fn (mixed $id): bool => $id !== null && $id !== '');
@@ -246,6 +253,26 @@ class ProductRequest extends FormRequest
         $text = is_string($description) ? RichText::fromJson($description) : null;
 
         return $text === null || $text->isEmpty() ? null : $text;
+    }
+
+    /**
+     * The options the form sent, value IDs by definition ID, or null when it sent none.
+     *
+     * @return array<int, list<int>>|null
+     */
+    public function options(): ?array
+    {
+        if (! $this->has('options') && ! $this->has('options_sent')) {
+            return null;
+        }
+
+        $options = [];
+
+        foreach (array_filter($this->validated('options') ?? [], fn (mixed $ids): bool => $ids !== null) as $definitionId => $ids) {
+            $options[(int) $definitionId] = array_values(array_map(intval(...), $ids));
+        }
+
+        return $options;
     }
 
     /**

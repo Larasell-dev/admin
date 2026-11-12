@@ -8,11 +8,12 @@ use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
-use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\AttributeCardinality;
 use Larasell\Larasell\Catalog\AttributeScope;
+use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\Models\ProductAttribute;
+use Larasell\Larasell\Catalog\Options\Models\OptionDefinition;
 use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
@@ -1146,4 +1147,45 @@ it('saves several values of a multi-value attribute, and only one of a single-va
     $update([$material->id => [$cotton->id, $wool->id], $fit->id => [$slim->id, $loose->id]])->assertSessionHasErrors("attributes.{$fit->id}");
     $update([$material->id => [$cotton->id, $wool->id], $fit->id => $slim->id])->assertSessionHasNoErrors();
     expect($boots->defaultVariant()->effectiveAttributeValues()->pluck('slug')->sort()->values()->all())->toBe(['cotton', 'slim', 'wool']);
+});
+
+it('saves the product\'s options with the form, and deletes variants of removed values only once confirmed', function () {
+    // Arrange
+    signInAdmin();
+
+    $size = OptionDefinition::create(['slug' => 'size', 'name' => ['en' => 'Size']]);
+    $s = $size->values()->create(['slug' => 's', 'name' => ['en' => 'S'], 'position' => 0]);
+    $m = $size->values()->create(['slug' => 'm', 'name' => ['en' => 'M'], 'position' => 1]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', ...$input]);
+
+    // Act & Assert
+    $update(['options' => [$size->id => [$s->id, $m->id]]])->assertSessionHasNoErrors();
+    $boots->createCombinations([[$s], [$m]]);
+    expect($boots->variants()->count())->toBe(2);
+
+    $update(['options' => [$size->id => [$s->id]]])->assertSessionHasErrors('delete_variants');
+    expect($boots->variants()->count())->toBe(2);
+
+    $update(['options' => [$size->id => [$s->id]], 'delete_variants' => 1])->assertSessionHasNoErrors();
+    expect($boots->variants()->count())->toBe(1)
+        ->and($boots->options()->sole()->values()->count())->toBe(1);
+});
+
+it('skips the gaps Inertia sends when it turns options keyed by ID into a list', function () {
+    // Arrange
+    signInAdmin();
+
+    $size = OptionDefinition::create(['slug' => 'size', 'name' => ['en' => 'Size']]);
+    $s = $size->values()->create(['slug' => 's', 'name' => ['en' => 'S'], 'position' => 0]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $options = array_fill(0, $size->id, null);
+    $options[$size->id] = [$s->id];
+
+    // Act
+    $this->putJson(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', 'options' => $options])
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect($boots->options()->sole()->option_definition_id)->toBe($size->id);
 });

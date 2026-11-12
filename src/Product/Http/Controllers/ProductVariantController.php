@@ -21,7 +21,6 @@ use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\Models\ProductAttribute;
 use Larasell\Larasell\Catalog\Models\ProductAttributeValue;
 use Larasell\Larasell\Catalog\Models\ProductVariant;
-use Larasell\Larasell\Catalog\Options\Models\OptionDefinition;
 use Larasell\Larasell\Catalog\Options\Models\OptionDefinitionValue;
 use Larasell\Larasell\Catalog\ProductId;
 use Larasell\Larasell\Catalog\ProductTypes;
@@ -41,50 +40,25 @@ class ProductVariantController
 {
     private const array STATES = ['inherited', 'overridden'];
 
-    /** Uses an option definition on the product, offering the picked values. */
-    public function storeOption(Request $request, Product $product): RedirectResponse
-    {
-        $data = $request->validate([
-            'definition' => ['required', 'integer', Rule::exists(OptionDefinition::class, 'id')],
-            'values' => ['required', 'array', 'min:1'],
-            'values.*' => ['integer', 'distinct'],
-        ]);
-        $definition = OptionDefinition::query()->findOrFail($data['definition']);
-        $values = $definition->values()->whereKey($data['values'])->get();
-
-        if ($values->count() !== count($data['values'])) {
-            return back()->withErrors(['values' => __('Pick values of the chosen option.')]);
-        }
-
-        DB::transaction(fn () => $product->addOption($definition, $values->all()));
-
-        return back();
-    }
-
-    public function storeOptionValue(Request $request, Product $product, OptionDefinition $definition): RedirectResponse
-    {
-        $data = $request->validate(['value' => ['required', 'integer', Rule::exists(OptionDefinitionValue::class, 'id')->where('option_definition_id', $definition->id)]]);
-
-        $product->addOptionValue($definition, OptionDefinitionValue::query()->findOrFail($data['value']));
-
-        return back();
-    }
-
     /** Creates the variants of the picked combinations. */
     public function store(Request $request, Product $product): RedirectResponse
     {
-        $data = $request->validate([
-            'combinations' => ['required', 'array', 'min:1'],
-            'combinations.*' => ['required', 'array'],
+        $request->validate([
+            'combinations' => ['required', 'list', 'min:1'],
+            'combinations.*' => ['required', 'list'],
             'combinations.*.*' => ['integer'],
         ]);
+        $combinations = array_map(
+            fn (mixed $ids): array => array_map(intval(...), array_values((array) $ids)),
+            array_values($request->array('combinations')),
+        );
 
-        DB::transaction(function () use ($product, $data): void {
-            $values = OptionDefinitionValue::query()->whereKey(collect($data['combinations'])->flatten()->all())->get()->keyBy('id');
+        DB::transaction(function () use ($product, $combinations): void {
+            $values = OptionDefinitionValue::query()->whereKey(array_merge(...$combinations))->get()->keyBy('id');
             $defaultId = $product->defaultVariant()->id;
             $variants = $product->createCombinations(array_map(
                 fn (array $ids): array => array_map(fn (int $id): OptionDefinitionValue => $values->get($id) ?? abort(422), $ids),
-                $data['combinations'],
+                $combinations,
             ));
 
             foreach ($variants as $variant) {

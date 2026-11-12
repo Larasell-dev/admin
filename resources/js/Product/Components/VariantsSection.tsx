@@ -1,9 +1,21 @@
-import { Link, router } from "@inertiajs/react";
-import { Badge, Button, Icon, Section, SectionStack, Select, Table } from "@larasell-dev/ui";
-import { AddLine } from "@larasell-dev/ui/icons";
-import { ghostAction } from "./ProductForm";
+import { Link, router, useFormContext } from "@inertiajs/react";
+import { cn } from "cn";
+import {
+  AlertDialog,
+  Badge,
+  Field,
+  Input,
+  Button,
+  Icon,
+  Section,
+  SectionStack,
+  Select,
+  Table,
+} from "@larasell-dev/ui";
+import { AddLine, ArrowRightSLine } from "@larasell-dev/ui/icons";
+import { AttributeValuesPicker, ghostAction, useMarkDirty, usePinnedAnchor } from "./ProductForm";
 import { fbs } from "fbtee";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Data = Larasell.Admin.Product.Data.ProductVariantsData;
 
@@ -11,7 +23,14 @@ type Data = Larasell.Admin.Product.Data.ProductVariantsData;
  * The product's options and variants, outside the product form: each change saves right away.
  * A product without options shows only how to add the first.
  */
-export default function VariantsSection({ variants }: { variants: Data }) {
+export default function VariantsSection({
+  variants,
+  productName,
+}: {
+  variants: Data;
+  /** What the admin types to confirm deleting variants. */
+  productName: string;
+}) {
   return (
     <SectionStack>
       <Section.Root>
@@ -25,16 +44,7 @@ export default function VariantsSection({ variants }: { variants: Data }) {
             "Product page: text below the heading of the options section",
           )}
         />
-        <div className="flex flex-col gap-4">
-          {variants.options.map((option) => (
-            <OptionRow key={option.definitionId} option={option} />
-          ))}
-          <AddOption
-            choices={variants.availableOptions}
-            url={variants.addOptionUrl}
-            definitionsUrl={variants.optionDefinitionsUrl}
-          />
-        </div>
+        <OptionFields variants={variants} productName={productName} />
       </Section.Root>
 
       {variants.options.length > 0 && (
@@ -61,149 +71,151 @@ export default function VariantsSection({ variants }: { variants: Data }) {
   );
 }
 
-function Swatch({ color }: { color: string | null }) {
-  return color ? (
-    <span
-      className="inline-block size-3 rounded-full border border-base-secondary"
-      style={{ background: color }}
-    />
-  ) : null;
-}
+type Definition = { id: number; name: string; values: { id: number; name: string }[] };
 
-function OptionRow({ option }: { option: Larasell.Admin.Product.Data.ProductOptionData }) {
+/**
+ * The product's options like its attributes: a row of value chips per option, a round add
+ * button for values, and "Add option" for another. Saved with the product form; removing values
+ * that variants use asks to confirm deleting them first.
+ */
+function OptionFields({ variants, productName }: { variants: Data; productName: string }) {
+  const errors: Record<string, string | undefined> = useFormContext()?.errors ?? {};
+  const definitions: Definition[] = [
+    ...variants.options.map((option) => ({
+      id: option.definitionId,
+      name: option.name,
+      values: [...option.values, ...option.otherValues],
+    })),
+    ...variants.availableOptions,
+  ];
+  const [shown, setShown] = useState(() => variants.options.map((option) => option.definitionId));
+  const picked = (id: number) =>
+    variants.options.find((option) => option.definitionId === id)?.values.map((v) => v.id) ?? [];
+  const deletions = Number(errors.delete_variants?.match(/\d+/)?.[0] ?? 0);
+  const form = useFormContext();
+  const root = useRef<HTMLDivElement>(null);
+  const confirmed = useRef<HTMLInputElement>(null);
+  useMarkDirty(root, shown);
+  // The server refuses a save that deletes variants until it's sent their count; ask first.
+  // Each refused save brings a new errors object, which opens the dialog again.
+  const [dismissed, setDismissed] = useState<object | null>(null);
+  const confirming = deletions > 0 && dismissed !== errors;
+  const [typed, setTyped] = useState("");
+  const setConfirming = (open: boolean) => {
+    if (!open) setDismissed(errors);
+    setTyped("");
+  };
+
+  const pinned = usePinnedAnchor();
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="type-label-md w-28 text-base-primary">{option.name}</span>
-      {option.values.map((value) => (
-        <span
-          key={value.id}
-          className="flex items-center gap-1.5 rounded-full bg-action-neutral-secondary-hover h-6.5 px-2.5 type-body-sm"
-        >
-          <Swatch color={value.swatch} />
-          {value.name}
-        </span>
-      ))}
-      {option.otherValues.length > 0 && (
-        <div className="w-40">
-          <Select
-            aria-label={fbs(
-              "Add value",
-              "Product page: accessible name of the select that adds a value to an option",
-            )}
-            placeholder={fbs(
-              "+ Add value",
-              "Product page: shown on the select that adds a value to an option",
-            )}
-            items={option.otherValues}
-            itemToKey={(value) => String(value.id)}
-            itemToLabel={(value) => value.name}
-            value={null}
-            onValueChange={(key) =>
-              key &&
-              router.post(option.addValueUrl, { value: Number(key) }, { preserveScroll: true })
-            }
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function AddOption({
-  choices,
-  url,
-  definitionsUrl,
-}: {
-  choices: Larasell.Admin.Product.Data.OptionChoiceData[];
-  url: string;
-  definitionsUrl: string;
-}) {
-  const [definition, setDefinition] = useState<number | null>(null);
-  const [values, setValues] = useState<number[]>([]);
-  const chosen = choices.find((choice) => choice.id === definition);
-
-  if (choices.length === 0) {
-    return (
-      <Link href={definitionsUrl} className={ghostAction}>
-        <Icon icon={AddLine} />
-        <fbt desc="Product page: link to the catalog's options, to create one when every option is already used">
-          Create option
-        </fbt>
-      </Link>
-    );
-  }
-
-  return (
-    <div
-      className={
-        chosen
-          ? "flex flex-col gap-3 rounded-lg border border-dashed border-base-secondary p-3"
-          : "flex flex-col"
-      }
-    >
-      <Select.Root
-        items={choices}
-        itemToKey={(choice) => String(choice.id)}
-        itemToLabel={(choice) => choice.name}
-        value={definition === null ? null : String(definition)}
-        onValueChange={(key) => {
-          setDefinition(key ? Number(key) : null);
-          setValues([]);
-        }}
-      >
-        <Select.Trigger
-          render={<button type="button" className={ghostAction} />}
-          aria-label={fbs(
-            "Option to add",
-            "Product page: accessible name of the button that opens the options to add",
+    <div ref={root} className="flex flex-col gap-3">
+      <input ref={confirmed} type="hidden" name="delete_variants" defaultValue="" />
+      {/* Says the options were sent, so removing every option still saves. */}
+      <input type="hidden" name="options_sent" value="1" />
+      {definitions
+        .filter((definition) => shown.includes(definition.id))
+        .map((definition) => (
+          <div key={definition.id} className="flex flex-wrap items-center gap-2">
+            <span className="w-28 type-label-md text-base-primary">{definition.name}</span>
+            <AttributeValuesPicker
+              name={`options[${definition.id}]`}
+              label={definition.name}
+              values={definition.values}
+              defaultValue={picked(definition.id)}
+            />
+          </div>
+        ))}
+      <AlertDialog.Root open={confirming} onOpenChange={setConfirming}>
+        <AlertDialog.Popup
+          title={fbs(
+            "Delete variants",
+            "Product page: title of the dialog that confirms saving deletes variants",
+          )}
+          description={fbs(
+            [
+              "Saving deletes ",
+              fbs.plural("variant", deletions, { many: "variants", showCount: "yes" }),
+              " made of the removed option values. Deleted variants lose their SKUs and stock and are taken out of carts. This can't be undone.",
+            ],
+            "Product page: text of the dialog that confirms saving deletes the variants of removed option values",
           )}
         >
-          <Icon icon={AddLine} />
-          {chosen?.name ??
-            fbs("Add option", "Product page: button that opens the list of options to add")}
-        </Select.Trigger>
-        <Select.Popup />
-      </Select.Root>
-      {chosen && (
-        <>
-          <div className="flex flex-wrap gap-3">
-            {chosen.values.map((value) => (
-              <label key={value.id} className="flex items-center gap-1.5 type-body-sm">
-                <input
-                  type="checkbox"
-                  checked={values.includes(value.id)}
-                  onChange={(event) =>
-                    setValues(
-                      event.target.checked
-                        ? [...values, value.id]
-                        : values.filter((id) => id !== value.id),
-                    )
-                  }
-                />
-                <Swatch color={value.swatch} />
-                {value.name}
-              </label>
-            ))}
-          </div>
-          <div>
-            <Button
-              size="sm"
-              disabled={values.length === 0}
-              onClick={() =>
-                router.post(
-                  url,
-                  { definition, values },
-                  { preserveScroll: true, onSuccess: () => setDefinition(null) },
-                )
-              }
+          <Field
+            name="confirm_delete_variants"
+            label={fbs(
+              ['Type "', fbs.param("productName", productName), '" to confirm'],
+              "Product page: label of the field in the variant deletion dialog the admin types the product's name into to confirm",
+            )}
+          >
+            <Input
+              value={typed}
+              onChange={(event) => setTyped(event.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </Field>
+          <AlertDialog.Actions>
+            <AlertDialog.Cancel>
+              <fbt desc="Product page: button that closes the variant deletion dialog without saving">
+                Cancel
+              </fbt>
+            </AlertDialog.Cancel>
+            <AlertDialog.Confirm
+              variant="destructive"
+              disabled={typed.trim() !== productName.trim()}
+              onClick={(_event, dialog) => {
+                if (confirmed.current) confirmed.current.value = String(deletions);
+                dialog.close();
+                form?.submit();
+              }}
             >
-              <fbt desc="Product page: button that adds the chosen option with its checked values">
+              <fbt desc="Product page: button that saves and deletes the variants">
+                Delete and save
+              </fbt>
+            </AlertDialog.Confirm>
+          </AlertDialog.Actions>
+        </AlertDialog.Popup>
+      </AlertDialog.Root>
+      <div className="flex items-center gap-1">
+        <Select.Root
+          multiple
+          items={definitions}
+          itemToKey={(definition) => String(definition.id)}
+          itemToLabel={(definition) => definition.name}
+          value={shown.map(String)}
+          onValueChange={(keys) => setShown(keys.map(Number))}
+          filter={{
+            placeholder: fbs(
+              "Search options",
+              "Product page: placeholder of the search in the list of options to add",
+            ),
+            empty: fbs(
+              "No options found",
+              "Product page: shown in the list of options when the search matches none",
+            ),
+          }}
+        >
+          <span {...pinned.trigger}>
+            <Select.Trigger render={<button type="button" className={ghostAction} />}>
+              <Icon icon={AddLine} />
+              <fbt desc="Product page: button that opens the list of options to give the product">
                 Add option
               </fbt>
-            </Button>
-          </div>
-        </>
-      )}
+            </Select.Trigger>
+          </span>
+          <Select.Popup anchor={pinned.anchor} />
+        </Select.Root>
+        <Link
+          href={variants.optionDefinitionsUrl}
+          className={cn(ghostAction, "w-6.5 justify-center px-0")}
+          aria-label={fbs(
+            "Options page",
+            "Product page: accessible name of the button next to Add option that opens the catalog's options",
+          )}
+        >
+          <Icon icon={ArrowRightSLine} />
+        </Link>
+      </div>
     </div>
   );
 }
@@ -289,7 +301,7 @@ function MissingCombinations({
   const [selected, setSelected] = useState<string[]>(combinations.map((c) => c.valueIds.join(",")));
 
   return (
-    <div className="mt-4 flex flex-col gap-3 rounded-lg border border-dashed border-base-secondary p-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-dashed border-base-secondary p-3">
       <span className="type-label-md">
         <fbt desc="Product page: heading of the list of option combinations without a variant">
           Combinations without a variant

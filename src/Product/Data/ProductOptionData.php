@@ -11,10 +11,9 @@ class ProductOptionData extends Data
     public function __construct(
         public int $definitionId,
         public string $name,
-        /** The values the product offers. @var array<int, OptionValueData> */
+        /** @var array<int, OptionValueData> The values the product offers */
         public array $values,
-        /** The definition's values the product doesn't offer yet. @var array<int, OptionValueData> */
+        /** @var array<int, OptionValueData> The definition's values the product doesn't offer yet */
         public array $otherValues,
-        public string $addValueUrl,
     ) {}
 }

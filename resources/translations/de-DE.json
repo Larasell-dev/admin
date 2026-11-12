@@ -5957,30 +5957,6 @@
       ],
       "types": []
     },
-    "9aaM9Wid2uKfmZFOS3tCtQ==": {
-      "description": "Product page: accessible name of the select that adds a value to an option",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Add value",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "RgxVEeUhOzelekLZwgCWeg==": {
-      "description": "Product page: button that adds the chosen option with its checked values",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Add option",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "NRDTmPa7QQdtonWaBc54ug==": {
       "description": "Product page: column heading of the variant's name",
       "status": "new",
@@ -6377,18 +6353,6 @@
       ],
       "types": []
     },
-    "l+J6a2CmF2HOF+CYcjPpvw==": {
-      "description": "Product page: shown on the select that adds a value to an option",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "+ Add value",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "yx5nJYSjvs697evsxM0vbQ==": {
       "description": "Variant page: heading of the country of origin and HS code",
       "status": "new",
@@ -6420,18 +6384,6 @@
       "translations": [
         {
           "translation": "Remove {value}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "6wi602mtcq9XNluAQ8GBIQ==": {
-      "description": "Product page: link to the catalog's options, to create one when every option is already used",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Create option",
           "variations": {}
         }
       ],
@@ -6528,30 +6480,6 @@
       "translations": [
         {
           "translation": "Attributes page",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "MbYlzS1u2Q2lg9q3hu79rQ==": {
-      "description": "Product page: accessible name of the button that opens the options to add",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Option to add",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "fc9lEqB2EIf0qGZm/kmq6Q==": {
-      "description": "Product page: button that opens the list of options to add",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Add option",
           "variations": {}
         }
       ],
@@ -7992,6 +7920,126 @@
       "translations": [
         {
           "translation": "Pick a colour",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9ZQOxIQF6gM8TsqKeVgByA==": {
+      "description": "Product page: placeholder of the search in the list of options to add",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search options",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qrbPqIir38uKWOhu9Hiz0g==": {
+      "description": "Product page: shown in the list of options when the search matches none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No options found",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tTGJ/pAxbNf5Im1LX4W/5g==": {
+      "description": "Product page: button that opens the list of options to give the product",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add option",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OSwCRYgC05KTt/Yq7MVTkA==": {
+      "description": "Product page: accessible name of the button next to Add option that opens the catalog's options",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Options page",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hAGPaOZasQ7gPZs7XLb9RQ==": {
+      "description": "Product page: title of the dialog that confirms saving deletes variants",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uNaF7SM74KMdJud2nWPnfg==": {
+      "description": "Product page: button that closes the variant deletion dialog without saving",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Cancel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SEK+uJmCTrGimhEf0iglyQ==": {
+      "description": "Product page: button that saves and deletes the variants",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Delete and save",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3DgC+UoySl2xkzU2GnoXOg==": {
+      "description": "Product page: label of the field in the variant deletion dialog the admin types the product's name into to confirm",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Type \"{productName}\" to confirm",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3rTbvnN/AY3WpWs7dR9syQ==": {
+      "description": "Product page: text of the dialog that confirms saving deletes the variants of removed option values",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Saving deletes {number} variants made of the removed option values. Deleted variants lose their SKUs and stock and are taken out of carts. This can't be undone.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BXI/PRR9i2Gv6TKJDg+nig==": {
+      "description": "Product page: text of the dialog that confirms saving deletes the variants of removed option values",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Saving deletes 1 variant made of the removed option values. Deleted variants lose their SKUs and stock and are taken out of carts. This can't be undone.",
           "variations": {}
         }
       ],

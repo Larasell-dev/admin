@@ -61,7 +61,7 @@ export default function Edit({
             countries={countries}
             attributesUrl={attributesUrl}
           />
-          <VariantsSection variants={variants} />
+          <VariantsSection variants={variants} productName={product.name ?? product.fallbackName} />
         </SectionStack>
         <UnsavedChangesToast />
       </Page.Body>

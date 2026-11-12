@@ -705,7 +705,8 @@ export function AttributeValuesPicker({
   single?: boolean;
   name: string;
   label: string;
-  values: { id: number; name: string }[];
+  /** An option value's swatch shows as a dot in its chip. */
+  values: { id: number; name: string; swatch?: string | null }[];
   defaultValue: number[];
   readOnly?: boolean;
 }) {
@@ -745,6 +746,13 @@ export function AttributeValuesPicker({
             className="flex items-center gap-1 rounded-full bg-action-neutral-secondary-hover h-6.5 pr-0.5 pl-2.5 type-body-sm"
           >
             <input type="hidden" name={`${name}[]`} value={value.id} />
+            {value.swatch && (
+              <span
+                aria-hidden
+                className="size-3 shrink-0 rounded-full border border-base-strong"
+                style={{ backgroundColor: value.swatch }}
+              />
+            )}
             {value.name}
             {!readOnly && (
               <button
@@ -844,7 +852,11 @@ function ValuesPopover({
           render={
             <button
               type="button"
-              className="flex size-6.5 cursor-pointer items-center justify-center rounded-full border border-transparent bg-transparent text-base-primary outline-none not-data-disabled:hover:bg-action-neutral-ghost-hover focus-visible:focus-ring data-popup-open:bg-action-neutral-ghost-hover"
+              className={cn(
+                "flex size-6.5 cursor-pointer items-center justify-center rounded-full",
+                "border border-transparent bg-transparent text-base-primary outline-none",
+                "not-data-disabled:hover:bg-action-neutral-ghost-hover focus-visible:focus-ring data-popup-open:bg-action-neutral-ghost-hover",
+              )}
             />
           }
           aria-label={addLabel}

@@ -5,6 +5,7 @@ namespace Larasell\Admin\Product\Data;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\Models\ProductVariant;
 use Larasell\Larasell\Catalog\Options\Models\OptionDefinition;
+use Larasell\Larasell\Catalog\Options\Models\OptionDefinitionValue;
 use Larasell\Larasell\Catalog\Options\Models\ProductOption;
 use Larasell\Larasell\Enums\Locale;
 use Spatie\LaravelData\Data;
@@ -19,9 +20,9 @@ class ProductVariantsData extends Data
     public function __construct(
         /** @var array<int, ProductOptionData> */
         public array $options,
-        /** Definitions the product doesn't use yet. @var array<int, OptionChoiceData> */
+        /** @var array<int, OptionChoiceData> Definitions the product doesn't use yet */
         public array $availableOptions,
-        /** One page of the variants. @var array<int, VariantRowData> */
+        /** @var array<int, VariantRowData> One page of the variants */
         public array $variants,
         /** The page, its size and every variant's count, from ?variants_page and ?variants_per_page. */
         public int $page,
@@ -29,7 +30,6 @@ class ProductVariantsData extends Data
         public int $total,
         /** @var array<int, CombinationData> */
         public array $missingCombinations,
-        public string $addOptionUrl,
         public string $createCombinationsUrl,
         public string $optionDefinitionsUrl,
     ) {}
@@ -56,7 +56,7 @@ class ProductVariantsData extends Data
             ->reject(fn (array $values): bool => in_array(collect($values)->pluck('id')->sort()->implode(','), $taken, true))
             ->take(500)
             ->map(fn (array $values): CombinationData => new CombinationData(
-                collect($values)->pluck('id')->all(),
+                array_values(array_map(fn (OptionDefinitionValue $value): int => $value->id, $values)),
                 collect($values)->map(fn ($value): string => $value->name->get($locale->value))->implode(' / '),
             ))->values()->all();
 
@@ -68,7 +68,6 @@ class ProductVariantsData extends Data
                 otherValues: $option->definition->values
                     ->whereNotIn('id', $option->values->pluck('option_definition_value_id'))
                     ->map(fn ($value): OptionValueData => OptionValueData::fromValue($value, $locale))->values()->all(),
-                addValueUrl: route('larasell.admin.products.options.values.store', [$product, $option->definition]),
             ))->all(),
             availableOptions: OptionDefinition::query()->with('values')->whereNotIn('id', $options->pluck('option_definition_id'))->orderBy('slug')->get()
                 ->map(fn (OptionDefinition $definition): OptionChoiceData => new OptionChoiceData(
@@ -89,7 +88,6 @@ class ProductVariantsData extends Data
             pageSize: $page->perPage(),
             total: $page->total(),
             missingCombinations: $missing,
-            addOptionUrl: route('larasell.admin.products.options.store', $product),
             createCombinationsUrl: route('larasell.admin.products.variants.store', $product),
             optionDefinitionsUrl: route('larasell.admin.options.index'),
         );

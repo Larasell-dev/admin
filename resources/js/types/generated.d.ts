@@ -534,7 +534,6 @@ declare namespace Larasell.Admin.Product.Data {
     name: string;
     values: Array<Larasell.Admin.Product.Data.OptionValueData>;
     otherValues: Array<Larasell.Admin.Product.Data.OptionValueData>;
-    addValueUrl: string;
   };
   export type ProductTypeData = {
     key: string;
@@ -549,7 +548,6 @@ declare namespace Larasell.Admin.Product.Data {
     pageSize: number;
     total: number;
     missingCombinations: Array<Larasell.Admin.Product.Data.CombinationData>;
-    addOptionUrl: string;
     createCombinationsUrl: string;
     optionDefinitionsUrl: string;
   };
