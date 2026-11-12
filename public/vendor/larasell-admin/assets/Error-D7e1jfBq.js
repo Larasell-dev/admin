@@ -1,0 +1,1 @@
+import{jn as e,p9 as t}from"./lib-1Thkf7wn.js";import{t as n}from"./SidebarLayout-A8xrHsw3.js";import{t as r}from"./ErrorState-BTz-eA_S.js";var i=t(e(),1);function a({status:e}){return(0,i.jsx)(`div`,{className:`flex flex-1 items-center justify-center px-6 py-12`,children:(0,i.jsx)(r,{status:e})})}a.layout=[n];export{a as default};
