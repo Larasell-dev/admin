@@ -5767,11 +5767,10 @@
     },
     "fK+HAzfRbV6sWk1dySZ8ZQ==": {
       "description": "Variant page: accessible name of the back arrow to the product",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Back to the product",
+          "translation": "Zurück zum Produkt",
           "variations": {}
         }
       ],
@@ -5779,7 +5778,6 @@
     },
     "N/YqD4hS/RD0NTXxiKFD0A==": {
       "description": "Variant page: label of the variant's name",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -5791,11 +5789,10 @@
     },
     "snt100hLQ9q6Gp2/QnWX5w==": {
       "description": "Variant page: label of the variant's description",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Description",
+          "translation": "Beschreibung",
           "variations": {}
         }
       ],
@@ -5803,11 +5800,10 @@
     },
     "VzQoqxNYK9AGb1gd8Adijg==": {
       "description": "Variant page: label of the weight",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Weight",
+          "translation": "Gewicht",
           "variations": {}
         }
       ],
@@ -5815,11 +5811,10 @@
     },
     "UNGmFtD7KBuUEoRHmnyQ7w==": {
       "description": "Variant page: label of the country the goods were made in",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Country of origin",
+          "translation": "Ursprungsland",
           "variations": {}
         }
       ],
@@ -5827,11 +5822,10 @@
     },
     "N6KSKtUcYfDqchIZdv66VQ==": {
       "description": "Variant page: label of the customs tariff number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "HS code",
+          "translation": "HS-Code",
           "variations": {}
         }
       ],
@@ -5839,11 +5833,10 @@
     },
     "qJskoSzKpKIEQmmzI2eLvw==": {
       "description": "Variant page: heading of the variant's attributes",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Attributes",
+          "translation": "Attribute",
           "variations": {}
         }
       ],
@@ -5851,11 +5844,10 @@
     },
     "EWvUAYJ+O6QA5/j+AIIDlQ==": {
       "description": "Variant page: button that opens the confirmation to delete the variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete variant",
+          "translation": "Variante löschen",
           "variations": {}
         }
       ],
@@ -5863,11 +5855,10 @@
     },
     "Unx7KM30CrtuVUI+OH1TGQ==": {
       "description": "Variant page: title of the confirmation to delete the variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete variant",
+          "translation": "Variante löschen",
           "variations": {}
         }
       ],
@@ -5875,11 +5866,10 @@
     },
     "9swgRXiKShW42xGFFqozqA==": {
       "description": "Variant page: text of the confirmation to delete the variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Carts and orders keep their copies, but the variant can't be bought anymore.",
+          "translation": "Warenkörbe und Bestellungen behalten ihre Kopien, aber die Variante kann nicht mehr gekauft werden.",
           "variations": {}
         }
       ],
@@ -5887,11 +5877,10 @@
     },
     "hcUf1jIeu7L+bpOQ3esrXw==": {
       "description": "Product form: heading of the section with the SKU, barcode (e.g. EAN or UPC) and manufacturer part number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Identifiers",
+          "translation": "Kennungen",
           "variations": {}
         }
       ],
@@ -5899,7 +5888,6 @@
     },
     "3r+9MiEPva5M3UFJj2rpMQ==": {
       "description": "Product form: label of the field for the manufacturer part number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -5911,11 +5899,10 @@
     },
     "Xl6LpvBa0hlFjNK4yqLucw==": {
       "description": "Product page: heading of the section with the product's options, e.g. size or colour",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Options",
+          "translation": "Optionen",
           "variations": {}
         }
       ],
@@ -5923,11 +5910,10 @@
     },
     "JZNBsnZ1zkS0q6I/ZnCXbQ==": {
       "description": "Product page: text below the heading of the options section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Options tell variants apart. Pick from the options defined in the catalog.",
+          "translation": "Optionen unterscheiden Varianten. Wähle aus den Optionen im Katalog.",
           "variations": {}
         }
       ],
@@ -5935,11 +5921,10 @@
     },
     "taEVXyVkoLP5ETUry7Dh7g==": {
       "description": "Product page: heading of the table of the product's variants",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variants",
+          "translation": "Varianten",
           "variations": {}
         }
       ],
@@ -5947,11 +5932,10 @@
     },
     "4kkWrreNHmcziSP0XtfCqg==": {
       "description": "Product page: text below the heading of the variants section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Each variant is one combination of option values with its own SKU and status.",
+          "translation": "Jede Variante ist eine Kombination von Optionswerten mit eigener SKU und eigenem Status.",
           "variations": {}
         }
       ],
@@ -5959,11 +5943,10 @@
     },
     "NRDTmPa7QQdtonWaBc54ug==": {
       "description": "Product page: column heading of the variant's name",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variant",
+          "translation": "Variante",
           "variations": {}
         }
       ],
@@ -5971,7 +5954,6 @@
     },
     "uKM6zHzhrvPNNTPK/HXtvQ==": {
       "description": "Product page: column heading of the variant's SKU",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -5983,7 +5965,6 @@
     },
     "UKSoaWbjpGtG+ibAjiczSQ==": {
       "description": "Product page: column heading of the variant's visibility",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -5995,11 +5976,10 @@
     },
     "5swCCBG62ZnItm4tMTCSFg==": {
       "description": "Product page: status badge of a visible variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Visible",
+          "translation": "Sichtbar",
           "variations": {}
         }
       ],
@@ -6007,11 +5987,10 @@
     },
     "w3gaRMWeWx4/rSn/vg0dyw==": {
       "description": "Product page: status badge of a hidden variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Hidden",
+          "translation": "Ausgeblendet",
           "variations": {}
         }
       ],
@@ -6019,11 +5998,10 @@
     },
     "JTBY40hxklKLgi2VB/hypQ==": {
       "description": "Product page: heading of the list of option combinations without a variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Combinations without a variant",
+          "translation": "Kombinationen ohne Variante",
           "variations": {}
         }
       ],
@@ -6031,11 +6009,10 @@
     },
     "vDocrueugmdUG3nHYBecAA==": {
       "description": "Product page: button that creates a variant for each checked combination",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Create {count} variants",
+          "translation": "{count} Varianten erstellen",
           "variations": {}
         }
       ],
@@ -6043,11 +6020,10 @@
     },
     "m7UZ+K0I7tx18aGv9H9kVg==": {
       "description": "Variant page: chain button that makes a field take the product's value again",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Use the product's value",
+          "translation": "Wert des Produkts übernehmen",
           "variations": {}
         }
       ],
@@ -6055,11 +6031,10 @@
     },
     "OkMFH5mKdbtpon0h236ivA==": {
       "description": "Variant page: chain button that gives the variant its own value of a field",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Use an own value",
+          "translation": "Eigenen Wert verwenden",
           "variations": {}
         }
       ],
@@ -6067,11 +6042,10 @@
     },
     "0TLqWAN/PuOINqYJpNZGUw==": {
       "description": "Variant page: heading of the name, description and visibility",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "General",
+          "translation": "Allgemein",
           "variations": {}
         }
       ],
@@ -6079,11 +6053,10 @@
     },
     "MgkJgvKqJHaVsvwp8kF/ng==": {
       "description": "Variant page: accessible name of the product's description shown while inherited",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Product description",
+          "translation": "Produktbeschreibung",
           "variations": {}
         }
       ],
@@ -6091,11 +6064,10 @@
     },
     "qVs4mvmRrZOp6NAyUFGGHQ==": {
       "description": "Variant page: accessible name of the variant's own description",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Description",
+          "translation": "Beschreibung",
           "variations": {}
         }
       ],
@@ -6103,11 +6075,10 @@
     },
     "m9g6n4Mqx0KtHoTyxpaZbQ==": {
       "description": "Variant page: heading of the weight and dimensions",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Weight and dimensions",
+          "translation": "Gewicht und Maße",
           "variations": {}
         }
       ],
@@ -6115,11 +6086,10 @@
     },
     "TsDx/+6adLsUHlMPsNdcUA==": {
       "description": "Variant page: label of the length, width and height",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Dimensions",
+          "translation": "Maße",
           "variations": {}
         }
       ],
@@ -6127,11 +6097,10 @@
     },
     "7zlomrNB0XHeF0DOtjjfmw==": {
       "description": "Variant page: heading of the SKU, barcode and manufacturer part number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Identifiers",
+          "translation": "Kennungen",
           "variations": {}
         }
       ],
@@ -6139,11 +6108,10 @@
     },
     "ipxjoonFlTfHsYnwoWQniQ==": {
       "description": "Product page: accessible name of the table of variants",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variants",
+          "translation": "Varianten",
           "variations": {}
         }
       ],
@@ -6151,11 +6119,10 @@
     },
     "aFtdgjCPJyl1ph69HVbx2g==": {
       "description": "Variant page: placeholder of the search field in the variant select's list",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Search variants",
+          "translation": "Varianten suchen",
           "variations": {}
         }
       ],
@@ -6163,11 +6130,10 @@
     },
     "cor39ER4JiifQSIGA6YpBQ==": {
       "description": "Variant page: shown in the variant select's list when the search matches no variant",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No variants found",
+          "translation": "Keine Varianten gefunden",
           "variations": {}
         }
       ],
@@ -6175,11 +6141,10 @@
     },
     "JvLlhCPzCaknLshSyrgnSA==": {
       "description": "Variant page: accessible name of the select that opens another variant of the product",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variant",
+          "translation": "Variante",
           "variations": {}
         }
       ],
@@ -6187,11 +6152,10 @@
     },
     "WRrc5sGWYPzRZpKAcoT4Fg==": {
       "description": "Variant page: accessible name of the select next to the weight field that picks the unit, e.g. kg",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Weight unit",
+          "translation": "Gewichtseinheit",
           "variations": {}
         }
       ],
@@ -6199,11 +6163,10 @@
     },
     "lZvG9zNBaH7+Xo79XyD8ZQ==": {
       "description": "Variant page: text below the label of the length, width and height",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "The packed size. All three share one unit.",
+          "translation": "Die Größe verpackt. Alle drei nutzen dieselbe Einheit.",
           "variations": {}
         }
       ],
@@ -6211,11 +6174,10 @@
     },
     "ie43rIiVMd5OwZow+xMXOg==": {
       "description": "Variant page: text below the heading of the Attributes section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Details customers can filter and compare by, such as material. Link one to use the product's value.",
+          "translation": "Details wie Material, nach denen Kunden filtern und vergleichen können. Verknüpfe eines, um den Wert des Produkts zu übernehmen.",
           "variations": {}
         }
       ],
@@ -6223,11 +6185,10 @@
     },
     "eDGxuPHpgLOoU2RQrPL8xg==": {
       "description": "Variant page: text below the heading of the General section, with the name, description and visibility",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "How the variant is named and found in the store.",
+          "translation": "Wie die Variante heißt und im Shop gefunden wird.",
           "variations": {}
         }
       ],
@@ -6235,11 +6196,10 @@
     },
     "0Qrs8El1UdVKXbdlOk6gqg==": {
       "description": "Variant page: text below the heading of the Weight and dimensions section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Used to choose shipping methods and their prices. Leave them empty for variants that aren't shipped.",
+          "translation": "Bestimmt die Versandarten und ihre Preise. Lass die Felder bei Varianten leer, die nicht versendet werden.",
           "variations": {}
         }
       ],
@@ -6247,11 +6207,10 @@
     },
     "9lrDORp8uSQ0csuYjYjOlw==": {
       "description": "Variant page: text below the heading of the Identifiers section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Identify the variant in your inventory and when it's scanned. Each belongs to one variant only.",
+          "translation": "Identifizieren die Variante im Lager und beim Scannen. Jede gehört nur zu einer Variante.",
           "variations": {}
         }
       ],
@@ -6259,11 +6218,10 @@
     },
     "bV4rtSlmdrDhHGPV1nsnFw==": {
       "description": "Product form: heading of the section with the product's attribute values, e.g. its material",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Attributes",
+          "translation": "Attribute",
           "variations": {}
         }
       ],
@@ -6271,11 +6229,10 @@
     },
     "zMWsQTjC+VJpOA3VDP/vmg==": {
       "description": "Product form: text below the heading of the Attributes section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Details customers can filter and compare by, such as material. Variants take these values unless they set their own.",
+          "translation": "Details wie Material, nach denen Kunden filtern und vergleichen können. Varianten übernehmen diese Werte, sofern sie keine eigenen haben.",
           "variations": {}
         }
       ],
@@ -6283,11 +6240,10 @@
     },
     "IAFhPvEq0Olk/REokXHCQw==": {
       "description": "Product form: heading of the section with the country of origin and HS code",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Customs",
+          "translation": "Zoll",
           "variations": {}
         }
       ],
@@ -6295,11 +6251,10 @@
     },
     "dtcfM+9N3AFBYDRcwCUDDg==": {
       "description": "Product form: text below the heading of the Customs section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "What customs need to know when the product is shipped abroad. Variants take these values unless they set their own.",
+          "translation": "Was der Zoll wissen muss, wenn das Produkt ins Ausland versendet wird. Varianten übernehmen diese Werte, sofern sie keine eigenen haben.",
           "variations": {}
         }
       ],
@@ -6307,11 +6262,10 @@
     },
     "X1oEs0dXz+KCPYBBfS9fjQ==": {
       "description": "Product form: label of the country the goods were made in",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Country of origin",
+          "translation": "Ursprungsland",
           "variations": {}
         }
       ],
@@ -6319,11 +6273,10 @@
     },
     "EPsmIOvXJrc4sitC0ikaxA==": {
       "description": "Product form: label of the customs tariff number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "HS code",
+          "translation": "HS-Code",
           "variations": {}
         }
       ],
@@ -6331,11 +6284,10 @@
     },
     "SkkxTwks8t2N1semQjaH5A==": {
       "description": "Placeholder of the search field in the list of countries",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Search countries",
+          "translation": "Länder suchen",
           "variations": {}
         }
       ],
@@ -6343,11 +6295,10 @@
     },
     "h+Jzv3hRVADExJreHR2sxw==": {
       "description": "Shown in the list of countries when the search matches none",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No country found",
+          "translation": "Kein Land gefunden",
           "variations": {}
         }
       ],
@@ -6355,11 +6306,10 @@
     },
     "yx5nJYSjvs697evsxM0vbQ==": {
       "description": "Variant page: heading of the country of origin and HS code",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Customs",
+          "translation": "Zoll",
           "variations": {}
         }
       ],
@@ -6367,11 +6317,10 @@
     },
     "bRXGWarNZz2k2pmLT0vwRg==": {
       "description": "Variant page: text below the heading of the Customs section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "What customs need to know when the variant is shipped abroad.",
+          "translation": "Was der Zoll wissen muss, wenn die Variante ins Ausland versendet wird.",
           "variations": {}
         }
       ],
@@ -6379,11 +6328,10 @@
     },
     "E6U+21pjZA/OJWHm58ZZug==": {
       "description": "Product form: accessible name of the button on an attribute value that removes it, e.g. 'Remove Cotton'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Remove {value}",
+          "translation": "{value} entfernen",
           "variations": {}
         }
       ],
@@ -6391,11 +6339,10 @@
     },
     "EPoyqzek+mGJqHwdVDQGfQ==": {
       "description": "Product form: shown next to an attribute that has no values to pick from yet",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No values yet. Add them on the Attributes page.",
+          "translation": "Noch keine Werte. Füge sie auf der Seite Attribute hinzu.",
           "variations": {}
         }
       ],
@@ -6403,11 +6350,10 @@
     },
     "ARf1AXFZUkUce/bBdUGdog==": {
       "description": "Product form: accessible name of the round button that opens the list of an attribute's values, e.g. 'Add values to Material'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add values to {attribute}",
+          "translation": "Werte zu {attribute} hinzufügen",
           "variations": {}
         }
       ],
@@ -6415,11 +6361,10 @@
     },
     "tmjx0gU2aJ/PXmimvxjMkw==": {
       "description": "Product form: placeholder of the search in the list of an attribute's values",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Search values",
+          "translation": "Werte suchen",
           "variations": {}
         }
       ],
@@ -6427,11 +6372,10 @@
     },
     "YHEyUBJZIQ68y/YpgTy5VQ==": {
       "description": "Product form: shown in the list of an attribute's values when the search matches none",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No values found",
+          "translation": "Keine Werte gefunden",
           "variations": {}
         }
       ],
@@ -6439,11 +6383,10 @@
     },
     "JwXK1OsqmkpmSlfMXrVB6Q==": {
       "description": "Product form: placeholder of the search in the list of attributes to add",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Search attributes",
+          "translation": "Attribute suchen",
           "variations": {}
         }
       ],
@@ -6451,11 +6394,10 @@
     },
     "4COBDgof9G3ju5QN4Vudqw==": {
       "description": "Product form: shown in the list of attributes when the search matches none",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No attributes found",
+          "translation": "Keine Attribute gefunden",
           "variations": {}
         }
       ],
@@ -6463,11 +6405,10 @@
     },
     "trfGUVQFaIFKf1MJH2Z1OA==": {
       "description": "Product form: button that opens the list of attributes to give the product",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add attribute",
+          "translation": "Attribut hinzufügen",
           "variations": {}
         }
       ],
@@ -6475,11 +6416,10 @@
     },
     "RMDwZQksIfSGHIThZcpr6Q==": {
       "description": "Product form: accessible name of the button next to Add attribute that opens the catalog's attributes",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Attributes page",
+          "translation": "Seite Attribute",
           "variations": {}
         }
       ],
@@ -6487,11 +6427,10 @@
     },
     "EcohPTp6D969bJMmHey/Tw==": {
       "description": "New attribute page: title",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "New attribute",
+          "translation": "Neues Attribut",
           "variations": {}
         }
       ],
@@ -6499,11 +6438,10 @@
     },
     "n8fUFLU2SGs+D5K7UFUFZw==": {
       "description": "New attribute page: accessible name of the back arrow to the list of attributes",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Back to attributes",
+          "translation": "Zurück zu den Attributen",
           "variations": {}
         }
       ],
@@ -6511,11 +6449,10 @@
     },
     "dBWkCwpTTRfb357YfjPeTA==": {
       "description": "New attribute page: heading of the attribute's fields",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "General",
+          "translation": "Allgemein",
           "variations": {}
         }
       ],
@@ -6523,11 +6460,10 @@
     },
     "qwmdQAtryr1kA7pM4SFNWw==": {
       "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{products} products and {variants} variants",
+          "translation": "{products} Produkten und {variants} Varianten",
           "variations": {}
         }
       ],
@@ -6535,11 +6471,10 @@
     },
     "juQ81atlIIc1pb8nj4XE8A==": {
       "description": "Attribute page: accessible name of the back arrow to the list of attributes",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Back to attributes",
+          "translation": "Zurück zu den Attributen",
           "variations": {}
         }
       ],
@@ -6547,11 +6482,10 @@
     },
     "6gEXDzS159sLdt4OsLhMWQ==": {
       "description": "Attribute page: heading of the attribute's settings",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "General",
+          "translation": "Allgemein",
           "variations": {}
         }
       ],
@@ -6559,11 +6493,10 @@
     },
     "5SZzG6nyWffxFUi26m59lQ==": {
       "description": "Attribute page: explains the section with the attribute's settings",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "How the attribute is named, and what it describes.",
+          "translation": "Wie das Attribut heißt und was es beschreibt.",
           "variations": {}
         }
       ],
@@ -6571,11 +6504,10 @@
     },
     "CdftVpJdSJpuYIhicWjHfA==": {
       "description": "Attribute page: heading of the delete section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete attribute",
+          "translation": "Attribut löschen",
           "variations": {}
         }
       ],
@@ -6583,11 +6515,10 @@
     },
     "52ObOU30yO3rP08B6eBYlA==": {
       "description": "Attribute page: explains the section with the button that deletes the attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Its values are deleted with it, and products and variants lose them.",
+          "translation": "Seine Werte werden mitgelöscht, und Produkte und Varianten verlieren sie.",
           "variations": {}
         }
       ],
@@ -6595,11 +6526,10 @@
     },
     "DoIjbZbxyUNAEFu173dcLA==": {
       "description": "Attribute page: button that asks to delete the attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete",
+          "translation": "Löschen",
           "variations": {}
         }
       ],
@@ -6607,11 +6537,10 @@
     },
     "Kq25rqfrkostYGEmIS5F+Q==": {
       "description": "Attribute page: title of the delete dialog",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete attribute",
+          "translation": "Attribut löschen",
           "variations": {}
         }
       ],
@@ -6619,11 +6548,10 @@
     },
     "4dHyuTfHZaMVDTX99G52ww==": {
       "description": "Attribute page: delete dialog text for an attribute in use",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{name} is used by {usage}. They lose its values. This can't be undone.",
+          "translation": "{name} wird von {usage} verwendet. Sie verlieren seine Werte. Das lässt sich nicht rückgängig machen.",
           "variations": {}
         }
       ],
@@ -6631,11 +6559,10 @@
     },
     "04LWHsPRkBV8gZM9l6IH1Q==": {
       "description": "Attribute page: delete dialog text for an unused attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No product or variant uses {name}. This can't be undone.",
+          "translation": "Kein Produkt und keine Variante verwendet {name}. Das lässt sich nicht rückgängig machen.",
           "variations": {}
         }
       ],
@@ -6643,11 +6570,10 @@
     },
     "PNMhgsQLhnWaOCjeX63aiw==": {
       "description": "Attribute page: heading of the attribute's values",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Values",
+          "translation": "Werte",
           "variations": {}
         }
       ],
@@ -6655,11 +6581,10 @@
     },
     "JDPRV21D0EESp/Ep9XHBPQ==": {
       "description": "Attribute page: explains the values section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "What products and variants pick from, in the order they show.",
+          "translation": "Woraus Produkte und Varianten wählen, in der angezeigten Reihenfolge.",
           "variations": {}
         }
       ],
@@ -6667,11 +6592,10 @@
     },
     "+INA3+DeIZvsePyThr62Gg==": {
       "description": "Attribute page: name of the values table",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Values",
+          "translation": "Werte",
           "variations": {}
         }
       ],
@@ -6679,7 +6603,6 @@
     },
     "3e0TtzJX2ACepvPmBPVFew==": {
       "description": "Attribute page: values table column with the name",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -6691,7 +6614,6 @@
     },
     "oGJyhgIhzNT25s+hctfUmQ==": {
       "description": "Attribute page: values table column with the slug",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -6703,11 +6625,10 @@
     },
     "kqpRjlURziYeTC1otDvf9g==": {
       "description": "Attribute page: values table column with each value's buttons",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Actions",
+          "translation": "Aktionen",
           "variations": {}
         }
       ],
@@ -6715,7 +6636,6 @@
     },
     "5UOyl2qWUwY1DMLjPd9QBA==": {
       "description": "Attribute form: label of the field for the attribute's name",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -6727,7 +6647,6 @@
     },
     "4P0T9VUaZY34MqEyp4W7CA==": {
       "description": "Attribute form: label of the field for the attribute's slug, its key in URLs",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -6739,11 +6658,10 @@
     },
     "tWRU9C/I7rHlmlPlOGzqCA==": {
       "description": "Attribute form: hint below the slug of an existing attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Storefront filter links use it. Changing it breaks links that use the old one.",
+          "translation": "Filterlinks im Shop nutzen ihn. Wenn du ihn änderst, funktionieren Links mit dem alten nicht mehr.",
           "variations": {}
         }
       ],
@@ -6751,11 +6669,10 @@
     },
     "DR6sdLRsZdS0yhSgM0260w==": {
       "description": "Attribute form: hint below the slug of a new attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Used in storefront filter links. Lowercase letters and numbers, joined by - or _.",
+          "translation": "Wird in Filterlinks im Shop verwendet. Kleinbuchstaben und Zahlen, verbunden mit - oder _.",
           "variations": {}
         }
       ],
@@ -6763,11 +6680,10 @@
     },
     "QG+8EAk+R5R0drNCIeng0w==": {
       "description": "Attribute form: label of the select for whether the attribute describes products, variants or both",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Describes",
+          "translation": "Beschreibt",
           "variations": {}
         }
       ],
@@ -6775,11 +6691,10 @@
     },
     "HN+R8v4ea6j82Zt5Swr65g==": {
       "description": "Attribute form: checkbox that lets products and variants have several values of the attribute, e.g. a blend of materials",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Several values per product or variant",
+          "translation": "Mehrere Werte pro Produkt oder Variante",
           "variations": {}
         }
       ],
@@ -6787,11 +6702,10 @@
     },
     "6mB5U5Meh0AlyT5HzL6N3A==": {
       "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{products} products and 1 variant",
+          "translation": "{products} Produkten und 1 Variante",
           "variations": {}
         }
       ],
@@ -6799,11 +6713,10 @@
     },
     "DLRAuQiBCOsH+UPsc27Z1w==": {
       "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "1 product and {variants} variants",
+          "translation": "1 Produkt und {variants} Varianten",
           "variations": {}
         }
       ],
@@ -6811,11 +6724,10 @@
     },
     "eWDdaOjiijgNm2dOQX2/uw==": {
       "description": "Attribute page: how many products and variants use an attribute or value, inside a delete dialog's text",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "1 product and 1 variant",
+          "translation": "1 Produkt und 1 Variante",
           "variations": {}
         }
       ],
@@ -6823,11 +6735,10 @@
     },
     "aniv9gmescGREV0skQBWlQ==": {
       "description": "Attribute page: shown in the values section while the attribute has none",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No values yet",
+          "translation": "Noch keine Werte",
           "variations": {}
         }
       ],
@@ -6835,11 +6746,10 @@
     },
     "YkIh6NdBkIdf0b0zm19Ypg==": {
       "description": "Attribute page: explains the empty values section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add the values products and variants pick from, e.g. Cotton or Wool.",
+          "translation": "Füge die Werte hinzu, aus denen Produkte und Varianten wählen, z. B. Baumwolle oder Wolle.",
           "variations": {}
         }
       ],
@@ -6847,11 +6757,10 @@
     },
     "lGv1tPeIInvOVN+mzMv3CQ==": {
       "description": "Attribute page: button that opens the slideover to add a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add value",
+          "translation": "Wert hinzufügen",
           "variations": {}
         }
       ],
@@ -6859,11 +6768,10 @@
     },
     "4VkFMWnJnG/C7LeHpzr2KA==": {
       "description": "Attribute page: title of the slideover that adds a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add value",
+          "translation": "Wert hinzufügen",
           "variations": {}
         }
       ],
@@ -6871,11 +6779,10 @@
     },
     "aDpM4qKSOaBWUCrEcY/ysg==": {
       "description": "Attribute page: accessible name of the button that closes the value slideover",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Close",
+          "translation": "Schließen",
           "variations": {}
         }
       ],
@@ -6883,7 +6790,6 @@
     },
     "mzJ879Q9ZMDqdY1kVJ89ew==": {
       "description": "Value slideover: label of the value's name, e.g. Cotton",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -6895,7 +6801,6 @@
     },
     "+bK/yCHkqsdK/obxMZeWdQ==": {
       "description": "Value slideover: label of the value's slug",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -6907,11 +6812,10 @@
     },
     "WLC1CeIxBDpwPYzV05uriA==": {
       "description": "Value slideover: hint below the slug",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Storefront filter links use it. Changing it breaks links that use the old one.",
+          "translation": "Filterlinks im Shop nutzen ihn. Wenn du ihn änderst, funktionieren Links mit dem alten nicht mehr.",
           "variations": {}
         }
       ],
@@ -6919,11 +6823,10 @@
     },
     "5SJ5TU1Ey3h33XJG6VyY1w==": {
       "description": "New attribute page: explains the section with the attribute's fields",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "E.g. Material, Care or Fit.",
+          "translation": "Z. B. Material, Pflege oder Passform.",
           "variations": {}
         }
       ],
@@ -6931,11 +6834,10 @@
     },
     "2KNoFKYUTv1SJsePIzFimQ==": {
       "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Deleted on save. {products} products and {variants} variants lose it.",
+          "translation": "Wird beim Speichern gelöscht. {products} Produkte und {variants} Varianten verlieren ihn.",
           "variations": {}
         }
       ],
@@ -6943,11 +6845,10 @@
     },
     "76Gw8VHTpUuxK6c0uneS1g==": {
       "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Deleted on save. {products} products and 1 variant lose it.",
+          "translation": "Wird beim Speichern gelöscht. {products} Produkte und 1 Variante verlieren ihn.",
           "variations": {}
         }
       ],
@@ -6955,11 +6856,10 @@
     },
     "oipaPVfBhip2+irnIQCKzg==": {
       "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Deleted on save. 1 product and {variants} variants lose it.",
+          "translation": "Wird beim Speichern gelöscht. 1 Produkt und {variants} Varianten verlieren ihn.",
           "variations": {}
         }
       ],
@@ -6967,11 +6867,10 @@
     },
     "FYHczsAyJ7K8X/d33aDzSA==": {
       "description": "Attribute page: below a value in use that saving deletes, e.g. 'Deleted on save. 3 products and 1 variant lose it.'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Deleted on save. 1 product and 1 variant lose it.",
+          "translation": "Wird beim Speichern gelöscht. 1 Produkt und 1 Variante verlieren ihn.",
           "variations": {}
         }
       ],
@@ -6979,11 +6878,10 @@
     },
     "cmbELMO5ORtefwBRgXR5Pw==": {
       "description": "Value slideover: error when the name is empty",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Enter a name.",
+          "translation": "Gib einen Namen ein.",
           "variations": {}
         }
       ],
@@ -6991,11 +6889,10 @@
     },
     "HuS5HNHsAZTdqfHkQrmRvg==": {
       "description": "Value slideover: error when the slug has other characters or is empty",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Use lowercase letters and numbers, joined by - or _.",
+          "translation": "Verwende Kleinbuchstaben und Zahlen, verbunden mit - oder _.",
           "variations": {}
         }
       ],
@@ -7003,11 +6900,10 @@
     },
     "4QV1RC2VGbIVrcJkCemFbg==": {
       "description": "Value slideover: error when the slug is taken",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Another value has this slug.",
+          "translation": "Ein anderer Wert hat diesen Slug.",
           "variations": {}
         }
       ],
@@ -7015,11 +6911,10 @@
     },
     "LX7+vA64iopJiIx6reb5pA==": {
       "description": "Attribute page: title of the slideover that changes a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Edit value",
+          "translation": "Wert bearbeiten",
           "variations": {}
         }
       ],
@@ -7027,11 +6922,10 @@
     },
     "SaSSELXaulYZ12MwA67alA==": {
       "description": "Value slideover: says the change is stored when the attribute page is saved",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Saved with the attribute.",
+          "translation": "Wird mit dem Attribut gespeichert.",
           "variations": {}
         }
       ],
@@ -7039,11 +6933,10 @@
     },
     "7SPvSKUoQ2hgp+6r6R/UYA==": {
       "description": "Value slideover: button that closes it without changes",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Cancel",
+          "translation": "Abbrechen",
           "variations": {}
         }
       ],
@@ -7051,11 +6944,10 @@
     },
     "TO4cS8LN4714rooS1CnYzA==": {
       "description": "Value slideover: button that adds the value to the list",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add",
+          "translation": "Hinzufügen",
           "variations": {}
         }
       ],
@@ -7063,11 +6955,10 @@
     },
     "SW05sRn2Z9eIFMLeL8b10Q==": {
       "description": "Value slideover: button that applies the changes to the value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Apply",
+          "translation": "Übernehmen",
           "variations": {}
         }
       ],
@@ -7075,11 +6966,10 @@
     },
     "exNff7pKNiJ7Nvz8SSr/7g==": {
       "description": "Attribute page: accessible name of the button that opens a value's menu, e.g. 'Actions for Cotton'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Actions for {name}",
+          "translation": "Aktionen für {name}",
           "variations": {}
         }
       ],
@@ -7087,11 +6977,10 @@
     },
     "/I7cuMIEbOT//AsE3SUw6g==": {
       "description": "Attribute page: menu item that undoes removing a value before saving",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Keep value",
+          "translation": "Wert behalten",
           "variations": {}
         }
       ],
@@ -7099,11 +6988,10 @@
     },
     "waDt4wNpUrTI9y92+BUOQQ==": {
       "description": "Attribute page: menu item that opens the slideover to change a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Edit",
+          "translation": "Bearbeiten",
           "variations": {}
         }
       ],
@@ -7111,11 +6999,10 @@
     },
     "FUuQfXnao/A+SIWLhzz1jg==": {
       "description": "Attribute page: menu item that moves a value one place up",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Move up",
+          "translation": "Nach oben",
           "variations": {}
         }
       ],
@@ -7123,11 +7010,10 @@
     },
     "hrNEbVMJkuZM0OdbOJyMXg==": {
       "description": "Attribute page: menu item that moves a value one place down",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Move down",
+          "translation": "Nach unten",
           "variations": {}
         }
       ],
@@ -7135,11 +7021,10 @@
     },
     "EdVawzaC+G77daiuUoebJQ==": {
       "description": "Attribute page: menu item that removes a value; saving deletes it",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Remove",
+          "translation": "Entfernen",
           "variations": {}
         }
       ],
@@ -7147,7 +7032,6 @@
     },
     "BYLpLuFTF6m5Bh17vWtb5A==": {
       "description": "Attribute form: type of an attribute whose values are words, e.g. Cotton",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7159,11 +7043,10 @@
     },
     "s3qKXNoqVph3t2sx8+gUnw==": {
       "description": "Attribute form: type of an attribute whose values are numbers, e.g. 180",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Number",
+          "translation": "Zahl",
           "variations": {}
         }
       ],
@@ -7171,11 +7054,10 @@
     },
     "Z+7zaltTob5JKB1Xn5K1fw==": {
       "description": "Attribute form: type of an attribute that is either yes or no, e.g. Waterproof",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Yes or no",
+          "translation": "Ja oder Nein",
           "variations": {}
         }
       ],
@@ -7183,11 +7065,10 @@
     },
     "0bBUJS91eDJ1KCE0/x1iGQ==": {
       "description": "Attribute form: label of the attribute's type, e.g. Number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Type",
+          "translation": "Typ",
           "variations": {}
         }
       ],
@@ -7195,11 +7076,10 @@
     },
     "/XniPn9KnaKU+lvD8voeSQ==": {
       "description": "Attribute form: hint below the read-only type of an existing attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "It can't change, since products picked its values.",
+          "translation": "Er lässt sich nicht ändern, da Produkte seine Werte gewählt haben.",
           "variations": {}
         }
       ],
@@ -7207,11 +7087,10 @@
     },
     "WXVUKdXgJxMELu2/rxHffw==": {
       "description": "Attribute form: hint below the type select of a new attribute",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "It can't change later.",
+          "translation": "Er lässt sich später nicht ändern.",
           "variations": {}
         }
       ],
@@ -7219,11 +7098,10 @@
     },
     "mL4yGN5ESOXfpwTmZ8gMlw==": {
       "description": "Attribute page: name of a yes-or-no attribute's yes value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Yes",
+          "translation": "Ja",
           "variations": {}
         }
       ],
@@ -7231,11 +7109,10 @@
     },
     "vuui19PNRERzInJmRqhLpQ==": {
       "description": "Attribute page: name of a yes-or-no attribute's no value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No",
+          "translation": "Nein",
           "variations": {}
         }
       ],
@@ -7243,11 +7120,10 @@
     },
     "SN1xdEmbWIyJJxejkmSf4g==": {
       "description": "Value slideover: error when a number attribute's value isn't a number",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Enter a number, e.g. 180 or 2.5.",
+          "translation": "Gib eine Zahl ein, z. B. 180 oder 2.5.",
           "variations": {}
         }
       ],
@@ -7255,11 +7131,10 @@
     },
     "Qve+7B9QqT1S0njQpAxmag==": {
       "description": "New option page: title",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "New option",
+          "translation": "Neue Option",
           "variations": {}
         }
       ],
@@ -7267,11 +7142,10 @@
     },
     "qCp9iRVwTgVwdx3MN8LMXQ==": {
       "description": "New option page: accessible name of the back arrow to the list of options",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Back to options",
+          "translation": "Zurück zu den Optionen",
           "variations": {}
         }
       ],
@@ -7279,11 +7153,10 @@
     },
     "tW31o2/WOVI5ojZtIgsUew==": {
       "description": "New option page: heading of the option's fields",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "General",
+          "translation": "Allgemein",
           "variations": {}
         }
       ],
@@ -7291,11 +7164,10 @@
     },
     "bgLEos18zkbeoE/tvepxzg==": {
       "description": "New option page: explains the section with the option's fields",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "E.g. Colour, Size or Material.",
+          "translation": "Z. B. Farbe, Größe oder Material.",
           "variations": {}
         }
       ],
@@ -7303,11 +7175,10 @@
     },
     "QNq/own2Qj0qfj2DtfHw+g==": {
       "description": "Option page: accessible name of the back arrow to the list of options",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Back to options",
+          "translation": "Zurück zu den Optionen",
           "variations": {}
         }
       ],
@@ -7315,11 +7186,10 @@
     },
     "a4iEadIEYk3Jviybvkt6hw==": {
       "description": "Option page: heading of the option's settings",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "General",
+          "translation": "Allgemein",
           "variations": {}
         }
       ],
@@ -7327,11 +7197,10 @@
     },
     "fUsmiHJqv8yn0ll8PyJ+MQ==": {
       "description": "Option page: explains the section with the option's settings",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "How the option is named, and how the store shows it.",
+          "translation": "Wie die Option heißt und wie der Shop sie anzeigt.",
           "variations": {}
         }
       ],
@@ -7339,11 +7208,10 @@
     },
     "eATfy1t55sd9Hlg4ZGLSCQ==": {
       "description": "Option page: heading of the delete section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete option",
+          "translation": "Option löschen",
           "variations": {}
         }
       ],
@@ -7351,11 +7219,10 @@
     },
     "nC0Ug6mv4zN+9MEHukZnnQ==": {
       "description": "Option page: explains why an option in use can't be deleted",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variants use it: {variants} variants of {products} products. Delete those variants on their products first.",
+          "translation": "Varianten verwenden sie: {variants} Varianten von {products} Produkten. Lösche diese Varianten zuerst bei ihren Produkten.",
           "variations": {}
         }
       ],
@@ -7363,11 +7230,10 @@
     },
     "1ftv4SwMO8ypD0g+JwXDBQ==": {
       "description": "Option page: explains why an option in use can't be deleted",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variants use it: {variants} variants of 1 product. Delete those variants on their products first.",
+          "translation": "Varianten verwenden sie: {variants} Varianten von 1 Produkt. Lösche diese Varianten zuerst bei ihren Produkten.",
           "variations": {}
         }
       ],
@@ -7375,11 +7241,10 @@
     },
     "asDE7VrJe5bm8j7B6cmDJw==": {
       "description": "Option page: explains why an option in use can't be deleted",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variants use it: 1 variant of {products} products. Delete those variants on their products first.",
+          "translation": "Varianten verwenden sie: 1 Variante von {products} Produkten. Lösche diese Varianten zuerst bei ihren Produkten.",
           "variations": {}
         }
       ],
@@ -7387,11 +7252,10 @@
     },
     "JRpPBeRN99giZiJcKFaEMg==": {
       "description": "Option page: explains why an option in use can't be deleted",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Variants use it: 1 variant of 1 product. Delete those variants on their products first.",
+          "translation": "Varianten verwenden sie: 1 Variante von 1 Produkt. Lösche diese Varianten zuerst bei ihren Produkten.",
           "variations": {}
         }
       ],
@@ -7399,11 +7263,10 @@
     },
     "G8PU5Ts19DrM4QAxe0i29g==": {
       "description": "Option page: explains the section with the button that deletes an unused option",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Its values are deleted with it. No variant uses it.",
+          "translation": "Ihre Werte werden mitgelöscht. Keine Variante verwendet sie.",
           "variations": {}
         }
       ],
@@ -7411,11 +7274,10 @@
     },
     "C+gnDFa/mDiBsBWU9g4b3A==": {
       "description": "Option page: button that asks to delete the option",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete",
+          "translation": "Löschen",
           "variations": {}
         }
       ],
@@ -7423,11 +7285,10 @@
     },
     "boOX+equIf3d0FdPOcF4BA==": {
       "description": "Option page: title of the delete dialog",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete option",
+          "translation": "Option löschen",
           "variations": {}
         }
       ],
@@ -7435,11 +7296,10 @@
     },
     "TP8+m1N1AVEetVeaP8K1KA==": {
       "description": "Option page: delete dialog text",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{name} and its values are deleted, and products stop offering them. This can't be undone.",
+          "translation": "{name} und die zugehörigen Werte werden gelöscht, und Produkte bieten sie nicht mehr an. Das lässt sich nicht rückgängig machen.",
           "variations": {}
         }
       ],
@@ -7447,7 +7307,6 @@
     },
     "eqF5Mvo9xBOShd1gpwRkCg==": {
       "description": "Option form: label of the field for the option's name",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7459,7 +7318,6 @@
     },
     "l/ihutcDbqUstaG9D7tVxg==": {
       "description": "Option form: label of the field for the option's slug, its key in URLs",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7471,11 +7329,10 @@
     },
     "Y1linMwos1Xc+flvdNbxXQ==": {
       "description": "Option form: hint below the option's slug",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Lowercase letters and numbers, joined by - or _.",
+          "translation": "Kleinbuchstaben und Zahlen, verbunden mit - oder _.",
           "variations": {}
         }
       ],
@@ -7483,11 +7340,10 @@
     },
     "VHCSONnvys9WeCWgU5CBGg==": {
       "description": "Option form: label of how the store shows the option's values",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Display",
+          "translation": "Darstellung",
           "variations": {}
         }
       ],
@@ -7495,11 +7351,10 @@
     },
     "4zRX4R6UO4yj3sDgwyboBg==": {
       "description": "Option form: hint below the display select",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Swatches show each value's colour.",
+          "translation": "Farbfelder zeigen die Farbe jedes Werts.",
           "variations": {}
         }
       ],
@@ -7507,11 +7362,10 @@
     },
     "05JopnldbpuGLt1aeTDRlw==": {
       "description": "Option page: how many variants of how many products use a value, e.g. '2 variants of 1 product'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{variants} variants of {products} products",
+          "translation": "{variants} Varianten von {products} Produkten",
           "variations": {}
         }
       ],
@@ -7519,11 +7373,10 @@
     },
     "GYSgdGHmx1vHXC9Wj8Iu7g==": {
       "description": "Option page: how many variants of how many products use a value, e.g. '2 variants of 1 product'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{variants} variants of 1 product",
+          "translation": "{variants} Varianten von 1 Produkt",
           "variations": {}
         }
       ],
@@ -7531,11 +7384,10 @@
     },
     "VXTNyTvWveDk1QQrWAwQ4g==": {
       "description": "Option page: how many variants of how many products use a value, e.g. '2 variants of 1 product'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "1 variant of {products} products",
+          "translation": "1 Variante von {products} Produkten",
           "variations": {}
         }
       ],
@@ -7543,11 +7395,10 @@
     },
     "w8dwjOhtA3uDAA73S2j/zQ==": {
       "description": "Option page: how many variants of how many products use a value, e.g. '2 variants of 1 product'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "1 variant of 1 product",
+          "translation": "1 Variante von 1 Produkt",
           "variations": {}
         }
       ],
@@ -7555,11 +7406,10 @@
     },
     "7WYDx52VazrpGpGKv0wG4Q==": {
       "description": "Option page: button that opens the slideover to add a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add value",
+          "translation": "Wert hinzufügen",
           "variations": {}
         }
       ],
@@ -7567,11 +7417,10 @@
     },
     "q4mxSUljDoN4FRjdTW1LAQ==": {
       "description": "Option page: heading of the option's values",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Values",
+          "translation": "Werte",
           "variations": {}
         }
       ],
@@ -7579,11 +7428,10 @@
     },
     "cVkvBj7GRPm1PgsQkfbi1g==": {
       "description": "Option page: explains the values section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "What variants are told apart by, in the order the store shows them.",
+          "translation": "Wonach sich Varianten unterscheiden, in der Reihenfolge, in der der Shop sie anzeigt.",
           "variations": {}
         }
       ],
@@ -7591,11 +7439,10 @@
     },
     "ux/tBSib/dsM0YL3y0kjoQ==": {
       "description": "Option page: name of the values table",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Values",
+          "translation": "Werte",
           "variations": {}
         }
       ],
@@ -7603,7 +7450,6 @@
     },
     "hQgwBKEtQuXc0Hw33AXSdQ==": {
       "description": "Option page: values table column with the name",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7615,7 +7461,6 @@
     },
     "dByBq78Jhp/1mVEmYnpFGw==": {
       "description": "Option page: values table column with the slug",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7627,11 +7472,10 @@
     },
     "DaQSSFLJJd0yiGgMAuyiRQ==": {
       "description": "Option page: values table column with each value's buttons",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Actions",
+          "translation": "Aktionen",
           "variations": {}
         }
       ],
@@ -7639,11 +7483,10 @@
     },
     "1It/QFO8HLcMSo7X737BsQ==": {
       "description": "Option page: accessible name of the button that opens a value's menu, e.g. 'Actions for Black'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Actions for {name}",
+          "translation": "Aktionen für {name}",
           "variations": {}
         }
       ],
@@ -7651,11 +7494,10 @@
     },
     "GzTBpKAz1EHxHg9GHCSZjA==": {
       "description": "Option page: menu item that opens the slideover to change a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Edit",
+          "translation": "Bearbeiten",
           "variations": {}
         }
       ],
@@ -7663,11 +7505,10 @@
     },
     "Fo/LWNEce/O+92tPfzlvcQ==": {
       "description": "Option page: menu item that moves a value one place up",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Move up",
+          "translation": "Nach oben",
           "variations": {}
         }
       ],
@@ -7675,11 +7516,10 @@
     },
     "/cc58TtmbV/+zaWas7StyQ==": {
       "description": "Option page: menu item that moves a value one place down",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Move down",
+          "translation": "Nach unten",
           "variations": {}
         }
       ],
@@ -7687,11 +7527,10 @@
     },
     "emBVFsixhHwIITqfqlswWg==": {
       "description": "Option page: shown in the values section while the option has none",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No values yet",
+          "translation": "Noch keine Werte",
           "variations": {}
         }
       ],
@@ -7699,11 +7538,10 @@
     },
     "YMDPnDjUmi0cu1gzO7RdCQ==": {
       "description": "Option page: explains the empty values section",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add the values variants are told apart by, e.g. Black or White.",
+          "translation": "Füge die Werte hinzu, nach denen sich Varianten unterscheiden, z. B. Schwarz oder Weiß.",
           "variations": {}
         }
       ],
@@ -7711,11 +7549,10 @@
     },
     "+FOoHMlQnCO1ldnRoH+RFw==": {
       "description": "Option page: title of the slideover that adds a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add value",
+          "translation": "Wert hinzufügen",
           "variations": {}
         }
       ],
@@ -7723,11 +7560,10 @@
     },
     "NnYLvWRTQtJYEL34VG2CPQ==": {
       "description": "Option page: title of the slideover that changes a value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Edit value",
+          "translation": "Wert bearbeiten",
           "variations": {}
         }
       ],
@@ -7735,11 +7571,10 @@
     },
     "2q60zhr74uT+bwB81Mx84Q==": {
       "description": "Option value slideover: says the change is stored when the option page is saved",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Saved with the option.",
+          "translation": "Wird mit der Option gespeichert.",
           "variations": {}
         }
       ],
@@ -7747,11 +7582,10 @@
     },
     "CG8LE5vRNv4BmxP1S1Oc0A==": {
       "description": "Option page: accessible name of the button that closes the value slideover",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Close",
+          "translation": "Schließen",
           "variations": {}
         }
       ],
@@ -7759,7 +7593,6 @@
     },
     "VXNZZrpZUVXWjpNyLDJyuQ==": {
       "description": "Option value slideover: label of the value's name, e.g. Black",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7771,11 +7604,10 @@
     },
     "GnVDAaTeCiGtQerttTdwrg==": {
       "description": "Option value slideover: error when the name is empty",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Enter a name.",
+          "translation": "Gib einen Namen ein.",
           "variations": {}
         }
       ],
@@ -7783,7 +7615,6 @@
     },
     "cDwgcUOl1GpbJmsMw7dC+Q==": {
       "description": "Option value slideover: label of the value's slug",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
@@ -7795,11 +7626,10 @@
     },
     "yvW1tvPjRUUSKQ5Peob5Ow==": {
       "description": "Option value slideover: error when the slug is taken",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Another value has this slug.",
+          "translation": "Ein anderer Wert hat diesen Slug.",
           "variations": {}
         }
       ],
@@ -7807,11 +7637,10 @@
     },
     "UPt9yTOGEr3doa1f/tYyhg==": {
       "description": "Option value slideover: error when the slug has other characters or is empty",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Use lowercase letters and numbers, joined by - or _.",
+          "translation": "Verwende Kleinbuchstaben und Zahlen, verbunden mit - oder _.",
           "variations": {}
         }
       ],
@@ -7819,11 +7648,10 @@
     },
     "FlP3WiK8MiVZ5EPZLQ9UEg==": {
       "description": "Option value slideover: label of the value's colour",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Swatch colour",
+          "translation": "Farbe des Farbfelds",
           "variations": {}
         }
       ],
@@ -7831,11 +7659,10 @@
     },
     "ZvZJ5eKa9jiOPE+Esw2Opg==": {
       "description": "Option value slideover: button that closes it without changes",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Cancel",
+          "translation": "Abbrechen",
           "variations": {}
         }
       ],
@@ -7843,11 +7670,10 @@
     },
     "XnBAfkQOTVJrxodTpf9/2w==": {
       "description": "Option value slideover: button that adds the value to the list",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add",
+          "translation": "Hinzufügen",
           "variations": {}
         }
       ],
@@ -7855,11 +7681,10 @@
     },
     "FJsN3Uhk0i2S2hRUny1vTg==": {
       "description": "Option value slideover: button that applies the changes to the value",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Apply",
+          "translation": "Übernehmen",
           "variations": {}
         }
       ],
@@ -7867,11 +7692,10 @@
     },
     "IfWksLmv0sA6P5ZEvoEevw==": {
       "description": "Option page: toast title when removing a value variants use, e.g. 'Black can't be removed'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "{name} can't be removed",
+          "translation": "{name} kann nicht entfernt werden",
           "variations": {}
         }
       ],
@@ -7879,11 +7703,10 @@
     },
     "LZi2x6VZovODUQ4UfOp2YQ==": {
       "description": "Option page: toast text when removing a value variants use, e.g. 'It's used by 2 variants of 1 product. Delete those variants on the product page first.'",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "It's used by {usage}. Delete those variants on the product page first.",
+          "translation": "Er wird von {usage} verwendet. Lösche diese Varianten zuerst auf der Produktseite.",
           "variations": {}
         }
       ],
@@ -7891,11 +7714,10 @@
     },
     "pq/9gRC2BmKQF0JGQcrkzg==": {
       "description": "Option page: menu item that removes a value; saving deletes it, or a toast says which variants use it",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Remove",
+          "translation": "Entfernen",
           "variations": {}
         }
       ],
@@ -7903,11 +7725,10 @@
     },
     "RYDQgZ/S/svzz6iCI0ULvw==": {
       "description": "Option value slideover: hint below the swatch colour",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "The colour of its swatch in the store. Leave empty for none.",
+          "translation": "Die Farbe seines Farbfelds im Shop. Leer lassen für keines.",
           "variations": {}
         }
       ],
@@ -7915,11 +7736,10 @@
     },
     "7g5DECg7ybsA1vWkWfuLDg==": {
       "description": "Option value slideover: accessible name of the button that opens the colour picker",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Pick a colour",
+          "translation": "Farbe wählen",
           "variations": {}
         }
       ],
@@ -7927,11 +7747,10 @@
     },
     "9ZQOxIQF6gM8TsqKeVgByA==": {
       "description": "Product page: placeholder of the search in the list of options to add",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Search options",
+          "translation": "Optionen suchen",
           "variations": {}
         }
       ],
@@ -7939,11 +7758,10 @@
     },
     "qrbPqIir38uKWOhu9Hiz0g==": {
       "description": "Product page: shown in the list of options when the search matches none",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "No options found",
+          "translation": "Keine Optionen gefunden",
           "variations": {}
         }
       ],
@@ -7951,11 +7769,10 @@
     },
     "tTGJ/pAxbNf5Im1LX4W/5g==": {
       "description": "Product page: button that opens the list of options to give the product",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Add option",
+          "translation": "Option hinzufügen",
           "variations": {}
         }
       ],
@@ -7963,11 +7780,10 @@
     },
     "OSwCRYgC05KTt/Yq7MVTkA==": {
       "description": "Product page: accessible name of the button next to Add option that opens the catalog's options",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Options page",
+          "translation": "Seite Optionen",
           "variations": {}
         }
       ],
@@ -7975,11 +7791,10 @@
     },
     "hAGPaOZasQ7gPZs7XLb9RQ==": {
       "description": "Product page: title of the dialog that confirms saving deletes variants",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete variants",
+          "translation": "Varianten löschen",
           "variations": {}
         }
       ],
@@ -7987,11 +7802,10 @@
     },
     "uNaF7SM74KMdJud2nWPnfg==": {
       "description": "Product page: button that closes the variant deletion dialog without saving",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Cancel",
+          "translation": "Abbrechen",
           "variations": {}
         }
       ],
@@ -7999,11 +7813,10 @@
     },
     "SEK+uJmCTrGimhEf0iglyQ==": {
       "description": "Product page: button that saves and deletes the variants",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Delete and save",
+          "translation": "Löschen und speichern",
           "variations": {}
         }
       ],
@@ -8011,11 +7824,10 @@
     },
     "3DgC+UoySl2xkzU2GnoXOg==": {
       "description": "Product page: label of the field in the variant deletion dialog the admin types the product's name into to confirm",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Type \"{productName}\" to confirm",
+          "translation": "Gib „{productName}“ zur Bestätigung ein",
           "variations": {}
         }
       ],
@@ -8023,11 +7835,10 @@
     },
     "3rTbvnN/AY3WpWs7dR9syQ==": {
       "description": "Product page: text of the dialog that confirms saving deletes the variants of removed option values",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Saving deletes {number} variants made of the removed option values. Deleted variants lose their SKUs and stock and are taken out of carts. This can't be undone.",
+          "translation": "Beim Speichern werden {number} Varianten aus den entfernten Optionswerten gelöscht. Gelöschte Varianten verlieren ihre SKUs und ihren Bestand und werden aus Warenkörben entfernt. Das lässt sich nicht rückgängig machen.",
           "variations": {}
         }
       ],
@@ -8035,11 +7846,208 @@
     },
     "BXI/PRR9i2Gv6TKJDg+nig==": {
       "description": "Product page: text of the dialog that confirms saving deletes the variants of removed option values",
-      "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Saving deletes 1 variant made of the removed option values. Deleted variants lose their SKUs and stock and are taken out of carts. This can't be undone.",
+          "translation": "Beim Speichern wird 1 Variante aus den entfernten Optionswerten gelöscht. Gelöschte Varianten verlieren ihre SKUs und ihren Bestand und werden aus Warenkörben entfernt. Das lässt sich nicht rückgängig machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dYeBSY1qbZfaIkDMpRYFSg==": {
+      "description": "Colour picker in the option value slideover: accessible name of the area that picks saturation and brightness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sättigung und Helligkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AoezDyDKMJ5WVWOh674HlA==": {
+      "description": "Colour picker in the option value slideover: accessible name of the hue slider",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Farbton",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zEP28Hg5nyh1/wjelEVvIQ==": {
+      "description": "Colour picker in the option value slideover: accessible name of the opacity slider",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deckkraft",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Af1HTKRrsmFmgEEL1CbnCw==": {
+      "description": "Colour picker in the option value slideover: accessible name of the button that copies the colour as LCH",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LCH kopieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QBjZQI6nNtv1WcG19eF6xw==": {
+      "description": "Colour picker in the option value slideover: accessible name of the LCH lightness field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LCH-Helligkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ngbG9844ufy7ow5JYhE0Ig==": {
+      "description": "Colour picker in the option value slideover: accessible name of the LCH chroma field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LCH-Buntheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZRRcYK5gNdwQJ67VjuGChQ==": {
+      "description": "Colour picker in the option value slideover: accessible name of the LCH hue field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LCH-Farbton",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KuBu7lfJropZw9v2whXiUQ==": {
+      "description": "Colour picker in the option value slideover: accessible name of the button that copies the colour as HSL",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HSL kopieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C+lCG0WBnk2fwYMvDTA+Vw==": {
+      "description": "Colour picker in the option value slideover: accessible name of the HSL hue field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HSL-Farbton",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xXODXDybMnjATHr+ui5PNA==": {
+      "description": "Colour picker in the option value slideover: accessible name of the HSL saturation field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HSL-Sättigung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0KQhAYYfjXV7qgNegowqEw==": {
+      "description": "Colour picker in the option value slideover: accessible name of the HSL lightness field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HSL-Helligkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xepnQ2zcUw5VLdIVUlzzoQ==": {
+      "description": "Colour picker in the option value slideover: accessible name of the button that copies the colour as RGB",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "RGB kopieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ir9iE6W1e9PjPbH9BdkqNA==": {
+      "description": "Colour picker in the option value slideover: accessible name of the RGB red field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rot",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qFaqPkA1OVdPIgtsrqTXWQ==": {
+      "description": "Colour picker in the option value slideover: accessible name of the RGB green field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Grün",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kq21EKfSRYT9ymNUXKuYng==": {
+      "description": "Colour picker in the option value slideover: accessible name of the RGB blue field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Blau",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PIXpg9AbGNu1G7cO7r01+w==": {
+      "description": "Colour picker in the option value slideover: accessible name of the button that copies the colour as hex",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hex kopieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ndFk7vPfcxciyiT3c/tbEA==": {
+      "description": "Colour picker in the option value slideover: accessible name of the hex colour field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hex",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vEh+GTl14IStqEi4NIbzmQ==": {
+      "description": "Colour picker in the option value slideover: accessible name of the opacity percentage field",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deckkraft in Prozent",
           "variations": {}
         }
       ],
