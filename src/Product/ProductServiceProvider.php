@@ -13,6 +13,7 @@ use Larasell\Admin\Platform\Search\Searches;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Admin\Product\Enums\ProductSection;
+use Larasell\Admin\Product\Http\Controllers\CatalogDefinitionController;
 use Larasell\Admin\Product\Http\Controllers\ProductController;
 use Larasell\Admin\Product\Http\Controllers\SearchProductsController;
 use Larasell\Admin\Product\Search\DatabaseProductSearch;
@@ -42,6 +43,8 @@ class ProductServiceProvider extends ServiceProvider
         Section::anchors(SectionForm::Product, ProductSection::class);
 
         Navigation::index(NavItem::Products->label(), 'products', Products::class, icon: Icon::ShoppingBag)->position(NavItem::Products->position());
+        Navigation::add(Translate::later('Options'), 'larasell.admin.options.index', icon: Icon::ListCheck)->under(NavItem::Products);
+        Navigation::add(Translate::later('Attributes'), 'larasell.admin.attributes.index', icon: Icon::PriceTag3)->under(NavItem::Products);
 
         app(Searches::class)->add('products', Translate::later('Search products'), Icon::ShoppingBag, Translate::later('Search by name, SKU or barcode'), 'larasell.admin.search.products');
 
@@ -50,6 +53,13 @@ class ProductServiceProvider extends ServiceProvider
             Route::post('products', [ProductController::class, 'store'])->name('products.store');
             Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+            Route::get('options', [CatalogDefinitionController::class, 'options'])->name('options.index')->withHead(title: Translate::later('Options'));
+            Route::post('options', [CatalogDefinitionController::class, 'storeOption'])->name('options.store');
+            Route::post('options/{definition}/values', [CatalogDefinitionController::class, 'storeOptionValue'])->name('options.values.store');
+            Route::get('attributes', [CatalogDefinitionController::class, 'attributes'])->name('attributes.index')->withHead(title: Translate::later('Attributes'));
+            Route::post('attributes', [CatalogDefinitionController::class, 'storeAttribute'])->name('attributes.store');
+            Route::put('attributes/{attribute}', [CatalogDefinitionController::class, 'updateAttribute'])->name('attributes.update');
+            Route::post('attributes/{attribute}/values', [CatalogDefinitionController::class, 'storeAttributeValue'])->name('attributes.values.store');
             Route::get('search/products', SearchProductsController::class)->name('search.products');
         });
     }

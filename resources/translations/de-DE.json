@@ -5775,6 +5775,354 @@
         }
       ],
       "types": []
+    },
+    "fuw2Mcn6RtKxGpDTXVKmww==": {
+      "description": "Options page: title of the page of the catalog's option definitions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Options",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2nEpLMvtQCjy6vvtRMO6jg==": {
+      "description": "Options page: heading of the form that creates an option",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New option",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qkkRNxz7bE8tCfMipQuzog==": {
+      "description": "Options page: examples below the heading of the new option form",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E.g. Colour, Size or Material.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QmgOseisFcwV4IwiKrAs0w==": {
+      "description": "Options page: accessible name of the new option's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GSBQ7mfgWpJnhX2nv+H0Ng==": {
+      "description": "Options page: placeholder of the new option's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mm+beiF/4i4jQo6GawiZzA==": {
+      "description": "Options page: accessible name of how the option shows in the store",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Display",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EMJqO66cnP80VcGFEC9w1Q==": {
+      "description": "Options page: option shown as a dropdown",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dropdown",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wUon9c1+/qt2TeELzpKhWA==": {
+      "description": "Options page: option shown as buttons",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Buttons",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wvTeEU1QNKnRQg0A98Dq1g==": {
+      "description": "Options page: option shown as colour swatches",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Swatches",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6+7NslT/TpTBZ8KHIhG/nw==": {
+      "description": "Options page: button that creates the option",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add option",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C93WVsK6JxzIY6f9CM853w==": {
+      "description": "Options page: how the option shows and how many products use it",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{display} · used by {count} products",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3yle+4HGxgxfBNdeKF2e0g==": {
+      "description": "Options page: accessible name of the field for a new value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y39ibvmTVsR6YRf5gAVLGA==": {
+      "description": "Options page: placeholder of the field for a new value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gR0yduKeRjqcCxl3zssteg==": {
+      "description": "Options page: colour of the new value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Swatch",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wxLNmHQmRQFSLUk45mWpGg==": {
+      "description": "Options page: button that adds a value to the option",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xwZc8nSSyQ2ibiI7bftK9g==": {
+      "description": "Attributes page: scope of an attribute only the product has",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Product only",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vpKVjaukaR3iQK2diChawg==": {
+      "description": "Attributes page: scope of an attribute variants inherit, override or clear",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Product, inherited by variants",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ukAgb46YBL+JWuxKLdHSfg==": {
+      "description": "Attributes page: scope of an attribute only variants have",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Variants only",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TFyeMB4Ks7sTHs+FCzqmkw==": {
+      "description": "Attributes page: accessible name of what the attribute describes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Describes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "znWqiuFrjRwwC+ZXHl1JXQ==": {
+      "description": "Attributes page: title of the page of the catalog's attributes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Vw50K2xSAwFpws0+nOk4EQ==": {
+      "description": "Attributes page: heading of the form that creates an attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UxqDu9AnJvMXtPfKrF3xpA==": {
+      "description": "Attributes page: examples below the heading of the new attribute form",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E.g. Material, Care or Voltage.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A5ooXxnQFXUF/iGEBMaJgA==": {
+      "description": "Attributes page: accessible name of the new attribute's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CWEPPSi1RXb2y+B57qHYag==": {
+      "description": "Attributes page: placeholder of the new attribute's name",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6dGGnauxZqPY3pCiOt6bPA==": {
+      "description": "Attributes page: button that creates the attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HYgjixeYrATNAC80MALIjg==": {
+      "description": "Attributes page: checkbox that lets products and variants have several values of the attribute, e.g. a blend of materials",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Several values per product or variant",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Fcr8sLL7AKQ0ICgVU9XmVw==": {
+      "description": "Attributes page: accessible name of the field for a new value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d3DoMT5YuxDGa2LLbLcFpw==": {
+      "description": "Attributes page: placeholder of the field for a new value",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "New value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "niaFxZhWrKyf7gp6n11WVQ==": {
+      "description": "Attributes page: button that adds a value to the attribute",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
