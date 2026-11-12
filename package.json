@@ -30,7 +30,7 @@
     "@input/pen-react": "0.5.2",
     "@input/pen-shortcuts": "0.5.2",
     "@input/pen-types": "0.5.2",
-    "@larasell-dev/ui": "^0.5.1",
+    "@larasell-dev/ui": "^0.5.2",
     "@laravel/echo-react": "^2.6.3",
     "@roving-focus/react": "^2.0.0",
     "@tanstack/react-hotkeys": "^0.17.0",

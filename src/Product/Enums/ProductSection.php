@@ -25,4 +25,10 @@ enum ProductSection: string
 
     /** The SKU and barcode. */
     case Identifiers = 'identifiers';
+
+    /** The country of origin and HS code. */
+    case Customs = 'customs';
+
+    /** The product's attribute values, such as its material. */
+    case Attributes = 'attributes';
 }

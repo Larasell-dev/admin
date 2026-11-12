@@ -19,7 +19,7 @@ import { setUpLive } from "./Platform/Support/live";
 type PageModule = { default: ResolvedComponent };
 
 const pages = import.meta.glob<PageModule>([
-  "./*/Pages/*.tsx",
+  "./*/Pages/**/*.tsx",
   "./Platform/*/Pages/*.tsx",
   "!**/*.test.tsx",
 ]);

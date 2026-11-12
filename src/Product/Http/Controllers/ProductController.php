@@ -5,6 +5,7 @@ namespace Larasell\Admin\Product\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Larasell\Admin\Category\Data\CategoryOptionData;
@@ -16,23 +17,32 @@ use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Platform\Support\Assert;
 use Larasell\Admin\Product\Data\CreateProductPageData;
 use Larasell\Admin\Product\Data\EditProductPageData;
+use Larasell\Admin\Product\Data\ProductAttributeFieldData;
 use Larasell\Admin\Product\Data\ProductDetailData;
 use Larasell\Admin\Product\Data\ProductTypeData;
+use Larasell\Admin\Product\Data\ProductVariantsData;
 use Larasell\Admin\Product\Events\ProductSaved;
 use Larasell\Admin\Product\Exceptions\ProductNotSavedAtomically;
 use Larasell\Admin\Product\Http\Requests\ProductRequest;
 use Larasell\Larasell\Audit\Origin;
 use Larasell\Larasell\Catalog\Actions\CreateProduct;
 use Larasell\Larasell\Catalog\Actions\CreateProductPayload;
+use Larasell\Larasell\Catalog\Actions\SetProductAttributeValues;
 use Larasell\Larasell\Catalog\Actions\SetProductCategories;
+use Larasell\Larasell\Catalog\Actions\SyncProductOptions;
 use Larasell\Larasell\Catalog\Actions\UpdateProduct;
 use Larasell\Larasell\Catalog\Actions\UpdateProductPayload;
+use Larasell\Larasell\Catalog\Actions\UpdateProductVariant;
+use Larasell\Larasell\Catalog\AttributeScope;
+use Larasell\Larasell\Catalog\AttributeValueId;
 use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\CoreProductType;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\Models\ProductAttribute;
 use Larasell\Larasell\Catalog\ProductId;
 use Larasell\Larasell\Catalog\ProductTypes;
+use Larasell\Larasell\Catalog\VariantId;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Price;
 use Larasell\Larasell\RichText\TranslatableRichText;
@@ -49,6 +59,7 @@ class ProductController
         private readonly CreateProduct $createProduct,
         private readonly UpdateProduct $updateProduct,
         private readonly SetProductCategories $setCategories,
+        private readonly SetProductAttributeValues $setAttributeValues,
     ) {}
 
     /**
@@ -72,6 +83,9 @@ class ProductController
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             sections: $this->sections->data(SectionForm::Product, null, new SectionContext($locale, $type->capabilities())),
             type: ProductTypeData::fromType($type),
+            countries: EditProductPageData::countries(),
+            attributes: ProductAttributeFieldData::forProduct(null, $locale),
+            attributesUrl: route('larasell.admin.attributes.index'),
         ));
     }
 
@@ -88,9 +102,8 @@ class ProductController
                 'status' => $request->validated('status'),
                 'description' => $request->description() === null ? null : TranslatableRichText::of($request->description(), $locale->value),
                 'weight' => $request->weight(),
+                ...$request->customs(),
                 'dimensions' => $request->dimensions(),
-                'sku' => $request->validated('sku'),
-                'barcode' => $request->validated('barcode'),
                 ...$request->stock(),
                 'price' => Price::of(0),
             ], attachments: $request->attachments()), $origin);
@@ -116,6 +129,10 @@ class ProductController
             createCategoryUrl: config('larasell.admin.categories.enabled') ? route('larasell.admin.categories.create') : null,
             sections: $this->sections->data(SectionForm::Product, $product, new SectionContext($locale, $product->productType()->capabilities())),
             type: ProductTypeData::fromType($product->productType()),
+            countries: EditProductPageData::countries(),
+            attributes: ProductAttributeFieldData::forProduct($product, $locale),
+            attributesUrl: route('larasell.admin.attributes.index'),
+            variants: ProductVariantsData::fromProduct($product, $locale),
         ));
     }
 
@@ -139,9 +156,8 @@ class ProductController
                 'status' => $request->validated('status'),
                 ...$request->hasDescription() ? ['description' => $this->description($request, $product, $locale)] : [],
                 'weight' => $request->weight(),
+                ...$request->customs(),
                 'dimensions' => $request->dimensions(),
-                'sku' => $request->validated('sku'),
-                'barcode' => $request->validated('barcode'),
                 ...$limits,
                 ...array_diff_key($stock, $limits),
             ], $request->attachments()), $origin);
@@ -184,7 +200,41 @@ class ProductController
      */
     protected function saveRelations(ProductRequest $request, Product $product, #[CurrentOrigin] Origin $origin): void
     {
+        $options = $request->options();
+
+        if ($options !== null) {
+            $sync = app(SyncProductOptions::class);
+            $deletions = $sync->deletions(ProductId::of($product), $options);
+
+            // Deleting variants is confirmed with their count, so a stale page can't delete more.
+            if ($deletions > 0 && (int) $request->validated('delete_variants', 0) !== $deletions) {
+                throw ValidationException::withMessages(['delete_variants' => trans_choice('Saving deletes :count variant.|Saving deletes :count variants.', $deletions, ['count' => $deletions])]);
+            }
+
+            $sync->handle(ProductId::of($product), $options);
+        }
+
+        // A product without options has only its default variant, whose identifiers the form edits.
+        if (! $product->options()->exists()) {
+            app(UpdateProductVariant::class)->handle(VariantId::of($product->defaultVariant()), [
+                'sku' => $request->validated('sku'),
+                'barcode' => $request->validated('barcode'),
+                'mpn' => $request->validated('mpn'),
+            ]);
+        }
+
         $this->setCategories->handle(ProductId::of($product), CategoryId::many($request->categoryIds()), $origin);
+
+        if ($request->has('attributes')) {
+            // The form sets the attributes it shows; values of any others stay.
+            $shown = ProductAttribute::query()->whereIn('scope', [AttributeScope::Product->value, AttributeScope::Inherited->value])->pluck('id');
+            $kept = $product->attributeValues()->whereNotIn('product_attribute_id', $shown)->pluck('larasell_product_attribute_values.id');
+            $this->setAttributeValues->handle(
+                ProductId::of($product),
+                AttributeValueId::many([...$kept->map(intval(...)), ...$request->attributeValueIds()]),
+                $origin,
+            );
+        }
     }
 
     /**

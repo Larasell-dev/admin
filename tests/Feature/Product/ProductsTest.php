@@ -8,8 +8,12 @@ use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
 use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
+use Larasell\Larasell\Catalog\AttributeCardinality;
+use Larasell\Larasell\Catalog\AttributeScope;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\Models\ProductAttribute;
+use Larasell\Larasell\Catalog\Options\Models\OptionDefinition;
 use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Dimensions;
 use Larasell\Larasell\Enums\LengthUnit;
@@ -166,6 +170,9 @@ it('shows the product\'s values to edit on its page', function () {
                 'dimensions' => null,
                 'sku' => null,
                 'barcode' => null,
+                'mpn' => null,
+                'countryOfOrigin' => null,
+                'hsCode' => null,
                 'stock' => null,
                 'allowBackorders' => false,
                 'minQuantity' => null,
@@ -334,7 +341,8 @@ it('shows the product\'s SKU and barcode on its page', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots->defaultVariant()->update(['sku' => 'BOOT-42', 'barcode' => '4006381333931']);
 
     // Act & Assert
     $this->get(route('larasell.admin.products.edit', $boots))
@@ -358,8 +366,8 @@ it('saves the SKU as entered and the barcode as its digits', function () {
     // Assert
     $boots = Product::query()->sole();
 
-    expect($boots->sku)->toBe('Boot/42-black')
-        ->and($boots->barcode)->toBe('4006381333931');
+    expect($boots->defaultVariant()->sku)->toBe('Boot/42-black')
+        ->and($boots->defaultVariant()->barcode)->toBe('4006381333931');
 });
 
 it('saves no SKU or barcode when they are left empty', function () {
@@ -373,34 +381,36 @@ it('saves no SKU or barcode when they are left empty', function () {
     // Assert
     $boots = Product::query()->sole();
 
-    expect($boots->sku)->toBeNull()
-        ->and($boots->barcode)->toBeNull();
+    expect($boots->defaultVariant()->sku)->toBeNull()
+        ->and($boots->defaultVariant()->barcode)->toBeNull();
 });
 
 it('changes and removes the SKU and barcode, and keeps them when they are unchanged', function () {
     // Arrange
     signInAdmin();
 
-    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000), 'sku' => 'BOOT-42', 'barcode' => '4006381333931']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots->defaultVariant()->update(['sku' => 'BOOT-42', 'barcode' => '4006381333931']);
     $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', ...$input]);
 
     // Act & Assert
     // Its own SKU and barcode aren't taken by another product.
     $update(['sku' => 'BOOT-42', 'barcode' => '4006381333931'])->assertSessionHasNoErrors();
     $update(['sku' => 'BOOT-43', 'barcode' => '012345678905'])->assertSessionHasNoErrors();
-    expect($boots->refresh()->sku)->toBe('BOOT-43')
-        ->and($boots->barcode)->toBe('012345678905');
+    expect($boots->defaultVariant()->sku)->toBe('BOOT-43')
+        ->and($boots->defaultVariant()->barcode)->toBe('012345678905');
 
     $update(['sku' => '', 'barcode' => ''])->assertSessionHasNoErrors();
-    expect($boots->refresh()->sku)->toBeNull()
-        ->and($boots->barcode)->toBeNull();
+    expect($boots->defaultVariant()->sku)->toBeNull()
+        ->and($boots->defaultVariant()->barcode)->toBeNull();
 });
 
 it('rejects an invalid or taken SKU or barcode', function (array $input, string $error) {
     // Arrange
     signInAdmin();
 
-    Product::create(['name' => 'Shirt', 'price' => Price::of(1000), 'sku' => 'SHIRT-1', 'barcode' => '4006381333931']);
+    $identified = Product::create(['name' => 'Shirt', 'price' => Price::of(1000)]);
+    $identified->defaultVariant()->update(['sku' => 'SHIRT-1', 'barcode' => '4006381333931']);
 
     // Act
     $this->post(route('larasell.admin.products.store'), ['name' => 'Boots', 'status' => 'visible', ...$input])
@@ -409,10 +419,10 @@ it('rejects an invalid or taken SKU or barcode', function (array $input, string 
     // Assert
     expect(Product::query()->count())->toBe(1);
 })->with([
-    'SKU of another product' => [['sku' => 'SHIRT-1'], 'sku'],
+    'SKU of another variant' => [['sku' => 'SHIRT-1'], 'sku'],
     'SKU over 255 characters' => [['sku' => str_repeat('a', 256)], 'sku'],
-    'barcode of another product' => [['barcode' => '4006381333931'], 'barcode'],
-    'barcode of another product, written with dashes' => [['barcode' => '400-6381-333931'], 'barcode'],
+    'barcode of another variant' => [['barcode' => '4006381333931'], 'barcode'],
+    'barcode of another variant, written with dashes' => [['barcode' => '400-6381-333931'], 'barcode'],
     'barcode with letters' => [['barcode' => '40063813339A1'], 'barcode'],
     'barcode of the wrong length' => [['barcode' => '1234567890'], 'barcode'],
     'barcode with a wrong check digit' => [['barcode' => '4006381333932'], 'barcode'],
@@ -1071,4 +1081,111 @@ it('leaves out sections whose capability the type lacks', function () {
     $this->get(route('larasell.admin.products.create', ['type' => 'digital']))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('sections', fn ($sections) => collect($sections)->pluck('key')->sort()->values()->all() === ['seo', 'test-download-files']));
+});
+
+it('saves the product\'s attribute values, which its variants inherit, and keeps values of attributes the form leaves out', function () {
+    // Arrange
+    signInAdmin();
+
+    $attribute = fn (string $slug, AttributeScope $scope) => ProductAttribute::create(['slug' => $slug, 'name' => ucfirst($slug), 'scope' => $scope]);
+    $value = fn (ProductAttribute $attribute, string $slug) => $attribute->values()->create(['slug' => $slug, 'name' => ucfirst($slug), 'value' => $slug]);
+    $material = $attribute('material', AttributeScope::Inherited);
+    $wool = $value($material, 'wool');
+    $cotton = $value($material, 'cotton');
+    $fit = $attribute('fit', AttributeScope::Product);
+    $slim = $value($fit, 'slim');
+    $size = $attribute('size', AttributeScope::Variant);
+    $small = $value($size, 'small');
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $boots->attributeValues()->attach([$cotton->id, $slim->id, $small->id]);
+
+    // Act
+    $this->put(route('larasell.admin.products.update', $boots), [
+        'name' => 'Boots',
+        'status' => 'visible',
+        'attributes' => [$material->id => $wool->id, $fit->id => ''],
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    expect($boots->attributeValues()->pluck('larasell_product_attribute_values.id')->sort()->values()->all())
+        ->toBe(collect([$wool->id, $small->id])->sort()->values()->all())
+        ->and($boots->defaultVariant()->effectiveAttributeValues()->modelKeys())->toContain($wool->id);
+});
+
+it('rejects an attribute value that belongs to another attribute', function () {
+    // Arrange
+    signInAdmin();
+
+    $material = ProductAttribute::create(['slug' => 'material', 'name' => 'Material', 'scope' => AttributeScope::Inherited]);
+    $fit = ProductAttribute::create(['slug' => 'fit', 'name' => 'Fit']);
+    $slim = $fit->values()->create(['slug' => 'slim', 'name' => 'Slim', 'value' => 'slim']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+
+    // Act & Assert
+    $this->put(route('larasell.admin.products.update', $boots), [
+        'name' => 'Boots',
+        'status' => 'visible',
+        'attributes' => [$material->id => $slim->id],
+    ])->assertSessionHasErrors("attributes.{$material->id}");
+    expect($boots->attributeValues()->exists())->toBeFalse();
+});
+
+it('saves several values of a multi-value attribute, and only one of a single-value one', function () {
+    // Arrange
+    signInAdmin();
+
+    $material = ProductAttribute::create(['slug' => 'material', 'name' => 'Material', 'scope' => AttributeScope::Inherited, 'cardinality' => AttributeCardinality::Multiple]);
+    $cotton = $material->values()->create(['slug' => 'cotton', 'name' => 'Cotton', 'value' => 'cotton']);
+    $wool = $material->values()->create(['slug' => 'wool', 'name' => 'Wool', 'value' => 'wool']);
+    $fit = ProductAttribute::create(['slug' => 'fit', 'name' => 'Fit', 'scope' => AttributeScope::Inherited]);
+    $slim = $fit->values()->create(['slug' => 'slim', 'name' => 'Slim', 'value' => 'slim']);
+    $loose = $fit->values()->create(['slug' => 'loose', 'name' => 'Loose', 'value' => 'loose']);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $update = fn (array $attributes) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', 'attributes' => $attributes]);
+
+    // Act & Assert
+    $update([$material->id => [$cotton->id, $wool->id], $fit->id => [$slim->id, $loose->id]])->assertSessionHasErrors("attributes.{$fit->id}");
+    $update([$material->id => [$cotton->id, $wool->id], $fit->id => $slim->id])->assertSessionHasNoErrors();
+    expect($boots->defaultVariant()->effectiveAttributeValues()->pluck('slug')->sort()->values()->all())->toBe(['cotton', 'slim', 'wool']);
+});
+
+it('saves the product\'s options with the form, and deletes variants of removed values only once confirmed', function () {
+    // Arrange
+    signInAdmin();
+
+    $size = OptionDefinition::create(['slug' => 'size', 'name' => ['en' => 'Size']]);
+    $s = $size->values()->create(['slug' => 's', 'name' => ['en' => 'S'], 'position' => 0]);
+    $m = $size->values()->create(['slug' => 'm', 'name' => ['en' => 'M'], 'position' => 1]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $update = fn (array $input) => $this->put(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', ...$input]);
+
+    // Act & Assert
+    $update(['options' => [$size->id => [$s->id, $m->id]]])->assertSessionHasNoErrors();
+    $boots->createCombinations([[$s], [$m]]);
+    expect($boots->variants()->count())->toBe(2);
+
+    $update(['options' => [$size->id => [$s->id]]])->assertSessionHasErrors('delete_variants');
+    expect($boots->variants()->count())->toBe(2);
+
+    $update(['options' => [$size->id => [$s->id]], 'delete_variants' => 1])->assertSessionHasNoErrors();
+    expect($boots->variants()->count())->toBe(1)
+        ->and($boots->options()->sole()->values()->count())->toBe(1);
+});
+
+it('skips the gaps Inertia sends when it turns options keyed by ID into a list', function () {
+    // Arrange
+    signInAdmin();
+
+    $size = OptionDefinition::create(['slug' => 'size', 'name' => ['en' => 'Size']]);
+    $s = $size->values()->create(['slug' => 's', 'name' => ['en' => 'S'], 'position' => 0]);
+    $boots = Product::create(['name' => 'Boots', 'price' => Price::of(1000)]);
+    $options = array_fill(0, $size->id, null);
+    $options[$size->id] = [$s->id];
+
+    // Act
+    $this->putJson(route('larasell.admin.products.update', $boots), ['name' => 'Boots', 'status' => 'visible', 'options' => $options])
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect($boots->options()->sole()->option_definition_id)->toBe($size->id);
 });

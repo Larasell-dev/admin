@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Larasell\Admin\ApiToken\Models\ApiToken;
 use Larasell\Admin\Platform\Audit\CurrentOrigin;
+use Larasell\Admin\Platform\Audit\Exceptions\MissingOrigin;
 use Larasell\Admin\Platform\Auth\Models\Admin;
-use Larasell\Chronicle\Exceptions\StructuredLogicException;
 use Larasell\Larasell\Audit\Origin;
 
 beforeEach(function () {
@@ -43,5 +43,5 @@ it('fails when no one is signed in, instead of auditing a change as no one\'s', 
     // Act & Assert
     $this->withoutExceptionHandling();
 
-    expect(fn () => $this->post('books/archive'))->toThrow(StructuredLogicException::class, 'no origin');
+    expect(fn () => $this->post('books/archive'))->toThrow(MissingOrigin::class, 'no origin');
 });

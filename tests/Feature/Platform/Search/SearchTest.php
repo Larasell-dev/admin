@@ -34,11 +34,11 @@ function signInSearchAdmin(): void
  */
 function searchableProduct(array $name, array $attributes = []): Product
 {
-    return Product::create([
-        'name' => $name,
-        'price' => Price::of(1000),
-        ...$attributes,
-    ]);
+    $product = Product::create(['name' => $name, 'price' => Price::of(1000)]);
+    // Identifiers belong to the default variant.
+    $product->defaultVariant()->update($attributes);
+
+    return $product;
 }
 
 /**

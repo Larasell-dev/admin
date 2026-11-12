@@ -366,6 +366,51 @@ declare namespace Larasell.Admin.Platform.Settings.Data {
   };
 }
 declare namespace Larasell.Admin.Product.Data {
+  export type AttributeDetailData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    type: "text" | "number" | "boolean";
+    scope: string;
+    multiple: boolean;
+    products: number;
+    variants: number;
+  };
+  export type AttributePageData = {
+    attribute: Larasell.Admin.Product.Data.AttributeDetailData;
+    values: Array<Larasell.Admin.Product.Data.AttributeValueRowData>;
+    scopes: Array<Larasell.Admin.Product.Data.AttributeScopeOptionData>;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type AttributeScopeOptionData = {
+    value: string;
+    label: string;
+  };
+  export type AttributeValueRowData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    products: number;
+    variants: number;
+  };
+  export type CombinationData = {
+    valueIds: Array<number>;
+    label: string;
+  };
+  export type CreateAttributePageData = {
+    storeUrl: string;
+    indexUrl: string;
+    scopes: Array<Larasell.Admin.Product.Data.AttributeScopeOptionData>;
+  };
+  export type CreateOptionPageData = {
+    storeUrl: string;
+    indexUrl: string;
+    displays: Array<Larasell.Admin.Product.Data.OptionDisplayOptionData>;
+  };
   export type CreateProductPageData = {
     storeUrl: string;
     indexUrl: string;
@@ -373,6 +418,9 @@ declare namespace Larasell.Admin.Product.Data {
     createCategoryUrl: string | null;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
     type: Larasell.Admin.Product.Data.ProductTypeData;
+    countries: Array<{ code: string; label: string }>;
+    attributes: Array<Larasell.Admin.Product.Data.ProductAttributeFieldData>;
+    attributesUrl: string;
   };
   export type DimensionsData = {
     length: string;
@@ -388,6 +436,79 @@ declare namespace Larasell.Admin.Product.Data {
     createCategoryUrl: string | null;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
     type: Larasell.Admin.Product.Data.ProductTypeData;
+    countries: Array<{ code: string; label: string }>;
+    attributes: Array<Larasell.Admin.Product.Data.ProductAttributeFieldData>;
+    attributesUrl: string;
+    variants: Larasell.Admin.Product.Data.ProductVariantsData;
+  };
+  export type EditVariantPageData = {
+    id: number;
+    title: string;
+    productName: string;
+    options: Array<{ option: string; value: string }>;
+    isDefault: boolean;
+    visible: boolean;
+    sku: string | null;
+    barcode: string | null;
+    mpn: string | null;
+    countries: Array<{ code: string; label: string }>;
+    fields: Record<
+      "weight" | "dimensions" | "country_of_origin" | "hs_code" | "name" | "description",
+      { state: "inherited" | "overridden"; value: any; inherited: any }
+    >;
+    attributes: Array<Larasell.Admin.Product.Data.VariantAttributeData>;
+    siblings: Array<{ id: number; name: string; url: string }>;
+    productUrl: string;
+    updateUrl: string;
+    deleteUrl: string | null;
+  };
+  export type OptionChoiceData = {
+    id: number;
+    name: string;
+    values: Array<Larasell.Admin.Product.Data.OptionValueData>;
+  };
+  export type OptionDetailData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    display: "dropdown" | "buttons" | "swatch";
+    products: number;
+    variants: number;
+  };
+  export type OptionDisplayOptionData = {
+    value: string;
+    label: string;
+  };
+  export type OptionPageData = {
+    option: Larasell.Admin.Product.Data.OptionDetailData;
+    values: Array<Larasell.Admin.Product.Data.OptionValueRowData>;
+    displays: Array<Larasell.Admin.Product.Data.OptionDisplayOptionData>;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type OptionValueData = {
+    id: number;
+    name: string;
+    swatch: string | null;
+  };
+  export type OptionValueRowData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    swatch: string | null;
+    products: number;
+    variants: number;
+  };
+  export type ProductAttributeFieldData = {
+    id: number;
+    name: string;
+    inherited: boolean;
+    multiple: boolean;
+    value: number[];
+    values: Array<{ id: number; name: string }>;
   };
   export type ProductDetailData = {
     id: number;
@@ -399,16 +520,55 @@ declare namespace Larasell.Admin.Product.Data {
     dimensions: Larasell.Admin.Product.Data.DimensionsData | null;
     sku: string | null;
     barcode: string | null;
+    mpn: string | null;
+    countryOfOrigin: string | null;
+    hsCode: string | null;
     stock: number | null;
     allowBackorders: boolean;
     minQuantity: number | null;
     maxQuantity: number | null;
     categoryIds: Array<number>;
   };
+  export type ProductOptionData = {
+    definitionId: number;
+    name: string;
+    values: Array<Larasell.Admin.Product.Data.OptionValueData>;
+    otherValues: Array<Larasell.Admin.Product.Data.OptionValueData>;
+  };
   export type ProductTypeData = {
     key: string;
     label: string;
     capabilities: Array<string>;
+  };
+  export type ProductVariantsData = {
+    options: Array<Larasell.Admin.Product.Data.ProductOptionData>;
+    availableOptions: Array<Larasell.Admin.Product.Data.OptionChoiceData>;
+    variants: Array<Larasell.Admin.Product.Data.VariantRowData>;
+    page: number;
+    pageSize: number;
+    total: number;
+    missingCombinations: Array<Larasell.Admin.Product.Data.CombinationData>;
+    createCombinationsUrl: string;
+    optionDefinitionsUrl: string;
+  };
+  export type VariantAttributeData = {
+    id: number;
+    name: string;
+    inheritable: boolean;
+    multiple: boolean;
+    state: "inherited" | "overridden";
+    value: number[];
+    inherited: number[];
+    values: Array<{ id: number; name: string }>;
+  };
+  export type VariantRowData = {
+    id: number;
+    name: string;
+    sku: string | null;
+    visible: boolean;
+    isDefault: boolean;
+    editUrl: string;
+    deleteUrl: string;
   };
   export type WeightData = {
     amount: string;
@@ -421,7 +581,9 @@ declare namespace Larasell.Admin.Product.Enums {
     | "categories"
     | "stock"
     | "weight-and-dimensions"
-    | "identifiers";
+    | "identifiers"
+    | "customs"
+    | "attributes";
 }
 declare namespace Larasell.Admin.SalesChannel.Data {
   export type CreateSalesChannelPageData = {
