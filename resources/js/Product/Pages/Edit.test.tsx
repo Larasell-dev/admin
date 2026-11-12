@@ -28,7 +28,10 @@ function props(
       weight: null,
       dimensions: null,
       sku: null,
+      mpn: null,
       barcode: null,
+      countryOfOrigin: null,
+      hsCode: null,
       stock: null,
       allowBackorders: false,
       minQuantity: null,
@@ -45,6 +48,9 @@ function props(
       label: "Physical product",
       capabilities: ["stock", "shipping", "dimensions"],
     },
+    attributes: [],
+    countries: [],
+    attributesUrl: "",
     contentLocale: {
       current: "en",
       options: [english, german],
@@ -264,7 +270,8 @@ it("places sections before or after the product's own sections, or after all of 
     "Stock",
     "After stock",
     "Weight and dimensions",
-    "SKU and barcode",
+    "Identifiers",
+    "Customs",
     "Last",
   ]);
 });
@@ -289,7 +296,7 @@ it("leaves out a section that can't show in production, and says why, while the 
   });
 
   // Assert
-  await expect.element(page.getByRole("heading", { name: "SKU and barcode" })).toBeVisible();
+  await expect.element(page.getByRole("heading", { name: "Identifiers" })).toBeVisible();
   expect(logged).toHaveBeenCalledWith(
     expect.stringContaining(
       "No extension registered a component for the section [product/unregistered]",

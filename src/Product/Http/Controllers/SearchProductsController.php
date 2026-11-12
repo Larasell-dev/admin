@@ -52,7 +52,8 @@ class SearchProductsController
             }
         }
 
-        $identifiers = [[__('SKU'), $product->sku], [__('Barcode'), $product->barcode]];
+        $default = $product->variants->firstWhere('is_default', true);
+        $identifiers = [[__('SKU'), $default?->sku], [__('Barcode'), $default?->barcode]];
 
         foreach ($product->variants->where('is_default', false) as $variant) {
             $identifiers[] = [__('Variant SKU'), $variant->sku];

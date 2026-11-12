@@ -373,6 +373,9 @@ declare namespace Larasell.Admin.Product.Data {
     createCategoryUrl: string | null;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
     type: Larasell.Admin.Product.Data.ProductTypeData;
+    countries: Array<{ code: string; label: string }>;
+    attributes: Array<Larasell.Admin.Product.Data.ProductAttributeFieldData>;
+    attributesUrl: string;
   };
   export type DimensionsData = {
     length: string;
@@ -388,6 +391,17 @@ declare namespace Larasell.Admin.Product.Data {
     createCategoryUrl: string | null;
     sections: Array<Larasell.Admin.Platform.Sections.Data.SectionData>;
     type: Larasell.Admin.Product.Data.ProductTypeData;
+    countries: Array<{ code: string; label: string }>;
+    attributes: Array<Larasell.Admin.Product.Data.ProductAttributeFieldData>;
+    attributesUrl: string;
+  };
+  export type ProductAttributeFieldData = {
+    id: number;
+    name: string;
+    inherited: boolean;
+    multiple: boolean;
+    value: number[];
+    values: Array<{ id: number; name: string }>;
   };
   export type ProductDetailData = {
     id: number;
@@ -399,6 +413,9 @@ declare namespace Larasell.Admin.Product.Data {
     dimensions: Larasell.Admin.Product.Data.DimensionsData | null;
     sku: string | null;
     barcode: string | null;
+    mpn: string | null;
+    countryOfOrigin: string | null;
+    hsCode: string | null;
     stock: number | null;
     allowBackorders: boolean;
     minQuantity: number | null;
@@ -421,7 +438,9 @@ declare namespace Larasell.Admin.Product.Enums {
     | "categories"
     | "stock"
     | "weight-and-dimensions"
-    | "identifiers";
+    | "identifiers"
+    | "customs"
+    | "attributes";
 }
 declare namespace Larasell.Admin.SalesChannel.Data {
   export type CreateSalesChannelPageData = {

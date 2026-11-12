@@ -2,7 +2,10 @@
 
 namespace Larasell\Admin\Product\Http\Requests;
 
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
@@ -14,11 +17,16 @@ use Larasell\Admin\Platform\Sections\Sections;
 use Larasell\Admin\Product\Rules\Barcode;
 use Larasell\Larasell\Attachments\Attachments;
 use Larasell\Larasell\Barcode as LarasellBarcode;
+use Larasell\Larasell\Catalog\AttributeCardinality;
 use Larasell\Larasell\Catalog\CoreProductType;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
+use Larasell\Larasell\Catalog\Models\ProductAttribute;
+use Larasell\Larasell\Catalog\Models\ProductAttributeValue;
+use Larasell\Larasell\Catalog\Models\ProductVariant;
 use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Dimensions;
+use Larasell\Larasell\Enums\Country;
 use Larasell\Larasell\Enums\LengthUnit;
 use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
@@ -63,8 +71,13 @@ class ProductRequest extends FormRequest
             'dimensions.height' => [...$dimensions, 'nullable', 'string', self::AMOUNT, 'required_with:dimensions.length,dimensions.width'],
             'dimensions.unit' => [...$dimensions, 'required_with:dimensions.length,dimensions.width,dimensions.height', Rule::enum(LengthUnit::class)],
             // Optional, but each identifies one product, so no other product may have it.
-            'sku' => ['nullable', 'string', 'max:255', Rule::unique(Product::class)->ignore($this->route('product'))],
-            'barcode' => ['nullable', 'string', new Barcode, Rule::unique(Product::class)->ignore($this->route('product'))],
+            // Saved on the default variant, so unique among all variants but that one.
+            'sku' => ['nullable', 'string', 'max:255', Rule::unique(ProductVariant::class)->ignore($this->defaultVariantId())],
+            'barcode' => ['nullable', 'string', new Barcode, Rule::unique(ProductVariant::class)->ignore($this->defaultVariantId())],
+            'mpn' => ['nullable', 'string', 'max:255'],
+            // Customs details for shipping abroad, which variants inherit. Left out, they stay.
+            'country_of_origin' => [...$dimensions, 'sometimes', 'nullable', Rule::enum(Country::class)],
+            'hs_code' => [...$dimensions, 'sometimes', 'nullable', 'string', 'max:16'],
             // An empty stock isn't tracked. Backorders sell past 0, so the stock may be below it.
             'stock' => [...$stock, 'nullable', 'integer'],
             // Left out, a new product allows backorders and an existing one keeps its setting.
@@ -74,7 +87,29 @@ class ProductRequest extends FormRequest
             // The form leaves it out when no category is selected.
             'categories' => ['sometimes', 'array'],
             'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
+            // By attribute ID: one of that attribute's values, a list of them for multi-value
+            // attributes, or empty for none.
+            'attributes' => ['sometimes', 'array'],
+            'attributes.*' => ['nullable', function (string $attribute, mixed $value, Closure $fail): void {
+                $ids = array_filter(Arr::wrap($value), fn (mixed $id): bool => $id !== null && $id !== '');
+                $of = ProductAttribute::query()->find((int) Str::after($attribute, 'attributes.'));
+
+                if ($of === null || array_filter($ids, fn (mixed $id): bool => ! is_numeric($id)) !== []
+                    || ProductAttributeValue::query()->whereKey($ids)->where('product_attribute_id', $of->id)->count() !== count(array_unique($ids))) {
+                    $fail(__('validation.exists', ['attribute' => __('attribute')]));
+                } elseif (count($ids) > 1 && $of->cardinality === AttributeCardinality::Single) {
+                    $fail(__(':attribute takes one value.', ['attribute' => $of->name->get(app()->getLocale())]));
+                }
+            }],
         ];
+    }
+
+    /** The edited product's default variant, which holds a simple product's identifiers. */
+    private function defaultVariantId(): ?int
+    {
+        $product = $this->route('product');
+
+        return $product instanceof Product ? $product->defaultVariant()->id : null;
     }
 
     /**
@@ -211,6 +246,40 @@ class ProductRequest extends FormRequest
         $text = is_string($description) ? RichText::fromJson($description) : null;
 
         return $text === null || $text->isEmpty() ? null : $text;
+    }
+
+    /**
+     * The customs fields the form sent, to save on the product.
+     *
+     * @return array{country_of_origin?: Country|null, hs_code?: string|null}
+     */
+    public function customs(): array
+    {
+        $customs = [];
+
+        if (array_key_exists('country_of_origin', $this->validated())) {
+            $country = $this->validated('country_of_origin');
+            $customs['country_of_origin'] = $country === null ? null : Country::from($country);
+        }
+
+        if (array_key_exists('hs_code', $this->validated())) {
+            $customs['hs_code'] = $this->validated('hs_code');
+        }
+
+        return $customs;
+    }
+
+    /**
+     * The attribute values the form set, leaving out attributes it left empty.
+     *
+     * @return list<int>
+     */
+    public function attributeValueIds(): array
+    {
+        return array_values(array_map(intval(...), array_filter(
+            Arr::flatten($this->validated('attributes', [])),
+            fn (mixed $id): bool => $id !== null && $id !== '',
+        )));
     }
 
     /**

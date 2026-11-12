@@ -2267,17 +2267,6 @@
       ],
       "types": []
     },
-    "mB7V0IdNmunXfFbeJz0hNg==": {
-      "description": "Product form: heading of the section with the stock keeping unit and the barcode (e.g. EAN or UPC)",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "SKU und Barcode",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "Q5NJ6qphw6Z4cuMvAY5JPg==": {
       "description": "Product form: text below the heading of the SKU and barcode section",
       "tokens": [],
@@ -6119,6 +6108,234 @@
       "translations": [
         {
           "translation": "Add value",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hcUf1jIeu7L+bpOQ3esrXw==": {
+      "description": "Product form: heading of the section with the SKU, barcode (e.g. EAN or UPC) and manufacturer part number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Identifiers",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IAFhPvEq0Olk/REokXHCQw==": {
+      "description": "Product form: heading of the section with the country of origin and HS code",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Customs",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dtcfM+9N3AFBYDRcwCUDDg==": {
+      "description": "Product form: text below the heading of the Customs section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "What customs need to know when the product is shipped abroad. Variants take these values unless they set their own.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X1oEs0dXz+KCPYBBfS9fjQ==": {
+      "description": "Product form: label of the country the goods were made in",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Country of origin",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EPsmIOvXJrc4sitC0ikaxA==": {
+      "description": "Product form: label of the customs tariff number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HS code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bV4rtSlmdrDhHGPV1nsnFw==": {
+      "description": "Product form: heading of the section with the product's attribute values, e.g. its material",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zMWsQTjC+VJpOA3VDP/vmg==": {
+      "description": "Product form: text below the heading of the Attributes section",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Details customers can filter and compare by, such as material. Variants take these values unless they set their own.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3r+9MiEPva5M3UFJj2rpMQ==": {
+      "description": "Product form: label of the field for the manufacturer part number",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MPN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SkkxTwks8t2N1semQjaH5A==": {
+      "description": "Placeholder of the search field in the list of countries",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search countries",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "h+Jzv3hRVADExJreHR2sxw==": {
+      "description": "Shown in the list of countries when the search matches none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No country found",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JwXK1OsqmkpmSlfMXrVB6Q==": {
+      "description": "Product form: placeholder of the search in the list of attributes to add",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search attributes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4COBDgof9G3ju5QN4Vudqw==": {
+      "description": "Product form: shown in the list of attributes when the search matches none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No attributes found",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "trfGUVQFaIFKf1MJH2Z1OA==": {
+      "description": "Product form: button that opens the list of attributes to give the product",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add attribute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RMDwZQksIfSGHIThZcpr6Q==": {
+      "description": "Product form: accessible name of the button next to Add attribute that opens the catalog's attributes",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Attributes page",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EPoyqzek+mGJqHwdVDQGfQ==": {
+      "description": "Product form: shown next to an attribute that has no values to pick from yet",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No values yet. Add them on the Attributes page.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "E6U+21pjZA/OJWHm58ZZug==": {
+      "description": "Product form: accessible name of the button on an attribute value that removes it, e.g. 'Remove Cotton'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Remove {value}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ARf1AXFZUkUce/bBdUGdog==": {
+      "description": "Product form: accessible name of the round button that opens the list of an attribute's values, e.g. 'Add values to Material'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Add values to {attribute}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tmjx0gU2aJ/PXmimvxjMkw==": {
+      "description": "Product form: placeholder of the search in the list of an attribute's values",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Search values",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YHEyUBJZIQ68y/YpgTy5VQ==": {
+      "description": "Product form: shown in the list of an attribute's values when the search matches none",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "No values found",
           "variations": {}
         }
       ],

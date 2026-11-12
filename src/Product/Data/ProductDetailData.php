@@ -21,7 +21,7 @@ class ProductDetailData extends Data
         /**
          * In the content locale, null while the product has none in it.
          *
-         * @var list<array<string, mixed>>|null
+         * @var array<int, array<string, mixed>>|null
          */
         #[LiteralTypeScriptType('import("../Platform/RichText/types").RichText | null')]
         public ?array $description,
@@ -30,6 +30,11 @@ class ProductDetailData extends Data
         public ?DimensionsData $dimensions,
         public ?string $sku,
         public ?string $barcode,
+        /** Manufacturer part number. Identifiers are the default variant's. */
+        public ?string $mpn,
+        public ?string $countryOfOrigin,
+        /** The customs tariff number. */
+        public ?string $hsCode,
         public ?int $stock,
         public bool $allowBackorders,
         public ?int $minQuantity,
@@ -53,8 +58,11 @@ class ProductDetailData extends Data
             visible: $product->status === Visibility::Visible,
             weight: $product->weight === null ? null : WeightData::fromWeight($product->weight),
             dimensions: $product->dimensions === null ? null : DimensionsData::fromDimensions($product->dimensions),
-            sku: $product->sku,
-            barcode: $product->barcode,
+            sku: $product->defaultVariant()->sku,
+            barcode: $product->defaultVariant()->barcode,
+            mpn: $product->defaultVariant()->mpn,
+            countryOfOrigin: $product->country_of_origin?->value,
+            hsCode: $product->hs_code,
             stock: $product->stock,
             allowBackorders: $product->allow_backorders,
             minQuantity: $product->min_quantity,

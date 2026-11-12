@@ -10,6 +10,9 @@ import type { SharedProps } from "../../types";
 type Props = Larasell.Admin.Product.Data.EditProductPageData & Pick<SharedProps, "contentLocale">;
 
 export default function Edit({
+  attributes,
+  countries,
+  attributesUrl,
   product,
   updateUrl,
   indexUrl,
@@ -50,6 +53,9 @@ export default function Edit({
           createCategoryUrl={createCategoryUrl}
           sections={sections}
           type={type}
+          attributes={attributes}
+          countries={countries}
+          attributesUrl={attributesUrl}
         />
         <UnsavedChangesToast />
       </Page.Body>

@@ -1,6 +1,7 @@
 {
   ":actor #:id": ":actor #:id",
   ":actor: :name": ":actor: :name",
+  ":attribute takes one value.": "",
   "A category cannot be moved into itself or a category below it.": "Eine Kategorie kann nicht in sich selbst oder eine ihrer Unterkategorien verschoben werden.",
   "A customer group with the code [:input] already exists.": "Eine Kundengruppe mit dem Code [:input] gibt es bereits.",
   "A sales channel already uses this URL.": "Ein Verkaufskanal nutzt diese URL bereits.",
@@ -24,6 +25,7 @@
   "API tokens": "API-Tokens",
   "Apps using it can no longer call the API. This can't be undone.": "Apps, die ihn nutzen, können die API nicht mehr aufrufen. Das lässt sich nicht rückgängig machen.",
   "Archived": "Archiviert",
+  "attribute": "",
   "Attributes": "",
   "Audit log": "Änderungsprotokoll",
   "backorders": "Lieferrückstände",
