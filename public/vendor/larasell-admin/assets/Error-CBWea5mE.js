@@ -1,0 +1,1 @@
+import{Mn as e,m9 as t}from"./lib-CfMjZU_7.js";import{t as n}from"./SidebarLayout-DJpnuVFO.js";import{t as r}from"./ErrorState-QCXf7bu2.js";var i=t(e(),1);function a({status:e}){return(0,i.jsx)(`div`,{className:`flex flex-1 items-center justify-center px-6 py-12`,children:(0,i.jsx)(r,{status:e})})}a.layout=[n];export{a as default};
