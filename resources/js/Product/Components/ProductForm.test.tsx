@@ -1,8 +1,8 @@
 import "../../../css/app.css";
-import { App, Form, router, usePage } from "@inertiajs/react";
+import { App, Form, http, router, usePage } from "@inertiajs/react";
 import { ToastProvider } from "@larasell-dev/ui";
 import type { ComponentProps } from "react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import ProductForm from "./ProductForm";
@@ -27,6 +27,10 @@ type FormPageProps = {
   categories: Category[];
   createCategoryUrl: string | null;
   type: ProductType;
+  manufacturers: ComponentProps<typeof ProductForm>["manufacturers"];
+  brands: ComponentProps<typeof ProductForm>["brands"];
+  checkBrandUrl: string;
+  checkManufacturerUrl: string;
 };
 
 /**
@@ -34,7 +38,16 @@ type FormPageProps = {
  * Inertia's router keeps resolving the component of the file's first test after a visit.
  */
 function FormPage() {
-  const { product, categories, createCategoryUrl, type } = usePage<FormPageProps>().props;
+  const {
+    product,
+    categories,
+    createCategoryUrl,
+    type,
+    manufacturers,
+    brands,
+    checkBrandUrl,
+    checkManufacturerUrl,
+  } = usePage<FormPageProps>().props;
 
   return (
     <>
@@ -44,6 +57,11 @@ function FormPage() {
           categories={categories}
           createCategoryUrl={createCategoryUrl}
           type={type}
+          manufacturers={manufacturers}
+          brands={brands}
+          checkBrandUrl={checkBrandUrl}
+          checkManufacturerUrl={checkManufacturerUrl}
+          countries={[{ code: "US", label: "United States" }]}
         />
         <UnsavedChangesToast />
       </Form>
@@ -71,7 +89,24 @@ async function renderForm(
     component: "FormPage",
     url,
     version: null,
-    props: { product, categories, createCategoryUrl, type },
+    props: {
+      product,
+      categories,
+      createCategoryUrl,
+      type,
+      manufacturers: [{ id: 7, name: "Acme Inc.", fields: { name: "Acme Inc." }, products: 1 }],
+      brands: [
+        {
+          id: 3,
+          name: "Globex",
+          slug: "globex",
+          fields: { name: "Globex", slug: "globex", description: "" },
+          products: 2,
+        },
+      ],
+      checkBrandUrl: "/admin/brands/validate",
+      checkManufacturerUrl: "/admin/manufacturers/validate",
+    },
   };
 
   const screen = await render(
@@ -106,6 +141,8 @@ const boots = {
   minQuantity: null,
   maxQuantity: null,
   categoryIds: [],
+  brandId: null,
+  manufacturerId: null,
 };
 
 const nameInput = () => page.getByRole("textbox", { name: "Name" });
@@ -595,5 +632,324 @@ describe("categories", () => {
     await expect
       .element(page.getByRole("link", { name: "Create categories" }))
       .not.toBeInTheDocument();
+  });
+});
+
+describe("manufacturer", () => {
+  const manufacturer = () => page.getByRole("combobox", { name: "Manufacturer" });
+  const hint = () => page.getByText("Required on product pages in the EU (GPSR)");
+
+  it("hints at the GPSR while a physical product has no manufacturer, until one is picked", async () => {
+    // Arrange
+    await renderForm(boots);
+    await expect.element(hint()).toBeVisible();
+
+    // Act
+    await userEvent.click(manufacturer());
+    await userEvent.click(page.getByRole("option", { name: "Acme Inc." }));
+
+    // Assert
+    expect(hint().query()).toBeNull();
+    expect(submitted()).toMatchObject({ manufacturer_id: "7" });
+  });
+
+  it("doesn't hint at the GPSR for products that aren't shipped", async () => {
+    // Arrange
+    const digital = { key: "digital", label: "Digital product", capabilities: [] };
+
+    // Act
+    await renderForm(boots, [], "/admin/products", null, digital);
+
+    // Assert
+    await expect.element(manufacturer()).toBeVisible();
+    expect(hint().query()).toBeNull();
+  });
+});
+
+describe("adding a brand on the product form", () => {
+  const brand = () => page.getByRole("combobox", { name: "Brand" });
+  const dialog = () => page.getByRole("dialog");
+  const addBrand = async (name: string) => {
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+    await dialog().getByRole("textbox", { name: "Name" }).fill(name);
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+  };
+
+  it("picks the new brand and sends its fields with the product, without saving it yet", async () => {
+    // Arrange
+    await renderForm(boots);
+
+    // Act
+    await addBrand("Acme Tools");
+
+    // Assert
+    await expect.element(brand()).toHaveTextContent("Acme Tools");
+    await expect.element(page.getByText("Unsaved changes")).toBeVisible();
+    expect(submitted()).toMatchObject({
+      brand_id: "new",
+      "new_brand[name]": "Acme Tools",
+      "new_brand[slug]": "acme-tools",
+    });
+  });
+
+  it("opens the new brand again with what was typed", async () => {
+    // Arrange
+    await renderForm(boots);
+    await addBrand("Acme Tools");
+
+    // Act
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+
+    // Assert
+    await expect.element(dialog().getByRole("textbox", { name: "Name" })).toHaveValue("Acme Tools");
+    await expect.element(dialog().getByRole("textbox", { name: "Slug" })).toHaveValue("acme-tools");
+  });
+
+  it("keeps the new brand to pick again after another is picked, sending it only while picked", async () => {
+    // Arrange
+    await renderForm(boots);
+    await addBrand("Acme Tools");
+
+    // Act
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Globex" }));
+    const other = submitted();
+    await userEvent.click(brand().first());
+    await userEvent.click(page.getByRole("option", { name: "Acme Tools" }));
+
+    // Assert
+    expect(other).toMatchObject({ brand_id: "3" });
+    expect(other).not.toHaveProperty("new_brand[name]");
+    expect(submitted()).toMatchObject({ brand_id: "new", "new_brand[name]": "Acme Tools" });
+  });
+
+  it("drops the new brand when the form's changes are discarded", async () => {
+    // Arrange
+    await renderForm(boots);
+    await addBrand("Acme Tools");
+
+    // Act
+    (page.getByTestId("form").element() as HTMLFormElement).reset();
+
+    // Assert
+    await expect.element(brand()).toHaveTextContent("—");
+    expect(formData().has("new_brand[name]")).toBe(false);
+  });
+
+  it("offers the brand that already has the new one's slug instead", async () => {
+    // Arrange
+    await renderForm(boots);
+    await addBrand("Globex");
+
+    // Act
+    await userEvent.click(page.getByRole("button", { name: "Use Globex" }));
+
+    // Assert
+    expect(submitted()).toMatchObject({ brand_id: "3" });
+    expect(formData().has("new_brand[name]")).toBe(false);
+  });
+
+  it("adds a manufacturer with its responsible person left out", async () => {
+    // Arrange
+    await renderForm(boots);
+    await userEvent.click(page.getByRole("combobox", { name: "Manufacturer" }));
+    await userEvent.click(page.getByRole("option", { name: "Create manufacturer…" }));
+
+    // Act
+    await dialog().getByRole("textbox", { name: "Legal name" }).fill("Initech");
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+
+    // Assert
+    await expect
+      .element(page.getByRole("combobox", { name: "Manufacturer" }))
+      .toHaveTextContent("Initech");
+    expect(submitted()).toMatchObject({
+      manufacturer_id: "new",
+      "new_manufacturer[name]": "Initech",
+    });
+    expect(formData().has("new_manufacturer[responsible_person][address][city]")).toBe(true);
+  });
+});
+
+describe("errors of a brand or manufacturer added on the form", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("show at their own selects, which keep what was added, and in their slide-overs", async () => {
+    // Arrange
+    vi.spyOn(http, "getClient").mockReturnValue({
+      async request() {
+        const answer = {
+          ...formPage,
+          props: {
+            ...formPage.props,
+            errors: {
+              "new_brand.slug": "The slug has already been taken.",
+              "new_manufacturer.responsible_person.address.city": "The city field is required.",
+            },
+          },
+        };
+        return { status: 200, data: JSON.stringify(answer), headers: { "x-inertia": "true" } };
+      },
+    } as never);
+    await renderForm(boots);
+    const dialog = () => page.getByRole("dialog");
+    await userEvent.click(page.getByRole("combobox", { name: "Brand" }));
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+    await dialog().getByRole("textbox", { name: "Name" }).fill("Acme");
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+    await userEvent.click(page.getByRole("combobox", { name: "Manufacturer" }));
+    await userEvent.click(page.getByRole("option", { name: "Create manufacturer…" }));
+    await dialog().getByRole("textbox", { name: "Legal name" }).fill("Initech");
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+
+    // Act
+    (page.getByTestId("form").element() as HTMLFormElement).requestSubmit();
+
+    // Assert
+    await expect.element(page.getByRole("button", { name: "Fix brand" })).toBeVisible();
+    await expect
+      .element(page.getByRole("combobox", { name: "Brand" }).first())
+      .toHaveTextContent("Acme");
+    // The slide-over is modal, so the rest of the page is out of reach while it's open.
+    await userEvent.click(page.getByRole("button", { name: "Fix manufacturer" }));
+    await expect.element(dialog().getByText("The city field is required.")).toBeVisible();
+    await expect
+      .element(dialog().getByRole("textbox", { name: "Legal name" }))
+      .toHaveValue("Initech");
+  });
+});
+
+describe("checking a brand in its slide-over", () => {
+  const brand = () => page.getByRole("combobox", { name: "Brand" });
+  const dialog = () => page.getByRole("dialog");
+  const answer = (status: number, errors: Record<string, string[]> = {}) =>
+    vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(status === 204 ? null : JSON.stringify({ errors }), { status }),
+      );
+  afterEach(() => vi.restoreAllMocks());
+
+  it("shows the Add button loading while the server checks the fields", async () => {
+    // Arrange
+    let answered: (response: Response) => void = () => {};
+    vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise((resolve) => (answered = resolve)));
+    await renderForm(boots);
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+    await dialog().getByRole("textbox", { name: "Name" }).fill("Acme");
+
+    // Act
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+
+    // Assert
+    await expect
+      .element(dialog().getByRole("button", { name: "Add" }))
+      .toHaveAttribute("aria-busy", "true");
+    answered(new Response(null, { status: 204 }));
+    await expect.element(dialog()).not.toBeInTheDocument();
+  });
+
+  it("keeps the slide-over's title while it closes after adding", async () => {
+    // Arrange
+    answer(204);
+    await renderForm(boots);
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+    await dialog().getByRole("textbox", { name: "Name" }).fill("Acme");
+    const titles = new Set<string>();
+    const watch = new MutationObserver(() => {
+      const title = document.querySelector("[role=dialog] h2")?.textContent;
+      if (title) titles.add(title);
+    });
+    watch.observe(document.body, { subtree: true, childList: true, characterData: true });
+
+    // Act
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+    await expect.element(dialog()).not.toBeInTheDocument();
+    watch.disconnect();
+
+    // Assert
+    expect([...titles]).toEqual(["New brand"]);
+  });
+
+  it("keeps the slide-over open with the server's errors, and picks nothing", async () => {
+    // Arrange
+    const check = answer(422, { slug: ["The slug has already been taken."] });
+    await renderForm(boots);
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+    await dialog().getByRole("textbox", { name: "Name" }).fill("Globex");
+
+    // Act
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+
+    // Assert
+    await expect.element(dialog().getByText("The slug has already been taken.")).toBeVisible();
+    expect(check).toHaveBeenCalledWith("/admin/brands/validate", expect.anything());
+    expect(formData().get("brand_id")).toBe("");
+  });
+
+  it("changes the picked brand, saved with the product, after telling how many products use it", async () => {
+    // Arrange
+    const check = answer(204);
+    await renderForm({ ...boots, brandId: 3 });
+
+    // Act
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("button", { name: "Edit Globex" }));
+    await expect.element(dialog().getByText(/Used by 2 products/)).toBeVisible();
+    await dialog().getByRole("textbox", { name: "Name" }).fill("Globex Tools");
+    await userEvent.click(dialog().getByRole("button", { name: "Apply" }));
+
+    // Assert
+    await expect.element(brand().first()).toHaveTextContent("Globex Tools");
+    expect(submitted()).toMatchObject({
+      brand_id: "3",
+      "brand_changes[name]": "Globex Tools",
+      "brand_changes[slug]": "globex",
+    });
+    const body = check.mock.calls[0]?.[1]?.body as FormData;
+    expect(body.get("brand")).toBe("3");
+  });
+
+  it("edits a row's brand from the list without picking it", async () => {
+    // Arrange
+    answer(204);
+    await renderForm(boots);
+
+    // Act
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("button", { name: "Edit Globex" }));
+
+    // Assert
+    await expect.element(dialog().getByRole("textbox", { name: "Name" })).toHaveValue("Globex");
+    expect(formData().get("brand_id")).toBe("");
+  });
+
+  it("edits the brand added on the form", async () => {
+    // Arrange
+    answer(204);
+    await renderForm(boots);
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("option", { name: "Create brand…" }));
+    await dialog().getByRole("textbox", { name: "Name" }).fill("Acme");
+    await userEvent.click(dialog().getByRole("button", { name: "Add" }));
+
+    // Act
+    await userEvent.click(brand());
+    await userEvent.click(page.getByRole("button", { name: "Edit Acme" }));
+    await dialog().getByRole("textbox", { name: "Slug" }).fill("acme-tools");
+    await userEvent.click(dialog().getByRole("button", { name: "Apply" }));
+
+    // Assert
+    await expect.poll(submitted).toMatchObject({
+      brand_id: "new",
+      "new_brand[name]": "Acme",
+      "new_brand[slug]": "acme-tools",
+    });
+    expect(formData().has("brand_changes[name]")).toBe(false);
   });
 });

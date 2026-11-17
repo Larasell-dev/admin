@@ -23,7 +23,10 @@ import {
   useRef,
   useState,
 } from "react";
+import BrandForm from "../../Brand/Components/BrandForm";
 import CategoryCheckboxTree from "../../Category/Components/CategoryCheckboxTree";
+import ManufacturerForm from "../../Manufacturer/Components/ManufacturerForm";
+import CreatablePicker, { type PendingFields } from "./CreatablePicker";
 import ExtensionSections from "../../Platform/Sections/Components/ExtensionSections";
 import FormCheckbox from "../../Platform/Panel/Components/FormCheckbox";
 import VisibilityField from "../../Platform/Panel/Components/VisibilityField";
@@ -51,7 +54,19 @@ export default function ProductForm({
   attributes = [],
   attributesUrl = "",
   countries = [],
+  brands = [],
+  manufacturers = [],
+  checkBrandUrl = "",
+  checkManufacturerUrl = "",
 }: {
+  /** Checks a brand added or changed on the form. */
+  checkBrandUrl?: string;
+  /** Checks a manufacturer added or changed on the form. */
+  checkManufacturerUrl?: string;
+  /** The brands to pick the product's from. */
+  brands?: Larasell.Admin.Brand.Data.BrandOptionData[];
+  /** The manufacturers to pick the product's from. */
+  manufacturers?: Larasell.Admin.Manufacturer.Data.ManufacturerOptionData[];
   /** The catalog's attributes page. */
   attributesUrl?: string;
   /** Every country to pick the country of origin from. */
@@ -85,7 +100,16 @@ export default function ProductForm({
             "Product form: text below the heading of the General section, with the name and visibility",
           )}
         />
-        <GeneralFields product={product} errors={errors} />
+        <GeneralFields
+          product={product}
+          errors={errors}
+          brands={brands}
+          manufacturers={manufacturers}
+          checkBrandUrl={checkBrandUrl}
+          checkManufacturerUrl={checkManufacturerUrl}
+          countries={countries}
+          physical={type.capabilities.includes("shipping")}
+        />
       </Section.Root>
     ),
     categories: (
@@ -224,7 +248,26 @@ export default function ProductForm({
   );
 }
 
-function GeneralFields({ product, errors }: { product?: Product; errors: Errors }) {
+function GeneralFields({
+  product,
+  errors,
+  brands,
+  manufacturers,
+  checkBrandUrl,
+  checkManufacturerUrl,
+  countries,
+  physical,
+}: {
+  checkBrandUrl: string;
+  checkManufacturerUrl: string;
+  countries: { code: string; label: string }[];
+  product?: Product;
+  errors: Errors;
+  brands: Larasell.Admin.Brand.Data.BrandOptionData[];
+  manufacturers: Larasell.Admin.Manufacturer.Data.ManufacturerOptionData[];
+  /** Shipped goods, which the GPSR has name their manufacturer. */
+  physical: boolean;
+}) {
   // Untranslated fields stay empty and show what the store shows instead.
   const untranslated = product?.name === null;
 
@@ -234,6 +277,8 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
         label={fbs("Name", "Product form: label of the field for the product's name")}
         name="name"
         error={errors.name}
+        // Untranslated, it may stay empty and the store shows another language's.
+        required={!untranslated}
       >
         <Input
           defaultValue={product?.name ?? undefined}
@@ -262,6 +307,212 @@ function GeneralFields({ product, errors }: { product?: Product; errors: Errors 
           invalid={!!errors.description}
         />
         {errors.description && <Error match>{errors.description}</Error>}
+      </div>
+
+      <div className="@container">
+        <div className="grid items-start gap-5 @md:grid-cols-2">
+          <CreatablePicker
+            name="brand_id"
+            newPrefix="new_brand"
+            changesPrefix="brand_changes"
+            checkUrl={checkBrandUrl}
+            label={fbs(
+              "Brand",
+              "Product form: label of the select for the brand the product is sold under",
+            )}
+            options={brands}
+            defaultValue={product?.brandId ?? null}
+            existing={(fields) => brands.find((brand) => brand.slug === fields.slug)}
+            texts={{
+              create: fbs(
+                "Create brand…",
+                "Product form: last option of the brand select, opens a slide-over to add one",
+              ),
+              title: fbs("New brand", "Product form: title of the slide-over that adds a brand"),
+              editTitle: fbs(
+                "Edit brand",
+                "Product form: title of the slide-over that changes the picked brand or the one added on the form",
+              ),
+              used: (products) =>
+                fbs(
+                  [
+                    "Used by ",
+                    fbs.plural("product", products, {
+                      many: "products",
+                      showCount: "yes",
+                      name: "products",
+                    }),
+                    ". Saving the product changes it on all of them.",
+                  ],
+                  "Product form: text in the slide-over that changes an existing brand, which every product with it shows",
+                ),
+              apply: fbs(
+                "Apply",
+                "Product form: button that keeps the slide-over's changes to the brand or manufacturer, saved with the product",
+              ),
+              edit: fbs(
+                "Edit",
+                "Product form: text button that shows on hover in a row of the brand or manufacturer select and opens that row's fields in a slide-over",
+              ),
+              editItem: (name) =>
+                fbs(
+                  ["Edit ", fbs.param("name", name)],
+                  "Product form: accessible name of the button in a row of the brand select that opens that brand's fields in a slide-over",
+                ),
+              explanation: fbs(
+                "It's saved with the product.",
+                "Product form: text in the slide-over that adds a brand or manufacturer",
+              ),
+              add: fbs(
+                "Add",
+                "Product form: button that adds the brand or manufacturer from the slide-over to the select",
+              ),
+              invalid: fbs(
+                "Check the brand's fields.",
+                "Product form: error below the brand select when the brand added or changed on the form isn't valid",
+              ),
+              fix: fbs(
+                "Fix brand",
+                "Product form: button below the brand select that opens the added brand's fields with their errors",
+              ),
+              use: (name) =>
+                fbs(
+                  ["Use ", fbs.param("name", name)],
+                  "Product form: button that picks the existing brand with the added one's slug instead",
+                ),
+            }}
+            fields={(pending, fieldErrors) => (
+              <BrandForm
+                errors={fieldErrors}
+                brand={
+                  pending
+                    ? {
+                        id: 0,
+                        name: pending.name ?? "",
+                        fallbackName: null,
+                        slug: pending.slug ?? "",
+                        description: pending.description ?? null,
+                        products: 0,
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
+          <CreatablePicker
+            name="manufacturer_id"
+            newPrefix="new_manufacturer"
+            changesPrefix="manufacturer_changes"
+            checkUrl={checkManufacturerUrl}
+            label={fbs(
+              "Manufacturer",
+              "Product form: label of the select for the product's legal producer",
+            )}
+            description={(value) =>
+              physical && value === ""
+                ? fbs(
+                    "Required on product pages in the EU (GPSR)",
+                    "Product form: hint below the manufacturer select while a physical product has none",
+                  )
+                : undefined
+            }
+            options={manufacturers}
+            defaultValue={product?.manufacturerId ?? null}
+            existing={(fields) =>
+              manufacturers.find(
+                (manufacturer) =>
+                  manufacturer.name.toLowerCase() === (fields.name ?? "").trim().toLowerCase(),
+              )
+            }
+            texts={{
+              create: fbs(
+                "Create manufacturer…",
+                "Product form: last option of the manufacturer select, opens a slide-over to add one",
+              ),
+              title: fbs(
+                "New manufacturer",
+                "Product form: title of the slide-over that adds a manufacturer",
+              ),
+              editTitle: fbs(
+                "Edit manufacturer",
+                "Product form: title of the slide-over that changes the picked manufacturer or the one added on the form",
+              ),
+              used: (products) =>
+                fbs(
+                  [
+                    "Used by ",
+                    fbs.plural("product", products, {
+                      many: "products",
+                      showCount: "yes",
+                      name: "products",
+                    }),
+                    ". Saving the product changes it on all of them.",
+                  ],
+                  "Product form: text in the slide-over that changes an existing manufacturer, which every product with it shows",
+                ),
+              apply: fbs(
+                "Apply",
+                "Product form: button that keeps the slide-over's changes to the brand or manufacturer, saved with the product",
+              ),
+              edit: fbs(
+                "Edit",
+                "Product form: text button that shows on hover in a row of the brand or manufacturer select and opens that row's fields in a slide-over",
+              ),
+              editItem: (name) =>
+                fbs(
+                  ["Edit ", fbs.param("name", name)],
+                  "Product form: accessible name of the button in a row of the manufacturer select that opens that manufacturer's fields in a slide-over",
+                ),
+              explanation: fbs(
+                "It's saved with the product.",
+                "Product form: text in the slide-over that adds a brand or manufacturer",
+              ),
+              add: fbs(
+                "Add",
+                "Product form: button that adds the brand or manufacturer from the slide-over to the select",
+              ),
+              invalid: fbs(
+                "Check the manufacturer's fields.",
+                "Product form: error below the manufacturer select when the manufacturer added or changed on the form isn't valid",
+              ),
+              fix: fbs(
+                "Fix manufacturer",
+                "Product form: button below the manufacturer select that opens the added manufacturer's fields with their errors",
+              ),
+              use: (name) =>
+                fbs(
+                  ["Use ", fbs.param("name", name)],
+                  "Product form: button that picks the existing manufacturer with the added one's name instead",
+                ),
+            }}
+            fields={(pending, fieldErrors) => {
+              const manufacturer = pending ? pendingManufacturer(pending) : undefined;
+              return (
+                <Stack spacing={8}>
+                  <ManufacturerForm
+                    manufacturer={manufacturer}
+                    countries={countries}
+                    part="manufacturer"
+                    errors={fieldErrors}
+                  />
+                  <Stack spacing={3}>
+                    <span className="type-label-lg text-base-primary">
+                      <fbt desc="Product form: heading of the responsible person's fields in the slide-over that adds a manufacturer">
+                        EU responsible person
+                      </fbt>
+                    </span>
+                    <ManufacturerForm
+                      manufacturer={manufacturer}
+                      countries={countries}
+                      part="responsible-person"
+                      errors={fieldErrors}
+                    />
+                  </Stack>
+                </Stack>
+              );
+            }}
+          />
+        </div>
       </div>
 
       <VisibilityField defaultVisible={product?.visible ?? true} error={errors.status} />
@@ -929,5 +1180,30 @@ export function usePinnedAnchor() {
           at.current.height,
         ),
     }),
+  };
+}
+
+/** A manufacturer added on the form, as its fields were sent, for the slide-over to show again. */
+function pendingManufacturer(
+  fields: PendingFields,
+): Larasell.Admin.Manufacturer.Data.ManufacturerDetailData {
+  const address = (prefix: string) => ({
+    street: fields[`${prefix}[street]`] ?? "",
+    postcode: fields[`${prefix}[postcode]`] ?? "",
+    city: fields[`${prefix}[city]`] ?? "",
+    state: fields[`${prefix}[state]`] || null,
+    country: fields[`${prefix}[country]`] ?? "",
+  });
+  return {
+    id: 0,
+    name: fields.name ?? "",
+    address: address("address"),
+    email: fields.email || null,
+    url: fields.url || null,
+    responsiblePersonName: fields["responsible_person[name]"] || null,
+    responsiblePersonEmail: fields["responsible_person[email]"] || null,
+    responsiblePersonAddress: address("responsible_person[address]"),
+    inEu: false,
+    products: 0,
   };
 }

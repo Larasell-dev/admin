@@ -12,6 +12,10 @@ type Props = Larasell.Admin.Product.Data.CreateProductPageData & Pick<SharedProp
 export default function Create({
   attributes,
   countries,
+  brands,
+  manufacturers,
+  checkBrandUrl,
+  checkManufacturerUrl,
   attributesUrl,
   storeUrl,
   indexUrl,
@@ -53,6 +57,10 @@ export default function Create({
           type={type}
           attributes={attributes}
           countries={countries}
+          brands={brands}
+          manufacturers={manufacturers}
+          checkBrandUrl={checkBrandUrl}
+          checkManufacturerUrl={checkManufacturerUrl}
           attributesUrl={attributesUrl}
         />
         <UnsavedChangesToast />

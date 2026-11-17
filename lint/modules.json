@@ -1,11 +1,13 @@
 {
   "ApiToken": { "buildsOn": [] },
+  "Brand": { "buildsOn": [] },
   "Category": { "buildsOn": [] },
   "Customer": { "buildsOn": [] },
+  "Manufacturer": { "buildsOn": [] },
   "Order": { "buildsOn": [] },
   "Product": {
-    "buildsOn": ["Category"],
-    "why": "The product form picks categories with the Category module's options."
+    "buildsOn": ["Category", "Brand", "Manufacturer"],
+    "why": "The product form picks categories, a brand and a manufacturer with those modules' options."
   },
   "SalesChannel": { "buildsOn": [] },
   "Seo": {

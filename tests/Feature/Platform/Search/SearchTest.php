@@ -303,6 +303,8 @@ it('shares the searches of the enabled modules with signed-in admins', function 
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', [
             ['id' => 'products', 'label' => 'Search products', 'icon' => 'ShoppingBag', 'placeholder' => 'Search by name, SKU or barcode', 'url' => route('larasell.admin.search.products')],
+            ['id' => 'brands', 'label' => 'Search brands', 'icon' => 'Award', 'placeholder' => 'Search by name or slug', 'url' => route('larasell.admin.search.brands')],
+            ['id' => 'manufacturers', 'label' => 'Search manufacturers', 'icon' => 'Building', 'placeholder' => 'Search by name or email', 'url' => route('larasell.admin.search.manufacturers')],
             ['id' => 'categories', 'label' => 'Search categories', 'icon' => 'Folders', 'placeholder' => 'Search by name', 'url' => route('larasell.admin.search.categories')],
             ['id' => 'orders', 'label' => 'Search orders', 'icon' => 'Receipt', 'placeholder' => 'Search by number, customer or email', 'url' => route('larasell.admin.search.orders')],
             ['id' => 'customers', 'label' => 'Search customers', 'icon' => 'User3', 'placeholder' => 'Search by number, name or email', 'url' => route('larasell.admin.search.customers')],
@@ -313,7 +315,7 @@ it('shares the searches of the enabled modules with signed-in admins', function 
     signInSearchAdmin();
 
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'categories', 'customers', 'sales-channels']));
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches', fn ($searches) => collect($searches)->pluck('id')->all() === ['products', 'brands', 'manufacturers', 'categories', 'customers', 'sales-channels']));
 });
 
 it('lets a plugin add its own search to the command menu', function () {
@@ -329,7 +331,7 @@ it('lets a plugin add its own search to the command menu', function () {
 
     // Act & Assert
     $this->get(route('larasell.admin.home'))
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.5', [
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('commandMenu.searches.7', [
             'id' => 'gift-cards',
             'label' => 'Search gift cards',
             'icon' => 'Gift',

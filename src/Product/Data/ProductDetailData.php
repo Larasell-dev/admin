@@ -41,6 +41,9 @@ class ProductDetailData extends Data
         public ?int $maxQuantity,
         /** @var int[] */
         public array $categoryIds,
+        public ?int $brandId,
+        /** The legal producer, which the GPSR has product pages in the EU name. */
+        public ?int $manufacturerId,
     ) {}
 
     public static function fromModel(Product $product, Locale $locale): self
@@ -68,6 +71,8 @@ class ProductDetailData extends Data
             minQuantity: $product->min_quantity,
             maxQuantity: $product->max_quantity,
             categoryIds: $product->categories()->orderBy($categoryKey)->pluck($categoryKey)->all(),
+            brandId: $product->brand_id,
+            manufacturerId: $product->manufacturer_id,
         );
     }
 }

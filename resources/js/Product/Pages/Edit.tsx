@@ -14,6 +14,10 @@ type Props = Larasell.Admin.Product.Data.EditProductPageData & Pick<SharedProps,
 export default function Edit({
   attributes,
   countries,
+  brands,
+  manufacturers,
+  checkBrandUrl,
+  checkManufacturerUrl,
   attributesUrl,
   product,
   updateUrl,
@@ -59,6 +63,10 @@ export default function Edit({
             type={type}
             attributes={attributes}
             countries={countries}
+            brands={brands}
+            manufacturers={manufacturers}
+            checkBrandUrl={checkBrandUrl}
+            checkManufacturerUrl={checkManufacturerUrl}
             attributesUrl={attributesUrl}
           />
           <VariantsSection variants={variants} productName={product.name ?? product.fallbackName} />

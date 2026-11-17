@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
+use Larasell\Admin\Brand\Http\Requests\BrandRequest;
+use Larasell\Admin\Manufacturer\Http\Requests\ManufacturerRequest;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\RichText\Rules\RichTextDocument;
 use Larasell\Admin\Platform\Sections\SectionContext;
@@ -18,7 +20,16 @@ use Larasell\Admin\Product\Rules\Barcode;
 use Larasell\Larasell\Attachments\Attachments;
 use Larasell\Larasell\Barcode as LarasellBarcode;
 use Larasell\Larasell\Catalog\AttributeCardinality;
+use Larasell\Larasell\Catalog\Brands\Actions\CreateBrandPayload;
+use Larasell\Larasell\Catalog\Brands\Actions\UpdateBrandPayload;
+use Larasell\Larasell\Catalog\Brands\BrandId;
+use Larasell\Larasell\Catalog\Brands\Models\Brand;
 use Larasell\Larasell\Catalog\CoreProductType;
+use Larasell\Larasell\Catalog\Keep;
+use Larasell\Larasell\Catalog\Manufacturers\Actions\CreateManufacturerPayload;
+use Larasell\Larasell\Catalog\Manufacturers\Actions\UpdateManufacturerPayload;
+use Larasell\Larasell\Catalog\Manufacturers\ManufacturerId;
+use Larasell\Larasell\Catalog\Manufacturers\Models\Manufacturer;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\Models\ProductAttribute;
@@ -84,6 +95,15 @@ class ProductRequest extends FormRequest
             'allow_backorders' => [...$stock, 'sometimes', 'boolean'],
             'min_quantity' => [...$stock, 'nullable', 'integer', 'min:1'],
             'max_quantity' => [...$stock, 'nullable', 'integer', 'min:1', 'gte:min_quantity'],
+            // Both optional; a physical product without a manufacturer only gets a hint about the GPSR.
+            // "new" picks the brand or manufacturer added on the form, saved with the product.
+            'brand_id' => ['sometimes', 'nullable', Rule::when($this->input('brand_id') !== 'new', ['integer', Rule::exists(Brand::class, 'id')])],
+            'manufacturer_id' => ['sometimes', 'nullable', Rule::when($this->input('manufacturer_id') !== 'new', ['integer', Rule::exists(Manufacturer::class, 'id')])],
+            ...$this->input('brand_id') === 'new' ? BrandRequest::newRules('new_brand.') : [],
+            ...$this->input('manufacturer_id') === 'new' ? ManufacturerRequest::newRules('new_manufacturer.') : [],
+            // The picked one's fields when the form changed them, saved with the product.
+            ...$this->changes('brand') ? BrandRequest::newRules('brand_changes.', Brand::query()->find($this->integer('brand_id'))) : [],
+            ...$this->changes('manufacturer') ? ManufacturerRequest::newRules('manufacturer_changes.') : [],
             // The form leaves it out when no category is selected.
             'categories' => ['sometimes', 'array'],
             'categories.*' => ['integer', 'distinct', Rule::exists(Category::class, 'id')],
@@ -215,6 +235,14 @@ class ProductRequest extends FormRequest
             'allow_backorders' => __('backorders'),
             'min_quantity' => __('minimum quantity'),
             'max_quantity' => __('maximum quantity'),
+            'new_brand.name' => __('name'),
+            'new_brand.slug' => __('slug'),
+            'new_brand.description' => __('description'),
+            ...ManufacturerRequest::newAttributes('new_manufacturer.'),
+            'brand_changes.name' => __('name'),
+            'brand_changes.slug' => __('slug'),
+            'brand_changes.description' => __('description'),
+            ...ManufacturerRequest::newAttributes('manufacturer_changes.'),
         ];
     }
 
@@ -307,6 +335,70 @@ class ProductRequest extends FormRequest
             Arr::flatten($this->validated('attributes', [])),
             fn (mixed $id): bool => $id !== null && $id !== '',
         )));
+    }
+
+    /** The brand the form added, to create with the product, or null when it picked another or none. */
+    public function newBrand(Locale $locale): ?CreateBrandPayload
+    {
+        return $this->validated('brand_id') === 'new' ? BrandRequest::newPayload($this->validated('new_brand'), $locale->value) : null;
+    }
+
+    /** The manufacturer the form added, to create with the product, or null when it picked another or none. */
+    public function newManufacturer(): ?CreateManufacturerPayload
+    {
+        return $this->validated('manufacturer_id') === 'new' ? ManufacturerRequest::newPayload($this->validated('new_manufacturer')) : null;
+    }
+
+    /** The changes to the picked brand, or null when the form changed none. */
+    public function brandChanges(Locale $locale): ?UpdateBrandPayload
+    {
+        $brand = $this->changes('brand') ? Brand::query()->find($this->integer('brand_id')) : null;
+
+        return $brand === null ? null : BrandRequest::changesPayload($brand, $this->validated('brand_changes'), $locale->value);
+    }
+
+    /** The changes to the picked manufacturer, or null when the form changed none. */
+    public function manufacturerChanges(): ?UpdateManufacturerPayload
+    {
+        if (! $this->changes('manufacturer')) {
+            return null;
+        }
+
+        $fields = ManufacturerRequest::newPayload($this->validated('manufacturer_changes'));
+
+        return new UpdateManufacturerPayload($fields->name, $fields->address, $fields->email, $fields->url, $fields->responsiblePerson);
+    }
+
+    /** Whether the form changed the existing brand or manufacturer it picked; one it added is new_*. */
+    private function changes(string $relation): bool
+    {
+        $id = $this->input("{$relation}_id");
+
+        return is_numeric($id) && is_array($this->input("{$relation}_changes"));
+    }
+
+    /** The brand the form picked, null for none; left out, an existing product keeps its own. Ask newBrand() first. */
+    public function brandId(): BrandId|Keep|null
+    {
+        if (! array_key_exists('brand_id', $this->validated())) {
+            return Keep::Value;
+        }
+
+        $id = $this->validated('brand_id');
+
+        return $id === null ? null : new BrandId((int) $id);
+    }
+
+    /** The manufacturer the form picked, null for none; left out, an existing product keeps its own. */
+    public function manufacturerId(): ManufacturerId|Keep|null
+    {
+        if (! array_key_exists('manufacturer_id', $this->validated())) {
+            return Keep::Value;
+        }
+
+        $id = $this->validated('manufacturer_id');
+
+        return $id === null ? null : new ManufacturerId((int) $id);
     }
 
     /**

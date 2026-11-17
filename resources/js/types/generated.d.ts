@@ -14,6 +14,33 @@ declare namespace Larasell.Admin.ApiToken.Data {
     plainTextToken: string;
   };
 }
+declare namespace Larasell.Admin.Brand.Data {
+  export type BrandDetailData = {
+    id: number;
+    name: string | null;
+    fallbackName: string | null;
+    slug: string;
+    description: string | null;
+    products: number;
+  };
+  export type BrandOptionData = {
+    id: number;
+    name: string;
+    slug: string;
+    fields: { [key: string]: string };
+    products: number;
+  };
+  export type BrandPageData = {
+    brand: Larasell.Admin.Brand.Data.BrandDetailData;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type CreateBrandPageData = {
+    storeUrl: string;
+    indexUrl: string;
+  };
+}
 declare namespace Larasell.Admin.Category.Data {
   export type CategoriesPageData = {
     categories: Array<Larasell.Admin.Category.Data.CategoryData>;
@@ -186,6 +213,49 @@ declare namespace Larasell.Admin.Customer.Data {
     lastName: string;
     email: string | null;
     phone: string | null;
+  };
+}
+declare namespace Larasell.Admin.Manufacturer.Data {
+  export type CountryOptionData = {
+    code: string;
+    label: string;
+  };
+  export type CreateManufacturerPageData = {
+    countries: Array<Larasell.Admin.Manufacturer.Data.CountryOptionData>;
+    storeUrl: string;
+    indexUrl: string;
+  };
+  export type ManufacturerDetailData = {
+    id: number;
+    name: string;
+    address: Larasell.Admin.Manufacturer.Data.PostalAddressData;
+    email: string | null;
+    url: string | null;
+    responsiblePersonName: string | null;
+    responsiblePersonEmail: string | null;
+    responsiblePersonAddress: Larasell.Admin.Manufacturer.Data.PostalAddressData | null;
+    inEu: boolean;
+    products: number;
+  };
+  export type ManufacturerOptionData = {
+    id: number;
+    name: string;
+    fields: { [key: string]: string };
+    products: number;
+  };
+  export type ManufacturerPageData = {
+    manufacturer: Larasell.Admin.Manufacturer.Data.ManufacturerDetailData;
+    countries: Array<Larasell.Admin.Manufacturer.Data.CountryOptionData>;
+    updateUrl: string;
+    destroyUrl: string;
+    indexUrl: string;
+  };
+  export type PostalAddressData = {
+    street: string;
+    postcode: string;
+    city: string;
+    state: string | null;
+    country: string;
   };
 }
 declare namespace Larasell.Admin.Order.Data {
@@ -421,6 +491,10 @@ declare namespace Larasell.Admin.Product.Data {
     countries: Array<{ code: string; label: string }>;
     attributes: Array<Larasell.Admin.Product.Data.ProductAttributeFieldData>;
     attributesUrl: string;
+    brands: Array<Larasell.Admin.Brand.Data.BrandOptionData>;
+    manufacturers: Array<Larasell.Admin.Manufacturer.Data.ManufacturerOptionData>;
+    checkBrandUrl: string;
+    checkManufacturerUrl: string;
   };
   export type DimensionsData = {
     length: string;
@@ -439,6 +513,10 @@ declare namespace Larasell.Admin.Product.Data {
     countries: Array<{ code: string; label: string }>;
     attributes: Array<Larasell.Admin.Product.Data.ProductAttributeFieldData>;
     attributesUrl: string;
+    brands: Array<Larasell.Admin.Brand.Data.BrandOptionData>;
+    manufacturers: Array<Larasell.Admin.Manufacturer.Data.ManufacturerOptionData>;
+    checkBrandUrl: string;
+    checkManufacturerUrl: string;
     variants: Larasell.Admin.Product.Data.ProductVariantsData;
   };
   export type EditVariantPageData = {
@@ -528,6 +606,8 @@ declare namespace Larasell.Admin.Product.Data {
     minQuantity: number | null;
     maxQuantity: number | null;
     categoryIds: Array<number>;
+    brandId: number | null;
+    manufacturerId: number | null;
   };
   export type ProductOptionData = {
     definitionId: number;
