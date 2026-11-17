@@ -1,6 +1,5 @@
 import { useFormContext } from "@inertiajs/react";
-import { Field, Input, Select, Stack } from "@larasell-dev/ui";
-import Textarea from "../../Platform/Panel/Components/Textarea";
+import { Field, Input, Select, Stack, Textarea } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import { useState } from "react";
 

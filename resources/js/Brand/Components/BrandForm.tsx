@@ -1,9 +1,8 @@
 import { useFormContext } from "@inertiajs/react";
-import { Field, Input, Stack } from "@larasell-dev/ui";
+import { Field, Input, Stack, Textarea } from "@larasell-dev/ui";
 import { fbs } from "fbtee";
 import { slugify } from "../../Platform/Support/slugify";
 import { truncate } from "../../Platform/Support/truncate";
-import Textarea from "../../Platform/Panel/Components/Textarea";
 import { useCoupledField } from "../../Platform/Support/useCoupledField";
 
 type Brand = Larasell.Admin.Brand.Data.BrandDetailData;
