@@ -120,6 +120,7 @@
     "Table",
     "TagCombobox",
     "TestClipboard",
+    "Textarea",
     "Thumbnail",
     "ToastProvider",
     "Tooltip",

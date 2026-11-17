@@ -1,6 +1,14 @@
-import { cn } from "cn";
 import { Form } from "@inertiajs/react";
-import { Button, Field, Icon, Input, Section, SectionStack, Stack } from "@larasell-dev/ui";
+import {
+  Button,
+  Field,
+  Icon,
+  Input,
+  Section,
+  SectionStack,
+  Stack,
+  Textarea,
+} from "@larasell-dev/ui";
 import { DeleteBinLine } from "@larasell-dev/ui/icons";
 import { fbs } from "fbtee";
 import ConfirmDialog from "../../Platform/Panel/Components/ConfirmDialog";
@@ -69,16 +77,7 @@ export default function EditGroup({ group, saveUrl, destroyUrl, indexUrl }: Prop
                     name="description"
                     error={errors.description}
                   >
-                    {/* The UI package has no textarea yet; this one matches its inputs. */}
-                    <textarea
-                      name="description"
-                      rows={4}
-                      defaultValue={group?.description ?? ""}
-                      className={cn(
-                        "type-input-md border-base-strong bg-base-surface text-base-primary placeholder:text-base-tertiary",
-                        "focus:focus-ring min-h-28 w-full resize-y border px-3.5 py-2.5 outline-none",
-                      )}
-                    />
+                    <Textarea name="description" rows={4} defaultValue={group?.description ?? ""} />
                   </Field>
                 </Stack>
                 <UnsavedChangesToast />

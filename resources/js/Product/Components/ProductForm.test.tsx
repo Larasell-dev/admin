@@ -190,6 +190,7 @@ describe("description", () => {
       description: [block(0, [["Warm"]])],
     });
     const content = page.elementLocator(description().element().parentElement!);
+    // oxlint-disable-next-line larasell/no-layout-assertions -- the click must land below the text, so it needs the box's height.
     const { height } = content.element().getBoundingClientRect();
 
     // Act
