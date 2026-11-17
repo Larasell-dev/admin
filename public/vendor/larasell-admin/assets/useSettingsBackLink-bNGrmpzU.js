@@ -1,0 +1,1 @@
+import{t as e}from"./lib-CfMjZU_7.js";import{s as t}from"./dist-CcRb4ulP.js";function n(){return{href:t().props.settingsUrl,label:e._(`Back to settings`,null,{hk:`3gQv57`})}}export{n as t};

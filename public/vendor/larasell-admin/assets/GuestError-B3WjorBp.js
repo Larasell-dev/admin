@@ -1,0 +1,1 @@
+import{Mn as e,m9 as t}from"./lib-CfMjZU_7.js";import{t as n}from"./ErrorState-QCXf7bu2.js";var r=t(e(),1);function i({status:e}){return(0,r.jsx)(`main`,{className:`flex min-h-dvh items-center justify-center bg-base-canvas px-6 py-12`,children:(0,r.jsx)(n,{status:e})})}export{i as default};
