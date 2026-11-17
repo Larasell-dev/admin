@@ -8052,6 +8052,798 @@
         }
       ],
       "types": []
+    },
+    "o4v3oQ2tCayvZxTcIjYrjA==": {
+      "description": "Product form: label of the select for the brand the product is sold under",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Marke",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KJrAZoCAZ669oM8CmFc0mw==": {
+      "description": "Product form: label of the select for the product's legal producer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hersteller",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JrTDbGyP+9n2yICuNUSRZA==": {
+      "description": "Product form: hint below the manufacturer select while a physical product has none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Auf Produktseiten in der EU vorgeschrieben (GPSR)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RWF3c5fut2+7M/FILU21kg==": {
+      "description": "New manufacturer page: title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Hersteller",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D4R/aw+spKc4WFTBUrJYrg==": {
+      "description": "New manufacturer page: accessible name of the back arrow to the manufacturers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Herstellern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KceGXNQgI8UYevLdf/2DvQ==": {
+      "description": "Manufacturer page: heading of the manufacturer's fields",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "74l74vJ4AtdxZky/+iITNA==": {
+      "description": "Manufacturer page: explains the section with the manufacturer's fields",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der rechtliche Hersteller, den Produktseiten in der EU mit Post- und E-Mail-Adresse nennen (GPSR).",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uKxl4oBDN2b1jXOL8J/kfQ==": {
+      "description": "Manufacturer page: heading of the section with the manufacturer's representative in the EU",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verantwortliche Person in der EU",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RwN26o7F7u+HSMlIlh0NLA==": {
+      "description": "Manufacturer page: explains the EU responsible person section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nötig, wenn der Hersteller außerhalb der EU sitzt. Ohne Namen wird keine gespeichert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eHGiu+lDHjnUMIpjtbz9Bw==": {
+      "description": "Manufacturer page: accessible name of the back arrow to the manufacturers",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Herstellern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XH+yMI7pq5IGk32YlJDJ+w==": {
+      "description": "Manufacturer page: heading of the delete section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hersteller löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pNj7c+StKYF5IE7sVMH5lQ==": {
+      "description": "Manufacturer page: explains why a manufacturer products use can't be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von {products} Produkten verwendet. Gib ihnen zuerst einen anderen Hersteller.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iNN6tHUY3X/awogKGDjgpA==": {
+      "description": "Manufacturer page: explains why a manufacturer products use can't be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von 1 Produkt verwendet. Gib ihm zuerst einen anderen Hersteller.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "R9uW1kcCByCQJPWy5rwHpw==": {
+      "description": "Manufacturer page: explains that the manufacturer can be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kein Produkt verwendet ihn.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZOznIUpIObSRHFDWXjsqqw==": {
+      "description": "Manufacturer page: button that asks to delete the manufacturer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0YZB4IrsAZ2CAPh+E9Ge1g==": {
+      "description": "Manufacturer page: title of the delete dialog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hersteller löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "78OK/CUIPE4oePD/s3WXbQ==": {
+      "description": "Manufacturer page: delete dialog text",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} wird gelöscht. Das kann nicht rückgängig gemacht werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g6YnVO9voD2yRT/R7iZhfQ==": {
+      "description": "Manufacturer form: label of the responsible person's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UJrGVZoltd8n0/6YR0OTng==": {
+      "description": "Manufacturer form: label of the responsible person's email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pZ0Fcjn0fn9ngQh0JQUwBw==": {
+      "description": "Manufacturer form: label of the manufacturer's legal name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Rechtlicher Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lIMUtcBAkDD4aXBwFt0o7Q==": {
+      "description": "Manufacturer form: label of the manufacturer's contact email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "E-Mail",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "k783pUfjqSFLv+sWVgtvjg==": {
+      "description": "Manufacturer form: label of the manufacturer's website URL",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Website",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gATBrGHlWQ4WRe94fWDk7w==": {
+      "description": "Manufacturer form: label of the address's street lines",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Straße",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p2oRZyKdBUQQgtc0XQaxfg==": {
+      "description": "Manufacturer form: label of the address's postcode",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Postleitzahl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RLnakJt4MjcgGyBxFJWBNg==": {
+      "description": "Manufacturer form: label of the address's city",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ort",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0A7iX9uevey2JijP6Fb5qA==": {
+      "description": "Manufacturer form: label of the address's optional state",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bundesland oder Region",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p/xEJVoXzK2SR8CnUCcC4g==": {
+      "description": "Manufacturer form: label of the address's country",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Land",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iYKGqQP2olMelezSdJeGnQ==": {
+      "description": "Manufacturer form: placeholder of the country search",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Länder suchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iGtutloawF5VugEJZgWPDQ==": {
+      "description": "Manufacturer form: shown when the country search matches none",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kein Land gefunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NzlcnsjbrcnK3YxTAXeSEQ==": {
+      "description": "New brand page: title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Marke",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y0+CEI0d9x3Hi7Qk6UIJ3g==": {
+      "description": "New brand page: accessible name of the back arrow to the brands",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Marken",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "h06F6WssfCNRgWOQVp4IUA==": {
+      "description": "New brand page: heading of the brand's fields",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "szo6xIiaQ4Fyf3fonmNOGg==": {
+      "description": "New brand page: explains the section with the brand's fields",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Name, unter dem Produkte vermarktet werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0wkZMsY/TQdxTwmEloA8Mw==": {
+      "description": "Brand page: accessible name of the back arrow to the brands",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück zu den Marken",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SDp1Fim5WgA4dzn92K9rIw==": {
+      "description": "Brand page: heading of the brand's fields",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Allgemein",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zTdchkjsnabZQ8uR9IKe0g==": {
+      "description": "Brand page: explains the section with the brand's fields",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Name, unter dem Produkte vermarktet werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5Wj8/DdLXQ0C5dBMKxQymQ==": {
+      "description": "Brand page: heading of the delete section",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Marke löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vrxcTBU7sMxC8I6NQEAw+g==": {
+      "description": "Brand page: explains why a brand products use can't be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von {products} Produkten verwendet. Gib ihnen zuerst eine andere Marke.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tPGhLdpqzw1idChey+Y2qQ==": {
+      "description": "Brand page: explains why a brand products use can't be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von 1 Produkt verwendet. Gib ihm zuerst eine andere Marke.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TUC5tozOzwzV+XYGqoWOUg==": {
+      "description": "Brand page: explains that the brand can be deleted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kein Produkt verwendet sie.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6a1ml01fOFcVhjSfb4sQiw==": {
+      "description": "Brand page: button that asks to delete the brand",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "denKY3efVWg5IB3ON0l6ZQ==": {
+      "description": "Brand page: title of the delete dialog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Marke löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NdyD0BMtpYJJ0EvWJZUC7A==": {
+      "description": "Brand page: delete dialog text",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} wird gelöscht. Das kann nicht rückgängig gemacht werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2OlLSlOLHU+0LDeRvVOLhA==": {
+      "description": "Brand form: label of the field for the brand's name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ISgvIyfbPdNEx1iYgqkxyg==": {
+      "description": "Brand form: label of the field for the brand's slug, its key in URLs",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Slug",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qUegr8Y6xCI8qkpScMd/VA==": {
+      "description": "Brand form: hint below the brand's slug",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kleinbuchstaben und Ziffern, verbunden mit - oder _.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lKAcpqAxh8HnWYEsldLX8w==": {
+      "description": "Brand form: label of the brand's optional description",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beschreibung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "o6+WlwkPn6AP+lT93PVy/w==": {
+      "description": "Product form: accessible name of the button that closes the slide-over adding a brand or manufacturer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IHeCdpTvinYHJ2+P+MqS6A==": {
+      "description": "Product form: button that closes the slide-over adding a brand or manufacturer without adding it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vEsLqw3UOrviRXCopo8FPA==": {
+      "description": "Product form: last option of the brand select, opens a slide-over to add one",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Marke anlegen…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "E/FzC8rDH//SH1BHr7x+8Q==": {
+      "description": "Product form: title of the slide-over that adds a brand",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Marke",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "u4+2+7XQB+skhPCtbf7LEQ==": {
+      "description": "Product form: text in the slide-over that adds a brand or manufacturer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sie wird mit dem Produkt gespeichert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WoPsr9faLDc10z9gQBQYGw==": {
+      "description": "Product form: button that adds the brand or manufacturer from the slide-over to the select",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GFP2eVciT06CtV3FF5ducQ==": {
+      "description": "Product form: button below the brand select that opens the added brand's fields with their errors",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Marke korrigieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "App8haAYenoYqz9nOTxO2A==": {
+      "description": "Product form: button that picks the existing brand with the added one's slug instead",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} verwenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F5CjgNlyt5jCQn3rI2revg==": {
+      "description": "Product form: last option of the manufacturer select, opens a slide-over to add one",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hersteller anlegen…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IdWFkZ9tyNBUfoKneIVAPg==": {
+      "description": "Product form: title of the slide-over that adds a manufacturer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Hersteller",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tMh1XM63KAHYEX+I3dkZww==": {
+      "description": "Product form: button below the manufacturer select that opens the added manufacturer's fields with their errors",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hersteller korrigieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "107hOCPtXfTa63BkmxX+JA==": {
+      "description": "Product form: button that picks the existing manufacturer with the added one's name instead",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} verwenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sfvA0mo5IlLTz3MtYPDdXA==": {
+      "description": "Product form: heading of the responsible person's fields in the slide-over that adds a manufacturer",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verantwortliche Person in der EU",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+dogn5Dv+wfVWFexxBwQiw==": {
+      "description": "Product form: title of the slide-over that changes the picked brand or the one added on the form",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Marke bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FLNeAnIFDp4qoj0BuqxAPg==": {
+      "description": "Product form: text in the slide-over that changes an existing brand, which every product with it shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von {products} Produkten verwendet. Beim Speichern des Produkts ändert es sich bei allen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ndHY2z/VQNvIEFsr+l1jQw==": {
+      "description": "Product form: text in the slide-over that changes an existing brand, which every product with it shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von 1 Produkt verwendet. Beim Speichern des Produkts ändert es sich bei allen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nCw2pTaY3I6yqq47gCiXiw==": {
+      "description": "Product form: button that keeps the slide-over's changes to the brand or manufacturer, saved with the product",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Übernehmen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m5voHxDRnStm4RAO6snmoQ==": {
+      "description": "Product form: error below the brand select when the brand added or changed on the form isn't valid",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Prüfe die Felder der Marke.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CQqLwXaAMbaox2nEfXPsxQ==": {
+      "description": "Product form: title of the slide-over that changes the picked manufacturer or the one added on the form",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hersteller bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UHW+Lyyvsb00wigpJAg7BA==": {
+      "description": "Product form: text in the slide-over that changes an existing manufacturer, which every product with it shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von {products} Produkten verwendet. Beim Speichern des Produkts ändert es sich bei allen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P5qvNU5jpsFQ1YR8jN1S3w==": {
+      "description": "Product form: text in the slide-over that changes an existing manufacturer, which every product with it shows",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Von 1 Produkt verwendet. Beim Speichern des Produkts ändert es sich bei allen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2P12VOq9MxVWkSD8D2jLVA==": {
+      "description": "Product form: error below the manufacturer select when the manufacturer added or changed on the form isn't valid",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Prüfe die Felder des Herstellers.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GWczhjMyYMVoilyQzfp9Gg==": {
+      "description": "Product form: text button that shows on hover in a row of the brand or manufacturer select and opens that row's fields in a slide-over",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nRuvYyKu5lYOgr5yKvpjnA==": {
+      "description": "Product form: accessible name of the button in a row of the brand select that opens that brand's fields in a slide-over",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EIQlLQTh/Rt1f2cGNM51LQ==": {
+      "description": "Product form: accessible name of the button in a row of the manufacturer select that opens that manufacturer's fields in a slide-over",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

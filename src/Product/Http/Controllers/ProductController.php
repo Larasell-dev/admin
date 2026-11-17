@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Larasell\Admin\Brand\Data\BrandOptionData;
 use Larasell\Admin\Category\Data\CategoryOptionData;
+use Larasell\Admin\Manufacturer\Data\ManufacturerOptionData;
 use Larasell\Admin\Platform\Audit\CurrentOrigin;
 use Larasell\Admin\Platform\ContentLocale\CurrentContentLocale;
 use Larasell\Admin\Platform\Sections\SectionContext;
@@ -35,8 +37,15 @@ use Larasell\Larasell\Catalog\Actions\UpdateProductPayload;
 use Larasell\Larasell\Catalog\Actions\UpdateProductVariant;
 use Larasell\Larasell\Catalog\AttributeScope;
 use Larasell\Larasell\Catalog\AttributeValueId;
+use Larasell\Larasell\Catalog\Brands\Actions\CreateBrand;
+use Larasell\Larasell\Catalog\Brands\Actions\UpdateBrand;
+use Larasell\Larasell\Catalog\Brands\BrandId;
 use Larasell\Larasell\Catalog\CategoryId;
 use Larasell\Larasell\Catalog\CoreProductType;
+use Larasell\Larasell\Catalog\Keep;
+use Larasell\Larasell\Catalog\Manufacturers\Actions\CreateManufacturer;
+use Larasell\Larasell\Catalog\Manufacturers\Actions\UpdateManufacturer;
+use Larasell\Larasell\Catalog\Manufacturers\ManufacturerId;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\Models\ProductAttribute;
@@ -86,6 +95,10 @@ class ProductController
             countries: EditProductPageData::countries(),
             attributes: ProductAttributeFieldData::forProduct(null, $locale),
             attributesUrl: route('larasell.admin.attributes.index'),
+            brands: BrandOptionData::options($locale),
+            manufacturers: ManufacturerOptionData::options(),
+            checkBrandUrl: route('larasell.admin.brands.validate'),
+            checkManufacturerUrl: route('larasell.admin.manufacturers.validate'),
         ));
     }
 
@@ -97,6 +110,7 @@ class ProductController
     {
         // With the sections' own fields, so a section that fails leaves no product behind.
         $product = DB::transaction(function () use ($origin, $request, $locale): Product {
+            [$brandId, $manufacturerId] = $this->brandAndManufacturer($request, $locale, $origin);
             $product = $this->createProduct->handle(new CreateProductPayload(type: $request->productType()->key(), attributes: [
                 'name' => Translatable::fromString($request->validated('name'), $locale->value),
                 'status' => $request->validated('status'),
@@ -106,7 +120,8 @@ class ProductController
                 'dimensions' => $request->dimensions(),
                 ...$request->stock(),
                 'price' => Price::of(0),
-            ], attachments: $request->attachments()), $origin);
+            ], attachments: $request->attachments(), // A new product has no brand or manufacturer unless the form picked one.
+                brandId: $brandId instanceof BrandId ? $brandId : null, manufacturerId: $manufacturerId instanceof ManufacturerId ? $manufacturerId : null), $origin);
 
             $this->saveRelations($request, $product, $origin);
             $this->saved($request, $product, true, $locale);
@@ -132,6 +147,10 @@ class ProductController
             countries: EditProductPageData::countries(),
             attributes: ProductAttributeFieldData::forProduct($product, $locale),
             attributesUrl: route('larasell.admin.attributes.index'),
+            brands: BrandOptionData::options($locale),
+            manufacturers: ManufacturerOptionData::options(),
+            checkBrandUrl: route('larasell.admin.brands.validate'),
+            checkManufacturerUrl: route('larasell.admin.manufacturers.validate'),
             variants: ProductVariantsData::fromProduct($product, $locale),
         ));
     }
@@ -144,6 +163,7 @@ class ProductController
     {
         // With the sections' own fields, so a section that fails leaves the product unchanged.
         DB::transaction(function () use ($origin, $request, $product, $locale): void {
+            [$brandId, $manufacturerId] = $this->brandAndManufacturer($request, $locale, $origin);
             $stock = $request->stock();
             // The product checks each quantity limit against the other one it has as it's set, so
             // a new range wholly above the old one sets its maximum first, and any other its minimum.
@@ -160,7 +180,7 @@ class ProductController
                 'dimensions' => $request->dimensions(),
                 ...$limits,
                 ...array_diff_key($stock, $limits),
-            ], $request->attachments()), $origin);
+            ], $request->attachments(), $brandId, $manufacturerId), $origin);
 
             $this->saveRelations($request, $product, $origin);
             $this->saved($request, $product, false, $locale);
@@ -246,5 +266,36 @@ class ProductController
     {
         // One query for the whole tree; the Category relations would query once per level.
         return CategoryOptionData::tree(Category::query()->orderBy('position')->orderBy('id')->get(), $locale);
+    }
+
+    /**
+     * The brand and manufacturer the form picked, first creating the ones it added and changing
+     * the ones it edited, in the product's transaction, so a product that fails to save leaves
+     * no brand behind and changes none.
+     *
+     * @return array{BrandId|Keep|null, ManufacturerId|Keep|null}
+     */
+    private function brandAndManufacturer(ProductRequest $request, Locale $locale, Origin $origin): array
+    {
+        $brand = $request->newBrand($locale);
+        $manufacturer = $request->newManufacturer();
+        // Added ones are "new", which has no id.
+        $brandId = $brand === null ? $request->brandId() : null;
+        $manufacturerId = $manufacturer === null ? $request->manufacturerId() : null;
+        $brandChanges = $request->brandChanges($locale);
+        $manufacturerChanges = $request->manufacturerChanges();
+
+        if ($brandChanges !== null && $brandId instanceof BrandId) {
+            app(UpdateBrand::class)->handle($brandId, $brandChanges, $origin);
+        }
+
+        if ($manufacturerChanges !== null && $manufacturerId instanceof ManufacturerId) {
+            app(UpdateManufacturer::class)->handle($manufacturerId, $manufacturerChanges, $origin);
+        }
+
+        return [
+            $brand === null ? $brandId : BrandId::of(app(CreateBrand::class)->handle($brand, $origin)),
+            $manufacturer === null ? $manufacturerId : ManufacturerId::of(app(CreateManufacturer::class)->handle($manufacturer, $origin)),
+        ];
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Larasell\Admin\Product\Data;
 
+use Larasell\Admin\Brand\Data\BrandOptionData;
 use Larasell\Admin\Category\Data\CategoryOptionData;
+use Larasell\Admin\Manufacturer\Data\ManufacturerOptionData;
 use Larasell\Admin\Platform\Sections\Data\SectionData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
@@ -27,5 +29,13 @@ class CreateProductPageData extends Data
         public array $attributes,
         /** The catalog's attributes, where their values are defined. */
         public string $attributesUrl,
+        /** @var array<int, BrandOptionData> */
+        public array $brands,
+        /** @var array<int, ManufacturerOptionData> */
+        public array $manufacturers,
+        /** Checks a brand added or changed on the form, which saves nothing. */
+        public string $checkBrandUrl,
+        /** Checks a manufacturer added or changed on the form, which saves nothing. */
+        public string $checkManufacturerUrl,
     ) {}
 }

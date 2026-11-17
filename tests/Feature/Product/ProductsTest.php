@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia;
 use Larasell\Admin\Platform\Auth\Models\Admin;
@@ -10,13 +11,19 @@ use Larasell\Admin\Platform\Sections\Facades\Section;
 use Larasell\Admin\Platform\Sections\SectionForm;
 use Larasell\Larasell\Catalog\AttributeCardinality;
 use Larasell\Larasell\Catalog\AttributeScope;
+use Larasell\Larasell\Catalog\Brands\Models\Brand;
+use Larasell\Larasell\Catalog\Events\ProductCreated;
+use Larasell\Larasell\Catalog\Manufacturers\Models\Manufacturer;
+use Larasell\Larasell\Catalog\Manufacturers\PostalAddress;
 use Larasell\Larasell\Catalog\Models\Category;
 use Larasell\Larasell\Catalog\Models\Product;
 use Larasell\Larasell\Catalog\Models\ProductAttribute;
 use Larasell\Larasell\Catalog\Options\Models\OptionDefinition;
 use Larasell\Larasell\Catalog\ProductType;
 use Larasell\Larasell\Dimensions;
+use Larasell\Larasell\Enums\Country;
 use Larasell\Larasell\Enums\LengthUnit;
+use Larasell\Larasell\Enums\Locale;
 use Larasell\Larasell\Enums\Visibility;
 use Larasell\Larasell\Enums\WeightUnit;
 use Larasell\Larasell\Facades\ProductCapabilities;
@@ -178,6 +185,8 @@ it('shows the product\'s values to edit on its page', function () {
                 'minQuantity' => null,
                 'maxQuantity' => null,
                 'categoryIds' => [],
+                'brandId' => null,
+                'manufacturerId' => null,
             ])
             ->where('updateUrl', route('larasell.admin.products.update', $boots))
             ->where('indexUrl', route('larasell.admin.products.index')));
@@ -986,6 +995,9 @@ it('turns the products off when disabled in the config', function () {
     $this->get('/admin/products')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get('/admin/products/create')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->post('/admin/products')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    // Brands and manufacturers are only picked on products, so they go with them.
+    $this->get('/admin/brands')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
+    $this->get('/admin/manufacturers')->assertNotFound(); // @phpstan-ignore larasell.preferRouteHelper
     $this->get(route('larasell.admin.home'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('navigation', fn ($items) => ! collect($items)->pluck('label')->contains('Products')));
@@ -1188,4 +1200,204 @@ it('skips the gaps Inertia sends when it turns options keyed by ID into a list',
 
     // Assert
     expect($boots->options()->sole()->option_definition_id)->toBe($size->id);
+});
+
+/** @return array{Brand, Manufacturer} */
+function brandAndManufacturer(): array
+{
+    return [
+        Brand::create(['slug' => 'acme', 'name' => ['en' => 'Acme']]),
+        Manufacturer::create(['name' => 'Acme Inc.', 'address' => new PostalAddress('1 Main Street', '12345', 'Springfield', Country::US)]),
+    ];
+}
+
+it('creates a product with its brand and manufacturer', function () {
+    // Arrange
+    signInAdmin();
+    [$brand, $manufacturer] = brandAndManufacturer();
+
+    // Act
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Hammer', 'status' => 'visible', 'brand_id' => $brand->id, 'manufacturer_id' => $manufacturer->id])
+        ->assertSessionHasNoErrors();
+
+    // Assert
+    expect(Product::query()->sole()->only('brand_id', 'manufacturer_id'))->toBe(['brand_id' => $brand->id, 'manufacturer_id' => $manufacturer->id]);
+});
+
+it('removes the brand and manufacturer sent empty, and keeps them when left out', function () {
+    // Arrange
+    signInAdmin();
+    [$brand, $manufacturer] = brandAndManufacturer();
+    $hammer = Product::create(['name' => 'Hammer', 'price' => Price::of(1000), 'brand_id' => $brand->id, 'manufacturer_id' => $manufacturer->id]);
+
+    // Act
+    $this->put(route('larasell.admin.products.update', $hammer), ['name' => 'Hammer', 'status' => 'visible'])->assertSessionHasNoErrors();
+    $kept = $hammer->refresh()->only('brand_id', 'manufacturer_id');
+    $this->put(route('larasell.admin.products.update', $hammer), ['name' => 'Hammer', 'status' => 'visible', 'brand_id' => '', 'manufacturer_id' => ''])->assertSessionHasNoErrors();
+
+    // Assert
+    expect($kept)->toBe(['brand_id' => $brand->id, 'manufacturer_id' => $manufacturer->id])
+        ->and($hammer->refresh()->only('brand_id', 'manufacturer_id'))->toBe(['brand_id' => null, 'manufacturer_id' => null]);
+});
+
+it('rejects a brand or manufacturer that does not exist', function () {
+    // Arrange
+    signInAdmin();
+
+    // Act & Assert
+    $this->post(route('larasell.admin.products.store'), ['name' => 'Hammer', 'status' => 'visible', 'brand_id' => 999, 'manufacturer_id' => 999])
+        ->assertSessionHasErrors(['brand_id', 'manufacturer_id']);
+});
+
+it('offers the brands and manufacturers to pick, with the product\'s', function () {
+    // Arrange
+    signInAdmin();
+    [$brand, $manufacturer] = brandAndManufacturer();
+    $hammer = Product::create(['name' => 'Hammer', 'price' => Price::of(1000), 'brand_id' => $brand->id]);
+
+    // Act & Assert
+    $this->get(route('larasell.admin.products.edit', $hammer))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('brands', [['id' => $brand->id, 'name' => 'Acme', 'slug' => 'acme', 'fields' => ['name' => 'Acme', 'slug' => 'acme', 'description' => ''], 'products' => 1]])
+            ->where('manufacturers.0.id', $manufacturer->id)
+            ->where('manufacturers.0.products', 0)
+            ->where('manufacturers.0.fields', [
+                'name' => 'Acme Inc.', 'email' => '', 'url' => '',
+                'address[street]' => '1 Main Street', 'address[postcode]' => '12345', 'address[city]' => 'Springfield', 'address[state]' => '', 'address[country]' => 'US',
+                'responsible_person[name]' => '', 'responsible_person[email]' => '',
+                'responsible_person[address][street]' => '', 'responsible_person[address][postcode]' => '', 'responsible_person[address][city]' => '', 'responsible_person[address][state]' => '', 'responsible_person[address][country]' => '',
+            ])
+            ->where('product.brandId', $brand->id)
+            ->where('product.manufacturerId', null));
+});
+
+/** @return array<string, mixed> A manufacturer as the slide-over sends it. */
+function newManufacturerFields(array $overrides = []): array
+{
+    return array_replace_recursive([
+        'name' => 'Acme Inc.',
+        'email' => 'legal@acme.test',
+        'address' => ['street' => '1 Main Street', 'postcode' => '12345', 'city' => 'Springfield', 'country' => 'US'],
+        'responsible_person' => ['name' => '', 'address' => ['street' => '', 'postcode' => '', 'city' => '', 'country' => '']],
+    ], $overrides);
+}
+
+it('creates the brand and manufacturer the product page added, with the product', function () {
+    // Arrange
+    signInAdmin();
+
+    // Act
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => 'new', 'new_brand' => ['name' => 'Acme', 'slug' => 'acme', 'description' => 'Tools'],
+        'manufacturer_id' => 'new', 'new_manufacturer' => newManufacturerFields(),
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    $hammer = Product::query()->sole();
+    expect($hammer->brand?->slug)->toBe('acme')
+        ->and($hammer->brand?->description?->all())->toBe(['en' => 'Tools'])
+        ->and($hammer->manufacturer?->name)->toBe('Acme Inc.')
+        ->and($hammer->manufacturer?->responsible_person)->toBeNull()
+        ->and(DB::table('larasell_audit_log')->whereIn('event', ['brand.created', 'manufacturer.created'])->count())->toBe(2);
+});
+
+it('sets a new brand on an existing product when it is saved', function () {
+    // Arrange
+    signInAdmin();
+    $hammer = Product::create(['name' => 'Hammer', 'price' => Price::of(1000)]);
+
+    // Act
+    $this->put(route('larasell.admin.products.update', $hammer), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => 'new', 'new_brand' => ['name' => 'Acme', 'slug' => 'acme'],
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    expect($hammer->refresh()->brand?->slug)->toBe('acme');
+});
+
+it('creates no new brand when the product picked an existing one', function () {
+    // Arrange
+    signInAdmin();
+    [$brand] = brandAndManufacturer();
+
+    // Act
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => $brand->id, 'new_brand' => ['name' => 'Other', 'slug' => 'other'],
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    expect(Brand::query()->pluck('slug')->all())->toBe(['acme'])
+        ->and(Product::query()->sole()->brand_id)->toBe($brand->id);
+});
+
+it('reports the new brand\'s and manufacturer\'s errors under their own keys, and saves nothing', function () {
+    // Arrange
+    signInAdmin();
+    brandAndManufacturer();
+
+    // Act & Assert
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => 'new', 'new_brand' => ['name' => 'Acme', 'slug' => 'acme'],
+        'manufacturer_id' => 'new', 'new_manufacturer' => newManufacturerFields([
+            'address' => ['city' => ''],
+            'responsible_person' => ['name' => 'Acme GmbH'],
+        ]),
+    ])->assertSessionHasErrors(['new_brand.slug', 'new_manufacturer.address.city', 'new_manufacturer.responsible_person.address.street']);
+    expect(Product::query()->exists())->toBeFalse()
+        ->and(Brand::query()->count())->toBe(1);
+});
+
+it('rolls the new brand back, audit included, when the product fails to save', function () {
+    // Arrange
+    signInAdmin();
+    $this->withoutExceptionHandling();
+    Event::listen(ProductCreated::class, fn () => throw new RuntimeException('Product failed after the brand was created.'));
+
+    // Act
+    $save = fn () => $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => 'new', 'new_brand' => ['name' => 'Acme', 'slug' => 'acme'],
+    ]);
+
+    // Assert
+    expect($save)->toThrow(RuntimeException::class);
+    expect(Brand::query()->exists())->toBeFalse()
+        ->and(DB::table('larasell_audit_log')->where('event', 'brand.created')->exists())->toBeFalse();
+});
+
+it('saves changes to the picked brand and manufacturer with the product', function () {
+    // Arrange
+    signInAdmin();
+    [$brand, $manufacturer] = brandAndManufacturer();
+    $hammer = Product::create(['name' => 'Hammer', 'price' => Price::of(1000)]);
+
+    // Act
+    $this->put(route('larasell.admin.products.update', $hammer), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => $brand->id, 'brand_changes' => ['name' => 'Acme Tools', 'slug' => 'acme'],
+        'manufacturer_id' => $manufacturer->id, 'manufacturer_changes' => newManufacturerFields(['name' => 'Acme GmbH']),
+    ])->assertSessionHasNoErrors();
+
+    // Assert
+    expect($hammer->refresh()->brand?->name->get(Locale::ENGLISH->value))->toBe('Acme Tools')
+        ->and($hammer->manufacturer?->name)->toBe('Acme GmbH')
+        ->and(DB::table('larasell_audit_log')->whereIn('event', ['brand.updated', 'manufacturer.updated'])->count())->toBe(2);
+});
+
+it('reports errors in the picked brand\'s changes under their own keys', function () {
+    // Arrange
+    signInAdmin();
+    [$brand] = brandAndManufacturer();
+    Brand::create(['slug' => 'bolt', 'name' => ['en' => 'Bolt']]);
+
+    // Act & Assert
+    $this->post(route('larasell.admin.products.store'), [
+        'name' => 'Hammer', 'status' => 'visible',
+        'brand_id' => $brand->id, 'brand_changes' => ['name' => 'Acme', 'slug' => 'bolt'],
+    ])->assertSessionHasErrors(['brand_changes.slug']);
+    expect(Product::query()->exists())->toBeFalse();
 });
