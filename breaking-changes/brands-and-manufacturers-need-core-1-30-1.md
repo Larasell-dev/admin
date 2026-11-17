@@ -1,8 +1,8 @@
-# The panel needs larasell-dev/larasell ^1.31 for brands and manufacturers
+# The panel needs larasell-dev/larasell ^1.30.1 for brands and manufacturers
 
 The panel now has **Brands** and **Manufacturers** pages under Products, and the
 product form picks a product's brand and manufacturer. Both come from the core's
-new `Catalog\Brands` and `Catalog\Manufacturers`, which need core 1.31 and its
+new `Catalog\Brands` and `Catalog\Manufacturers`, which need core 1.30.1 and its
 migrations.
 
 ## Why
@@ -20,7 +20,7 @@ add the `larasell_brands` and `larasell_manufacturers` tables, nullable
 `brand_name` and `manufacturer` snapshots on `larasell_order_items`:
 
 ```bash
-composer require larasell-dev/larasell:^1.31
+composer require larasell-dev/larasell:^1.30.1
 php artisan migrate
 ```
 
